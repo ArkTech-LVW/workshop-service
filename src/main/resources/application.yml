@@ -1,6 +1,9 @@
 spring:
   application:
     name: workshop-service
+  web:
+    locale: pt_BR
+    locale-resolver: fixed
 
 server:
   port: 8080
