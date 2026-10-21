@@ -28,9 +28,10 @@ br.com.arktech.workshop
 api ──> application ──> domain <── infrastructure
 ```
 
-- `domain` **não importa** `api`, `application`, `infrastructure` nem Spring (`org.springframework..`).
+- `domain` **não importa** `api`, `application`, `infrastructure`, Spring (`org.springframework..`) nem Hibernate (`org.hibernate..`). Anotações `jakarta.persistence` são permitidas.
 - `application` não importa `api` nem `infrastructure`.
 - `api` não importa `infrastructure`.
+- Repositórios Spring Data (`JpaRepository` etc.) só existem na `infrastructure`.
 
 Essas regras são verificadas pelo teste ArchUnit `LayerDependencyTest`, e uma violação **quebra o build**.
 
@@ -49,6 +50,61 @@ Essas regras são verificadas pelo teste ArchUnit `LayerDependencyTest`, e uma v
 - Datas em ISO-8601.
 - Valores monetários em `BigDecimal`.
 
+## Banco de dados e persistência
+
+PostgreSQL 18 com Spring Data JPA e Flyway. Os motivos estão no [ADR 001](docs/adr/001-database.md).
+
+### Migrations
+
+- O esquema vem **só das migrations** (`ddl-auto=validate`): toda tabela, coluna ou índice novo entra por uma migration em `src/main/resources/db/migration`.
+- Nome no padrão `V<n>__<description>.sql`, com a descrição em inglês e snake_case (ex.: `V2__create_customers.sql`). Use o próximo número livre na `main`; se outro PR mergear a mesma versão antes do seu, renumere a sua.
+- **Nunca altere uma migration que já está na `main`.** Para corrigir, crie uma nova.
+- Tabelas no plural e colunas em inglês e snake_case (`service_orders`, `created_at`).
+- Chave primária: `id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY`.
+
+### Entidades e repositórios
+
+As entidades de domínio levam as anotações `jakarta.persistence` direto. O repositório é uma interface Java pura no domínio, e a infraestrutura a implementa com Spring Data:
+
+```java
+// <module>/domain
+@Entity
+@Table(name = "customers")
+public class Customer {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    protected Customer() {} // exigido pelo JPA
+
+    // O id só existe após o persist: duas entidades novas nunca são iguais
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Customer other)) return false;
+        return id != null && id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+}
+
+public interface CustomerRepository {
+    Customer save(Customer customer);
+    Optional<Customer> findById(Long id);
+}
+
+// <module>/infrastructure
+interface CustomerJpaRepository extends JpaRepository<Customer, Long>, CustomerRepository {}
+```
+
+- Os métodos da interface do domínio seguem as convenções de nome do Spring Data (`save`, `findById`, `findByDocument`...), que gera a implementação. Consultas que não dá para derivar do nome são redeclaradas na interface da infraestrutura com `@Query`.
+- A `application` injeta sempre a interface do domínio (`CustomerRepository`), nunca a do Spring Data.
+- Transações (`@Transactional`) ficam nos casos de uso da `application`.
+
 ## Lombok
 
 - **Liberado:** `@RequiredArgsConstructor`, `@Getter`, `@Slf4j` e `@Builder` quando fizer sentido.
@@ -65,6 +121,9 @@ Essas regras são verificadas pelo teste ArchUnit `LayerDependencyTest`, e uma v
 
 - Testes automatizados com **JUnit**.
 - `./gradlew build` roda todos os testes e precisa passar antes de abrir o PR.
+- **Unitários:** JUnit puro, sem Spring e sem banco. É o padrão para domínio e regras de negócio.
+- **Integração:** anote a classe com `@IntegrationTest` (ou `@IntegrationTest(webEnvironment = RANDOM_PORT)` para chamar via HTTP). A anotação sobe a aplicação inteira contra um PostgreSQL real (Testcontainers) e marca o teste com a tag JUnit `integration`. O Docker precisa estar rodando.
+- Use `@IntegrationTest` só quando o teste precisa da aplicação ou do banco de verdade. Testes com a mesma configuração compartilham contexto e container; cada configuração diferente (ex.: outro `webEnvironment`) sobe os seus.
 
 ## Pull Requests
 
