@@ -7,6 +7,7 @@ import com.tngtech.archunit.core.importer.ImportOption.DoNotIncludeTests;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
+import jakarta.persistence.Entity;
 import org.springframework.data.repository.Repository;
 
 // Rules apply to every module (<module>/{api,application,domain,infrastructure}).
@@ -25,7 +26,8 @@ class LayerDependencyTest {
             .resideInAPackage(DOMAIN)
             .should()
             .dependOnClassesThat()
-            .resideInAnyPackage(API, APPLICATION, INFRASTRUCTURE, "org.springframework..", "org.hibernate..")
+            .resideInAnyPackage(
+                    API, APPLICATION, INFRASTRUCTURE, "org.springframework..", "org.hibernate..", "jakarta.persistence..")
             .allowEmptyShould(true);
 
     @ArchTest
@@ -50,6 +52,14 @@ class LayerDependencyTest {
     static final ArchRule springDataRepositoriesResideInInfrastructure = classes()
             .that()
             .areAssignableTo(Repository.class)
+            .should()
+            .resideInAPackage(INFRASTRUCTURE)
+            .allowEmptyShould(true);
+
+    @ArchTest
+    static final ArchRule jpaEntitiesResideInInfrastructure = classes()
+            .that()
+            .areAnnotatedWith(Entity.class)
             .should()
             .resideInAPackage(INFRASTRUCTURE)
             .allowEmptyShould(true);
