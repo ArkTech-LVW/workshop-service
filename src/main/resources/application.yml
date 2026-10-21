@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: workshop-service
+  profiles:
+    active: development
+  web:
+    locale: pt_BR
+    locale-resolver: fixed
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
