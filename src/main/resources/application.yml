@@ -11,7 +11,6 @@ spring:
   jpa:
     open-in-view: false
     hibernate:
-      # Schema comes only from the Flyway migrations in db/migration
       ddl-auto: validate
 
 server:

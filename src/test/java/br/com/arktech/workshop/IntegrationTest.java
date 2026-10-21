@@ -11,8 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.AliasFor;
 
-// Boots the whole application against a real PostgreSQL (Testcontainers).
-// Unit tests use plain JUnit and never need this annotation.
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

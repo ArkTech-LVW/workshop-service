@@ -19,7 +19,6 @@ class LayerDependencyTest {
     private static final String DOMAIN = "br.com.arktech.workshop..domain..";
     private static final String INFRASTRUCTURE = "br.com.arktech.workshop..infrastructure..";
 
-    // jakarta.persistence is allowed in the domain; Spring and Hibernate-specific APIs are not
     @ArchTest
     static final ArchRule domainDependsOnNothingElse = noClasses()
             .that()

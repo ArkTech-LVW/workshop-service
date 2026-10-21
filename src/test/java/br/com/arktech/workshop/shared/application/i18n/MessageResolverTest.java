@@ -12,7 +12,6 @@ import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-// Loads only the i18n beans and application.yml placeholders, not the whole application, so no database is needed
 @SpringBootTest(classes = MessageResolverTest.I18nOnly.class)
 class MessageResolverTest {
 

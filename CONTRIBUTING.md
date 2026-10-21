@@ -78,20 +78,7 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    protected Customer() {} // exigido pelo JPA
-
-    // O id só existe após o persist: duas entidades novas nunca são iguais
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Customer other)) return false;
-        return id != null && id.equals(other.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
+    protected Customer() {}
 }
 
 public interface CustomerRepository {
@@ -103,6 +90,7 @@ public interface CustomerRepository {
 interface CustomerJpaRepository extends JpaRepository<Customer, Long>, CustomerRepository {}
 ```
 
+- O construtor `protected` sem argumentos existe porque o JPA exige.
 - Os métodos da interface do domínio seguem as convenções de nome do Spring Data (`save`, `findById`, `findByDocument`...), que gera a implementação. Consultas que não dá para derivar do nome são redeclaradas na interface da infraestrutura com `@Query`.
 - A `application` injeta sempre a interface do domínio (`CustomerRepository`), nunca a do Spring Data.
 - Transações (`@Transactional`) ficam nos casos de uso da `application`.
