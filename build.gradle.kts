@@ -1,5 +1,6 @@
 plugins {
     java
+    jacoco
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependency.management)
 }
@@ -43,4 +44,8 @@ tasks.withType<Test> {
     // Run tests with a non pt-BR JVM locale (like Docker/CI) so i18n defaults are actually exercised
     systemProperty("user.language", "en")
     systemProperty("user.country", "US")
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
 }
