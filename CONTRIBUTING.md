@@ -165,8 +165,15 @@ class CustomerRepositoryAdapter implements CustomerRepository {
 - **Unitários:** JUnit puro, sem Spring e sem banco. É o padrão para domínio e regras de negócio.
 - **Integração:** anote a classe com `@IntegrationTest` (ou `@IntegrationTest(webEnvironment = RANDOM_PORT)` para chamar via HTTP). A anotação sobe a aplicação inteira contra um PostgreSQL real (Testcontainers) e marca o teste com a tag JUnit `integration`. O Docker precisa estar rodando.
 - Use `@IntegrationTest` só quando o teste precisa da aplicação ou do banco de verdade. Testes com a mesma configuração compartilham contexto e container; cada configuração diferente (ex.: outro `webEnvironment`) sobe os seus.
+- **Cobertura:** o `./gradlew build` também gera o relatório do JaCoCo em `build/reports/jacoco/test/html/index.html`, mesmo quando algum teste falha.
 
 ## Pull Requests
 
 - Todo PR é aberto para a `main` usando o template do repositório, com o link da tarefa no Jira.
 - O merge é feito com **merge commit**.
+
+### CI
+
+- O workflow `.github/workflows/ci.yml` roda `./gradlew build` (compilação, testes unitários e de integração, cobertura) em todo PR e em todo push na `main`, com JDK 25 (Temurin) e cache do Gradle. O runner do GitHub já vem com Docker, então os testes de integração sobem o PostgreSQL via Testcontainers como na sua máquina.
+- O check `build` é obrigatório na `main`: PR com build ou teste quebrado não pode ser mergeado.
+- O relatório de cobertura fica no artefato `coverage-report` de cada execução (página da execução no GitHub Actions, seção *Artifacts*).

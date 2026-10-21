@@ -1,5 +1,7 @@
 # workshop-service
 
+[![CI](https://github.com/ArkTech-LVW/workshop-service/actions/workflows/ci.yml/badge.svg)](https://github.com/ArkTech-LVW/workshop-service/actions/workflows/ci.yml)
+
 API de gestão de oficina mecânica (clientes, veículos, ordens de serviço e estoque).
 
 ## Pré-requisitos
@@ -14,7 +16,7 @@ Não é preciso instalar o Gradle: use o wrapper (`./gradlew`, ou `gradlew.bat` 
 ## Como rodar
 
 ```bash
-# Compila e roda todos os testes
+# Compila, roda todos os testes e gera o relatório de cobertura (build/reports/jacoco/test/html)
 ./gradlew build
 
 # Sobe o PostgreSQL (docker-compose.yml) e a aplicação em http://localhost:8080
