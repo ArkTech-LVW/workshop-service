@@ -24,6 +24,7 @@ dependencies {
     implementation(libs.spring.boot.starter.flyway)
     implementation(libs.flyway.database.postgresql)
     runtimeOnly(libs.postgresql)
+    developmentOnly(libs.spring.boot.docker.compose)
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
 
