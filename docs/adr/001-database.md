@@ -21,7 +21,7 @@ Além disso, o esquema precisa ser versionado, testável contra o banco real e r
 | Transação multi-tabela / multi-documento | ACID completo, `SELECT ... FOR UPDATE` | ACID (InnoDB) | Só com replica set, e o agregado da OS deixa de ser o único documento envolvido |
 | Integridade (FK, UNIQUE, CHECK) | Sim | Sim (CHECK só a partir da 8.0.16) | Não: fica a cargo da aplicação |
 | Relatórios | CTEs, window functions, `interval` com `avg()` | Funções analíticas mais limitadas, sem `interval` | Aggregation pipeline, sem SQL |
-| DDL transacional (migration que falha é revertida inteira) | Sim | Não | N/A |
+| DDL transacional (migration que falha é revertida inteira) | Sim | Não: cada instrução é atômica (8.0+), mas toda DDL faz commit implícito, então uma migration que falha no meio fica pela metade | N/A |
 | Encaixe na stack do épico (Spring Data JPA, Flyway, Testcontainers) | Total | Total | Exigiria Spring Data MongoDB e outra ferramenta de migration |
 
 ## Decisão
@@ -39,20 +39,20 @@ Além disso, o esquema precisa ser versionado, testável contra o banco real e r
 
 - Migrations em `src/main/resources/db/migration`, no padrão `V<n>__<description>.sql`, aplicadas pelo Flyway na subida da aplicação. `spring.jpa.hibernate.ddl-auto=validate`: o Hibernate apenas confere o mapeamento, e o esquema vem só das migrations.
 - `V1__baseline.sql` marca o início com o esquema vazio. Cada módulo cria as próprias tabelas na sua tarefa, a partir da V2.
-- Tabelas e colunas em inglês e snake_case, tabelas no plural (`service_orders`, `stock_movements`).
+- Tabelas e colunas em inglês e snake_case, tabelas no singular (`service_order`, `stock_movement`).
 - Conexão pelas variáveis `DB_URL`, `DB_USERNAME` e `DB_PASSWORD`, com padrões para `localhost` em desenvolvimento.
 - `spring.jpa.open-in-view=false`: nenhum acesso lazy fora da transação da `application`.
 - Imagem fixa `postgres:18.6-alpine` (oficial), a mesma no `docker-compose.yml` e nos testes. A imagem da Bitnami foi descartada porque o catálogo gratuito dela só publica a tag `latest`, o que impede fixar a versão.
 - Desenvolvimento: `./gradlew bootRun` sobe o PostgreSQL do `docker-compose.yml` sozinho, via `spring-boot-docker-compose`. Essa dependência existe só em desenvolvimento e não entra no jar.
 - Testes de integração (`@IntegrationTest`) contra PostgreSQL real via Testcontainers. Testes unitários não sobem banco.
 
-### Persistência nas entidades de domínio
+### Domínio separado da persistência
 
-- As entidades de domínio usam anotações **`jakarta.persistence`** diretamente. Não há entidades espelho na infraestrutura.
-  - **Por quê:** evita duplicar cada entidade e escrever mapeadores em todos os CRUDs. `jakarta.persistence` é uma especificação e não traz Spring para o domínio.
-  - **Custo aceito:** o domínio conhece nomes de tabelas e colunas e precisa de um construtor sem argumentos `protected` (exigência do JPA).
-- O domínio continua sem Spring e também não pode usar APIs específicas do Hibernate (`org.hibernate..`). O `LayerDependencyTest` (ArchUnit) verifica isso.
-- **Repositórios:** a interface fica no domínio, em Java puro. Na infraestrutura, uma interface Spring Data estende a do domínio e `JpaRepository`, e o Spring Data gera a implementação. A `application` injeta só a interface do domínio. Repositórios Spring Data só podem existir na infraestrutura (ArchUnit).
+- O domínio é Java puro: nenhuma anotação de persistência (`jakarta.persistence`), nem Spring, nem Hibernate. Entidades JPA e repositórios Spring Data só existem na infraestrutura. O `LayerDependencyTest` (ArchUnit) verifica tudo isso.
+- Cada módulo tem, na infraestrutura, a entidade JPA (`CustomerEntity`), a interface Spring Data (`CustomerJpaRepository`) e um adapter (`CustomerRepositoryAdapter`). O adapter implementa a interface de repositório do domínio e faz o mapeamento entre as duas representações, à mão. A `application` injeta só a interface do domínio.
+- No domínio, um construtor cria um objeto novo (sem id) e outro recebe o id para recriar um objeto vindo do banco.
+- Como o objeto de domínio não é gerenciado pelo Hibernate, toda alteração é gravada com `save` explícito no caso de uso.
+- **Alternativa considerada:** anotar as próprias entidades de domínio com `jakarta.persistence`. Evitaria a entidade JPA e o mapeamento em cada módulo, mas abre uma brecha na arquitetura em camadas: o domínio passaria a conhecer tabelas e colunas e a seguir as restrições do JPA (construtor sem argumentos, campos não finais, proxies). Como nenhum módulo existe ainda, separar agora não tem custo de migração.
 - **Chave primária:** `BIGINT GENERATED ALWAYS AS IDENTITY`, mapeada como `Long` com `GenerationType.IDENTITY`. É simples, legível e compacta nos índices. O número legível da OS (`SO-2026-000123`) é um campo à parte.
 
 ## Consequências
@@ -61,4 +61,5 @@ Além disso, o esquema precisa ser versionado, testável contra o banco real e r
 - **T0.4:** o `docker-compose.yml` já tem o serviço `postgres`. A T0.4 acrescenta o serviço da aplicação, lendo `DB_URL`, `DB_USERNAME` e `DB_PASSWORD`, e precisa garantir que o `bootRun` continue subindo só o banco (por exemplo, com `profiles` no serviço da aplicação ou um arquivo separado indicado em `spring.docker.compose.file`).
 - IDs sequenciais são enumeráveis. A API do cliente (T3.8) precisa autorizar pelo dono do recurso, nunca pela dificuldade de adivinhar o ID.
 - Dois PRs em paralelo podem criar a mesma versão de migration. Quem mergear por último renumera a sua antes do merge (o Flyway recusa versões duplicadas e o build quebra).
+- Cada módulo tem duas classes a mais (entidade JPA e adapter). Agregados com coleções, como a OS com itens e histórico (T3.1), mapeiam os filhos nos dois sentidos.
 - Em aberto: a interface de repositório do domínio não pode usar `Pageable`/`Page` do Spring Data. A primeira listagem paginada (ex.: T3.9) define o tipo de paginação a adotar.

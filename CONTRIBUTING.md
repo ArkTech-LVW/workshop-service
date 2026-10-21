@@ -28,10 +28,10 @@ br.com.arktech.workshop
 api ──> application ──> domain <── infrastructure
 ```
 
-- `domain` **não importa** `api`, `application`, `infrastructure`, Spring (`org.springframework..`) nem Hibernate (`org.hibernate..`). Anotações `jakarta.persistence` são permitidas.
+- `domain` **não importa** `api`, `application`, `infrastructure`, Spring (`org.springframework..`), Hibernate (`org.hibernate..`) nem JPA (`jakarta.persistence..`).
 - `application` não importa `api` nem `infrastructure`.
 - `api` não importa `infrastructure`.
-- Repositórios Spring Data (`JpaRepository` etc.) só existem na `infrastructure`.
+- Entidades JPA (`@Entity`) e repositórios Spring Data (`JpaRepository` etc.) só existem na `infrastructure`.
 
 Essas regras são verificadas pelo teste ArchUnit `LayerDependencyTest`, e uma violação **quebra o build**.
 
@@ -59,26 +59,31 @@ A imagem do banco tem versão fixa (`postgres:18.6-alpine`) e aparece em dois lu
 ### Migrations
 
 - O esquema vem **só das migrations** (`ddl-auto=validate`): toda tabela, coluna ou índice novo entra por uma migration em `src/main/resources/db/migration`.
-- Nome no padrão `V<n>__<description>.sql`, com a descrição em inglês e snake_case (ex.: `V2__create_customers.sql`). Use o próximo número livre na `main`; se outro PR mergear a mesma versão antes do seu, renumere a sua.
+- Nome no padrão `V<n>__<description>.sql`, com a descrição em inglês e snake_case (ex.: `V2__create_customer.sql`). Use o próximo número livre na `main`; se outro PR mergear a mesma versão antes do seu, renumere a sua.
 - **Nunca altere uma migration que já está na `main`.** Para corrigir, crie uma nova.
-- Tabelas no plural e colunas em inglês e snake_case (`service_orders`, `created_at`).
+- Tabelas no singular e colunas em inglês e snake_case (`service_order`, `created_at`).
 - Chave primária: `id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY`.
 
 ### Entidades e repositórios
 
-As entidades de domínio levam as anotações `jakarta.persistence` direto. O repositório é uma interface Java pura no domínio, e a infraestrutura a implementa com Spring Data:
+O domínio não sabe nada de banco. Cada módulo tem a classe de domínio e a interface do repositório no `domain`, e na `infrastructure` a entidade JPA, a interface Spring Data e um adapter que liga as duas:
 
 ```java
 // <module>/domain
-@Entity
-@Table(name = "customers")
+@Getter
 public class Customer {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private final Long id;
+    private String name;
 
-    protected Customer() {}
+    public Customer(String name) {
+        this(null, name);
+    }
+
+    public Customer(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }
 
 public interface CustomerRepository {
@@ -87,13 +92,59 @@ public interface CustomerRepository {
 }
 
 // <module>/infrastructure
-interface CustomerJpaRepository extends JpaRepository<Customer, Long>, CustomerRepository {}
+@Entity
+@Table(name = "customer")
+@Getter
+class CustomerEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+
+    protected CustomerEntity() {}
+
+    CustomerEntity(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+}
+
+interface CustomerJpaRepository extends JpaRepository<CustomerEntity, Long> {}
+
+@Component
+@RequiredArgsConstructor
+class CustomerRepositoryAdapter implements CustomerRepository {
+
+    private final CustomerJpaRepository jpaRepository;
+
+    @Override
+    public Customer save(Customer customer) {
+        return toDomain(jpaRepository.save(toEntity(customer)));
+    }
+
+    @Override
+    public Optional<Customer> findById(Long id) {
+        return jpaRepository.findById(id).map(this::toDomain);
+    }
+
+    private Customer toDomain(CustomerEntity entity) {
+        return new Customer(entity.getId(), entity.getName());
+    }
+
+    private CustomerEntity toEntity(Customer customer) {
+        return new CustomerEntity(customer.getId(), customer.getName());
+    }
+}
 ```
 
-- O construtor `protected` sem argumentos existe porque o JPA exige.
-- Os métodos da interface do domínio seguem as convenções de nome do Spring Data (`save`, `findById`, `findByDocument`...), que gera a implementação. Consultas que não dá para derivar do nome são redeclaradas na interface da infraestrutura com `@Query`.
-- A `application` injeta sempre a interface do domínio (`CustomerRepository`), nunca a do Spring Data.
-- Transações (`@Transactional`) ficam nos casos de uso da `application`.
+- A classe de domínio tem dois construtores: `Customer(name)` para um objeto novo e `Customer(id, name)` para um objeto vindo do banco.
+- O mapeamento é feito à mão, em `toDomain`/`toEntity` no adapter. Se crescer, extraia para uma classe `CustomerMapper` na `infrastructure`.
+- Entidade JPA, interface Spring Data e adapter ficam package-private: fora da `infrastructure`, ninguém os enxerga. O construtor `protected` sem argumentos da entidade existe porque o JPA exige.
+- Consultas novas entram na interface do domínio com nome de negócio; o adapter delega para um método derivado ou um `@Query` no `CustomerJpaRepository`.
+- O objeto de domínio não é acompanhado pelo Hibernate: toda alteração é gravada com `save` explícito.
+- A `application` injeta sempre a interface do domínio (`CustomerRepository`), e as transações (`@Transactional`) ficam nos casos de uso dela.
 
 ## Lombok
 
