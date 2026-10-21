@@ -1,0 +1,2 @@
+-- Baseline: the schema starts empty.
+-- Each module adds its own tables in the next versions (V2, V3, ...).
