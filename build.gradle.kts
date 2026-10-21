@@ -20,11 +20,18 @@ repositories {
 dependencies {
     implementation(libs.spring.boot.starter.webmvc)
     implementation(libs.spring.boot.starter.actuator)
+    implementation(libs.spring.boot.starter.data.jpa)
+    implementation(libs.spring.boot.starter.flyway)
+    implementation(libs.flyway.database.postgresql)
+    runtimeOnly(libs.postgresql)
+    developmentOnly(libs.spring.boot.docker.compose)
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
 
     testImplementation(libs.spring.boot.starter.webmvc.test)
     testImplementation(libs.spring.boot.starter.actuator.test)
+    testImplementation(libs.spring.boot.testcontainers)
+    testImplementation(libs.testcontainers.postgresql)
     testImplementation(libs.archunit.junit5)
     testCompileOnly(libs.lombok)
     testAnnotationProcessor(libs.lombok)

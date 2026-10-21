@@ -1,11 +1,14 @@
 package br.com.arktech.workshop;
 
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 import com.tngtech.archunit.core.importer.ImportOption.DoNotIncludeTests;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
+import jakarta.persistence.Entity;
+import org.springframework.data.repository.Repository;
 
 // Rules apply to every module (<module>/{api,application,domain,infrastructure}).
 // allowEmptyShould keeps them passing until the first module exists.
@@ -23,7 +26,8 @@ class LayerDependencyTest {
             .resideInAPackage(DOMAIN)
             .should()
             .dependOnClassesThat()
-            .resideInAnyPackage(API, APPLICATION, INFRASTRUCTURE, "org.springframework..")
+            .resideInAnyPackage(
+                    API, APPLICATION, INFRASTRUCTURE, "org.springframework..", "org.hibernate..", "jakarta.persistence..")
             .allowEmptyShould(true);
 
     @ArchTest
@@ -41,6 +45,22 @@ class LayerDependencyTest {
             .resideInAPackage(API)
             .should()
             .dependOnClassesThat()
+            .resideInAPackage(INFRASTRUCTURE)
+            .allowEmptyShould(true);
+
+    @ArchTest
+    static final ArchRule springDataRepositoriesResideInInfrastructure = classes()
+            .that()
+            .areAssignableTo(Repository.class)
+            .should()
+            .resideInAPackage(INFRASTRUCTURE)
+            .allowEmptyShould(true);
+
+    @ArchTest
+    static final ArchRule jpaEntitiesResideInInfrastructure = classes()
+            .that()
+            .areAnnotatedWith(Entity.class)
+            .should()
             .resideInAPackage(INFRASTRUCTURE)
             .allowEmptyShould(true);
 }

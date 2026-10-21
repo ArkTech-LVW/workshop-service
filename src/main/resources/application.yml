@@ -6,6 +6,14 @@ spring:
   web:
     locale: pt_BR
     locale-resolver: fixed
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/workshop}
+    username: ${DB_USERNAME:workshop}
+    password: ${DB_PASSWORD:workshop}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
 
 server:
   port: 8080
