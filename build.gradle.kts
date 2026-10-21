@@ -48,4 +48,14 @@ tasks.withType<Test> {
 
 tasks.test {
     finalizedBy(tasks.jacocoTestReport)
+    addTestListener(object : TestListener {
+        override fun afterSuite(suite: TestDescriptor, result: TestResult) {
+            if (suite.parent != null) return
+
+            val skipped = if (result.skippedTestCount > 0) ", ${result.skippedTestCount} skipped" else ""
+            logger.lifecycle(
+                "Tests: ${result.testCount} run, ${result.successfulTestCount} passed, ${result.failedTestCount} failed$skipped"
+            )
+        }
+    })
 }
