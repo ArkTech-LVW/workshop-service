@@ -50,6 +50,50 @@ Essas regras são verificadas pelo teste ArchUnit `LayerDependencyTest`, e uma v
 - Datas em ISO-8601.
 - Valores monetários em `BigDecimal`.
 
+## Erros da API
+
+Os motivos estão no [ADR 002](docs/adr/002-api-errors.md).
+
+### Formato
+
+Toda resposta de erro é um `ApiError` em `application/json`:
+
+```json
+{ "code": "customer.notFound", "message": "Cliente não encontrado.", "details": null }
+
+{ "code": "request.invalidFields", "message": "Existem campos inválidos na requisição.",
+  "details": [ { "field": "vehicles[0].plate", "message": "Não pode estar em branco." } ] }
+```
+
+- `code` é a chave de i18n e é o que o front usa para decidir o comportamento. Nunca mude o `code` de um erro existente.
+- `details` só aparece nos erros de entrada (400); nos demais é `null`.
+- Um erro inesperado sai como 500 `server.unexpectedError`, com um código de referência na mensagem. O mesmo código aparece no log `ERROR`, junto com o stack trace.
+
+### Como lançar erros
+
+O domínio e a `application` lançam as exceções de `shared/domain/exception`, sem pensar em HTTP:
+
+| Exceção | Status | Quando |
+|---|---|---|
+| `NotFoundException` | 404 | O recurso pedido não existe |
+| `ConflictException` | 409 | Conflita com o estado atual (ex.: CPF ou placa já cadastrados) |
+| `BusinessRuleException` | 422 | Viola uma regra de negócio (ex.: transição de status inválida) |
+
+```java
+throw new NotFoundException("customer.notFound", id);
+```
+
+- A exceção recebe a chave da mensagem e os argumentos (`{0}`, `{1}`...). Cadastre a chave no `messages_pt_BR.properties`.
+- Crie uma subclasse quando o caso se repetir ou quando um nome de negócio deixar o código mais claro: `class InvalidStatusTransitionException extends BusinessRuleException`. O status vem da categoria.
+- Não crie `@ExceptionHandler` nos controllers: o `GlobalExceptionHandler` já trata tudo.
+
+### Mensagens de validação
+
+- As anotações de Bean Validation usam a mensagem padrão (`jakarta.validation.constraints.NotBlank.message`) ou uma chave própria entre chaves: `@NotBlank(message = "{customer.nameRequired}")`. Texto literal é proibido.
+- Ao usar uma anotação pela primeira vez, cadastre a mensagem dela no `messages_pt_BR.properties`. Uma mensagem literal ou uma chave inexistente lança exceção na validação (500), então o teste que dispara a validação acusa o esquecimento.
+- Parâmetros da anotação entram como `{min}`, `{max}`, `{value}`: `Deve ter entre {min} e {max} caracteres.`
+- Em mensagens com argumentos (`{0}`), o apóstrofo precisa ser duplicado (`''`), porque o `MessageFormat` trata `'` como escape. Mensagens de validação e mensagens sem argumentos usam o apóstrofo simples.
+
 ## Banco de dados e persistência
 
 PostgreSQL 18 com Spring Data JPA e Flyway. Os motivos estão no [ADR 001](docs/adr/001-database.md).
@@ -163,6 +207,7 @@ class CustomerRepositoryAdapter implements CustomerRepository {
 - Testes automatizados com **JUnit**.
 - `./gradlew build` roda todos os testes e precisa passar antes de abrir o PR.
 - **Unitários:** JUnit puro, sem Spring e sem banco. É o padrão para domínio e regras de negócio.
+- **Camada `api`:** `@WebMvcTest(controllers = ...)` é o padrão para testar controllers, validação e respostas de erro sem subir banco. Veja o `GlobalExceptionHandlerTest`.
 - **Integração:** anote a classe com `@IntegrationTest` (ou `@IntegrationTest(webEnvironment = RANDOM_PORT)` para chamar via HTTP). A anotação sobe a aplicação inteira contra um PostgreSQL real (Testcontainers) e marca o teste com a tag JUnit `integration`. O Docker precisa estar rodando.
 - Use `@IntegrationTest` só quando o teste precisa da aplicação ou do banco de verdade. Testes com a mesma configuração compartilham contexto e container; cada configuração diferente (ex.: outro `webEnvironment`) sobe os seus.
 - **Cobertura:** o `./gradlew build` também gera o relatório do JaCoCo em `build/reports/jacoco/test/html/index.html`, mesmo quando algum teste falha.
