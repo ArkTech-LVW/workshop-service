@@ -7,6 +7,11 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
+
+defaults:
+  run:
+    shell: bash
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -26,7 +31,7 @@ jobs:
           cache: gradle
 
       - name: Build and test
-        run: ./gradlew build
+        run: ./gradlew build | tee "$RUNNER_TEMP/gradle.log"
 
       - name: Upload coverage report
         if: ${{ always() }}
@@ -34,3 +39,23 @@ jobs:
         with:
           name: coverage-report
           path: build/reports/jacoco/test/html
+
+      - name: Comment failed tests on PR
+        if: ${{ failure() && github.event_name == 'pull_request' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          log="$RUNNER_TEMP/gradle.log"
+          summary=$(grep -m1 -E '^Tests: .*, [1-9][0-9]* failed' "$log") || exit 0
+          {
+            echo "### ❌ Testes falharam no commit ${HEAD_SHA:0:7}"
+            echo
+            echo "\`$summary\`"
+            echo
+            grep -E '^[A-Za-z].* > .* FAILED$' "$log" | sed -E 's/ FAILED$//; s/.*/- `&`/' | head -n 20
+            echo
+            echo "[Ver o log da execução]($RUN_URL)"
+          } | gh pr comment "$PR_NUMBER" --body-file -
