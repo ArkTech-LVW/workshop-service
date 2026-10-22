@@ -176,4 +176,5 @@ class CustomerRepositoryAdapter implements CustomerRepository {
 
 - O workflow `.github/workflows/ci.yml` roda `./gradlew build` (compilação, testes unitários e de integração, cobertura) em todo PR e em todo push na `main`, com JDK 25 (Temurin) e cache do Gradle. O runner do GitHub já vem com Docker, então os testes de integração sobem o PostgreSQL via Testcontainers como na sua máquina.
 - O check `build` é obrigatório na `main`: PR com build ou teste quebrado não pode ser mergeado.
+- Quando algum teste falha num PR, o CI comenta no PR com o resumo (`Tests: X run, Y passed, Z failed`), os testes que falharam e o link do log.
 - O relatório de cobertura fica no artefato `coverage-report` de cada execução (página da execução no GitHub Actions, seção *Artifacts*).
