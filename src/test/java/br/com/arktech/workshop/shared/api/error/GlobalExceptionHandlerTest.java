@@ -1,6 +1,7 @@
 package br.com.arktech.workshop.shared.api.error;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -8,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
@@ -230,6 +232,13 @@ class GlobalExceptionHandlerTest {
                 .andExpect(jsonPath("$.code").value("server.unexpectedError"));
 
         assertThat(output).contains("Validation message must be a {key}: texto literal");
+    }
+
+    @Test
+    void shouldLeaveDomainExceptionWithMissingKeyToErrorController() {
+        assertThatThrownBy(() -> mockMvc.perform(get("/test/errors/missingDomainKey")))
+                .hasRootCauseInstanceOf(NotFoundException.class)
+                .hasRootCauseMessage("test.missingKey");
     }
 
     private ResultActions perform(MockHttpServletRequestBuilder request) throws Exception {

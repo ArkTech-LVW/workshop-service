@@ -41,6 +41,11 @@ class ErrorTestController {
         throw new InvalidStatusTransitionException("FINISHED");
     }
 
+    @GetMapping("/missingDomainKey")
+    void missingDomainKey() {
+        throw new NotFoundException("test.missingKey");
+    }
+
     @GetMapping("/unexpected")
     void unexpected() {
         throw new IllegalStateException("sensitive internal detail");
