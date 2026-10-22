@@ -47,14 +47,19 @@ Sem tratamento próprio, a API devolve o erro padrão do Spring Boot (`timestamp
    - Erros de entrada (Bean Validation no corpo e nos parâmetros, tipo inválido, parâmetro ausente, valor JSON inválido) saem como 400 `request.invalidFields` com `details`. JSON sintaticamente quebrado ou corpo ausente sai como 400 `request.malformedBody`.
    - As demais exceções do Spring MVC recebem um código pelo status (`request.routeNotFound`, `request.methodNotSupported` etc.), preservando os headers (ex.: `Allow` no 405).
    - Qualquer outra exceção, e todo 5xx, sai como 500 `server.unexpectedError`, com um código de referência de 8 caracteres na mensagem. O mesmo código vai para o log `ERROR`, junto com o stack trace. Erros 4xx não são logados.
-4. **Validação estrita:** `spring-boot-starter-validation` com um `LocalValidatorFactoryBean` próprio (`shared/infrastructure/validation`), cujo interpolador só aceita mensagens no formato `{chave}` e resolve a chave pelo `MessageResolver`, em pt_BR. Texto literal ou chave inexistente lança exceção na validação, que vira 500 com a chave no log.
+4. **`ApiErrorController` no lugar do `BasicErrorController`:** atende o `/error`, para onde o Tomcat encaminha o que escapa do `DispatcherServlet` (exceção em filtro, exceção dentro do próprio advice).
+   - Com exceção: sempre 500 `server.unexpectedError`, com código de referência e log, como no advice.
+   - Só com status, sem exceção (ex.: `response.sendError(404)` num filtro): mantém o status e usa o mesmo código por status do advice.
+   - Responde sempre em JSON, inclusive para `Accept: text/html`.
+   - A montagem do `ApiError` e o log do código de referência ficam no `ApiErrors`, usado pelo advice e pelo `ApiErrorController`.
+5. **Validação estrita:** `spring-boot-starter-validation` com um `LocalValidatorFactoryBean` próprio (`shared/infrastructure/validation`), cujo interpolador só aceita mensagens no formato `{chave}` e resolve a chave pelo `MessageResolver`, em pt_BR. Texto literal ou chave inexistente lança exceção na validação, que vira 500 com a chave no log.
 
 ## Consequências
 
 - O front decide pelo `code`, nunca pelo texto, e marca os campos pelo `field` de cada item de `details`.
 - Toda anotação de validação usada pela primeira vez precisa ter a mensagem cadastrada no `messages_pt_BR.properties`; senão, o teste que a dispara quebra com 500.
-- As chaves das `DomainException` só são verificadas em runtime (`NoSuchMessageException` → 500). Cada caso de uso deve ter um teste que dispara o erro.
-- **401/403 ficam para a KAN-18.** As falhas de autenticação acontecem nos filtros do Spring Security, fora do `DispatcherServlet`, e não passam pelo `@RestControllerAdvice`. O `AuthenticationEntryPoint` e o `AccessDeniedHandler` precisam escrever o mesmo `ApiError` diretamente.
-- Exceções em filtros e o `/error` continuam no `BasicErrorController`, com o formato padrão do Spring Boot.
+- As chaves das `DomainException` só são verificadas em runtime. Uma chave inexistente faz o advice falhar, e a exceção original sai pelo `ApiErrorController` como 500. Cada caso de uso deve ter um teste que dispara o erro.
+- **401/403 ficam para a KAN-18.** As falhas de autenticação acontecem nos filtros do Spring Security, fora do `DispatcherServlet`. Sem tratamento, um 401/403 enviado por `sendError` sai como `request.error`, sem código próprio. O `AuthenticationEntryPoint` e o `AccessDeniedHandler` devem escrever o `ApiError` com o código certo.
+- Requisições que o Tomcat rejeita antes de chegar ao Spring (linha de requisição malformada, header grande demais) não passam pelo `/error` e saem na resposta padrão do Tomcat.
 - `spring.mvc.problemdetails.enabled` não pode ser ativado: registraria um segundo advice concorrendo com o nosso.
 - A KAN-43 (Swagger) vai documentar `ApiError` e `ApiFieldError`, que por isso são públicos.
