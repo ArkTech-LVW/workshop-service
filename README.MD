@@ -32,6 +32,7 @@ Para usar um PostgreSQL próprio, desligue o compose com `SPRING_DOCKER_COMPOSE_
 ## Decisões de arquitetura
 
 - [ADR 001: Banco de dados e persistência](docs/adr/001-database.md)
+- [ADR 002: Padrão de erros da API](docs/adr/002-api-errors.md)
 
 ## Contribuindo
 
