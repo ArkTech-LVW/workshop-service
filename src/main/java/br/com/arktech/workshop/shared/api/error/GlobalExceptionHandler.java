@@ -1,15 +1,12 @@
 package br.com.arktech.workshop.shared.api.error;
 
-import br.com.arktech.workshop.shared.application.i18n.MessageResolver;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.exception.DomainException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
@@ -19,27 +16,24 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.exc.MismatchedInputException;
 
-@Slf4j
 @RestControllerAdvice
 @RequiredArgsConstructor
 class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    private static final String INVALID_FIELDS = "request.invalidFields";
     private static final String INVALID_VALUE = "request.invalidValue";
-    private static final String UNEXPECTED_ERROR = "server.unexpectedError";
 
-    private final MessageResolver messageResolver;
+    private final ApiErrors apiErrors;
 
     @ExceptionHandler(DomainException.class)
     ResponseEntity<ApiError> handleDomainException(DomainException ex) {
@@ -48,12 +42,12 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             case ConflictException e -> HttpStatus.CONFLICT;
             case BusinessRuleException e -> HttpStatus.UNPROCESSABLE_CONTENT;
         };
-        return response(status, error(ex.getCode(), ex.getArgs()));
+        return ApiErrors.response(status, apiErrors.of(ex.getCode(), ex.getArgs()));
     }
 
     @ExceptionHandler(Exception.class)
     ResponseEntity<ApiError> handleUnexpected(Exception ex) {
-        return response(HttpStatus.INTERNAL_SERVER_ERROR, unexpectedError(ex));
+        return ApiErrors.response(HttpStatus.INTERNAL_SERVER_ERROR, apiErrors.unexpected(ex));
     }
 
     @Override
@@ -64,7 +58,7 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                         error instanceof FieldError fieldError ? fieldError.getField() : null,
                         error.getDefaultMessage()))
                 .toList();
-        return handleExceptionInternal(ex, invalidFields(details), headers, status, request);
+        return handleExceptionInternal(ex, apiErrors.invalidFields(details), headers, status, request);
     }
 
     @Override
@@ -78,13 +72,14 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 details.add(new ApiFieldError(field, error.getDefaultMessage()));
             }
         });
-        return handleExceptionInternal(ex, invalidFields(details), headers, status, request);
+        return handleExceptionInternal(ex, apiErrors.invalidFields(details), headers, status, request);
     }
 
     @Override
     protected ResponseEntity<Object> handleTypeMismatch(
             TypeMismatchException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        return handleExceptionInternal(ex, invalidField(ex.getPropertyName(), INVALID_VALUE), headers, status, request);
+        ApiError body = apiErrors.invalidField(ex.getPropertyName(), INVALID_VALUE);
+        return handleExceptionInternal(ex, body, headers, status, request);
     }
 
     @Override
@@ -93,7 +88,7 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpHeaders headers,
             HttpStatusCode status,
             WebRequest request) {
-        ApiError body = invalidField(ex.getParameterName(), "request.requiredParameter");
+        ApiError body = apiErrors.invalidField(ex.getParameterName(), "request.requiredParameter");
         return handleExceptionInternal(ex, body, headers, status, request);
     }
 
@@ -102,56 +97,25 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         ApiError body = ex.getCause() instanceof MismatchedInputException mismatch
                         && !mismatch.getPath().isEmpty()
-                ? invalidField(path(mismatch.getPath()), INVALID_VALUE)
-                : error("request.malformedBody");
+                ? apiErrors.invalidField(path(mismatch.getPath()), INVALID_VALUE)
+                : apiErrors.of("request.malformedBody");
         return handleExceptionInternal(ex, body, headers, status, request);
     }
 
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(
             Exception ex, Object body, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
-        ApiError apiError = body instanceof ApiError error ? error : errorFor(ex, statusCode);
+        ApiError apiError = body instanceof ApiError error
+                ? error
+                : apiErrors.forStatus(statusCode, methodOf(request), ex);
         HttpHeaders jsonHeaders = new HttpHeaders();
         jsonHeaders.putAll(headers);
         jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
         return super.handleExceptionInternal(ex, apiError, jsonHeaders, statusCode, request);
     }
 
-    private ApiError errorFor(Exception ex, HttpStatusCode status) {
-        if (status.is5xxServerError()) {
-            return unexpectedError(ex);
-        }
-        return switch (status.value()) {
-            case 404 -> error("request.routeNotFound");
-            case 405 -> error(
-                    "request.methodNotSupported",
-                    ex instanceof HttpRequestMethodNotSupportedException e ? e.getMethod() : "");
-            case 406 -> error("request.notAcceptable");
-            case 415 -> error("request.unsupportedMediaType");
-            default -> error("request.error");
-        };
-    }
-
-    private ApiError unexpectedError(Exception ex) {
-        String referenceCode = UUID.randomUUID().toString().substring(0, 8);
-        log.error("Unexpected error [referenceCode={}]", referenceCode, ex);
-        return error(UNEXPECTED_ERROR, referenceCode);
-    }
-
-    private ApiError invalidField(String field, String messageCode) {
-        return invalidFields(List.of(new ApiFieldError(field, messageResolver.get(messageCode))));
-    }
-
-    private ApiError invalidFields(List<ApiFieldError> details) {
-        return new ApiError(INVALID_FIELDS, messageResolver.get(INVALID_FIELDS), details);
-    }
-
-    private ApiError error(String code, Object... args) {
-        return ApiError.of(code, messageResolver.get(code, args));
-    }
-
-    private static ResponseEntity<ApiError> response(HttpStatus status, ApiError body) {
-        return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(body);
+    private static String methodOf(WebRequest request) {
+        return request instanceof ServletWebRequest servletRequest ? servletRequest.getRequest().getMethod() : null;
     }
 
     private static String path(List<JacksonException.Reference> references) {

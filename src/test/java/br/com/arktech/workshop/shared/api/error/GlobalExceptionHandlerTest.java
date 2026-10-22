@@ -16,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -28,7 +26,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 @WebMvcTest(controllers = ErrorTestController.class)
-@Import(GlobalExceptionHandlerTest.ErrorHandlingConfig.class)
+@Import(ApiErrorTestConfig.class)
 @ExtendWith(OutputCaptureExtension.class)
 class GlobalExceptionHandlerTest {
 
@@ -256,12 +254,4 @@ class GlobalExceptionHandlerTest {
                 }
                 """.formatted(field, message);
     }
-
-    @TestConfiguration(proxyBeanMethods = false)
-    @ComponentScan({
-        "br.com.arktech.workshop.shared.application.i18n",
-        "br.com.arktech.workshop.shared.infrastructure.i18n",
-        "br.com.arktech.workshop.shared.infrastructure.validation"
-    })
-    static class ErrorHandlingConfig {}
 }
