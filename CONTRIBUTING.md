@@ -14,13 +14,19 @@ O pacote base é `br.com.arktech.workshop`, organizado **por módulo**, com as c
 
 ```
 br.com.arktech.workshop
-└── <module>              ex.: customer, vehicle, serviceorder
+├── shared                o que todos os módulos usam (erros, i18n, TimeStamping, UseCase)
+└── <module>              ex.: auth, customer, vehicle, serviceorder
     ├── api               controllers e DTOs de entrada/saída
     ├── application       casos de uso, orquestração e transações
     ├── domain            entidades, regras de negócio e interfaces de repositório
     └── infrastructure    implementações técnicas (persistência, integrações)
 ```
 
+### Isolamento entre módulos
+
+- Um módulo só importa classes dele mesmo e do `shared`, nunca de outro módulo.
+- A referência a algo de outro módulo é pelo id: `Long createdByUserId`, nunca `User createdBy` nem `@ManyToOne` para entidade de outro módulo. A FK continua no banco.
+- O que um módulo precisa de outro vira um contrato (interface) no `shared`, implementado pelo módulo dono. Crie o contrato só quando algum módulo precisar dele.
 
 ### Regra de dependência entre camadas
 
@@ -28,12 +34,35 @@ br.com.arktech.workshop
 api ──> application ──> domain <── infrastructure
 ```
 
-- `domain` **não importa** `api`, `application`, `infrastructure`, Spring (`org.springframework..`), Hibernate (`org.hibernate..`) nem JPA (`jakarta.persistence..`).
+- `domain` **não importa** `api`, `application`, `infrastructure`, Spring (`org.springframework..`) nem Hibernate (`org.hibernate..`), com uma exceção: as anotações `org.hibernate.annotations`. JPA (`jakarta.persistence`) é liberado, porque as entidades são as próprias classes de domínio ([ADR 001](docs/adr/001-database.md)).
 - `application` não importa `api` nem `infrastructure`.
 - `api` não importa `infrastructure`.
-- Entidades JPA (`@Entity`) e repositórios Spring Data (`JpaRepository` etc.) só existem na `infrastructure`.
+- Entidades JPA (`@Entity`, `@MappedSuperclass`) ficam no `domain`; repositórios Spring Data (`JpaRepository` etc.) só na `infrastructure`.
 
-Essas regras são verificadas pelo teste ArchUnit `LayerDependencyTest`, e uma violação **quebra o build**.
+Essas regras, o isolamento entre módulos e os padrões de controller e de caso de uso (abaixo) são verificados pelo teste ArchUnit `LayerDependencyTest`, e uma violação **quebra o build**.
+
+## Casos de uso
+
+Cada caso de uso é uma classe da `application` que implementa `UseCase<I, O>` (`shared/application`), com um único método `execute`:
+
+```java
+@Service
+@RequiredArgsConstructor
+public class FindCustomerUseCase implements UseCase<FindCustomerQuery, CustomerResult> {
+
+    private final CustomerRepository customerRepository;
+
+    @Override
+    @Transactional(readOnly = true)
+    public CustomerResult execute(FindCustomerQuery query) { ... }
+}
+```
+
+- Nome: `<Ação><Objeto>UseCase` (`LoginUseCase`, `CreateCustomerUseCase`).
+- Entrada e saída são `record`s da `application`, separados dos DTOs da `api`: `XxxCommand` para o que altera estado, `XxxQuery` para consultas e `XxxResult` para a saída. O controller converte o DTO de entrada em command/query e o result no DTO de resposta.
+- `@Transactional` fica no `execute` (`readOnly = true` nas consultas).
+- O controller injeta a classe do caso de uso diretamente.
+- Record com senha ou outro dado sensível sobrescreve o `toString` para mascarar o valor, porque o `toString` padrão do record imprime todos os campos.
 
 ## Mensagens e i18n
 
@@ -49,6 +78,39 @@ Essas regras são verificadas pelo teste ArchUnit `LayerDependencyTest`, e uma v
 - DTOs como `record`.
 - Datas em ISO-8601.
 - Valores monetários em `BigDecimal`.
+
+### Controllers
+
+As anotações de rota, validação e documentação ficam numa interface `I<Nome>Controller`; o controller só a implementa:
+
+```java
+@Tag(name = "${openapi.customer.tag}")
+@RequestMapping("/admin/customers")
+interface ICustomerController {
+
+    @Operation(summary = "${openapi.customer.findById}")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "404", ref = "NotFound")
+    @GetMapping("/{id}")
+    CustomerResponse findById(@PathVariable Long id);
+}
+
+@RestController
+@RequiredArgsConstructor
+class CustomerController implements ICustomerController {
+
+    private final FindCustomerUseCase findCustomerUseCase;
+
+    @Override
+    public CustomerResponse findById(Long id) {
+        return CustomerResponse.from(findCustomerUseCase.execute(new FindCustomerQuery(id)));
+    }
+}
+```
+
+- Na classe ficam só `@RestController` e `@RequiredArgsConstructor`, sem anotação nos métodos nem nos parâmetros: o Spring lê `@PathVariable`, `@RequestBody`, `@Valid` etc. da interface.
+- Constraints de validação nos parâmetros (`@Positive`, `@NotNull`...) ficam **só** na interface. Repetir na classe faz o Hibernate Validator lançar `ConstraintDeclarationException` (HV000151).
+- Interface e controller ficam package-private, na `api` do módulo.
 
 ## Erros da API
 
@@ -89,14 +151,11 @@ throw new NotFoundException("customer.notFound", id);
 
 ### Como documentar os erros
 
-A documentação da API (`/docs`) é gerada pelo springdoc a partir dos controllers. Os erros já têm respostas prontas, com schema e exemplo, no `OpenApiConfig`: `BadRequest` (400), `NotFound` (404), `Conflict` (409) e `BusinessRule` (422). Cada endpoint declara só os erros que de fato pode retornar:
+A documentação da API (`/docs`) é gerada pelo springdoc a partir das interfaces dos controllers. Os erros já têm respostas prontas, com schema e exemplo, no `OpenApiConfig`: `BadRequest` (400), `NotFound` (404), `Conflict` (409) e `BusinessRule` (422). Cada endpoint declara só os erros que de fato pode retornar, como o `findById` do exemplo de [Controllers](#controllers):
 
 ```java
-@Operation(summary = "${openapi.customer.findById}")
 @ApiResponse(responseCode = "200")
 @ApiResponse(responseCode = "404", ref = "NotFound")
-@GetMapping("/{id}")
-CustomerResponse findById(@PathVariable Long id) { ... }
 ```
 
 ```properties
@@ -129,26 +188,43 @@ A imagem do banco tem versão fixa (`postgres:18.6-alpine`) e aparece em dois lu
 - **Nunca altere uma migration que já está na `main`.** Para corrigir, crie uma nova.
 - Tabelas no singular e colunas em inglês e snake_case (`service_order`, `created_at`).
 - Chave primária: `id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY`.
+- Toda tabela tem as colunas da `TimeStamping`: `date_created TIMESTAMPTZ NOT NULL`, `last_updated TIMESTAMPTZ NOT NULL` e `version BIGINT NOT NULL`.
 
 ### Entidades e repositórios
 
-O domínio não sabe nada de banco. Cada módulo tem a classe de domínio e a interface do repositório no `domain`, e na `infrastructure` a entidade JPA, a interface Spring Data e um adapter que liga as duas:
+As classes de domínio são as próprias entidades JPA ([ADR 001](docs/adr/001-database.md)). A interface do repositório fica no `domain`, sem Spring, e a interface Spring Data da `infrastructure` a estende:
 
 ```java
 // <module>/domain
+@Entity
+@Table(name = "customer")
 @Getter
-public class Customer {
+public class Customer extends TimeStamping {
 
-    private final Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String name;
 
+    protected Customer() {}
+
     public Customer(String name) {
-        this(null, name);
+        this.name = name;
     }
 
-    public Customer(Long id, String name) {
-        this.id = id;
+    public void rename(String name) {
         this.name = name;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object other) {
+        return this == other || other instanceof Customer customer && id != null && id.equals(customer.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Customer.class.hashCode();
     }
 }
 
@@ -158,59 +234,15 @@ public interface CustomerRepository {
 }
 
 // <module>/infrastructure
-@Entity
-@Table(name = "customer")
-@Getter
-class CustomerEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String name;
-
-    protected CustomerEntity() {}
-
-    CustomerEntity(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-}
-
-interface CustomerJpaRepository extends JpaRepository<CustomerEntity, Long> {}
-
-@Component
-@RequiredArgsConstructor
-class CustomerRepositoryAdapter implements CustomerRepository {
-
-    private final CustomerJpaRepository jpaRepository;
-
-    @Override
-    public Customer save(Customer customer) {
-        return toDomain(jpaRepository.save(toEntity(customer)));
-    }
-
-    @Override
-    public Optional<Customer> findById(Long id) {
-        return jpaRepository.findById(id).map(this::toDomain);
-    }
-
-    private Customer toDomain(CustomerEntity entity) {
-        return new Customer(entity.getId(), entity.getName());
-    }
-
-    private CustomerEntity toEntity(Customer customer) {
-        return new CustomerEntity(customer.getId(), customer.getName());
-    }
-}
+interface CustomerJpaRepository extends JpaRepository<Customer, Long>, CustomerRepository {}
 ```
 
-- A classe de domínio tem dois construtores: `Customer(name)` para um objeto novo e `Customer(id, name)` para um objeto vindo do banco.
-- O mapeamento é feito à mão, em `toDomain`/`toEntity` no adapter. Se crescer, extraia para uma classe `CustomerMapper` na `infrastructure`.
-- Entidade JPA, interface Spring Data e adapter ficam package-private: fora da `infrastructure`, ninguém os enxerga. O construtor `protected` sem argumentos da entidade existe porque o JPA exige.
-- Consultas novas entram na interface do domínio com nome de negócio; o adapter delega para um método derivado ou um `@Query` no `CustomerJpaRepository`.
-- O objeto de domínio não é acompanhado pelo Hibernate: toda alteração é gravada com `save` explícito.
-- A `application` injeta sempre a interface do domínio (`CustomerRepository`), e as transações (`@Transactional`) ficam nos casos de uso dela.
+- Toda entidade estende `TimeStamping` (`shared/domain`): `dateCreated` e `lastUpdated` são preenchidos pelo Hibernate (`@CreationTimestamp`/`@UpdateTimestamp`) e `version` é o `@Version` do lock otimista.
+- O construtor `protected` sem argumentos existe porque o JPA exige. O construtor público cria um objeto novo, sem id.
+- Sem setters: o estado muda por métodos de negócio (`rename`, `deactivate`).
+- O Spring Data implementa os métodos do repositório do domínio através do `XxxJpaRepository`, que fica package-private. Consultas novas entram na interface do domínio com nome de negócio; se precisarem de `@Query`, o método é redeclarado com a anotação no `XxxJpaRepository`.
+- Filhos do mesmo agregado (ex.: os itens da OS) são entidades mapeadas a partir da raiz (`@OneToMany(mappedBy = ..., cascade = CascadeType.ALL, orphanRemoval = true)`). Entidade de outro módulo, nunca: guarde o id.
+- A `application` injeta sempre a interface do domínio (`CustomerRepository`), e as transações (`@Transactional`) ficam nos casos de uso. Dentro da transação, o Hibernate grava as alterações sozinho no commit; chame `save` mesmo assim, para deixar a intenção explícita.
 
 ## Lombok
 
@@ -232,6 +264,7 @@ public record ApiFieldError(@Nullable String field, String message) {}
 
 - **Variável local não leva `@Nullable`**: o JSpecify não aceita a anotação ali, e o NullAway infere a nulabilidade da variável pelo fluxo do código.
 - Na sobrescrita de um método do Spring, repita o `@Nullable` dos parâmetros e do retorno da classe-mãe (ex.: `handleExceptionInternal` no `GlobalExceptionHandler`).
+- Entidades JPA: o construtor `protected` sem argumentos não precisa inicializar os campos (o NullAway trata classes `@Entity`/`@MappedSuperclass` como inicializadas pelo JPA), e o campo `@Id` é tratado como não nulo. O id só existe depois do `save`: não o leia antes. Os campos da `TimeStamping` são `@Nullable` pelo mesmo motivo.
 - O `./gradlew build` falha quando um valor `@Nullable` é usado sem checagem, ou quando `null` é passado onde não é aceito. Os testes não são verificados.
 
 ## Dependências

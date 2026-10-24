@@ -48,10 +48,10 @@ Além disso, o esquema precisa ser versionado, testável contra o banco real e r
 
 ### Entidades de domínio mapeadas com JPA
 
-Revisado em 2026-10-24 na [KAN-18 (T1.3)](https://arktech-lvw.atlassian.net/browse/KAN-18), primeira tarefa com persistência. A versão anterior deste ADR separava o domínio da persistência (classe de domínio, entidade JPA e um adapter que mapeava as duas). O grupo ficou com a alternativa:
+Revisado em 2026-10-24 na [KAN-47 (T1.3.1)](https://arktech-lvw.atlassian.net/browse/KAN-47), antes do primeiro módulo com persistência ([KAN-18](https://arktech-lvw.atlassian.net/browse/KAN-18)). A versão anterior deste ADR separava o domínio da persistência (classe de domínio, entidade JPA e um adapter que mapeava as duas). O grupo ficou com a alternativa:
 
 - As classes de domínio são as próprias entidades JPA: `@Entity`, `@Table`, `@Id`, `@OneToMany` etc. ficam no `domain`. O domínio pode importar `jakarta.persistence` e `org.hibernate.annotations`; Spring e o restante do Hibernate continuam proibidos (`LayerDependencyTest`).
-- A interface do repositório continua no `domain`, sem Spring. Na infraestrutura, a interface Spring Data estende as duas (`interface UserJpaRepository extends JpaRepository<User, Long>, UserRepository {}`), e o Spring Data implementa os métodos do domínio. Não há adapter nem mapeamento.
+- A interface do repositório continua no `domain`, sem Spring. Na infraestrutura, a interface Spring Data estende as duas (`interface CustomerJpaRepository extends JpaRepository<Customer, Long>, CustomerRepository {}`), e o Spring Data implementa os métodos do domínio. Não há adapter nem mapeamento.
 - Toda entidade estende `TimeStamping` (`shared/domain`): `date_created` e `last_updated` preenchidos pelo Hibernate (`@CreationTimestamp`/`@UpdateTimestamp`) e `version` com `@Version` (lock otimista).
 - O domínio segue as regras do JPA: construtor `protected` sem argumentos, classes e métodos não `final`, `equals`/`hashCode` pelo id. O estado muda por métodos de negócio, sem setters públicos.
 - Módulos não se referenciam por objeto: fora do agregado, a ligação é pelo id (`Long userId`), nunca `@ManyToOne` para entidade de outro módulo. A FK continua no banco.
@@ -72,5 +72,5 @@ Revisado em 2026-10-24 na [KAN-18 (T1.3)](https://arktech-lvw.atlassian.net/brow
 - **T0.4:** o `docker-compose.yml` já tem o serviço `postgres`. A T0.4 acrescenta o serviço da aplicação, lendo `DB_URL`, `DB_USERNAME` e `DB_PASSWORD`, e precisa garantir que o `bootRun` continue subindo só o banco (por exemplo, com `profiles` no serviço da aplicação ou um arquivo separado indicado em `spring.docker.compose.file`).
 - IDs sequenciais são enumeráveis. A API do cliente (T3.8) precisa autorizar pelo dono do recurso, nunca pela dificuldade de adivinhar o ID.
 - Dois PRs em paralelo podem criar a mesma versão de migration. Quem mergear por último renumera a sua antes do merge (o Flyway recusa versões duplicadas e o build quebra).
-- Agregados com coleções, como a OS com itens e histórico (T3.1), mapeiam os filhos como entidades a partir da raiz (`cascade` + `orphanRemoval`), como `User` e `UserRole`.
+- Agregados com coleções, como a OS com itens e histórico (T3.1), mapeiam os filhos como entidades a partir da raiz (`cascade` + `orphanRemoval`).
 - Em aberto: a interface de repositório do domínio não pode usar `Pageable`/`Page` do Spring Data. A primeira listagem paginada (ex.: T3.9) define o tipo de paginação a adotar.
