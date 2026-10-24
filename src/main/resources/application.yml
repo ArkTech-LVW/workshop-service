@@ -18,6 +18,16 @@ spring:
 server:
   port: 8080
 
+springdoc:
+  api-docs:
+    path: /docs/openapi.json
+    # Resolves ${...} in @Schema too (DTO fields), not only in @Operation, @Parameter and @Tag
+    resolve-schema-properties: true
+  swagger-ui:
+    path: /docs
+  # Error responses come from OpenApiConfig (global 500) and from each controller, not from the advice handlers
+  override-with-generic-response: false
+
 management:
   endpoints:
     web:

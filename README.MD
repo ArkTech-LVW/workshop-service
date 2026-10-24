@@ -29,6 +29,12 @@ As migrations do Flyway são aplicadas automaticamente na subida. Quando a aplic
 
 Para usar um PostgreSQL próprio, desligue o compose com `SPRING_DOCKER_COMPOSE_ENABLED=false` e defina `DB_URL`, `DB_USERNAME` e `DB_PASSWORD` (padrão: `jdbc:postgresql://localhost:5432/workshop`, usuário e senha `workshop`).
 
+## Documentação da API
+
+Com a aplicação no ar, a documentação (Swagger UI) fica em <http://localhost:8080/docs>, com todas as rotas, os contratos e o formato dos erros. A especificação OpenAPI em JSON está em <http://localhost:8080/docs/openapi.json>.
+
+Para chamar rotas protegidas pela própria UI, clique em **Authorize** e cole o token JWT.
+
 ## Decisões de arquitetura
 
 - [ADR 001: Banco de dados e persistência](docs/adr/001-database.md)
