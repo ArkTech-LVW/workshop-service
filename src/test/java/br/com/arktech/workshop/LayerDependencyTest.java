@@ -10,6 +10,7 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noMethods;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 
 import br.com.arktech.workshop.shared.application.UseCase;
+import br.com.arktech.workshop.shared.domain.BaseEntity;
 
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.importer.ImportOption.DoNotIncludeTests;
@@ -88,6 +89,14 @@ class LayerDependencyTest {
             .areAnnotatedWith(MappedSuperclass.class)
             .should()
             .resideInAPackage(DOMAIN)
+            .allowEmptyShould(true);
+
+    @ArchTest
+    static final ArchRule jpaEntitiesExtendBaseEntity = classes()
+            .that()
+            .areAnnotatedWith(Entity.class)
+            .should()
+            .beAssignableTo(BaseEntity.class)
             .allowEmptyShould(true);
 
     @ArchTest
