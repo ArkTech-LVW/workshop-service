@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 // Accepts the alphanumeric CNPJ (Receita Federal, from July 2026): letters in the first 12 positions,
 // numeric check digits.
-public record Cnpj(String value) implements CpfCnpj {
+public record CNPJ(String value) implements CPFCNPJ {
 
     static final int LENGTH = 14;
 
@@ -15,7 +15,7 @@ public record Cnpj(String value) implements CpfCnpj {
     private static final Pattern MASK_GROUPS = Pattern.compile("(\\w{2})(\\w{3})(\\w{3})(\\w{4})(\\d{2})");
     private static final String MASK = "$1.$2.$3/$4-$5";
 
-    public Cnpj {
+    public CNPJ {
         value = CheckDigits.normalize(value);
         if (!isValid(value)) {
             throw new BusinessRuleException("cpfCnpj.invalid");

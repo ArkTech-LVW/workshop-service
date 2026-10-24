@@ -1,6 +1,6 @@
 package br.com.arktech.workshop.shared.api.error;
 
-import br.com.arktech.workshop.shared.api.validation.ValidCpfCnpj;
+import br.com.arktech.workshop.shared.api.validation.CPFOrCNPJ;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
@@ -73,7 +73,7 @@ class ErrorTestController {
     void literalMessage(@Valid @RequestBody LiteralMessageRequest request) {}
 
     @PostMapping("/cpfCnpj")
-    void cpfCnpj(@Valid @RequestBody CpfCnpjRequest request) {}
+    void cpfCnpj(@Valid @RequestBody CPFOrCNPJRequest request) {}
 
     static class InvalidStatusTransitionException extends BusinessRuleException {
 
@@ -92,5 +92,5 @@ class ErrorTestController {
 
     record LiteralMessageRequest(@NotBlank(message = "texto literal") String name) {}
 
-    record CpfCnpjRequest(@ValidCpfCnpj String document) {}
+    record CPFOrCNPJRequest(@CPFOrCNPJ String document) {}
 }

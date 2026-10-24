@@ -8,7 +8,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class CpfCnpjTest {
+class CPFCNPJTest {
 
     @ParameterizedTest
     @CsvSource({
@@ -20,9 +20,9 @@ class CpfCnpjTest {
     })
     void shouldAcceptValidDocumentsWithOrWithoutMask(
             String input, String value, String formatted, PersonType personType) {
-        CpfCnpj document = CpfCnpj.of(input);
+        CPFCNPJ document = CPFCNPJ.of(input);
 
-        assertThat(CpfCnpj.isValid(input)).isTrue();
+        assertThat(CPFCNPJ.isValid(input)).isTrue();
         assertThat(document.value()).isEqualTo(value);
         assertThat(document.formatted()).isEqualTo(formatted);
         assertThat(document.personType()).isEqualTo(personType);
@@ -46,8 +46,8 @@ class CpfCnpjTest {
                 "529,982,247-25"
             })
     void shouldRejectInvalidDocuments(String input) {
-        assertThat(CpfCnpj.isValid(input)).isFalse();
-        assertThatThrownBy(() -> CpfCnpj.of(input))
+        assertThat(CPFCNPJ.isValid(input)).isFalse();
+        assertThatThrownBy(() -> CPFCNPJ.of(input))
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessage("cpfCnpj.invalid");
     }

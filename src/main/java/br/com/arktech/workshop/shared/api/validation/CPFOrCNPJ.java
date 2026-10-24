@@ -14,10 +14,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 @Documented
-@Constraint(validatedBy = ValidCpfCnpjValidator.class)
+@Constraint(validatedBy = CPFOrCNPJValidator.class)
 @Target({FIELD, METHOD, PARAMETER, ANNOTATION_TYPE, TYPE_USE})
 @Retention(RUNTIME)
-public @interface ValidCpfCnpj {
+public @interface CPFOrCNPJ {
 
     String message() default "{cpfCnpj.invalid}";
 

@@ -3,7 +3,7 @@ package br.com.arktech.workshop.shared.domain.document;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import java.util.regex.Pattern;
 
-public record Cpf(String value) implements CpfCnpj {
+public record CPF(String value) implements CPFCNPJ {
 
     static final int LENGTH = 11;
 
@@ -13,7 +13,7 @@ public record Cpf(String value) implements CpfCnpj {
     private static final Pattern MASK_GROUPS = Pattern.compile("(\\d{3})(\\d{3})(\\d{3})(\\d{2})");
     private static final String MASK = "$1.$2.$3-$4";
 
-    public Cpf {
+    public CPF {
         value = CheckDigits.normalize(value);
         if (!isValid(value)) {
             throw new BusinessRuleException("cpfCnpj.invalid");

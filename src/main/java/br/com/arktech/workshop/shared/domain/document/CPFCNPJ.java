@@ -3,7 +3,7 @@ package br.com.arktech.workshop.shared.domain.document;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import org.jspecify.annotations.Nullable;
 
-public sealed interface CpfCnpj permits Cpf, Cnpj {
+public sealed interface CPFCNPJ permits CPF, CNPJ {
 
     String value();
 
@@ -11,11 +11,11 @@ public sealed interface CpfCnpj permits Cpf, Cnpj {
 
     String formatted();
 
-    static CpfCnpj of(@Nullable String input) {
+    static CPFCNPJ of(@Nullable String input) {
         String normalized = CheckDigits.normalize(input);
         return switch (normalized.length()) {
-            case Cpf.LENGTH -> new Cpf(normalized);
-            case Cnpj.LENGTH -> new Cnpj(normalized);
+            case CPF.LENGTH -> new CPF(normalized);
+            case CNPJ.LENGTH -> new CNPJ(normalized);
             default -> throw new BusinessRuleException("cpfCnpj.invalid");
         };
     }
@@ -23,8 +23,8 @@ public sealed interface CpfCnpj permits Cpf, Cnpj {
     static boolean isValid(@Nullable String input) {
         String normalized = CheckDigits.normalize(input);
         return switch (normalized.length()) {
-            case Cpf.LENGTH -> Cpf.isValid(normalized);
-            case Cnpj.LENGTH -> Cnpj.isValid(normalized);
+            case CPF.LENGTH -> CPF.isValid(normalized);
+            case CNPJ.LENGTH -> CNPJ.isValid(normalized);
             default -> false;
         };
     }
