@@ -14,7 +14,7 @@ O pacote base é `br.com.arktech.workshop`, organizado **por módulo**, com as c
 
 ```
 br.com.arktech.workshop
-├── shared                o que todos os módulos usam (erros, i18n, TimeStamping, UseCase)
+├── shared                o que todos os módulos usam (erros, i18n, BaseEntity, UseCase)
 └── <module>              ex.: auth, customer, vehicle, serviceorder
     ├── api               controllers e DTOs de entrada/saída
     ├── application       casos de uso, orquestração e transações
@@ -187,7 +187,7 @@ A imagem do banco tem versão fixa (`postgres:18.6-alpine`) e aparece em dois lu
 - Nome no padrão `V<n>__<description>.sql`, com a descrição em inglês e snake_case (ex.: `V2__create_customer.sql`). Use o próximo número livre na `main`; se outro PR mergear a mesma versão antes do seu, renumere a sua.
 - **Nunca altere uma migration que já está na `main`.** Para corrigir, crie uma nova.
 - Tabelas no singular e colunas em inglês e snake_case (`service_order`, `created_at`).
-- Chave primária: `id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY`.
+- Chave primária: `id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY` (mapeada na `BaseEntity`).
 - Toda tabela tem as colunas da `TimeStamping`: `date_created TIMESTAMPTZ NOT NULL`, `last_updated TIMESTAMPTZ NOT NULL` e `version BIGINT NOT NULL`.
 
 ### Entidades e repositórios
@@ -199,11 +199,7 @@ As classes de domínio são as próprias entidades JPA ([ADR 001](docs/adr/001-d
 @Entity
 @Table(name = "customer")
 @Getter
-public class Customer extends TimeStamping {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Customer extends BaseEntity {
 
     private String name;
 
@@ -216,16 +212,6 @@ public class Customer extends TimeStamping {
     public void rename(String name) {
         this.name = name;
     }
-
-    @Override
-    public boolean equals(@Nullable Object other) {
-        return this == other || other instanceof Customer customer && id != null && id.equals(customer.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Customer.class.hashCode();
-    }
 }
 
 public interface CustomerRepository {
@@ -237,7 +223,7 @@ public interface CustomerRepository {
 interface CustomerJpaRepository extends JpaRepository<Customer, Long>, CustomerRepository {}
 ```
 
-- Toda entidade estende `TimeStamping` (`shared/domain`): `dateCreated` e `lastUpdated` são preenchidos pelo Hibernate (`@CreationTimestamp`/`@UpdateTimestamp`) e `version` é o `@Version` do lock otimista.
+- Toda entidade estende `BaseEntity` (`shared/domain`), que traz o `id` (`IDENTITY`) e o `equals`/`hashCode` pelo id. A `BaseEntity` estende a `TimeStamping`: `dateCreated` e `lastUpdated` são preenchidos pelo Hibernate (`@CreationTimestamp`/`@UpdateTimestamp`) e `version` é o `@Version` do lock otimista. O `LayerDependencyTest` exige que toda `@Entity` estenda a `BaseEntity`.
 - O construtor `protected` sem argumentos existe porque o JPA exige. O construtor público cria um objeto novo, sem id.
 - Sem setters: o estado muda por métodos de negócio (`rename`, `deactivate`).
 - O Spring Data implementa os métodos do repositório do domínio através do `XxxJpaRepository`, que fica package-private. Consultas novas entram na interface do domínio com nome de negócio; se precisarem de `@Query`, o método é redeclarado com a anotação no `XxxJpaRepository`.
@@ -249,7 +235,7 @@ interface CustomerJpaRepository extends JpaRepository<Customer, Long>, CustomerR
 - **Liberado:** `@RequiredArgsConstructor`, `@Getter`, `@Slf4j` e `@Builder` quando fizer sentido.
 - **Proibido:** `@Data` e `@Value`. Para dados imutáveis, use `record`. O `lombok.config` faz a compilação falhar se eles forem usados.
 - Injeção de dependência **sempre por construtor** (campos `final` + `@RequiredArgsConstructor`), nunca `@Autowired` em campo.
-- Entidades JPA: sem `@EqualsAndHashCode` e `@ToString` gerados. Escreva `equals`/`hashCode` à mão, baseados no id.
+- Entidades JPA: sem `@EqualsAndHashCode` e `@ToString` gerados. O `equals`/`hashCode` pelo id já vem da `BaseEntity`.
 
 ## Nulabilidade
 
@@ -264,7 +250,7 @@ public record ApiFieldError(@Nullable String field, String message) {}
 
 - **Variável local não leva `@Nullable`**: o JSpecify não aceita a anotação ali, e o NullAway infere a nulabilidade da variável pelo fluxo do código.
 - Na sobrescrita de um método do Spring, repita o `@Nullable` dos parâmetros e do retorno da classe-mãe (ex.: `handleExceptionInternal` no `GlobalExceptionHandler`).
-- Entidades JPA: o construtor `protected` sem argumentos não precisa inicializar os campos (o NullAway trata classes `@Entity`/`@MappedSuperclass` como inicializadas pelo JPA), e o campo `@Id` é tratado como não nulo. O id só existe depois do `save`: não o leia antes. Os campos da `TimeStamping` são `@Nullable` pelo mesmo motivo.
+- Entidades JPA: o construtor `protected` sem argumentos não precisa inicializar os campos (o NullAway trata classes `@Entity`/`@MappedSuperclass` como inicializadas pelo JPA), e o `id` da `BaseEntity` é tratado como não nulo. Ele só existe depois do `save`: não o leia antes. Os campos da `TimeStamping` são `@Nullable` pelo mesmo motivo.
 - O `./gradlew build` falha quando um valor `@Nullable` é usado sem checagem, ou quando `null` é passado onde não é aceito. Os testes não são verificados.
 
 ## Dependências

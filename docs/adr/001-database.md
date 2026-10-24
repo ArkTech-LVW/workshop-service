@@ -52,19 +52,19 @@ Revisado em 2026-10-24 na [KAN-47 (T1.3.1)](https://arktech-lvw.atlassian.net/br
 
 - As classes de domínio são as próprias entidades JPA: `@Entity`, `@Table`, `@Id`, `@OneToMany` etc. ficam no `domain`. O domínio pode importar `jakarta.persistence` e `org.hibernate.annotations`; Spring e o restante do Hibernate continuam proibidos (`LayerDependencyTest`).
 - A interface do repositório continua no `domain`, sem Spring. Na infraestrutura, a interface Spring Data estende as duas (`interface CustomerJpaRepository extends JpaRepository<Customer, Long>, CustomerRepository {}`), e o Spring Data implementa os métodos do domínio. Não há adapter nem mapeamento.
-- Toda entidade estende `TimeStamping` (`shared/domain`): `date_created` e `last_updated` preenchidos pelo Hibernate (`@CreationTimestamp`/`@UpdateTimestamp`) e `version` com `@Version` (lock otimista).
-- O domínio segue as regras do JPA: construtor `protected` sem argumentos, classes e métodos não `final`, `equals`/`hashCode` pelo id. O estado muda por métodos de negócio, sem setters públicos.
+- Toda entidade estende `BaseEntity` (`shared/domain`), com o `id` e o `equals`/`hashCode` pelo id. Ela estende a `TimeStamping`: `date_created` e `last_updated` preenchidos pelo Hibernate (`@CreationTimestamp`/`@UpdateTimestamp`) e `version` com `@Version` (lock otimista).
+- O domínio segue as regras do JPA: construtor `protected` sem argumentos e classes e métodos não `final`. O estado muda por métodos de negócio, sem setters públicos.
 - Módulos não se referenciam por objeto: fora do agregado, a ligação é pelo id (`Long userId`), nunca `@ManyToOne` para entidade de outro módulo. A FK continua no banco.
 
 **Por que mudou:**
 
 - Com o domínio separado, o adapter recria a entidade JPA a cada `save`. Para o `@Version` funcionar, o domínio teria que carregar a versão de ida e volta, ou seja, a persistência vazaria para o domínio de qualquer jeito.
 - Agregados com filhos (papéis do usuário agora, itens e histórico da OS depois) exigiriam mapeamento manual nos dois sentidos e reconciliação das coleções no adapter.
-- A `TimeStamping` vira uma única classe base, sem uma cópia no domínio e outra na infraestrutura.
+- O `id`, o `equals`/`hashCode` e a `TimeStamping` ficam numa única classe base, sem uma cópia no domínio e outra na infraestrutura.
 
 **Custo aceito:** o domínio conhece tabelas e colunas e segue as restrições do JPA. O Hibernate acompanha as entidades carregadas na transação e grava as alterações no commit, mesmo sem `save`.
 
-- **Chave primária:** `BIGINT GENERATED ALWAYS AS IDENTITY`, mapeada como `Long` com `GenerationType.IDENTITY`. É simples, legível e compacta nos índices. O número legível da OS (`SO-2026-000123`) é um campo à parte.
+- **Chave primária:** `BIGINT GENERATED ALWAYS AS IDENTITY`, mapeada na `BaseEntity` como `Long` com `GenerationType.IDENTITY`. É simples, legível e compacta nos índices. O número legível da OS (`SO-2026-000123`) é um campo à parte.
 
 ## Consequências
 
