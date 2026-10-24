@@ -10,17 +10,31 @@ Convenções combinadas para que todos codem no mesmo padrão.
 
 ## Estrutura de pacotes
 
-O pacote base é `br.com.arktech.workshop`, organizado **por módulo**, com as camadas dentro de cada módulo:
+O pacote base é `br.com.arktech.workshop`, organizado **por módulo**, com as camadas dentro de cada módulo e subpacotes dentro das camadas:
 
 ```
 br.com.arktech.workshop
-├── shared                o que todos os módulos usam (erros, i18n, BaseEntity, UseCase)
-└── <module>              ex.: auth, customer, vehicle, serviceorder
-    ├── api               controllers e DTOs de entrada/saída
-    ├── application       casos de uso, orquestração e transações
-    ├── domain            entidades, regras de negócio e interfaces de repositório
-    └── infrastructure    implementações técnicas (persistência, integrações)
+├── shared                    o que todos os módulos usam (erros, i18n, BaseEntity, UseCase)
+└── <module>                  ex.: auth, customer, vehicle, serviceorder
+    ├── api                   controllers e DTOs de entrada/saída
+    ├── application           casos de uso, orquestração e transações
+    │   ├── <caso de uso>     um pacote por caso de uso (ex.: login, createuser)
+    │   └── port              interfaces que os casos de uso usam e a infraestrutura implementa
+    ├── domain                entidades, regras de negócio e contratos
+    │   ├── model             entidades, value objects e enums
+    │   ├── repository        interfaces de repositório
+    │   └── port              outras interfaces que o domínio usa e a infraestrutura implementa
+    └── infrastructure        implementações técnicas
+        ├── config            @Configuration e @ConfigurationProperties
+        ├── persistence       interfaces Spring Data
+        └── <assunto>         demais implementações, agrupadas por assunto (ex.: security)
 ```
+
+- **Port** é uma interface que a camada declara para dizer do que precisa, sem saber como é feito (ex.: `PasswordHasher` no domínio, `TokenIssuer` na `application`). A implementação fica na `infrastructure`. Repositórios também são ports, mas ficam no próprio `repository`.
+- O pacote de um caso de uso tem o nome dele em minúsculas, sem separador (`createuser`), e guarda o `XxxUseCase`, o `XxxCommand`/`XxxQuery` e o `XxxResult`.
+- Crie o subpacote junto com o primeiro arquivo dele; não deixe pacotes vazios.
+- Classes usadas só dentro do próprio subpacote ficam package-private; as que outro subpacote do módulo usa ficam `public`. O isolamento entre módulos continua garantido pelo `LayerDependencyTest`.
+- O `shared` segue a mesma divisão em camadas, com subpacotes por assunto (`error`, `i18n`, `exception`...).
 
 ### Isolamento entre módulos
 
@@ -43,7 +57,7 @@ Essas regras, o isolamento entre módulos e os padrões de controller e de caso 
 
 ## Casos de uso
 
-Cada caso de uso é uma classe da `application` que implementa `UseCase<I, O>` (`shared/application`), com um único método `execute`:
+Cada caso de uso é uma classe da `application`, no pacote do próprio caso de uso, que implementa `UseCase<I, O>` (`shared/application`), com um único método `execute`:
 
 ```java
 @Service
@@ -192,10 +206,10 @@ A imagem do banco tem versão fixa (`postgres:18.6-alpine`) e aparece em dois lu
 
 ### Entidades e repositórios
 
-As classes de domínio são as próprias entidades JPA ([ADR 001](docs/adr/001-database.md)). A interface do repositório fica no `domain`, sem Spring, e a interface Spring Data da `infrastructure` a estende:
+As classes de domínio são as próprias entidades JPA ([ADR 001](docs/adr/001-database.md)). A interface do repositório fica no `domain/repository`, sem Spring, e a interface Spring Data da `infrastructure/persistence` a estende:
 
 ```java
-// <module>/domain
+// <module>/domain/model
 @Entity
 @Table(name = "customer")
 @Getter
@@ -214,12 +228,13 @@ public class Customer extends BaseEntity {
     }
 }
 
+// <module>/domain/repository
 public interface CustomerRepository {
     Customer save(Customer customer);
     Optional<Customer> findById(Long id);
 }
 
-// <module>/infrastructure
+// <module>/infrastructure/persistence
 interface CustomerJpaRepository extends JpaRepository<Customer, Long>, CustomerRepository {}
 ```
 
