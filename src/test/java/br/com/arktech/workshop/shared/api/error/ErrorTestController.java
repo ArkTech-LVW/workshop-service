@@ -3,6 +3,7 @@ package br.com.arktech.workshop.shared.api.error;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
+import br.com.arktech.workshop.shared.domain.exception.UnauthorizedException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -36,6 +37,11 @@ class ErrorTestController {
     @GetMapping("/businessRule")
     void businessRule() {
         throw new BusinessRuleException("test.businessRule");
+    }
+
+    @GetMapping("/unauthorized")
+    void unauthorized() {
+        throw new UnauthorizedException("test.unauthorized");
     }
 
     @GetMapping("/unauthenticated")

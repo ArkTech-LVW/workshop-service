@@ -42,7 +42,7 @@ Sem tratamento próprio, a API devolve o erro padrão do Spring Boot (`timestamp
 ## Decisão
 
 1. **Formato próprio `ApiError{code, message, details}`** para toda resposta de erro, sempre `application/json`. `code` é a chave de i18n, `message` é o texto em pt_BR e `details` é a lista de `{field, message}` nos erros de entrada, ou `null`.
-2. **Hierarquia selada em `shared/domain/exception`:** `DomainException` (sealed) com `NotFoundException` → 404, `ConflictException` → 409 e `BusinessRuleException` → 422, todas `non-sealed`. A exceção carrega só a chave e os argumentos, e a tradução acontece na `api`.
+2. **Hierarquia selada em `shared/domain/exception`:** `DomainException` (sealed) com `NotFoundException` → 404, `ConflictException` → 409, `BusinessRuleException` → 422 e `UnauthorizedException` → 401 (acrescentada na KAN-50, para o login), todas `non-sealed`. A exceção carrega só a chave e os argumentos, e a tradução acontece na `api`.
 3. **`GlobalExceptionHandler` em `shared/api/error`, estendendo `ResponseEntityExceptionHandler`:**
    - Erros de entrada (Bean Validation no corpo e nos parâmetros, tipo inválido, parâmetro ausente, valor JSON inválido) saem como 400 `request.invalidFields` com `details`. JSON sintaticamente quebrado ou corpo ausente sai como 400 `request.malformedBody`.
    - As demais exceções do Spring MVC recebem um código pelo status (`request.routeNotFound`, `request.methodNotSupported` etc.), preservando os headers (ex.: `Allow` no 405).

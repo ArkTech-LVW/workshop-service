@@ -154,6 +154,9 @@ O domínio e a `application` lançam as exceções de `shared/domain/exception`,
 | `NotFoundException` | 404 | O recurso pedido não existe |
 | `ConflictException` | 409 | Conflita com o estado atual (ex.: CPF ou placa já cadastrados) |
 | `BusinessRuleException` | 422 | Viola uma regra de negócio (ex.: transição de status inválida) |
+| `UnauthorizedException` | 401 | O próprio caso de uso recusa a identificação (ex.: login com credenciais inválidas) |
+
+O 401 e o 403 de token ausente, inválido ou sem o papel exigido saem do Spring Security, não dessas exceções (ver [Segurança](#segurança)).
 
 ```java
 throw new NotFoundException("customer.notFound", id);
@@ -165,7 +168,7 @@ throw new NotFoundException("customer.notFound", id);
 
 ### Como documentar os erros
 
-A documentação da API (`/docs`) é gerada pelo springdoc a partir das interfaces dos controllers. Os erros já têm respostas prontas, com schema e exemplo, no `OpenApiConfig`: `BadRequest` (400), `NotFound` (404), `Conflict` (409) e `BusinessRule` (422). Cada endpoint declara só os erros que de fato pode retornar, como o `findById` do exemplo de [Controllers](#controllers):
+A documentação da API (`/docs`) é gerada pelo springdoc a partir das interfaces dos controllers. Os erros já têm respostas prontas, com schema e exemplo, no `OpenApiConfig`: `BadRequest` (400), `InvalidCredentials` (401 do login), `NotFound` (404), `Conflict` (409) e `BusinessRule` (422). Cada endpoint declara só os erros que de fato pode retornar, como o `findById` do exemplo de [Controllers](#controllers):
 
 ```java
 @ApiResponse(responseCode = "200")
@@ -289,7 +292,7 @@ public record ApiFieldError(@Nullable String field, String message) {}
 - Testes automatizados com **JUnit**.
 - `./gradlew build` roda todos os testes e precisa passar antes de abrir o PR.
 - **Unitários:** JUnit puro, sem Spring e sem banco. É o padrão para domínio e regras de negócio.
-- **Camada `api`:** `@WebMvcTest(controllers = ...)` com `@AutoConfigureMockMvc(addFilters = false)` é o padrão para testar controllers, validação e respostas de erro sem banco e sem os filtros de segurança. Veja o `GlobalExceptionHandlerTest`.
+- **Camada `api`:** `@WebMvcTest(controllers = ...)` com `@AutoConfigureMockMvc(addFilters = false)` e `@Import(ApiErrorTestConfig.class)` é o padrão para testar controllers, validação e respostas de erro sem banco e sem os filtros de segurança. O caso de uso entra com `@MockitoBean`. Veja o `AuthControllerTest`.
 - **Integração:** anote a classe com `@IntegrationTest` (ou `@IntegrationTest(webEnvironment = RANDOM_PORT)` para chamar via HTTP). A anotação sobe a aplicação inteira contra um PostgreSQL real (Testcontainers), já com `MockMvc` (com a segurança ligada), e marca o teste com a tag JUnit `integration`. O Docker precisa estar rodando.
 - **Rotas protegidas nos testes de integração:** gere o token com o `TokenIssuer` (`tokenIssuer.issue(userId, Set.of(Role.ADMIN))`) e envie no header `Authorization: Bearer <token>`. Veja o `JwtAuthenticationTest`.
 - Use `@IntegrationTest` só quando o teste precisa da aplicação ou do banco de verdade. Testes com a mesma configuração compartilham contexto e container; cada configuração diferente (ex.: outro `webEnvironment`) sobe os seus.

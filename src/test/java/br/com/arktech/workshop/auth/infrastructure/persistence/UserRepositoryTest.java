@@ -46,6 +46,8 @@ class UserRepositoryTest {
         assertThat(found.getDateCreated()).isNotNull();
         assertThat(found.getLastUpdated()).isNotNull();
         assertThat(found.getVersion()).isZero();
+        assertThat(userRepository.existsByEmail("ana@workshop.com")).isTrue();
+        assertThat(userRepository.existsByEmail("other@workshop.com")).isFalse();
     }
 
     @Test

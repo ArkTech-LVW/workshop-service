@@ -116,13 +116,17 @@ class OpenApiConfig {
                 "serviceOrder.invalidStatusTransition", environment.getRequiredProperty("openapi.example.businessRule"));
         ApiError internalError =
                 ApiError.of("server.unexpectedError", messageResolver.get("server.unexpectedError", "a1b2c3d4"));
+        ApiError invalidCredentials =
+                ApiError.of("auth.invalidCredentials", messageResolver.get("auth.invalidCredentials"));
 
         components
                 .addResponses("BadRequest", errorResponse(environment, "badRequest", invalidFields))
                 .addResponses("NotFound", errorResponse(environment, "notFound", notFound))
                 .addResponses("Conflict", errorResponse(environment, "conflict", conflict))
                 .addResponses("BusinessRule", errorResponse(environment, "businessRule", businessRule))
-                .addResponses("InternalError", errorResponse(environment, "internalError", internalError));
+                .addResponses("InternalError", errorResponse(environment, "internalError", internalError))
+                .addResponses(
+                        "InvalidCredentials", errorResponse(environment, "invalidCredentials", invalidCredentials));
     }
 
     private static ApiResponse errorResponse(Environment environment, String name, ApiError example) {

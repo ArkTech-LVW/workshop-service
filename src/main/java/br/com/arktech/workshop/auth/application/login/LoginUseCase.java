@@ -1,0 +1,56 @@
+package br.com.arktech.workshop.auth.application.login;
+
+import br.com.arktech.workshop.auth.application.port.AccessToken;
+import br.com.arktech.workshop.auth.application.port.TokenIssuer;
+
+import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
+import br.com.arktech.workshop.auth.domain.model.User;
+import br.com.arktech.workshop.auth.domain.repository.UserRepository;
+import br.com.arktech.workshop.shared.application.UseCase;
+import br.com.arktech.workshop.shared.domain.exception.UnauthorizedException;
+
+import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class LoginUseCase implements UseCase<LoginCommand, LoginResult> {
+
+    private static final String INVALID_CREDENTIALS = "auth.invalidCredentials";
+
+    private final UserRepository userRepository;
+    private final PasswordHasher passwordHasher;
+    private final TokenIssuer tokenIssuer;
+    private final String dummyHash;
+
+    public LoginUseCase(UserRepository userRepository, PasswordHasher passwordHasher, TokenIssuer tokenIssuer) {
+        this.userRepository = userRepository;
+        this.passwordHasher = passwordHasher;
+        this.tokenIssuer = tokenIssuer;
+        this.dummyHash = passwordHasher.hash(UUID.randomUUID().toString());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public LoginResult execute(LoginCommand command) {
+        Optional<User> found = userRepository.findByEmail(User.normalizeEmail(command.email()));
+        if (found.isEmpty()) {
+            spendPasswordCheckTime(command.password());
+            throw new UnauthorizedException(INVALID_CREDENTIALS);
+        }
+
+        User user = found.get();
+        if (!user.authenticate(command.password(), passwordHasher)) {
+            throw new UnauthorizedException(INVALID_CREDENTIALS);
+        }
+
+        AccessToken token = tokenIssuer.issue(user.getId(), user.getRoles());
+        return new LoginResult(token.value(), token.expiresIn());
+    }
+
+    private void spendPasswordCheckTime(String password) {
+        passwordHasher.matches(password, dummyHash);
+    }
+}

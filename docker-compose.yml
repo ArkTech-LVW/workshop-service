@@ -18,6 +18,7 @@ services:
   app:
     build: .
     environment:
+      SPRING_PROFILES_ACTIVE: development
       DB_URL: jdbc:postgresql://postgres:5432/workshop
       DB_USERNAME: ${DB_USERNAME:-workshop}
       DB_PASSWORD: ${DB_PASSWORD:-workshop}

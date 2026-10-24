@@ -67,6 +67,15 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void shouldMapUnauthorizedTo401() throws Exception {
+        perform(get("/test/errors/unauthorized"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(json("""
+                        {"code": "test.unauthorized", "message": "Credenciais de teste inválidas.", "details": null}
+                        """));
+    }
+
+    @Test
     void shouldMapAuthenticationFailureTo401WithBearerChallenge() throws Exception {
         perform(get("/test/errors/unauthenticated"))
                 .andExpect(status().isUnauthorized())

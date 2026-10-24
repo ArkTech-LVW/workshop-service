@@ -49,6 +49,17 @@
 - Claims: `sub` (id do usuário), `roles`, `iat` e `exp`. Validade de 1h (`security.jwt.expiration`).
 - A chave vem da variável `JWT_SECRET` (mínimo de 32 bytes). Sem ela, vale uma chave de desenvolvimento definida no `application.yml`, para a aplicação rodar localmente sem configuração.
 
+### Login
+
+- `POST /auth/login` recebe e-mail e senha e devolve o token.
+- E-mail inexistente, senha errada e usuário inativo devolvem o mesmo 401 `auth.invalidCredentials`. Quando o e-mail não existe, a senha é comparada com um hash fictício, para o tempo de resposta não revelar se o e-mail está cadastrado.
+
+### ADMIN de desenvolvimento
+
+- No perfil `development`, a aplicação cria na subida um ADMIN pelo `CreateUserUseCase`, se ele ainda não existir. As credenciais ficam no `application-development.yml`.
+- Foi preferido a uma migration de seed: passa pelas regras do domínio (normalização do e-mail, papéis, hash da senha) e não depende do esquema das tabelas nem de um hash gerado fora da aplicação.
+- O perfil `development` deixou de ser o padrão do `application.yml` e passou a ser ativado só pelo `bootRun` e pelo `docker-compose.yml`. Assim, nenhum outro ambiente sobe com um ADMIN de senha conhecida.
+
 ### Usuário logado e isolamento dos módulos
 
 - O módulo `auth` tem o usuário, o JWT e a cadeia do Spring Security. Os outros módulos só conhecem o que está no `shared`: o enum `Role` e a porta `CurrentUser` (`Long id()`), que o `auth` implementa lendo o `sub` do token.

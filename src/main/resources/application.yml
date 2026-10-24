@@ -1,8 +1,6 @@
 spring:
   application:
     name: workshop-service
-  profiles:
-    active: development
   web:
     locale: pt_BR
     locale-resolver: fixed

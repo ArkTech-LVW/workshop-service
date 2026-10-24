@@ -1,0 +1,4 @@
+local-admin:
+  name: Administrador
+  email: admin@workshop.local
+  password: admin123

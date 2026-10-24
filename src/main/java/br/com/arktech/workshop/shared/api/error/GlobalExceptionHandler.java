@@ -4,6 +4,7 @@ import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.exception.DomainException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
+import br.com.arktech.workshop.shared.domain.exception.UnauthorizedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -46,6 +47,7 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             case NotFoundException e -> HttpStatus.NOT_FOUND;
             case ConflictException e -> HttpStatus.CONFLICT;
             case BusinessRuleException e -> HttpStatus.UNPROCESSABLE_CONTENT;
+            case UnauthorizedException e -> HttpStatus.UNAUTHORIZED;
         };
         return ApiErrors.response(status, apiErrors.of(ex.getCode(), ex.getArgs()));
     }

@@ -49,11 +49,28 @@ Localmente, os tokens JWT são assinados com uma chave de desenvolvimento que j�
 
 Em qualquer outro ambiente, defina a variável `JWT_SECRET`, com pelo menos 32 bytes (para gerar uma: `openssl rand -base64 48`). A chave de desenvolvimento é pública no repositório: com ela, qualquer um consegue gerar um token válido.
 
+### Perfil `development` e usuário ADMIN local
+
+O `bootRun` e o `docker compose up` ativam o perfil `development`, que cria na subida, se ainda não existir, um usuário ADMIN só para ambiente local: **`admin@workshop.local`**, senha **`admin123`**.
+
+Rodando a aplicação de outro jeito (o jar ou a classe `WorkshopApplication` na IDE sem perfil), nenhum usuário é criado. Na IDE, ative o perfil `development` na configuração de execução (*Active profiles*).
+
+## Autenticação
+
+```bash
+curl -X POST http://localhost:8080/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email": "admin@workshop.local", "password": "admin123"}'
+# {"accessToken":"eyJ...","tokenType":"Bearer","expiresIn":3600}
+```
+
+Envie o `accessToken` no header `Authorization: Bearer <token>` das rotas protegidas. O token vale 1h.
+
 ## Documentação da API
 
 Com a aplicação no ar, a documentação (Swagger UI) fica em <http://localhost:8080/docs>, com todas as rotas, os contratos e o formato dos erros. A especificação OpenAPI em JSON está em <http://localhost:8080/docs/openapi.json>.
 
-Para chamar rotas protegidas pela própria UI, clique em **Authorize** e cole o token JWT.
+Para chamar rotas protegidas pela própria UI, faça o login em `POST /auth/login`, clique em **Authorize** e cole o `accessToken`.
 
 ## Decisões de arquitetura
 
