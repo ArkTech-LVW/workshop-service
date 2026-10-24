@@ -89,6 +89,12 @@ class OpenApiDocsTest {
         assertThat(spec.read("$.security[*].bearerAuth", List.class)).hasSize(1);
     }
 
+    @Test
+    void shouldMarkOperationWithEmptySecurityRequirementsAsPublic() {
+        assertThat(spec.read("$.paths['/test/docs/public'].get.security", List.class)).isEmpty();
+        assertThat(spec.read(TEST_OPERATION, Map.class)).doesNotContainKey("security");
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"BadRequest", "NotFound", "Conflict", "BusinessRule", "InternalError"})
     void shouldDefineReusableErrorResponseWithExample(String name) {

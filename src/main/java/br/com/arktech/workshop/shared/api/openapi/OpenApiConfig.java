@@ -4,6 +4,7 @@ import br.com.arktech.workshop.shared.api.error.ApiError;
 import br.com.arktech.workshop.shared.api.error.ApiFieldError;
 import br.com.arktech.workshop.shared.application.i18n.MessageResolver;
 import io.swagger.v3.core.converter.ModelConverters;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -15,17 +16,20 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.springdoc.core.customizers.OpenApiCustomizer;
+import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 
@@ -76,6 +80,23 @@ class OpenApiConfig {
                     .flatMap(path -> path.readOperations().stream())
                     .forEach(operation ->
                             operation.getResponses().putIfAbsent("500", new ApiResponse().$ref(INTERNAL_ERROR_REF)));
+        };
+    }
+
+    // springdoc ignores an empty @SecurityRequirements, so the operation would inherit the global bearerAuth.
+    // An empty security list is what marks the operation as public in the spec.
+    @Bean
+    OperationCustomizer publicOperationCustomizer() {
+        return (operation, handlerMethod) -> {
+            SecurityRequirements requirements = handlerMethod.getMethodAnnotation(SecurityRequirements.class);
+            if (requirements == null) {
+                requirements = AnnotatedElementUtils.findMergedAnnotation(
+                        handlerMethod.getBeanType(), SecurityRequirements.class);
+            }
+            if (requirements != null && requirements.value().length == 0) {
+                operation.setSecurity(new ArrayList<>());
+            }
+            return operation;
         };
     }
 
