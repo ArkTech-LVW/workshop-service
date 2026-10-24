@@ -3,6 +3,7 @@ import net.ltgt.gradle.errorprone.errorprone
 
 plugins {
     java
+    jacoco
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.errorprone)
@@ -64,4 +65,18 @@ tasks.compileJava {
 
 tasks.compileTestJava {
     options.errorprone.enabled = false
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+    addTestListener(object : TestListener {
+        override fun afterSuite(suite: TestDescriptor, result: TestResult) {
+            if (suite.parent != null) return
+
+            val skipped = if (result.skippedTestCount > 0) ", ${result.skippedTestCount} skipped" else ""
+            logger.lifecycle(
+                "Tests: ${result.testCount} run, ${result.successfulTestCount} passed, ${result.failedTestCount} failed$skipped"
+            )
+        }
+    })
 }
