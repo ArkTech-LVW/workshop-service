@@ -83,8 +83,6 @@ class OpenApiConfig {
         };
     }
 
-    // springdoc ignores an empty @SecurityRequirements, so the operation would inherit the global bearerAuth.
-    // An empty security list is what marks the operation as public in the spec.
     @Bean
     OperationCustomizer publicOperationCustomizer() {
         return (operation, handlerMethod) -> {
@@ -134,7 +132,6 @@ class OpenApiConfig {
                 .content(new Content().addMediaType(JSON, mediaType));
     }
 
-    // Swagger's serializer drops null properties, but the API always sends "details", even when null
     private static Map<String, @Nullable Object> asMap(ApiError error) {
         Map<String, @Nullable Object> map = new LinkedHashMap<>();
         map.put("code", error.code());
