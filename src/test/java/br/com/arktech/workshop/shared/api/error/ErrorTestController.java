@@ -9,6 +9,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import java.util.List;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +36,16 @@ class ErrorTestController {
     @GetMapping("/businessRule")
     void businessRule() {
         throw new BusinessRuleException("test.businessRule");
+    }
+
+    @GetMapping("/unauthenticated")
+    void unauthenticated() {
+        throw new InsufficientAuthenticationException("test");
+    }
+
+    @GetMapping("/accessDenied")
+    void accessDenied() {
+        throw new AccessDeniedException("test");
     }
 
     @GetMapping("/invalidStatusTransition")

@@ -14,7 +14,7 @@ O pacote base é `br.com.arktech.workshop`, organizado **por módulo**, com as c
 
 ```
 br.com.arktech.workshop
-├── shared                    o que todos os módulos usam (erros, i18n, BaseEntity, UseCase)
+├── shared                    o que todos os módulos usam (erros, i18n, segurança, BaseEntity, UseCase)
 └── <module>                  ex.: auth, customer, vehicle, serviceorder
     ├── api                   controllers e DTOs de entrada/saída
     ├── application           casos de uso, orquestração e transações
@@ -40,7 +40,7 @@ br.com.arktech.workshop
 
 - Um módulo só importa classes dele mesmo e do `shared`, nunca de outro módulo.
 - A referência a algo de outro módulo é pelo id: `Long createdByUserId`, nunca `User createdBy` nem `@ManyToOne` para entidade de outro módulo. A FK continua no banco.
-- O que um módulo precisa de outro vira um contrato (interface) no `shared`, implementado pelo módulo dono. Crie o contrato só quando algum módulo precisar dele.
+- O que um módulo precisa de outro vira um contrato (interface) no `shared`, implementado pelo módulo dono. Ex.: `CurrentUser` (`shared/application/security`), implementado no `auth`. Crie o contrato só quando algum módulo precisar dele.
 
 ### Regra de dependência entre camadas
 
@@ -83,7 +83,7 @@ public class FindCustomerUseCase implements UseCase<FindCustomerQuery, CustomerR
 - **Nunca escreva texto de mensagem direto no código.** Toda mensagem exibida ao cliente da API vem do `MessageSource`, sempre via `MessageResolver` (`get(code)` ou `get(code, args...)`), que já aplica o locale da aplicação.
 - Chaves em inglês no formato `<context>.<camelCase>` (ex.: `customer.notFound`) e textos em `src/main/resources/messages_pt_BR.properties`.
 - Ao adicionar um idioma, crie `messages_<locale>.properties`.
-- O locale da aplicação é fixo em `pt_BR` (`spring.web.locale`), dentro e fora de requisições HTTP.
+- O locale da aplicação é fixo em `pt_BR` (`spring.web.locale`), dentro e fora de requisições HTTP. O `MessageResolver` usa sempre esse locale, inclusive nos filtros do Spring Security, que rodam antes do `DispatcherServlet` ([ADR 002](docs/adr/002-api-errors.md)).
 - Chave inexistente lança `NoSuchMessageException`; o código da chave nunca é devolvido como mensagem.
 
 ## API
@@ -189,6 +189,16 @@ openapi.customer.findById=Busca um cliente
 - Parâmetros da anotação entram como `{min}`, `{max}`, `{value}`: `Deve ter entre {min} e {max} caracteres.`
 - Em mensagens com argumentos (`{0}`), o apóstrofo precisa ser duplicado (`''`), porque o `MessageFormat` trata `'` como escape. Mensagens de validação e mensagens sem argumentos usam o apóstrofo simples.
 
+## Segurança
+
+Os motivos estão no [ADR 003](docs/adr/003-authentication.md).
+
+- As rotas exigem um token JWT no header `Authorization: Bearer <token>`. Ficam abertos só o `/actuator/health/**` e a documentação (`/docs/**`, `/swagger-ui/**`), na `SecurityConfig`.
+- Sem token, ou com token inválido ou expirado: 401 (`auth.unauthenticated` ou `auth.invalidToken`). Com token, mas sem permissão: 403 (`auth.accessDenied`). Os dois saem pelo `GlobalExceptionHandler`, como os demais erros.
+- O caso de uso que precisa registrar quem fez a ação injeta `CurrentUser` (`shared/application/security`) e chama `currentUser.id()`. O id vem do token (`sub`). Os outros módulos guardam esse `Long`, nunca o `User`.
+- Senhas com hash Argon2id, pelo `PasswordHasher` do `auth`. Nunca logue nem devolva senha ou hash.
+- O token (HS256) leva o id do usuário (`sub`) e os papéis (`roles`) e vale 1h (`security.jwt.expiration`). A chave vem da variável `JWT_SECRET` (mínimo de 32 bytes); sem ela, vale a chave de desenvolvimento do `application.yml`, que só serve para ambiente local.
+
 ## Banco de dados e persistência
 
 PostgreSQL 18 com Spring Data JPA e Flyway. Os motivos estão no [ADR 001](docs/adr/001-database.md).
@@ -279,8 +289,9 @@ public record ApiFieldError(@Nullable String field, String message) {}
 - Testes automatizados com **JUnit**.
 - `./gradlew build` roda todos os testes e precisa passar antes de abrir o PR.
 - **Unitários:** JUnit puro, sem Spring e sem banco. É o padrão para domínio e regras de negócio.
-- **Camada `api`:** `@WebMvcTest(controllers = ...)` é o padrão para testar controllers, validação e respostas de erro sem subir banco. Veja o `GlobalExceptionHandlerTest`.
-- **Integração:** anote a classe com `@IntegrationTest` (ou `@IntegrationTest(webEnvironment = RANDOM_PORT)` para chamar via HTTP). A anotação sobe a aplicação inteira contra um PostgreSQL real (Testcontainers) e marca o teste com a tag JUnit `integration`. O Docker precisa estar rodando.
+- **Camada `api`:** `@WebMvcTest(controllers = ...)` com `@AutoConfigureMockMvc(addFilters = false)` é o padrão para testar controllers, validação e respostas de erro sem banco e sem os filtros de segurança. Veja o `GlobalExceptionHandlerTest`.
+- **Integração:** anote a classe com `@IntegrationTest` (ou `@IntegrationTest(webEnvironment = RANDOM_PORT)` para chamar via HTTP). A anotação sobe a aplicação inteira contra um PostgreSQL real (Testcontainers), já com `MockMvc` (com a segurança ligada), e marca o teste com a tag JUnit `integration`. O Docker precisa estar rodando.
+- **Rotas protegidas nos testes de integração:** gere o token com o `TokenIssuer` (`tokenIssuer.issue(userId, Set.of(Role.ADMIN))`) e envie no header `Authorization: Bearer <token>`. Veja o `JwtAuthenticationTest`.
 - Use `@IntegrationTest` só quando o teste precisa da aplicação ou do banco de verdade. Testes com a mesma configuração compartilham contexto e container; cada configuração diferente (ex.: outro `webEnvironment`) sobe os seus.
 - **Cobertura:** o `./gradlew build` também gera o relatório do JaCoCo em `build/reports/jacoco/test/html/index.html`, mesmo quando algum teste falha.
 

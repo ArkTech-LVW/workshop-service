@@ -43,6 +43,12 @@ As migrations do Flyway são aplicadas automaticamente na subida. Quando a aplic
 
 Para usar um PostgreSQL próprio, desligue o compose com `SPRING_DOCKER_COMPOSE_ENABLED=false` e defina `DB_URL`, `DB_USERNAME` e `DB_PASSWORD` (padrão: `jdbc:postgresql://localhost:5432/workshop`, usuário e senha `workshop`).
 
+### Chave dos tokens (`JWT_SECRET`)
+
+Localmente, os tokens JWT são assinados com uma chave de desenvolvimento que já vem no `application.yml`, sem precisar configurar nada.
+
+Em qualquer outro ambiente, defina a variável `JWT_SECRET`, com pelo menos 32 bytes (para gerar uma: `openssl rand -base64 48`). A chave de desenvolvimento é pública no repositório: com ela, qualquer um consegue gerar um token válido.
+
 ## Documentação da API
 
 Com a aplicação no ar, a documentação (Swagger UI) fica em <http://localhost:8080/docs>, com todas as rotas, os contratos e o formato dos erros. A especificação OpenAPI em JSON está em <http://localhost:8080/docs/openapi.json>.

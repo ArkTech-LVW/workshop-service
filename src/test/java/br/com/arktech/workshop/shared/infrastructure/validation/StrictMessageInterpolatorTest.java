@@ -13,12 +13,9 @@ import jakarta.validation.constraints.Size;
 import java.util.Locale;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.NoSuchMessageException;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.StaticMessageSource;
 
 class StrictMessageInterpolatorTest {
@@ -37,7 +34,7 @@ class StrictMessageInterpolatorTest {
         validatorFactory = Validation.byDefaultProvider()
                 .configure()
                 .messageInterpolator(new StrictMessageInterpolator(
-                        new MessageResolver(messageSource), new ResourceBundleMessageInterpolator()))
+                        new MessageResolver(messageSource, PT_BR), new ResourceBundleMessageInterpolator()))
                 .buildValidatorFactory();
         validator = validatorFactory.getValidator();
     }
@@ -45,16 +42,6 @@ class StrictMessageInterpolatorTest {
     @AfterAll
     static void tearDownValidator() {
         validatorFactory.close();
-    }
-
-    @BeforeEach
-    void setUpLocale() {
-        LocaleContextHolder.setLocale(PT_BR);
-    }
-
-    @AfterEach
-    void resetLocale() {
-        LocaleContextHolder.resetLocaleContext();
     }
 
     @Test

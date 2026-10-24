@@ -37,6 +37,8 @@ class ApiErrors {
             return unexpected(ex);
         }
         return switch (status.value()) {
+            case 401 -> of("auth.unauthenticated");
+            case 403 -> of("auth.accessDenied");
             case 404 -> of("request.routeNotFound");
             case 405 -> of("request.methodNotSupported", method);
             case 406 -> of("request.notAcceptable");

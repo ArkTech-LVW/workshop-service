@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -26,6 +27,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 @WebMvcTest(controllers = ApiErrorController.class)
+@AutoConfigureMockMvc(addFilters = false)
 @Import(ApiErrorTestConfig.class)
 @ExtendWith(OutputCaptureExtension.class)
 class ApiErrorControllerTest {
@@ -87,9 +89,35 @@ class ApiErrorControllerTest {
     }
 
     @Test
-    void shouldMapOtherClientErrorsToGenericCode() throws Exception {
+    void shouldMapUnauthorizedStatusToAuthenticationCode() throws Exception {
+        perform(get("/error").requestAttr(RequestDispatcher.ERROR_STATUS_CODE, 401))
+                .andExpect(status().isUnauthorized())
+                .andExpect(json("""
+                        {
+                          "code": "auth.unauthenticated",
+                          "message": "É preciso se autenticar para acessar este recurso.",
+                          "details": null
+                        }
+                        """));
+    }
+
+    @Test
+    void shouldMapForbiddenStatusToAccessDeniedCode() throws Exception {
         perform(get("/error").requestAttr(RequestDispatcher.ERROR_STATUS_CODE, 403))
                 .andExpect(status().isForbidden())
+                .andExpect(json("""
+                        {
+                          "code": "auth.accessDenied",
+                          "message": "Você não tem permissão para acessar este recurso.",
+                          "details": null
+                        }
+                        """));
+    }
+
+    @Test
+    void shouldMapOtherClientErrorsToGenericCode() throws Exception {
+        perform(get("/error").requestAttr(RequestDispatcher.ERROR_STATUS_CODE, 429))
+                .andExpect(status().isTooManyRequests())
                 .andExpect(json("""
                         {"code": "request.error", "message": "Não foi possível processar a requisição.", "details": null}
                         """));

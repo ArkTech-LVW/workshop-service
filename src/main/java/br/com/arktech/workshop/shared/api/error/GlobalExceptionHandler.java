@@ -17,6 +17,9 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -45,6 +48,20 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             case BusinessRuleException e -> HttpStatus.UNPROCESSABLE_CONTENT;
         };
         return ApiErrors.response(status, apiErrors.of(ex.getCode(), ex.getArgs()));
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    ResponseEntity<ApiError> handleAuthentication(AuthenticationException ex) {
+        String code = ex instanceof OAuth2AuthenticationException ? "auth.invalidToken" : "auth.unauthenticated";
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .header(HttpHeaders.WWW_AUTHENTICATE, "Bearer")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(apiErrors.of(code));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    ResponseEntity<ApiError> handleAccessDenied() {
+        return ApiErrors.response(HttpStatus.FORBIDDEN, apiErrors.of("auth.accessDenied"));
     }
 
     @ExceptionHandler(Exception.class)
