@@ -1,3 +1,5 @@
 package br.com.arktech.workshop.shared.api.error;
 
-public record ApiFieldError(String field, String message) {}
+import org.jspecify.annotations.Nullable;
+
+public record ApiFieldError(@Nullable String field, String message) {}

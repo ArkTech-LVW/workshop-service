@@ -6,7 +6,9 @@ import br.com.arktech.workshop.shared.domain.exception.DomainException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
@@ -51,39 +53,39 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+    protected @Nullable ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         List<ApiFieldError> details = ex.getBindingResult().getAllErrors().stream()
                 .map(error -> new ApiFieldError(
                         error instanceof FieldError fieldError ? fieldError.getField() : null,
-                        error.getDefaultMessage()))
+                        messageOf(error)))
                 .toList();
         return handleExceptionInternal(ex, apiErrors.invalidFields(details), headers, status, request);
     }
 
     @Override
-    protected ResponseEntity<Object> handleHandlerMethodValidationException(
+    protected @Nullable ResponseEntity<Object> handleHandlerMethodValidationException(
             HandlerMethodValidationException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         List<ApiFieldError> details = new ArrayList<>();
         ex.getParameterValidationResults().forEach(result -> {
             String parameterName = result.getMethodParameter().getParameterName();
             for (MessageSourceResolvable error : result.getResolvableErrors()) {
                 String field = error instanceof FieldError fieldError ? fieldError.getField() : parameterName;
-                details.add(new ApiFieldError(field, error.getDefaultMessage()));
+                details.add(new ApiFieldError(field, messageOf(error)));
             }
         });
         return handleExceptionInternal(ex, apiErrors.invalidFields(details), headers, status, request);
     }
 
     @Override
-    protected ResponseEntity<Object> handleTypeMismatch(
+    protected @Nullable ResponseEntity<Object> handleTypeMismatch(
             TypeMismatchException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         ApiError body = apiErrors.invalidField(ex.getPropertyName(), INVALID_VALUE);
         return handleExceptionInternal(ex, body, headers, status, request);
     }
 
     @Override
-    protected ResponseEntity<Object> handleMissingServletRequestParameter(
+    protected @Nullable ResponseEntity<Object> handleMissingServletRequestParameter(
             MissingServletRequestParameterException ex,
             HttpHeaders headers,
             HttpStatusCode status,
@@ -93,7 +95,7 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(
+    protected @Nullable ResponseEntity<Object> handleHttpMessageNotReadable(
             HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         ApiError body = ex.getCause() instanceof MismatchedInputException mismatch
                         && !mismatch.getPath().isEmpty()
@@ -103,8 +105,8 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleExceptionInternal(
-            Exception ex, Object body, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
+    protected @Nullable ResponseEntity<Object> handleExceptionInternal(
+            Exception ex, @Nullable Object body, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
         ApiError apiError = body instanceof ApiError error
                 ? error
                 : apiErrors.forStatus(statusCode, methodOf(request), ex);
@@ -115,7 +117,11 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private static String methodOf(WebRequest request) {
-        return request instanceof ServletWebRequest servletRequest ? servletRequest.getRequest().getMethod() : null;
+        return request instanceof ServletWebRequest servletRequest ? servletRequest.getRequest().getMethod() : "";
+    }
+
+    private static String messageOf(MessageSourceResolvable error) {
+        return Objects.requireNonNull(error.getDefaultMessage());
     }
 
     private static String path(List<JacksonException.Reference> references) {
