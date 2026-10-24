@@ -203,6 +203,7 @@ A imagem do banco tem versão fixa (`postgres:18.6-alpine`) e aparece em dois lu
 - Tabelas no singular e colunas em inglês e snake_case (`service_order`, `created_at`).
 - Chave primária: `id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY` (mapeada na `BaseEntity`).
 - Toda tabela tem as colunas da `TimeStamping`: `date_created TIMESTAMPTZ NOT NULL`, `last_updated TIMESTAMPTZ NOT NULL` e `version BIGINT NOT NULL`.
+- `user` é palavra reservada no PostgreSQL: nas migrations e em SQL nativo, a tabela é sempre `"user"`, entre aspas. Sem aspas, `SELECT * FROM user` não dá erro: devolve o usuário da conexão.
 
 ### Entidades e repositórios
 
@@ -242,7 +243,7 @@ interface CustomerJpaRepository extends JpaRepository<Customer, Long>, CustomerR
 - O construtor `protected` sem argumentos existe porque o JPA exige. O construtor público cria um objeto novo, sem id.
 - Sem setters: o estado muda por métodos de negócio (`rename`, `deactivate`).
 - O Spring Data implementa os métodos do repositório do domínio através do `XxxJpaRepository`, que fica package-private. Consultas novas entram na interface do domínio com nome de negócio; se precisarem de `@Query`, o método é redeclarado com a anotação no `XxxJpaRepository`.
-- Filhos do mesmo agregado (ex.: os itens da OS) são entidades mapeadas a partir da raiz (`@OneToMany(mappedBy = ..., cascade = CascadeType.ALL, orphanRemoval = true)`). Entidade de outro módulo, nunca: guarde o id.
+- Filhos do mesmo agregado (ex.: `UserRole` no `User`) são entidades mapeadas a partir da raiz (`@OneToMany(mappedBy = ..., cascade = CascadeType.ALL, orphanRemoval = true)`). Entidade de outro módulo, nunca: guarde o id.
 - A `application` injeta sempre a interface do domínio (`CustomerRepository`), e as transações (`@Transactional`) ficam nos casos de uso. Dentro da transação, o Hibernate grava as alterações sozinho no commit; chame `save` mesmo assim, para deixar a intenção explícita.
 
 ## Lombok

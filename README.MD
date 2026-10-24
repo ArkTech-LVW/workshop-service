@@ -53,6 +53,7 @@ Para chamar rotas protegidas pela própria UI, clique em **Authorize** e cole o 
 
 - [ADR 001: Banco de dados e persistência](docs/adr/001-database.md)
 - [ADR 002: Padrão de erros da API](docs/adr/002-api-errors.md)
+- [ADR 003: Autenticação e autorização](docs/adr/003-authentication.md)
 
 ## Contribuindo
 
