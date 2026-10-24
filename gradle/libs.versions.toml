@@ -2,6 +2,10 @@
 spring-boot = "4.1.1"
 spring-dependency-management = "1.1.7"
 archunit = "1.5.1"
+errorprone = "2.50.0"
+nullaway = "0.14.2"
+errorprone-plugin = "5.1.1"
+springdoc = "3.1.1"
 
 [libraries]
 spring-boot-starter-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
@@ -19,7 +23,12 @@ testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgr
 lombok = { module = "org.projectlombok:lombok" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 archunit-junit5 = { module = "com.tngtech.archunit:archunit-junit5", version.ref = "archunit" }
+errorprone-core = { module = "com.google.errorprone:error_prone_core", version.ref = "errorprone" }
+nullaway = { module = "com.uber.nullaway:nullaway", version.ref = "nullaway" }
+jspecify = { module = "org.jspecify:jspecify" }
+springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
+errorprone = { id = "net.ltgt.errorprone", version.ref = "errorprone-plugin" }

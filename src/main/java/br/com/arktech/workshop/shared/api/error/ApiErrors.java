@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ class ApiErrors {
         return ApiError.of(code, messageResolver.get(code, args));
     }
 
-    ApiError invalidField(String field, String messageCode) {
+    ApiError invalidField(@Nullable String field, String messageCode) {
         return invalidFields(List.of(new ApiFieldError(field, messageResolver.get(messageCode))));
     }
 
@@ -31,7 +32,7 @@ class ApiErrors {
         return new ApiError(INVALID_FIELDS, messageResolver.get(INVALID_FIELDS), details);
     }
 
-    ApiError forStatus(HttpStatusCode status, String method, Throwable ex) {
+    ApiError forStatus(HttpStatusCode status, String method, @Nullable Throwable ex) {
         if (status.is5xxServerError()) {
             return unexpected(ex);
         }
@@ -44,7 +45,7 @@ class ApiErrors {
         };
     }
 
-    ApiError unexpected(Throwable ex) {
+    ApiError unexpected(@Nullable Throwable ex) {
         String referenceCode = UUID.randomUUID().toString().substring(0, 8);
         log.error("Unexpected error [referenceCode={}]", referenceCode, ex);
         return of("server.unexpectedError", referenceCode);

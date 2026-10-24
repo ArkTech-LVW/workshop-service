@@ -87,6 +87,28 @@ throw new NotFoundException("customer.notFound", id);
 - Crie uma subclasse quando o caso se repetir ou quando um nome de negócio deixar o código mais claro: `class InvalidStatusTransitionException extends BusinessRuleException`. O status vem da categoria.
 - Não crie `@ExceptionHandler` nos controllers: o `GlobalExceptionHandler` já trata tudo.
 
+### Como documentar os erros
+
+A documentação da API (`/docs`) é gerada pelo springdoc a partir dos controllers. Os erros já têm respostas prontas, com schema e exemplo, no `OpenApiConfig`: `BadRequest` (400), `NotFound` (404), `Conflict` (409) e `BusinessRule` (422). Cada endpoint declara só os erros que de fato pode retornar:
+
+```java
+@Operation(summary = "${openapi.customer.findById}")
+@ApiResponse(responseCode = "200")
+@ApiResponse(responseCode = "404", ref = "NotFound")
+@GetMapping("/{id}")
+CustomerResponse findById(@PathVariable Long id) { ... }
+```
+
+```properties
+# src/main/resources/openapi/openapi.properties
+openapi.customer.findById=Busca um cliente
+```
+
+- Os textos da documentação (`summary`, `description`) não ficam no código: vão para o `openapi/openapi.properties`, com chaves `openapi.<context>.<camelCase>`, e são referenciados com `${...}`. Esse arquivo é só da documentação; as mensagens devolvidas ao cliente continuam no `messages_pt_BR.properties`.
+- Uma chave inexistente aparece crua na doc (`${openapi.customer.findById}`) e quebra o `OpenApiDocsTest`.
+- O 500 (`InternalError`) entra sozinho em todas as operações.
+- Toda rota exige o token JWT na documentação. Rota pública desliga o requisito com `@SecurityRequirements()` no método ou na classe.
+
 ### Mensagens de validação
 
 - As anotações de Bean Validation usam a mensagem padrão (`jakarta.validation.constraints.NotBlank.message`) ou uma chave própria entre chaves: `@NotBlank(message = "{customer.nameRequired}")`. Texto literal é proibido.
@@ -196,6 +218,21 @@ class CustomerRepositoryAdapter implements CustomerRepository {
 - **Proibido:** `@Data` e `@Value`. Para dados imutáveis, use `record`. O `lombok.config` faz a compilação falhar se eles forem usados.
 - Injeção de dependência **sempre por construtor** (campos `final` + `@RequiredArgsConstructor`), nunca `@Autowired` em campo.
 - Entidades JPA: sem `@EqualsAndHashCode` e `@ToString` gerados. Escreva `equals`/`hashCode` à mão, baseados no id.
+
+## Nulabilidade
+
+Nada aceita `null`, a não ser o que está marcado com `@Nullable` (`org.jspecify.annotations`, do [JSpecify](https://jspecify.dev)). A regra é verificada na compilação pelo [NullAway](https://github.com/uber/NullAway).
+
+- **Vale para todo o código de produção**, sem anotar classe ou pacote: o NullAway está configurado com `AnnotatedPackages=br.com.arktech.workshop`, que cobre o pacote base e todos os subpacotes. Classes e módulos novos já entram na verificação.
+- Marque com `@Nullable` só o que de fato pode ser nulo: campo, parâmetro, retorno ou componente de record.
+
+```java
+public record ApiFieldError(@Nullable String field, String message) {}
+```
+
+- **Variável local não leva `@Nullable`**: o JSpecify não aceita a anotação ali, e o NullAway infere a nulabilidade da variável pelo fluxo do código.
+- Na sobrescrita de um método do Spring, repita o `@Nullable` dos parâmetros e do retorno da classe-mãe (ex.: `handleExceptionInternal` no `GlobalExceptionHandler`).
+- O `./gradlew build` falha quando um valor `@Nullable` é usado sem checagem, ou quando `null` é passado onde não é aceito. Os testes não são verificados.
 
 ## Dependências
 
