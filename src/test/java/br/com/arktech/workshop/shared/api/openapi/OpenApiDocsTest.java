@@ -121,6 +121,8 @@ class OpenApiDocsTest {
     @Test
     void shouldResolveTextsFromOpenApiProperties() {
         assertThat(spec.read(TEST_OPERATION + ".summary", String.class)).isEqualTo("Erro inesperado");
+        assertThat(spec.read("$.components.schemas.DocsTestResponse.properties.value.description", String.class))
+                .isEqualTo("Recurso não encontrado");
         assertThat(spec.read("$.components.responses.NotFound.description", String.class))
                 .isEqualTo("Recurso não encontrado");
         assertThat(specJson).as("unresolved ${...} placeholder").doesNotContain("${");
