@@ -197,6 +197,21 @@ class CustomerRepositoryAdapter implements CustomerRepository {
 - Injeção de dependência **sempre por construtor** (campos `final` + `@RequiredArgsConstructor`), nunca `@Autowired` em campo.
 - Entidades JPA: sem `@EqualsAndHashCode` e `@ToString` gerados. Escreva `equals`/`hashCode` à mão, baseados no id.
 
+## Nulabilidade
+
+Nada aceita `null`, a não ser o que está marcado com `@Nullable` (`org.jspecify.annotations`, do [JSpecify](https://jspecify.dev)). A regra é verificada na compilação pelo [NullAway](https://github.com/uber/NullAway).
+
+- **Vale para todo o código de produção**, sem anotar classe ou pacote: o NullAway está configurado com `AnnotatedPackages=br.com.arktech.workshop`, que cobre o pacote base e todos os subpacotes. Classes e módulos novos já entram na verificação.
+- Marque com `@Nullable` só o que de fato pode ser nulo: campo, parâmetro, retorno ou componente de record.
+
+```java
+public record ApiFieldError(@Nullable String field, String message) {}
+```
+
+- **Variável local não leva `@Nullable`**: o JSpecify não aceita a anotação ali, e o NullAway infere a nulabilidade da variável pelo fluxo do código.
+- Na sobrescrita de um método do Spring, repita o `@Nullable` dos parâmetros e do retorno da classe-mãe (ex.: `handleExceptionInternal` no `GlobalExceptionHandler`).
+- O `./gradlew build` falha quando um valor `@Nullable` é usado sem checagem, ou quando `null` é passado onde não é aceito. Os testes não são verificados.
+
 ## Dependências
 
 - Adicione uma dependência **somente na tarefa que precisar dela**, nunca "para usar depois".
