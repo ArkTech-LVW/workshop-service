@@ -17,6 +17,7 @@ br.com.arktech.workshop
 ├── shared                    o que todos os módulos usam (erros, i18n, segurança, BaseEntity, UseCase)
 └── <module>                  ex.: auth, customer, vehicle, serviceorder
     ├── api                   controllers e DTOs de entrada/saída
+    │   └── <recurso>         um pacote por controller, com os DTOs dele (ex.: authentication)
     ├── application           casos de uso, orquestração e transações
     │   ├── <caso de uso>     um pacote por caso de uso (ex.: login, createuser)
     │   └── port              interfaces que os casos de uso usam e a infraestrutura implementa
@@ -32,6 +33,7 @@ br.com.arktech.workshop
 
 - **Port** é uma interface que a camada declara para dizer do que precisa, sem saber como é feito (ex.: `PasswordHasher` no domínio, `TokenIssuer` na `application`). A implementação fica na `infrastructure`. Repositórios também são ports, mas ficam no próprio `repository`.
 - O pacote de um caso de uso tem o nome dele em minúsculas, sem separador (`createuser`), e guarda o `XxxUseCase`, o `XxxCommand`/`XxxQuery` e o `XxxResult`.
+- Na `api`, cada controller fica num pacote com o nome do recurso (`authentication`), junto com os DTOs que só ele usa.
 - Crie o subpacote junto com o primeiro arquivo dele; não deixe pacotes vazios.
 - Classes usadas só dentro do próprio subpacote ficam package-private; as que outro subpacote do módulo usa ficam `public`. O isolamento entre módulos continua garantido pelo `LayerDependencyTest`.
 - O `shared` segue a mesma divisão em camadas, com subpacotes por assunto (`error`, `i18n`, `exception`...).
