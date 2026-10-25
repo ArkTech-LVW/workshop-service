@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
+import lombok.RequiredArgsConstructor;
+
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authorization.AuthenticatedAuthorizationManager;
@@ -29,6 +31,7 @@ import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 @Component
+@RequiredArgsConstructor
 public class EndpointAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext> {
 
     private static final AuthorizationDecision GRANTED = new AuthorizationDecision(true);
@@ -36,13 +39,10 @@ public class EndpointAuthorizationManager implements AuthorizationManager<Reques
     private static final AuthorizationManager<RequestAuthorizationContext> PERMIT_ALL = (authentication, context) -> GRANTED;
     private static final AuthorizationManager<RequestAuthorizationContext> DENY_ALL = (authentication, context) -> DENIED;
 
+    @Qualifier("requestMappingHandlerMapping")
     private final RequestMappingHandlerMapping handlerMapping;
-    private final Map<Method, AuthorizationManager<RequestAuthorizationContext>> managers = new ConcurrentHashMap<>();
 
-    public EndpointAuthorizationManager(
-            @Qualifier("requestMappingHandlerMapping") RequestMappingHandlerMapping handlerMapping) {
-        this.handlerMapping = handlerMapping;
-    }
+    private final Map<Method, AuthorizationManager<RequestAuthorizationContext>> managers = new ConcurrentHashMap<>();
 
     @Override
     public @Nullable AuthorizationResult authorize(
