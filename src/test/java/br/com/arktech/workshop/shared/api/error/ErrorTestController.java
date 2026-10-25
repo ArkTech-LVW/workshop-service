@@ -3,6 +3,7 @@ package br.com.arktech.workshop.shared.api.error;
 import br.com.arktech.workshop.shared.api.security.PublicEndpoint;
 import br.com.arktech.workshop.shared.api.validation.CPFOrCNPJ;
 import br.com.arktech.workshop.shared.api.validation.LicensePlate;
+import br.com.arktech.workshop.shared.api.validation.Phone;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
@@ -106,6 +107,9 @@ class ErrorTestController {
     @PostMapping("/licensePlate")
     void licensePlate(@Valid @RequestBody LicensePlateRequest request) {}
 
+    @PostMapping("/phone")
+    void phone(@Valid @RequestBody PhoneRequest request) {}
+
     static class InvalidStatusTransitionException extends BusinessRuleException {
 
         InvalidStatusTransitionException(String status) {
@@ -126,4 +130,6 @@ class ErrorTestController {
     record CPFOrCNPJRequest(@CPFOrCNPJ String document) {}
 
     record LicensePlateRequest(@LicensePlate String plate) {}
+
+    record PhoneRequest(@Phone String phone) {}
 }

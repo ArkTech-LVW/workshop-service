@@ -177,6 +177,16 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void shouldRejectInvalidPhoneWith400() throws Exception {
+        perform(postJson("/test/errors/phone", """
+                        {"phone": "9876-5432"}
+                        """))
+                .andExpect(status().isBadRequest())
+                .andExpect(json(invalidFields(
+                        "phone", "Telefone inválido. Informe o DDD e o número, como (11) 98765-4321.")));
+    }
+
+    @Test
     void shouldReportMethodValidationByParameterName() throws Exception {
         perform(get("/test/errors/param").param("quantity", "-1"))
                 .andExpect(status().isBadRequest())
