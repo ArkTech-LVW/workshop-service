@@ -1,4 +1,4 @@
-package br.com.arktech.workshop.auth.api;
+package br.com.arktech.workshop.auth.api.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

@@ -2,6 +2,7 @@ package br.com.arktech.workshop.shared.api.error;
 
 import br.com.arktech.workshop.shared.api.security.PublicEndpoint;
 import br.com.arktech.workshop.shared.api.validation.CPFOrCNPJ;
+import br.com.arktech.workshop.shared.api.validation.LicensePlate;
 import br.com.arktech.workshop.shared.api.validation.Phone;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
@@ -96,6 +97,9 @@ class ErrorTestController {
     @PostMapping("/cpfCnpj")
     void cpfCnpj(@Valid @RequestBody CPFOrCNPJRequest request) {}
 
+    @PostMapping("/licensePlate")
+    void licensePlate(@Valid @RequestBody LicensePlateRequest request) {}
+
     @PostMapping("/phone")
     void phone(@Valid @RequestBody PhoneRequest request) {}
 
@@ -117,6 +121,8 @@ class ErrorTestController {
     record LiteralMessageRequest(@NotBlank(message = "texto literal") String name) {}
 
     record CPFOrCNPJRequest(@CPFOrCNPJ String document) {}
+
+    record LicensePlateRequest(@LicensePlate String plate) {}
 
     record PhoneRequest(@Phone String phone) {}
 }
