@@ -62,13 +62,40 @@ class UserRepositoryTest {
         flushAndClear();
 
         User user = userRepository.findByEmail(new Email("bia@workshop.com")).orElseThrow();
-        user.deactivate();
+        user.deactivate(0);
         flushAndClear();
 
         User updated = userRepository.findByEmail(new Email("bia@workshop.com")).orElseThrow();
         assertThat(updated.isActive()).isFalse();
         assertThat(updated.getVersion()).isEqualTo(1);
         assertThat(updated.getLastUpdated()).isAfter(updated.getDateCreated());
+    }
+
+    @Test
+    void shouldPersistRoleChangesKeepingTheRolesThatStay() {
+        User user = userRepository.save(newUser("dani@workshop.com", Role.ATTENDANT, Role.MECHANIC));
+        flushAndClear();
+
+        User found = userRepository.findRequiredById(user.getId());
+        found.changeRoles(Set.of(Role.MECHANIC, Role.ADMIN), 0);
+        flushAndClear();
+
+        assertThat(userRepository.findRequiredById(user.getId()).getRoles())
+                .containsExactlyInAnyOrder(Role.MECHANIC, Role.ADMIN);
+    }
+
+    @Test
+    void shouldCountOnlyActiveAdmins() {
+        long before = userRepository.countActiveAdminsForUpdate();
+        userRepository.save(newUser("admin-1@workshop.com", Role.ADMIN, Role.MECHANIC));
+        userRepository.save(newUser("admin-2@workshop.com", Role.ADMIN));
+        userRepository.save(newUser("mechanic@workshop.com", Role.MECHANIC));
+        User inactiveAdmin = newUser("inactive-admin@workshop.com", Role.ADMIN);
+        inactiveAdmin.deactivate(2);
+        userRepository.save(inactiveAdmin);
+        flushAndClear();
+
+        assertThat(userRepository.countActiveAdminsForUpdate()).isEqualTo(before + 2);
     }
 
     @Test

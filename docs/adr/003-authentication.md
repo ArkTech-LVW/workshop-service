@@ -81,6 +81,15 @@
 - Foi preferido a uma migration de seed: passa pelas regras do domínio (normalização do e-mail, papéis, hash da senha) e não depende do esquema das tabelas nem de um hash gerado fora da aplicação.
 - Servidores rodam no perfil `production`, padrão da imagem Docker, onde o ADMIN não é criado. Assim, nenhum servidor sobe com um ADMIN de senha conhecida, desde que siga o deploy pela imagem ou passe o perfil (ver "Token").
 
+### Gestão de usuários
+
+Entrou na [KAN-45 (T1.5)](https://arktech-lvw.atlassian.net/browse/KAN-45).
+
+- O ADMIN cadastra, lista, detalha, atualiza (nome e papéis), ativa e desativa usuários em `/admin/users`.
+- Não existe exclusão: o usuário desativado não faz login, mas continua referenciado pelo id no histórico dos outros módulos.
+- **Sempre existe pelo menos um ADMIN ativo.** O agregado `User` recusa (422 `user.lastActiveAdmin`) desativar ou tirar o papel ADMIN do último ADMIN ativo. A contagem vem do repositório.
+- Para duas requisições simultâneas não removerem os dois últimos ADMINs, os casos de uso que podem remover um ADMIN pegam um advisory lock do PostgreSQL (`pg_advisory_xact_lock`) antes de carregar o usuário e contar os ADMINs (`UserRepository.countActiveAdminsForUpdate`). O lock vale até o fim da transação, e a contagem, feita depois dele, já vê o que a transação anterior gravou. Um `SELECT ... FOR UPDATE` nas linhas dos ADMINs não serviria: a remoção do papel apaga uma linha da `user_role`, que a segunda transação continuaria enxergando.
+
 ### Usuário logado e isolamento dos módulos
 
 - O módulo `auth` tem o usuário, o JWT e a cadeia do Spring Security. Os outros módulos só conhecem o que está no `shared`: o enum `Role` e a porta `CurrentUser` (`Long id()`), que o `auth` implementa lendo o `sub` do token.
@@ -90,6 +99,7 @@
 
 - Um usuário desativado ou com papéis alterados mantém o token atual até ele expirar (no máximo 1h). Se isso virar problema, as saídas são um token mais curto com refresh token ou consultar o usuário a cada requisição.
 - Trocar a `JWT_SECRET` invalida todos os tokens emitidos.
+- Desativar e alterar papéis passam por um único lock, um de cada vez, mesmo quando o usuário não é ADMIN. Ativar não pega o lock. No volume de uma oficina, essa fila é irrelevante.
 - Rodar o jar num servidor sem `SPRING_PROFILES_ACTIVE=production` cai no perfil `development`, que aceita tokens assinados com a chave pública do repositório. O deploy pela imagem Docker evita isso, porque ela já vem em `production`; quem rodar o jar direto precisa passar o perfil.
 - Configurações específicas de produção (ex.: desligar o Swagger) entram num `application-production.yml` quando forem necessárias.
 - Cada requisição casa a rota duas vezes: no `EndpointAuthorizationManager` e no `DispatcherServlet`. O custo é desprezível perto de decidir antes do controller.

@@ -21,6 +21,8 @@ public interface UserRepository {
 
     Page<User> findPage(Pagination pagination);
 
+    long countActiveAdminsForUpdate();
+
     default User findRequiredById(Long id) {
         return findById(id).orElseThrow(() -> new NotFoundException("user.notFound", id.toString()));
     }

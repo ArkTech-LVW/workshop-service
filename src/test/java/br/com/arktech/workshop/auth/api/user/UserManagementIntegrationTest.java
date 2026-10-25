@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -43,7 +44,10 @@ class UserManagementIntegrationTest {
         return Stream.of(
                 Arguments.of(post("/admin/users").contentType(MediaType.APPLICATION_JSON).content("{}")),
                 Arguments.of(get("/admin/users")),
-                Arguments.of(get("/admin/users/1")));
+                Arguments.of(get("/admin/users/1")),
+                Arguments.of(put("/admin/users/1").contentType(MediaType.APPLICATION_JSON).content("{}")),
+                Arguments.of(post("/admin/users/1/activate")),
+                Arguments.of(post("/admin/users/1/deactivate")));
     }
 
     @ParameterizedTest
@@ -63,7 +67,7 @@ class UserManagementIntegrationTest {
     }
 
     @Test
-    void shouldCreateAndFindUser() throws Exception {
+    void shouldManageUserLifecycle() throws Exception {
         String email = uniqueEmail();
 
         String created = asAdmin(post("/admin/users").contentType(MediaType.APPLICATION_JSON).content("""
@@ -84,6 +88,22 @@ class UserManagementIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size").value(100))
                 .andExpect(jsonPath("$.content[*].password").doesNotExist());
+
+        asAdmin(put("/admin/users/{id}", id).contentType(MediaType.APPLICATION_JSON).content("""
+                        {"name": "Ana Souza", "roles": ["MECHANIC"]}
+                        """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Ana Souza"))
+                .andExpect(jsonPath("$.roles").value(contains("MECHANIC")));
+
+        asAdmin(post("/admin/users/{id}/deactivate", id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.active").value(false));
+        login(email, PASSWORD).andExpect(status().isUnauthorized());
+
+        asAdmin(post("/admin/users/{id}/activate", id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.active").value(true));
         login(email, PASSWORD).andExpect(status().isOk());
     }
 

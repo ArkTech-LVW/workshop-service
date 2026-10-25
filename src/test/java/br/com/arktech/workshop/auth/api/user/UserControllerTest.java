@@ -8,16 +8,22 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import br.com.arktech.workshop.auth.application.activateuser.ActivateUserUseCase;
 import br.com.arktech.workshop.auth.application.createuser.CreateUserCommand;
 import br.com.arktech.workshop.auth.application.createuser.CreateUserUseCase;
+import br.com.arktech.workshop.auth.application.deactivateuser.DeactivateUserUseCase;
 import br.com.arktech.workshop.auth.application.finduser.FindUserUseCase;
 import br.com.arktech.workshop.auth.application.listusers.ListUsersQuery;
 import br.com.arktech.workshop.auth.application.listusers.ListUsersUseCase;
+import br.com.arktech.workshop.auth.application.updateuser.UpdateUserCommand;
+import br.com.arktech.workshop.auth.application.updateuser.UpdateUserUseCase;
 import br.com.arktech.workshop.auth.application.user.UserResult;
 import br.com.arktech.workshop.shared.api.error.ApiErrorTestConfig;
+import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.pagination.Page;
@@ -60,6 +66,15 @@ class UserControllerTest {
 
     @MockitoBean
     private FindUserUseCase findUserUseCase;
+
+    @MockitoBean
+    private UpdateUserUseCase updateUserUseCase;
+
+    @MockitoBean
+    private ActivateUserUseCase activateUserUseCase;
+
+    @MockitoBean
+    private DeactivateUserUseCase deactivateUserUseCase;
 
     @Test
     void shouldCreateUserWithoutEchoingThePassword() throws Exception {
@@ -181,6 +196,42 @@ class UserControllerTest {
                 .andExpect(json("""
                         {"code": "user.notFound", "message": "Usuário 1234 não encontrado.", "details": null}
                         """));
+    }
+
+    @Test
+    void shouldUpdateNameAndRoles() throws Exception {
+        when(updateUserUseCase.execute(any())).thenReturn(ANA);
+
+        mockMvc.perform(put("/admin/users/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"name": "Ana", "roles": ["ADMIN", "MECHANIC"]}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(json(ANA_JSON));
+        verify(updateUserUseCase).execute(new UpdateUserCommand(1L, "Ana", Set.of(Role.ADMIN, Role.MECHANIC)));
+    }
+
+    @Test
+    void shouldAnswer422WhenRemovingTheLastActiveAdmin() throws Exception {
+        when(deactivateUserUseCase.execute(any())).thenThrow(new BusinessRuleException("user.lastActiveAdmin"));
+
+        mockMvc.perform(post("/admin/users/1/deactivate"))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(json("""
+                        {"code": "user.lastActiveAdmin",
+                         "message": "Não é possível remover o último ADMIN ativo. Cadastre ou ative outro ADMIN antes.",
+                         "details": null}
+                        """));
+    }
+
+    @Test
+    void shouldActivateAndDeactivate() throws Exception {
+        when(activateUserUseCase.execute(any())).thenReturn(ANA);
+        when(deactivateUserUseCase.execute(any())).thenReturn(ANA);
+
+        mockMvc.perform(post("/admin/users/1/activate")).andExpect(status().isOk()).andExpect(json(ANA_JSON));
+        mockMvc.perform(post("/admin/users/1/deactivate")).andExpect(status().isOk()).andExpect(json(ANA_JSON));
     }
 
     private static ResultMatcher json(String expected) {
