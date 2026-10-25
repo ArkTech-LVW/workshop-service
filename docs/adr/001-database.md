@@ -46,14 +46,23 @@ Além disso, o esquema precisa ser versionado, testável contra o banco real e r
 - Desenvolvimento: `./gradlew bootRun` sobe o PostgreSQL do `docker-compose.yml` sozinho, via `spring-boot-docker-compose`. Essa dependência existe só em desenvolvimento e não entra no jar.
 - Testes de integração (`@IntegrationTest`) contra PostgreSQL real via Testcontainers. Testes unitários não sobem banco.
 
-### Domínio separado da persistência
+### Entidades de domínio mapeadas com JPA
 
-- O domínio é Java puro: nenhuma anotação de persistência (`jakarta.persistence`), nem Spring, nem Hibernate. Entidades JPA e repositórios Spring Data só existem na infraestrutura. O `LayerDependencyTest` (ArchUnit) verifica tudo isso.
-- Cada módulo tem, na infraestrutura, a entidade JPA (`CustomerEntity`), a interface Spring Data (`CustomerJpaRepository`) e um adapter (`CustomerRepositoryAdapter`). O adapter implementa a interface de repositório do domínio e faz o mapeamento entre as duas representações, à mão. A `application` injeta só a interface do domínio.
-- No domínio, um construtor cria um objeto novo (sem id) e outro recebe o id para recriar um objeto vindo do banco.
-- Como o objeto de domínio não é gerenciado pelo Hibernate, toda alteração é gravada com `save` explícito no caso de uso.
-- **Alternativa considerada:** anotar as próprias entidades de domínio com `jakarta.persistence`. Evitaria a entidade JPA e o mapeamento em cada módulo, mas abre uma brecha na arquitetura em camadas: o domínio passaria a conhecer tabelas e colunas e a seguir as restrições do JPA (construtor sem argumentos, campos não finais, proxies). Como nenhum módulo existe ainda, separar agora não tem custo de migração.
-- **Chave primária:** `BIGINT GENERATED ALWAYS AS IDENTITY`, mapeada como `Long` com `GenerationType.IDENTITY`. É simples, legível e compacta nos índices. O número legível da OS (`SO-2026-000123`) é um campo à parte.
+- As classes de domínio são as próprias entidades JPA: `@Entity`, `@Table`, `@Id`, `@OneToMany` etc. ficam no `domain`. O domínio pode importar `jakarta.persistence` e `org.hibernate.annotations`; Spring e o restante do Hibernate continuam proibidos (`LayerDependencyTest`).
+- A interface do repositório continua no `domain`, sem Spring. Na infraestrutura, a interface Spring Data estende as duas (`interface CustomerJpaRepository extends JpaRepository<Customer, Long>, CustomerRepository {}`), e o Spring Data implementa os métodos do domínio. Não há adapter nem mapeamento.
+- Toda entidade estende `BaseEntity` (`shared/domain`), com o `id` e o `equals`/`hashCode` pelo id. Ela estende a `TimeStamping`: `date_created` e `last_updated` preenchidos pelo Hibernate (`@CreationTimestamp`/`@UpdateTimestamp`) e `version` com `@Version` (lock otimista).
+- O domínio segue as regras do JPA: construtor `protected` sem argumentos e classes e métodos não `final`. O estado muda por métodos de negócio, sem setters públicos.
+- Módulos não se referenciam por objeto: fora do agregado, a ligação é pelo id (`Long userId`), nunca `@ManyToOne` para entidade de outro módulo. A FK continua no banco.
+
+**Alternativa considerada: domínio separado da persistência** (classe de domínio, entidade JPA e um adapter que mapeia as duas). Deixaria o domínio sem nenhuma anotação, mas foi descartada:
+
+- O adapter recria a entidade JPA a cada `save`. Para o `@Version` funcionar, o domínio teria que carregar a versão de ida e volta, ou seja, a persistência vazaria para o domínio de qualquer jeito.
+- Agregados com filhos (papéis do usuário, itens e histórico da OS) exigiriam mapeamento manual nos dois sentidos e reconciliação das coleções no adapter.
+- Cada entidade teria duas classes a mais (entidade JPA e adapter), e o `id`, o `equals`/`hashCode` e a `TimeStamping` precisariam de uma cópia no domínio e outra na infraestrutura.
+
+**Custo aceito:** o domínio conhece tabelas e colunas e segue as restrições do JPA. O Hibernate acompanha as entidades carregadas na transação e grava as alterações no commit, mesmo sem `save`.
+
+- **Chave primária:** `BIGINT GENERATED ALWAYS AS IDENTITY`, mapeada na `BaseEntity` como `Long` com `GenerationType.IDENTITY`. É simples, legível e compacta nos índices. O número legível da OS (`SO-2026-000123`) é um campo à parte.
 
 ## Consequências
 
@@ -61,5 +70,5 @@ Além disso, o esquema precisa ser versionado, testável contra o banco real e r
 - **T0.4:** o `docker-compose.yml` já tem o serviço `postgres`. A T0.4 acrescenta o serviço da aplicação, lendo `DB_URL`, `DB_USERNAME` e `DB_PASSWORD`, e precisa garantir que o `bootRun` continue subindo só o banco (por exemplo, com `profiles` no serviço da aplicação ou um arquivo separado indicado em `spring.docker.compose.file`).
 - IDs sequenciais são enumeráveis. A API do cliente (T3.8) precisa autorizar pelo dono do recurso, nunca pela dificuldade de adivinhar o ID.
 - Dois PRs em paralelo podem criar a mesma versão de migration. Quem mergear por último renumera a sua antes do merge (o Flyway recusa versões duplicadas e o build quebra).
-- Cada módulo tem duas classes a mais (entidade JPA e adapter). Agregados com coleções, como a OS com itens e histórico (T3.1), mapeiam os filhos nos dois sentidos.
+- Agregados com coleções, como a OS com itens e histórico (T3.1), mapeiam os filhos como entidades a partir da raiz (`cascade` + `orphanRemoval`).
 - Em aberto: a interface de repositório do domínio não pode usar `Pageable`/`Page` do Spring Data. A primeira listagem paginada (ex.: T3.9) define o tipo de paginação a adotar.

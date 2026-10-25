@@ -66,6 +66,8 @@ tasks.compileJava {
         check("NullAway", CheckSeverity.ERROR)
         option("NullAway:AnnotatedPackages", "br.com.arktech.workshop")
         option("NullAway:JSpecifyMode", "true")
+        option("NullAway:ExternalInitAnnotations", "jakarta.persistence.Entity,jakarta.persistence.MappedSuperclass")
+        option("NullAway:ExcludedFieldAnnotations", "jakarta.persistence.Id")
     }
 }
 
