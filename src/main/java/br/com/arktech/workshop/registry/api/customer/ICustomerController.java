@@ -65,7 +65,9 @@ interface ICustomerController {
     @ApiResponse(responseCode = "404", ref = "NotFound")
     @ApiResponse(responseCode = "409", ref = "Conflict")
     @PutMapping("/{id}")
-    CustomerResponse update(@PathVariable Long id, @Valid @RequestBody CustomerRequest request);
+    CustomerResponse update(
+            @Parameter(description = "${openapi.customer.id}", example = "1") @PathVariable Long id,
+            @Valid @RequestBody CustomerRequest request);
 
     @Operation(summary = "${openapi.customer.delete}", description = "${openapi.customer.deleteDescription}")
     @ApiResponse(responseCode = "204")
@@ -73,5 +75,5 @@ interface ICustomerController {
     @ApiResponse(responseCode = "409", ref = "Conflict")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
-    void delete(@PathVariable Long id);
+    void delete(@Parameter(description = "${openapi.customer.id}", example = "1") @PathVariable Long id);
 }
