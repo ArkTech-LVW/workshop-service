@@ -51,7 +51,7 @@ public class JwtConfig {
         byte[] secret = properties.secret().getBytes(StandardCharsets.UTF_8);
         if (secret.length < MIN_SECRET_BYTES) {
             throw new IllegalStateException(
-                    "security.jwt.secret (JWT_SECRET) must have at least " + MIN_SECRET_BYTES + " bytes");
+                    "security.jwt.secret (JWT_SECRET) is missing or has less than " + MIN_SECRET_BYTES + " bytes");
         }
 
         return new SecretKeySpec(secret, "HmacSHA256");

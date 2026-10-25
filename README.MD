@@ -43,11 +43,16 @@ As migrations do Flyway são aplicadas automaticamente na subida. Quando a aplic
 
 Para usar um PostgreSQL próprio, desligue o compose com `SPRING_DOCKER_COMPOSE_ENABLED=false` e defina `DB_URL`, `DB_USERNAME` e `DB_PASSWORD` (padrão: `jdbc:postgresql://localhost:5432/workshop`, usuário e senha `workshop`).
 
-### Chave dos tokens (`JWT_SECRET`)
+### Perfis: desenvolvimento e produção
 
-Localmente, os tokens JWT são assinados com uma chave de desenvolvimento que já vem no `application.yml`, sem precisar configurar nada.
+| Como roda | Perfil | O que precisa |
+|---|---|---|
+| IntelliJ, `./gradlew bootRun` ou o jar na sua máquina | `development` (padrão do `application.yml`) | nada |
+| `docker compose up` | `development` (definido no `docker-compose.yml`) | nada |
+| Imagem Docker num servidor | `production` (definido no `Dockerfile`) | `JWT_SECRET` e as variáveis do banco |
+| Jar direto num servidor | `production` | `SPRING_PROFILES_ACTIVE=production`, `JWT_SECRET` e as variáveis do banco |
 
-Em qualquer outro ambiente, defina a variável `JWT_SECRET`, com pelo menos 32 bytes (para gerar uma: `openssl rand -base64 48`). A chave de desenvolvimento é pública no repositório: com ela, qualquer um consegue gerar um token válido.
+O perfil `development` assina os tokens JWT com uma chave de desenvolvimento, que é pública no repositório. Fora dele, a variável `JWT_SECRET` é obrigatória, com pelo menos 32 bytes (para gerar uma: `openssl rand -base64 48`); sem ela, a aplicação não sobe. Nunca rode num servidor sem `SPRING_PROFILES_ACTIVE=production`: em `development`, qualquer um consegue gerar um token válido.
 
 ## Documentação da API
 
