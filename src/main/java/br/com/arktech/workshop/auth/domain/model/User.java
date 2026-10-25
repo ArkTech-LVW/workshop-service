@@ -3,6 +3,7 @@ package br.com.arktech.workshop.auth.domain.model;
 import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
 
 import br.com.arktech.workshop.shared.domain.BaseEntity;
+import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
@@ -13,7 +14,6 @@ import jakarta.persistence.Table;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,7 +27,7 @@ public class User extends BaseEntity {
 
     private String name;
 
-    private String email;
+    private Email email;
 
     @Getter(AccessLevel.NONE)
     private String passwordHash;
@@ -41,20 +41,16 @@ public class User extends BaseEntity {
     protected User() {
     }
 
-    public User(String name, String email, String password, Set<Role> roles, PasswordHasher passwordHasher) {
+    public User(String name, Email email, String password, Set<Role> roles, PasswordHasher passwordHasher) {
         if (roles.isEmpty()) {
             throw new BusinessRuleException("user.roleRequired");
         }
 
         this.name = name;
-        this.email = normalizeEmail(email);
+        this.email = email;
         this.passwordHash = passwordHasher.hash(password);
         this.active = true;
         roles.forEach(role -> this.roles.add(new UserRole(this, role)));
-    }
-
-    public static String normalizeEmail(String email) {
-        return email.strip().toLowerCase(Locale.ROOT);
     }
 
     public Set<Role> getRoles() {
