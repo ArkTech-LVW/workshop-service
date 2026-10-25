@@ -193,6 +193,27 @@ class UserTest {
     }
 
     @Test
+    void shouldNotChangePasswordToTheCurrentOne() {
+        User user = newUser();
+
+        assertThatThrownBy(() -> user.changePassword("secret", "secret", passwordHasher))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("user.samePassword");
+    }
+
+    @Test
+    void shouldNotChangePasswordOfInactiveUser() {
+        User user = newUser();
+        user.deactivate(0);
+
+        assertThatThrownBy(() -> user.changePassword("secret", "new-secret", passwordHasher))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("user.inactive");
+        user.activate();
+        assertThat(user.authenticate("secret", passwordHasher)).isTrue();
+    }
+
+    @Test
     void shouldExposeRolesAsReadOnly() {
         User user = newUser();
 

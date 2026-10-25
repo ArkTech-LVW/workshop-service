@@ -84,7 +84,7 @@
 
 Entrou na [KAN-45 (T1.5)](https://arktech-lvw.atlassian.net/browse/KAN-45).
 
-- O ADMIN cadastra, lista, detalha, atualiza (nome e papéis), ativa e desativa usuários em `/admin/users`. Cada usuário troca a própria senha em `PUT /auth/password`, informando a senha atual.
+- O ADMIN cadastra, lista, detalha, atualiza (nome e papéis), ativa e desativa usuários em `/admin/users`. Cada usuário troca a própria senha em `PUT /auth/password`, informando a senha atual. A nova precisa ser diferente da atual (422 `user.samePassword`), e um usuário desativado com token ainda válido não troca a senha (422 `user.inactive`).
 - Não existe exclusão: o usuário desativado não faz login, mas continua referenciado pelo id no histórico dos outros módulos.
 - **Sempre existe pelo menos um ADMIN ativo.** O agregado `User` recusa (422 `user.lastActiveAdmin`) desativar ou tirar o papel ADMIN do último ADMIN ativo. A contagem vem do repositório.
 - Para duas requisições simultâneas não removerem os dois últimos ADMINs, os casos de uso que podem remover um ADMIN pegam um advisory lock do PostgreSQL (`pg_advisory_xact_lock`) antes de carregar o usuário e contar os ADMINs (`UserRepository.countActiveAdminsForUpdate`). O lock vale até o fim da transação, e a contagem, feita depois dele, já vê o que a transação anterior gravou. Um `SELECT ... FOR UPDATE` nas linhas dos ADMINs não serviria: a remoção do papel apaga uma linha da `user_role`, que a segunda transação continuaria enxergando.

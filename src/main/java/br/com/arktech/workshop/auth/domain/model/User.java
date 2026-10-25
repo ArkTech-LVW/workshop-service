@@ -95,8 +95,14 @@ public class User extends BaseEntity {
     }
 
     public void changePassword(String currentPassword, String newPassword, PasswordHasher passwordHasher) {
+        if (!active) {
+            throw new BusinessRuleException("user.inactive");
+        }
         if (!passwordHasher.matches(currentPassword, passwordHash)) {
             throw new BusinessRuleException("user.wrongCurrentPassword");
+        }
+        if (newPassword.equals(currentPassword)) {
+            throw new BusinessRuleException("user.samePassword");
         }
 
         passwordHash = passwordHasher.hash(newPassword);

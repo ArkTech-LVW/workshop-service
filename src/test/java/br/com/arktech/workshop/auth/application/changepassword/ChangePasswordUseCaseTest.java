@@ -48,6 +48,22 @@ class ChangePasswordUseCaseTest {
     }
 
     @Test
+    void shouldRejectInactiveUser() {
+        user.deactivate(0);
+
+        assertThatThrownBy(() -> changePasswordUseCase.execute(new ChangePasswordCommand("secret", "new-secret")))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("user.inactive");
+    }
+
+    @Test
+    void shouldRejectSamePassword() {
+        assertThatThrownBy(() -> changePasswordUseCase.execute(new ChangePasswordCommand("secret", "secret")))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("user.samePassword");
+    }
+
+    @Test
     void shouldHidePasswordsFromToString() {
         assertThat(new ChangePasswordCommand("secret", "new-secret").toString())
                 .doesNotContain("secret");
