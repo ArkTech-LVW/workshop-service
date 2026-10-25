@@ -130,6 +130,10 @@ class CustomerController implements ICustomerController {
 - Constraints de validação nos parâmetros (`@Positive`, `@NotNull`...) ficam **só** na interface. Repetir na classe faz o Hibernate Validator lançar `ConstraintDeclarationException` (HV000151).
 - Interface e controller ficam package-private, na `api` do módulo.
 
+### Postman
+
+A collection do Postman em `docs/postman` tem todas as rotas da API, com o caso de sucesso de cada uma. Toda rota nova entra nela no mesmo PR. Como importar, usar e exportar está no [README da collection](docs/postman/README.md).
+
 ## Erros da API
 
 Os motivos estão no [ADR 002](docs/adr/002-api-errors.md).
