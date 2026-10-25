@@ -8,6 +8,9 @@ import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
 import br.com.arktech.workshop.auth.domain.model.User;
 import br.com.arktech.workshop.auth.domain.repository.UserRepository;
 import br.com.arktech.workshop.shared.domain.email.Email;
+import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
+import br.com.arktech.workshop.shared.domain.pagination.Page;
+import br.com.arktech.workshop.shared.domain.pagination.Pagination;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
 import jakarta.persistence.EntityManager;
@@ -68,6 +71,30 @@ class UserRepositoryTest {
         assertThat(updated.getLastUpdated()).isAfter(updated.getDateCreated());
     }
 
+    // Other integration tests commit users too, so this one only looks at the last pages, where its names sort.
+    @Test
+    void shouldPageUsersOrderedByName() {
+        userRepository.save(newNamedUser("zzz-c", "page-c@workshop.com"));
+        userRepository.save(newNamedUser("zzz-a", "page-a@workshop.com"));
+        userRepository.save(newNamedUser("zzz-b", "page-b@workshop.com"));
+        flushAndClear();
+        int total = (int) userRepository.findPage(new Pagination(0, 1)).totalElements();
+
+        Page<User> last = userRepository.findPage(new Pagination(total - 1, 1));
+
+        assertThat(last.totalPages()).isEqualTo(total);
+        assertThat(nameAt(total - 3)).isEqualTo("zzz-a");
+        assertThat(nameAt(total - 2)).isEqualTo("zzz-b");
+        assertThat(last.content()).extracting(User::getName).containsExactly("zzz-c");
+    }
+
+    @Test
+    void shouldReportUnknownUser() {
+        assertThatThrownBy(() -> userRepository.findRequiredById(Long.MAX_VALUE))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("user.notFound");
+    }
+
     @Test
     void shouldRejectDuplicatedEmail() {
         userRepository.save(newUser("caio@workshop.com", Role.MECHANIC));
@@ -82,6 +109,14 @@ class UserRepositoryTest {
 
     private User newUser(String email, Role... roles) {
         return new User("Ana", new Email(email), "secret", Set.of(roles), passwordHasher);
+    }
+
+    private User newNamedUser(String name, String email) {
+        return new User(name, new Email(email), "secret", Set.of(Role.MECHANIC), passwordHasher);
+    }
+
+    private String nameAt(int index) {
+        return userRepository.findPage(new Pagination(index, 1)).content().getFirst().getName();
     }
 
     private void flushAndClear() {
