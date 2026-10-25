@@ -107,6 +107,15 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void shouldRejectInvalidCpfCnpjWith400() throws Exception {
+        perform(postJson("/test/errors/cpfCnpj", """
+                        {"document": "111.111.111-11"}
+                        """))
+                .andExpect(status().isBadRequest())
+                .andExpect(json(invalidFields("document", "CPF ou CNPJ inválido.")));
+    }
+
+    @Test
     void shouldReportMethodValidationByParameterName() throws Exception {
         perform(get("/test/errors/param").param("quantity", "-1"))
                 .andExpect(status().isBadRequest())
