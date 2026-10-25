@@ -165,6 +165,57 @@
               ]
             }
           }
+        },
+        {
+          "name": "Atualiza os dados de um cliente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ana Souza Oliveira\",\n  \"document\": \"529.982.247-25\",\n  \"email\": \"ana.oliveira@email.com\",\n  \"phone\": \"(11) 98765-4321\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/customers/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "customers", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "Id devolvido pelo cadastro"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Exclui um cliente",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/admin/customers/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "customers", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "Id devolvido pelo cadastro"
+                }
+              ]
+            }
+          }
         }
       ]
     }
