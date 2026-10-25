@@ -1,18 +1,10 @@
 # Postman
 
-`workshop-service.postman_collection.json` é a collection **Workshop Service**, com as rotas da API, no formato Collection v2.1 do Postman. Qualquer pessoa importa no próprio Postman, no plano gratuito. O arquivo fica no repositório e muda no mesmo PR das rotas.
+A collection do Postman é gerada a partir do OpenAPI que a própria aplicação publica em `/docs/openapi.json`. Não há arquivo de collection no repositório: rota nova aparece no próximo import. O plano gratuito do Postman basta.
 
-## Como usar a collection no Postman
+## Como usar
 
-### 1. Importe a collection
-
-1. Instale o app do Postman e entre com a sua conta. O plano gratuito basta.
-2. Clique em **Import**, no canto superior esquerdo, e selecione o arquivo `docs/postman/workshop-service.postman_collection.json` do seu clone. Também dá para arrastar o arquivo para a janela.
-3. A collection **Workshop Service** aparece em **Collections**, com as pastas **Autenticação** e **Clientes**.
-
-Quando o arquivo mudar no repositório, importe de novo. Se o Postman perguntar o que fazer com a collection que já existe, escolha **Replace**, para trocar a versão antiga pela nova.
-
-### 2. Suba a aplicação
+### 1. Suba a aplicação
 
 ```bash
 ./gradlew bootRun
@@ -20,24 +12,34 @@ Quando o arquivo mudar no repositório, importe de novo. Se o Postman perguntar 
 
 A aplicação sobe em `http://localhost:8080` no perfil `development`, que cria o ADMIN `admin@workshop.local` com a senha `admin123`.
 
-### 3. Faça o login
+### 2. Importe o OpenAPI
 
-1. Abra **Autenticação → Autentica um usuário** e clique em **Send**.
-2. A resposta 200 traz o `accessToken`, e o Postman o guarda na variável `accessToken` da collection. A partir daí, todas as rotas mandam `Authorization: Bearer <token>` sozinhas.
-3. O token vale 1h. Quando as rotas começarem a responder 401, faça o login de novo.
+1. No Postman, clique em **Import** e cole `http://localhost:8080/docs/openapi.json`.
+2. Escolha importar como **Postman Collection** e abra **View Import Settings**.
+3. Mude **Folder organization** para **Tags**, para as rotas ficarem nas pastas **Autenticação**, **Clientes** etc.
+4. Mude **Parameter generation** para **Example**, para os corpos e parâmetros virem com os exemplos do Swagger em vez de `<string>`.
+5. Clique em **Import**. A collection **Workshop Service API** aparece em **Collections**, com o `baseUrl` já apontando para `http://localhost:8080`.
 
-### 4. Use as rotas
+Quando surgirem rotas novas, importe de novo e apague a collection antiga.
+
+### 3. Tire a auth do login
+
+Abra **Autenticação → Autentica um usuário**, vá na aba **Authorization** e escolha **No Auth**. Sem isso, o login herda o token da collection e, depois que o token vence, responde 401 até você limpar o token ([KAN-61](https://arktech-lvw.atlassian.net/browse/KAN-61)).
+
+### 4. Faça o login e guarde o token
+
+1. Envie **Autentica um usuário**. O corpo já vem com o ADMIN de desenvolvimento.
+2. Copie o `accessToken` da resposta.
+3. Clique na collection, vá na aba **Authorization** e cole o token no campo **Token**. Todas as rotas herdam essa auth.
+
+O token vale 1h. Quando as rotas começarem a responder 401, repita o login e troque o token.
+
+### 5. Use as rotas
 
 - **Clientes → Cadastra um cliente** cria um cliente com o CPF `529.982.247-25`. Para cadastrar outro, troque o documento no corpo, porque um CPF repetido responde 409.
 - Nas rotas com `:id`, ajuste o id na aba **Params**.
+- Cada rota traz, em **Examples**, as respostas documentadas no Swagger (sucesso e erros).
 
-O `baseUrl` já vem como `http://localhost:8080` nas variáveis da collection (clique na collection → aba **Variables**). Mude só se a aplicação rodar em outro endereço. Não é preciso selecionar nenhum ambiente.
+## Como manter
 
-## Como manter a collection
-
-Toda rota nova entra na collection no mesmo PR, só com o caso de sucesso:
-
-1. No Postman, crie a rota na pasta do recurso (crie a pasta, se o recurso for novo). Use como nome o `summary` da rota no Swagger, deixe a auth como **Inherit auth from parent** e mantenha a ordem em que as rotas fazem sentido (cadastrar antes de consultar, excluir por último).
-2. Nas variáveis da collection, apague o valor de `accessToken`, para o token não ir para o arquivo.
-3. Clique nos três pontos da collection → **Export**, escolha **Collection v2.1** e salve por cima de `docs/postman/workshop-service.postman_collection.json`.
-4. Confira no diff que só entrou o que você mudou e que o `accessToken` continua vazio, e commite junto com a rota.
+Não há collection para exportar. Para a rota nova sair utilizável no import, ela precisa estar completa no Swagger: `summary` na operação, `@Tag` no controller e `example` em cada campo do corpo e em cada parâmetro (ver "Postman" no [CONTRIBUTING](../../CONTRIBUTING.md)).
