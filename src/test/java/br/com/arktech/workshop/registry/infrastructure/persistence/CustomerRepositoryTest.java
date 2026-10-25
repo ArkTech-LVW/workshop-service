@@ -83,6 +83,16 @@ class CustomerRepositoryTest {
     }
 
     @Test
+    void shouldCheckDocumentIgnoringItsOwnCustomer() {
+        Customer saved = customerRepository.save(newCustomer("Ana", "529.982.247-25"));
+        flushAndClear();
+        CPFCNPJ document = CPFCNPJ.of("52998224725");
+
+        assertThat(customerRepository.existsByDocumentAndIdNot(document, saved.getId())).isFalse();
+        assertThat(customerRepository.existsByDocumentAndIdNot(document, saved.getId() + 1)).isTrue();
+    }
+
+    @Test
     void shouldPageCustomersOrderedByName() {
         customerRepository.save(newCustomer("zzz-c", "529.982.247-25"));
         customerRepository.save(newCustomer("zzz-a", "123.456.789-09"));

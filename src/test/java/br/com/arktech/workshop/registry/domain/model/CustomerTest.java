@@ -33,4 +33,26 @@ class CustomerTest {
         assertThat(customer.getEmail()).isEqualTo(EMAIL);
         assertThat(customer.getPhone()).isEqualTo(new Phone("11987654321"));
     }
+
+    @Test
+    void shouldUpdatePersonTypeWhenDocumentChanges() {
+        Customer customer = new Customer("Ana Souza", CPF, EMAIL, null);
+
+        customer.changeDocument(CNPJ);
+
+        assertThat(customer.getDocument()).isEqualTo(CNPJ);
+        assertThat(customer.getPersonType()).isEqualTo(PersonType.LEGAL_PERSON);
+    }
+
+    @Test
+    void shouldRenameAndReplaceContact() {
+        Customer customer = new Customer("Ana", CPF, EMAIL, new Phone("11987654321"));
+
+        customer.rename("Ana Souza");
+        customer.changeContact(new Email("contato@oficina.com"), null);
+
+        assertThat(customer.getName()).isEqualTo("Ana Souza");
+        assertThat(customer.getEmail()).isEqualTo(new Email("contato@oficina.com"));
+        assertThat(customer.getPhone()).isNull();
+    }
 }

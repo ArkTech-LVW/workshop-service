@@ -17,6 +17,8 @@ public interface CustomerRepository {
 
     boolean existsByDocument(CPFCNPJ document);
 
+    boolean existsByDocumentAndIdNot(CPFCNPJ document, Long id);
+
     Page<Customer> findPage(CustomerFilter filter, Pagination pagination);
 
     default Customer findRequiredById(Long id) {

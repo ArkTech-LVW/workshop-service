@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -55,4 +56,12 @@ interface ICustomerController {
     @ApiResponse(responseCode = "404", ref = "NotFound")
     @GetMapping("/{id}")
     CustomerResponse findById(@PathVariable Long id);
+
+    @Operation(summary = "${openapi.customer.update}")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "400", ref = "BadRequest")
+    @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "409", ref = "Conflict")
+    @PutMapping("/{id}")
+    CustomerResponse update(@PathVariable Long id, @Valid @RequestBody CustomerRequest request);
 }

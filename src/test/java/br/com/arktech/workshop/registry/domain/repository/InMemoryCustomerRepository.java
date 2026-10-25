@@ -38,6 +38,12 @@ public class InMemoryCustomerRepository implements CustomerRepository {
     }
 
     @Override
+    public boolean existsByDocumentAndIdNot(CPFCNPJ document, Long id) {
+        return customers.stream()
+                .anyMatch(customer -> customer.getDocument().equals(document) && !customer.getId().equals(id));
+    }
+
+    @Override
     public Page<Customer> findPage(CustomerFilter filter, Pagination pagination) {
         List<Customer> matching = customers.stream()
                 .filter(customer -> filter.document() == null || customer.getDocument().equals(filter.document()))

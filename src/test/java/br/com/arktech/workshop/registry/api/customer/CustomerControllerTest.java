@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -15,6 +16,8 @@ import br.com.arktech.workshop.registry.application.customer.CustomerResult;
 import br.com.arktech.workshop.registry.application.findcustomer.FindCustomerUseCase;
 import br.com.arktech.workshop.registry.application.listcustomers.ListCustomersQuery;
 import br.com.arktech.workshop.registry.application.listcustomers.ListCustomersUseCase;
+import br.com.arktech.workshop.registry.application.updatecustomer.UpdateCustomerCommand;
+import br.com.arktech.workshop.registry.application.updatecustomer.UpdateCustomerUseCase;
 import br.com.arktech.workshop.shared.api.error.ApiErrorTestConfig;
 import br.com.arktech.workshop.shared.domain.document.PersonType;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
@@ -61,6 +64,9 @@ class CustomerControllerTest {
 
     @MockitoBean
     private FindCustomerUseCase findCustomerUseCase;
+
+    @MockitoBean
+    private UpdateCustomerUseCase updateCustomerUseCase;
 
     @Test
     void shouldCreateCustomer() throws Exception {
@@ -207,6 +213,40 @@ class CustomerControllerTest {
                 .andExpect(json("""
                         {"code": "customer.notFound", "message": "Cliente 1234 não encontrado.", "details": null}
                         """));
+    }
+
+    @Test
+    void shouldUpdateCustomer() throws Exception {
+        when(updateCustomerUseCase.execute(any())).thenReturn(ANA);
+
+        mockMvc.perform(put("/admin/customers/1").contentType(MediaType.APPLICATION_JSON).content(ANA_REQUEST))
+                .andExpect(status().isOk())
+                .andExpect(json(ANA_JSON));
+        verify(updateCustomerUseCase)
+                .execute(new UpdateCustomerCommand(
+                        1L, "Ana Souza", "529.982.247-25", "ana@email.com", "(11) 98765-4321"));
+    }
+
+    @Test
+    void shouldValidateUpdatedCustomer() throws Exception {
+        mockMvc.perform(put("/admin/customers/1").contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(json("""
+                        {"code": "request.invalidFields"}
+                        """, JsonCompareMode.LENIENT));
+        verifyNoInteractions(updateCustomerUseCase);
+    }
+
+    @Test
+    void shouldAnswer409WhenUpdatingToAnotherCustomersDocument() throws Exception {
+        when(updateCustomerUseCase.execute(any()))
+                .thenThrow(new ConflictException("customer.documentAlreadyExists", "529.982.247-25"));
+
+        mockMvc.perform(put("/admin/customers/1").contentType(MediaType.APPLICATION_JSON).content(ANA_REQUEST))
+                .andExpect(status().isConflict())
+                .andExpect(json("""
+                        {"code": "customer.documentAlreadyExists"}
+                        """, JsonCompareMode.LENIENT));
     }
 
     private static ResultMatcher json(String expected) {

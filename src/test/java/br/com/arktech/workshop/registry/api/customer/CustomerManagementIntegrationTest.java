@@ -1,7 +1,9 @@
 package br.com.arktech.workshop.registry.api.customer;
 
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -41,7 +43,8 @@ class CustomerManagementIntegrationTest {
         return Stream.of(
                 Arguments.of(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("{}")),
                 Arguments.of(get("/admin/customers")),
-                Arguments.of(get("/admin/customers/1")));
+                Arguments.of(get("/admin/customers/1")),
+                Arguments.of(put("/admin/customers/1").contentType(MediaType.APPLICATION_JSON).content("{}")));
     }
 
     @ParameterizedTest
@@ -111,6 +114,39 @@ class CustomerManagementIntegrationTest {
     }
 
     @Test
+    void shouldUpdateDataAndPersonType() throws Exception {
+        CPFCNPJ cpf = uniqueCPF();
+        CPFCNPJ cnpj = uniqueCNPJ();
+        Integer id = createCustomer(cpf.value());
+
+        asAdmin(put("/admin/customers/{id}", id).contentType(MediaType.APPLICATION_JSON).content("""
+                        {"name": "Ana Souza ME", "document": "%s", "email": "Contato@AnaSouza.com"}
+                        """.formatted(cnpj.formatted())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Ana Souza ME"))
+                .andExpect(jsonPath("$.document").value(cnpj.value()))
+                .andExpect(jsonPath("$.personType").value("LEGAL_PERSON"))
+                .andExpect(jsonPath("$.email").value("contato@anasouza.com"))
+                .andExpect(jsonPath("$.phone").value(nullValue()));
+        asAdmin(get("/admin/customers").param("document", cpf.value()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(0));
+    }
+
+    @Test
+    void shouldRejectUpdateToAnotherCustomersDocument() throws Exception {
+        CPFCNPJ taken = uniqueCPF();
+        createCustomer(taken.value());
+        Integer id = createCustomer(uniqueCPF().value());
+
+        asAdmin(put("/admin/customers/{id}", id).contentType(MediaType.APPLICATION_JSON).content("""
+                        {"name": "Ana", "document": "%s", "email": "ana@email.com"}
+                        """.formatted(taken.formatted())))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("customer.documentAlreadyExists"));
+    }
+
+    @Test
     void shouldAnswer404ForUnknownCustomer() throws Exception {
         asAdmin(get("/admin/customers/{id}", Long.MAX_VALUE))
                 .andExpect(status().isNotFound())
@@ -138,6 +174,10 @@ class CustomerManagementIntegrationTest {
 
     private static CPFCNPJ uniqueCPF() {
         return withCheckDigits("%09d".formatted(ThreadLocalRandom.current().nextLong(1_000_000_000L)));
+    }
+
+    private static CPFCNPJ uniqueCNPJ() {
+        return withCheckDigits("%08d0001".formatted(ThreadLocalRandom.current().nextLong(100_000_000L)));
     }
 
     private static CPFCNPJ withCheckDigits(String base) {
