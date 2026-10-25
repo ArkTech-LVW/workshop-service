@@ -7,6 +7,7 @@ import br.com.arktech.workshop.IntegrationTest;
 import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
 import br.com.arktech.workshop.auth.domain.model.User;
 import br.com.arktech.workshop.auth.domain.repository.UserRepository;
+import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
 import jakarta.persistence.EntityManager;
@@ -36,10 +37,12 @@ class UserRepositoryTest {
         User saved = userRepository.save(newUser("ana@workshop.com", Role.ADMIN, Role.MECHANIC));
         flushAndClear();
 
-        User found = userRepository.findByEmail("ana@workshop.com").orElseThrow();
+        User found = userRepository.findByEmail(new Email("ana@workshop.com")).orElseThrow();
 
         assertThat(found.getId()).isEqualTo(saved.getId());
         assertThat(found.getName()).isEqualTo("Ana");
+        assertThat(found.getEmail()).isEqualTo(new Email("ana@workshop.com"));
+        assertThat(userRepository.findByEmail(new Email(" ANA@Workshop.com"))).contains(found);
         assertThat(found.isActive()).isTrue();
         assertThat(found.getRoles()).containsExactlyInAnyOrder(Role.ADMIN, Role.MECHANIC);
         assertThat(found.authenticate("secret", passwordHasher)).isTrue();
@@ -55,11 +58,11 @@ class UserRepositoryTest {
         userRepository.save(newUser("bia@workshop.com", Role.ATTENDANT));
         flushAndClear();
 
-        User user = userRepository.findByEmail("bia@workshop.com").orElseThrow();
+        User user = userRepository.findByEmail(new Email("bia@workshop.com")).orElseThrow();
         user.deactivate();
         flushAndClear();
 
-        User updated = userRepository.findByEmail("bia@workshop.com").orElseThrow();
+        User updated = userRepository.findByEmail(new Email("bia@workshop.com")).orElseThrow();
         assertThat(updated.isActive()).isFalse();
         assertThat(updated.getVersion()).isEqualTo(1);
         assertThat(updated.getLastUpdated()).isAfter(updated.getDateCreated());
@@ -78,7 +81,7 @@ class UserRepositoryTest {
     }
 
     private User newUser(String email, Role... roles) {
-        return new User("Ana", email, "secret", Set.of(roles), passwordHasher);
+        return new User("Ana", new Email(email), "secret", Set.of(roles), passwordHasher);
     }
 
     private void flushAndClear() {

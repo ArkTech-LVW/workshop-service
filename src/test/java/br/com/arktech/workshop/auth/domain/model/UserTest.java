@@ -1,10 +1,10 @@
 package br.com.arktech.workshop.auth.domain.model;
 
-import br.com.arktech.workshop.auth.domain.port.FakePasswordHasher;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import br.com.arktech.workshop.auth.domain.port.FakePasswordHasher;
+import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
@@ -14,21 +14,23 @@ import org.junit.jupiter.api.Test;
 
 class UserTest {
 
+    private static final Email EMAIL = new Email("ana@workshop.com");
+
     private final FakePasswordHasher passwordHasher = new FakePasswordHasher();
 
     @Test
-    void shouldStartActiveWithNormalizedEmailAndRoles() {
-        User user = new User("Ana", "  Ana@Workshop.COM ", "secret", Set.of(Role.ADMIN, Role.MECHANIC), passwordHasher);
+    void shouldStartActiveWithEmailAndRoles() {
+        User user = new User("Ana", EMAIL, "secret", Set.of(Role.ADMIN, Role.MECHANIC), passwordHasher);
 
         assertThat(user.getName()).isEqualTo("Ana");
-        assertThat(user.getEmail()).isEqualTo("ana@workshop.com");
+        assertThat(user.getEmail()).isEqualTo(EMAIL);
         assertThat(user.isActive()).isTrue();
         assertThat(user.getRoles()).containsExactlyInAnyOrder(Role.ADMIN, Role.MECHANIC);
     }
 
     @Test
     void shouldRequireAtLeastOneRole() {
-        assertThatThrownBy(() -> new User("Ana", "ana@workshop.com", "secret", Set.of(), passwordHasher))
+        assertThatThrownBy(() -> new User("Ana", EMAIL, "secret", Set.of(), passwordHasher))
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessage("user.roleRequired");
     }
@@ -76,6 +78,6 @@ class UserTest {
     }
 
     private User newUser() {
-        return new User("Ana", "ana@workshop.com", "secret", Set.of(Role.ATTENDANT), passwordHasher);
+        return new User("Ana", EMAIL, "secret", Set.of(Role.ATTENDANT), passwordHasher);
     }
 }

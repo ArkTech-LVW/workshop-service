@@ -1,3 +1,7 @@
+security:
+  jwt:
+    secret: local-development-secret-not-for-production-use
+
 local-admin:
   name: Administrador
   email: admin@workshop.local

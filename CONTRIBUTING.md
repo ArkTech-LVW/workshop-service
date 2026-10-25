@@ -200,7 +200,7 @@ Os motivos estão no [ADR 003](docs/adr/003-authentication.md).
 - Sem token, ou com token inválido ou expirado: 401 (`auth.unauthenticated` ou `auth.invalidToken`). Com token, mas sem permissão: 403 (`auth.accessDenied`). Os dois saem pelo `GlobalExceptionHandler`, como os demais erros.
 - O caso de uso que precisa registrar quem fez a ação injeta `CurrentUser` (`shared/application/security`) e chama `currentUser.id()`. O id vem do token (`sub`). Os outros módulos guardam esse `Long`, nunca o `User`.
 - Senhas com hash Argon2id, pelo `PasswordHasher` do `auth`. Nunca logue nem devolva senha ou hash.
-- O token (HS256) leva o id do usuário (`sub`) e os papéis (`roles`) e vale 1h (`security.jwt.expiration`). A chave vem da variável `JWT_SECRET` (mínimo de 32 bytes); sem ela, vale a chave de desenvolvimento do `application.yml`, que só serve para ambiente local.
+- O token (HS256) leva o id do usuário (`sub`) e os papéis (`roles`) e vale 1h (`security.jwt.expiration`). A chave vem da variável `JWT_SECRET` (mínimo de 32 bytes). Só o perfil `development`, padrão para rodar localmente, traz uma chave de desenvolvimento; em qualquer outro perfil, sem a variável a aplicação não sobe. Os perfis estão no README.
 
 ## Banco de dados e persistência
 
@@ -257,6 +257,8 @@ interface CustomerJpaRepository extends JpaRepository<Customer, Long>, CustomerR
 - Sem setters: o estado muda por métodos de negócio (`rename`, `deactivate`).
 - O Spring Data implementa os métodos do repositório do domínio através do `XxxJpaRepository`, que fica package-private. Consultas novas entram na interface do domínio com nome de negócio; se precisarem de `@Query`, o método é redeclarado com a anotação no `XxxJpaRepository`.
 - Filhos do mesmo agregado (ex.: `UserRole` no `User`) são entidades mapeadas a partir da raiz (`@OneToMany(mappedBy = ..., cascade = CascadeType.ALL, orphanRemoval = true)`). Entidade de outro módulo, nunca: guarde o id.
+- Value objects são `record`s com a regra (normalização e validação) no construtor compacto: não existe um `Email` fora do padrão. Quem recebe um `String` de fora cria o value object (`new Email(command.email())`) antes de usar ou consultar.
+- Value object de **uma coluna** (ex.: `Email`, em `shared/domain/email`) é persistido por um `AttributeConverter` com `@Converter(autoApply = true)`, ao lado do `record`: a entidade só declara o campo (`private Email email;`) e o repositório recebe o value object (`findByEmail(Email email)`). Value object de **várias colunas** (ex.: valor e moeda) é `@Embeddable`.
 - A `application` injeta sempre a interface do domínio (`CustomerRepository`), e as transações (`@Transactional`) ficam nos casos de uso. Dentro da transação, o Hibernate grava as alterações sozinho no commit; chame `save` mesmo assim, para deixar a intenção explícita.
 
 ## Lombok
@@ -293,7 +295,7 @@ public record ApiFieldError(@Nullable String field, String message) {}
 - `./gradlew build` roda todos os testes e precisa passar antes de abrir o PR.
 - **Unitários:** JUnit puro, sem Spring e sem banco. É o padrão para domínio e regras de negócio.
 - **Camada `api`:** `@WebMvcTest(controllers = ...)` com `@AutoConfigureMockMvc(addFilters = false)` e `@Import(ApiErrorTestConfig.class)` é o padrão para testar controllers, validação e respostas de erro sem banco e sem os filtros de segurança. O caso de uso entra com `@MockitoBean`. Veja o `AuthControllerTest`.
-- **Integração:** anote a classe com `@IntegrationTest` (ou `@IntegrationTest(webEnvironment = RANDOM_PORT)` para chamar via HTTP). A anotação sobe a aplicação inteira contra um PostgreSQL real (Testcontainers), já com `MockMvc` (com a segurança ligada), e marca o teste com a tag JUnit `integration`. O Docker precisa estar rodando.
+- **Integração:** anote a classe com `@IntegrationTest` (ou `@IntegrationTest(webEnvironment = RANDOM_PORT)` para chamar via HTTP). A anotação sobe a aplicação inteira contra um PostgreSQL real (Testcontainers), no perfil `test` (sem herdar o `development`) e com uma `JWT_SECRET` de teste, já com `MockMvc` (com a segurança ligada), e marca o teste com a tag JUnit `integration`. O Docker precisa estar rodando.
 - **Rotas protegidas nos testes de integração:** gere o token com o `TokenIssuer` (`tokenIssuer.issue(userId, Set.of(Role.ADMIN))`) e envie no header `Authorization: Bearer <token>`. Veja o `JwtAuthenticationTest`.
 - Use `@IntegrationTest` só quando o teste precisa da aplicação ou do banco de verdade. Testes com a mesma configuração compartilham contexto e container; cada configuração diferente (ex.: outro `webEnvironment`) sobe os seus.
 - **Cobertura:** o `./gradlew build` também gera o relatório do JaCoCo em `build/reports/jacoco/test/html/index.html`, mesmo quando algum teste falha.

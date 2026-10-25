@@ -94,7 +94,7 @@ class JwtTokenIssuerTest {
     void shouldRefuseShortSecret() {
         assertThatThrownBy(() -> config.jwtEncoder(properties("short-secret")))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("at least 32 bytes");
+                .hasMessageContaining("less than 32 bytes");
     }
 
     private String encode(JwtClaimsSet claims) {
