@@ -1,4 +1,4 @@
-package br.com.arktech.workshop.auth.api;
+package br.com.arktech.workshop.auth.api.authentication;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
