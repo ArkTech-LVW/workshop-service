@@ -31,7 +31,7 @@ dependencies {
     implementation(libs.spring.boot.starter.webmvc)
     implementation(libs.spring.boot.starter.actuator)
     implementation(libs.spring.boot.starter.validation)
-    implementation(libs.spring.security.crypto)
+    implementation(libs.spring.boot.starter.security.oauth2.resource.server)
     implementation(libs.bouncycastle.bcprov)
     implementation(libs.springdoc.openapi.starter.webmvc.ui)
     implementation(libs.jspecify)

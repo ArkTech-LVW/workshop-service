@@ -3,12 +3,14 @@ package br.com.arktech.workshop.shared.application.i18n;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.NoSuchMessageException;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -28,6 +30,17 @@ class MessageResolverTest {
     void shouldResolveMessageWithArgs() {
         assertThat(messageResolver.get("test.messageWithArgs", "o resolver", 2))
                 .isEqualTo("Mensagem de teste para o resolver com 2 argumentos.");
+    }
+
+    @Test
+    void shouldIgnoreTheRequestLocale() {
+        LocaleContextHolder.setLocale(Locale.US);
+        try {
+            assertThat(messageResolver.get("test.message"))
+                    .isEqualTo("Mensagem de teste para validação da configuração.");
+        } finally {
+            LocaleContextHolder.resetLocaleContext();
+        }
     }
 
     @Test

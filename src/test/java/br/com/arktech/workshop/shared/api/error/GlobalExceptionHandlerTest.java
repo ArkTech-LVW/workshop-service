@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
@@ -28,6 +29,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 @WebMvcTest(controllers = ErrorTestController.class)
+@AutoConfigureMockMvc(addFilters = false)
 @Import(ApiErrorTestConfig.class)
 @ExtendWith(OutputCaptureExtension.class)
 class GlobalExceptionHandlerTest {
@@ -61,6 +63,33 @@ class GlobalExceptionHandlerTest {
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(json("""
                         {"code": "test.businessRule", "message": "Regra de teste violada.", "details": null}
+                        """));
+    }
+
+    @Test
+    void shouldMapAuthenticationFailureTo401WithBearerChallenge() throws Exception {
+        perform(get("/test/errors/unauthenticated"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string(HttpHeaders.WWW_AUTHENTICATE, "Bearer"))
+                .andExpect(json("""
+                        {
+                          "code": "auth.unauthenticated",
+                          "message": "É preciso se autenticar para acessar este recurso.",
+                          "details": null
+                        }
+                        """));
+    }
+
+    @Test
+    void shouldMapAccessDeniedTo403() throws Exception {
+        perform(get("/test/errors/accessDenied"))
+                .andExpect(status().isForbidden())
+                .andExpect(json("""
+                        {
+                          "code": "auth.accessDenied",
+                          "message": "Você não tem permissão para acessar este recurso.",
+                          "details": null
+                        }
                         """));
     }
 
