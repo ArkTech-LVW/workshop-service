@@ -19,10 +19,12 @@ import java.util.stream.Collectors;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "\"user\"")
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
 
     private String name;
@@ -37,9 +39,6 @@ public class User extends BaseEntity {
     @Getter(AccessLevel.NONE)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserRole> roles = new ArrayList<>();
-
-    protected User() {
-    }
 
     public User(String name, Email email, String password, Set<Role> roles, PasswordHasher passwordHasher) {
         if (roles.isEmpty()) {

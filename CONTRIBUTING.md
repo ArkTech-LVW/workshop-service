@@ -214,11 +214,10 @@ As classes de domínio são as próprias entidades JPA ([ADR 001](docs/adr/001-d
 @Entity
 @Table(name = "customer")
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Customer extends BaseEntity {
 
     private String name;
-
-    protected Customer() {}
 
     public Customer(String name) {
         this.name = name;
@@ -240,7 +239,7 @@ interface CustomerJpaRepository extends JpaRepository<Customer, Long>, CustomerR
 ```
 
 - Toda entidade estende `BaseEntity` (`shared/domain`), que traz o `id` (`IDENTITY`) e o `equals`/`hashCode` pelo id. A `BaseEntity` estende a `TimeStamping`: `dateCreated` e `lastUpdated` são preenchidos pelo Hibernate (`@CreationTimestamp`/`@UpdateTimestamp`) e `version` é o `@Version` do lock otimista. O `LayerDependencyTest` exige que toda `@Entity` estenda a `BaseEntity`.
-- O construtor `protected` sem argumentos existe porque o JPA exige. O construtor público cria um objeto novo, sem id.
+- O construtor `protected` sem argumentos existe porque o JPA exige e é gerado pelo `@NoArgsConstructor(access = AccessLevel.PROTECTED)`. O construtor de negócio, que cria um objeto novo sem id, é escrito à mão: `@RequiredArgsConstructor` não serve, porque campo de entidade não pode ser `final`, e `@AllArgsConstructor` prenderia o construtor à lista e à ordem dos campos.
 - Sem setters: o estado muda por métodos de negócio (`rename`, `deactivate`).
 - O Spring Data implementa os métodos do repositório do domínio através do `XxxJpaRepository`, que fica package-private. Consultas novas entram na interface do domínio com nome de negócio; se precisarem de `@Query`, o método é redeclarado com a anotação no `XxxJpaRepository`.
 - Filhos do mesmo agregado (ex.: `UserRole` no `User`) são entidades mapeadas a partir da raiz (`@OneToMany(mappedBy = ..., cascade = CascadeType.ALL, orphanRemoval = true)`). Entidade de outro módulo, nunca: guarde o id.
@@ -250,7 +249,7 @@ interface CustomerJpaRepository extends JpaRepository<Customer, Long>, CustomerR
 
 ## Lombok
 
-- **Liberado:** `@RequiredArgsConstructor`, `@Getter`, `@Slf4j` e `@Builder` quando fizer sentido.
+- **Liberado:** `@RequiredArgsConstructor`, `@Getter`, `@Slf4j` e `@Builder` quando fizer sentido, e `@NoArgsConstructor(access = AccessLevel.PROTECTED)` para o construtor que o JPA exige nas entidades.
 - **Proibido:** `@Data` e `@Value`. Para dados imutáveis, use `record`. O `lombok.config` faz a compilação falhar se eles forem usados.
 - Injeção de dependência **sempre por construtor** (campos `final` + `@RequiredArgsConstructor`), nunca `@Autowired` em campo.
 - Entidades JPA: sem `@EqualsAndHashCode` e `@ToString` gerados. O `equals`/`hashCode` pelo id já vem da `BaseEntity`.

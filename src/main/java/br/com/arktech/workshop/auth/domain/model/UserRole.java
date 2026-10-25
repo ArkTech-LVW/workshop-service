@@ -11,11 +11,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "user_role")
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 class UserRole extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -24,9 +27,6 @@ class UserRole extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private Role role;
-
-    protected UserRole() {
-    }
 
     UserRole(User user, Role role) {
         this.user = user;
