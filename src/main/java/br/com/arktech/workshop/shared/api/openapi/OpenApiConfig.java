@@ -2,9 +2,9 @@ package br.com.arktech.workshop.shared.api.openapi;
 
 import br.com.arktech.workshop.shared.api.error.ApiError;
 import br.com.arktech.workshop.shared.api.error.ApiFieldError;
+import br.com.arktech.workshop.shared.api.security.EndpointAccess;
 import br.com.arktech.workshop.shared.application.i18n.MessageResolver;
 import io.swagger.v3.core.converter.ModelConverters;
-import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -12,6 +12,7 @@ import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import java.io.IOException;
@@ -29,7 +30,6 @@ import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 
@@ -43,6 +43,8 @@ class OpenApiConfig {
     private static final String JSON = org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
     private static final String API_ERROR_REF = "#/components/schemas/ApiError";
     private static final String INTERNAL_ERROR_REF = "#/components/responses/InternalError";
+    private static final String UNAUTHENTICATED_REF = "#/components/responses/Unauthenticated";
+    private static final String ACCESS_DENIED_REF = "#/components/responses/AccessDenied";
 
     @Bean
     OpenAPI openApi(
@@ -84,20 +86,23 @@ class OpenApiConfig {
     }
 
     @Bean
-    OperationCustomizer publicOperationCustomizer() {
+    OperationCustomizer endpointAccessCustomizer() {
         return (operation, handlerMethod) -> {
-            SecurityRequirements requirements = handlerMethod.getMethodAnnotation(SecurityRequirements.class);
-            if (requirements == null) {
-                requirements = AnnotatedElementUtils.findMergedAnnotation(
-                        handlerMethod.getBeanType(), SecurityRequirements.class);
-            }
-            if (requirements != null && requirements.value().length == 0) {
+            EndpointAccess access = EndpointAccess.of(handlerMethod);
+            if (access instanceof EndpointAccess.Public) {
                 operation.setSecurity(new ArrayList<>());
+                return operation;
+            }
+            if (operation.getResponses() == null) {
+                operation.setResponses(new ApiResponses());
+            }
+            operation.getResponses().putIfAbsent("401", new ApiResponse().$ref(UNAUTHENTICATED_REF));
+            if (!(access instanceof EndpointAccess.AnyUser)) {
+                operation.getResponses().putIfAbsent("403", new ApiResponse().$ref(ACCESS_DENIED_REF));
             }
             return operation;
         };
     }
-
 
     private static void addErrorResponses(
             Components components, MessageResolver messageResolver, Environment environment) {
@@ -118,6 +123,8 @@ class OpenApiConfig {
                 ApiError.of("server.unexpectedError", messageResolver.get("server.unexpectedError", "a1b2c3d4"));
         ApiError invalidCredentials =
                 ApiError.of("auth.invalidCredentials", messageResolver.get("auth.invalidCredentials"));
+        ApiError unauthenticated = ApiError.of("auth.unauthenticated", messageResolver.get("auth.unauthenticated"));
+        ApiError accessDenied = ApiError.of("auth.accessDenied", messageResolver.get("auth.accessDenied"));
 
         components
                 .addResponses("BadRequest", errorResponse(environment, "badRequest", invalidFields))
@@ -126,7 +133,9 @@ class OpenApiConfig {
                 .addResponses("BusinessRule", errorResponse(environment, "businessRule", businessRule))
                 .addResponses("InternalError", errorResponse(environment, "internalError", internalError))
                 .addResponses(
-                        "InvalidCredentials", errorResponse(environment, "invalidCredentials", invalidCredentials));
+                        "InvalidCredentials", errorResponse(environment, "invalidCredentials", invalidCredentials))
+                .addResponses("Unauthenticated", errorResponse(environment, "unauthenticated", unauthenticated))
+                .addResponses("AccessDenied", errorResponse(environment, "accessDenied", accessDenied));
     }
 
     private static ApiResponse errorResponse(Environment environment, String name, ApiError example) {

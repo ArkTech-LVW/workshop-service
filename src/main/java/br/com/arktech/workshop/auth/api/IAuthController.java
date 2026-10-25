@@ -1,8 +1,9 @@
 package br.com.arktech.workshop.auth.api;
 
+import br.com.arktech.workshop.shared.api.security.PublicEndpoint;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/auth")
 interface IAuthController {
 
-    @SecurityRequirements
+    @PublicEndpoint
     @Operation(summary = "${openapi.auth.login}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "400", ref = "BadRequest")

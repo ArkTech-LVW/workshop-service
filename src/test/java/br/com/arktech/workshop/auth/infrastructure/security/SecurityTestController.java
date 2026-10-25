@@ -16,4 +16,19 @@ class SecurityTestController implements ISecurityTestController {
     public Long me() {
         return currentUser.id();
     }
+
+    @Override
+    public String publicEndpoint() {
+        return "public";
+    }
+
+    @Override
+    public String frontDesk() {
+        return "frontDesk";
+    }
+
+    @Override
+    public String undeclared() {
+        return "undeclared";
+    }
 }

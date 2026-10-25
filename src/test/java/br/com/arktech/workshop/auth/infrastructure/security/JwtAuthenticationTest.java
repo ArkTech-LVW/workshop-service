@@ -96,11 +96,6 @@ class JwtAuthenticationTest {
                 .andExpect(json(INVALID_TOKEN));
     }
 
-    @Test
-    void shouldRequireTokenOnUnknownRoute() throws Exception {
-        mockMvc.perform(get("/test/security/doesNotExist")).andExpect(status().isUnauthorized());
-    }
-
     private static ResultMatcher json(String expected) {
         return result -> {
             content().contentType(MediaType.APPLICATION_JSON).match(result);

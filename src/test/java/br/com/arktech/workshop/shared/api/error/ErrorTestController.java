@@ -1,5 +1,6 @@
 package br.com.arktech.workshop.shared.api.error;
 
+import br.com.arktech.workshop.shared.api.security.PublicEndpoint;
 import br.com.arktech.workshop.shared.api.validation.CPFOrCNPJ;
 import br.com.arktech.workshop.shared.api.validation.LicensePlate;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@PublicEndpoint
 @RequestMapping("/test/errors")
 class ErrorTestController {
 

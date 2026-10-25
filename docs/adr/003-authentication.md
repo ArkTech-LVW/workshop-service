@@ -2,7 +2,7 @@
 
 - **Status:** Proposto (passa a Aceito com a aprovação do grupo no PR)
 - **Data:** 2026-10-24
-- **Tarefa:** [KAN-18 (T1.3)](https://arktech-lvw.atlassian.net/browse/KAN-18) e sub-tarefas
+- **Tarefa:** [KAN-18 (T1.3)](https://arktech-lvw.atlassian.net/browse/KAN-18) e sub-tarefas; autorização na [KAN-19 (T1.4)](https://arktech-lvw.atlassian.net/browse/KAN-19)
 
 ## Contexto
 
@@ -10,6 +10,7 @@
 - As senhas precisam ser guardadas de forma que um vazamento do banco não as revele.
 - Os casos de uso precisam registrar quem fez cada ação, sem que os outros módulos (ordem de serviço, estoque...) dependam do módulo de usuários.
 - Os erros 401 e 403 seguem o `ApiError` ([ADR 002](002-api-errors.md)).
+- Um endpoint esquecido sem restrição não pode ficar aberto: o padrão precisa ser negar.
 
 ## Opções consideradas
 
@@ -35,7 +36,25 @@
 | Tamanho da senha | Limite de 72 bytes | Sem limite prático |
 | Dependência | Nenhuma | BouncyCastle (`bcprov`) |
 
+### Autorização por endpoint
+
+| | Caminho na `SecurityConfig` | Method security do Spring (`@RolesAllowed`, `@PreAuthorize`) | Anotações próprias lidas na cadeia |
+|---|---|---|---|
+| Endpoint sem declaração | Cai na regra final | **Passa** (só checa o que está anotado) | Negado |
+| Rota pública | Caminho na `SecurityConfig` | Caminho na `SecurityConfig` **e** `@PermitAll` (a anotação roda depois da cadeia) | Só a anotação |
+| Papéis | String | String | Enum `Role` |
+| Regra perto do endpoint | Não | Sim | Sim |
+| Código próprio | Nenhum | Nenhum | Um `AuthorizationManager` |
+
 ## Decisão
+
+### Autorização
+
+- **Deny by default.** Cada endpoint declara o acesso com `@PublicEndpoint`, `@Authenticated` ou `@AllowedRoles({Role...})` (`shared/api/security`), no método ou no tipo, inclusive na interface `IXxxController`. A do método vence a do tipo; duas no mesmo elemento são erro de configuração. Sem declaração, ninguém acessa, nem o ADMIN.
+- Sem hierarquia de papéis e sem anotações compostas: cada endpoint lista os papéis que aceita.
+- A decisão é tomada na cadeia do Spring Security por um `AuthorizationManager` (`EndpointAuthorizationManager`), que encontra o handler da requisição no `RequestMappingHandlerMapping` e lê a anotação (`EndpointAccess`). O resultado fica em cache por método. Rota sem handler é negada; rota existente com a requisição fora do formato (método, `Content-Type`, `Accept`) é liberada para o MVC responder o erro dele (405, 415, 406).
+- Fora dos controllers, a `SecurityConfig` libera só o health e a documentação.
+- O `EndpointAccessCoverageTest` percorre todos os endpoints registrados e quebra o build quando algum fica sem declaração. O Swagger usa a mesma leitura (`EndpointAccess`) para tirar o cadeado das rotas públicas e incluir o 401/403 nas protegidas, então a documentação não diverge do comportamento.
 
 ### Senhas
 
@@ -73,5 +92,8 @@
 - Trocar a `JWT_SECRET` invalida todos os tokens emitidos.
 - Rodar o jar num servidor sem `SPRING_PROFILES_ACTIVE=production` cai no perfil `development`, que aceita tokens assinados com a chave pública do repositório. O deploy pela imagem Docker evita isso, porque ela já vem em `production`; quem rodar o jar direto precisa passar o perfil.
 - Configurações específicas de produção (ex.: desligar o Swagger) entram num `application-production.yml` quando forem necessárias.
+- Cada requisição casa a rota duas vezes: no `EndpointAuthorizationManager` e no `DispatcherServlet`. O custo é desprezível perto de decidir antes do controller.
+- As anotações de segurança do Spring e do Jakarta (`@PreAuthorize`, `@PermitAll`...) não têm efeito: um endpoint só com elas continua bloqueado.
+- Qualquer um, mesmo sem token, descobre se uma rota existe pelo 405 do método errado (ou pelo 415 do `Content-Type` errado). Nenhum handler é executado. Os demais caminhos respondem 401/403 sem diferenciar rota inexistente de rota proibida.
 - O Spring Security 7 acrescenta a authority `FACTOR_BEARER` às do token. Os papéis são só as authorities que começam com `ROLE_`.
 - Cada verificação de senha aloca cerca de 16 MB por alguns milissegundos. É irrelevante no volume de uma oficina, mas deve ser considerado ao definir um rate limit no login.

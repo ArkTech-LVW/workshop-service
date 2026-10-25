@@ -90,13 +90,42 @@ class OpenApiDocsTest {
     }
 
     @Test
-    void shouldMarkOperationWithEmptySecurityRequirementsAsPublic() {
-        assertThat(spec.read("$.paths['/test/docs/public'].get.security", List.class)).isEmpty();
+    void shouldMarkPublicEndpointAsPublic() {
+        String publicOperation = "$.paths['/test/docs/public'].get";
+
+        assertThat(spec.read(publicOperation + ".security", List.class)).isEmpty();
+        assertThat(spec.read(publicOperation + ".responses", Map.class)).containsOnlyKeys("200", "500");
         assertThat(spec.read(TEST_OPERATION, Map.class)).doesNotContainKey("security");
     }
 
+    @Test
+    void shouldAdd401ToAuthenticatedEndpoint() {
+        assertThat(spec.read(TEST_OPERATION + ".responses", Map.class)).containsOnlyKeys("200", "401", "500");
+        assertThat(spec.read(TEST_OPERATION + ".responses.401.$ref", String.class))
+                .isEqualTo("#/components/responses/Unauthenticated");
+    }
+
+    @Test
+    void shouldAdd401And403ToRoleEndpoint() {
+        String adminOperation = "$.paths['/test/docs/admin'].get";
+
+        assertThat(spec.read(adminOperation + ".responses", Map.class)).containsOnlyKeys("200", "401", "403", "500");
+        assertThat(spec.read(adminOperation + ".responses.403.$ref", String.class))
+                .isEqualTo("#/components/responses/AccessDenied");
+    }
+
     @ParameterizedTest
-    @ValueSource(strings = {"BadRequest", "NotFound", "Conflict", "BusinessRule", "InternalError", "InvalidCredentials"})
+    @ValueSource(
+            strings = {
+                "BadRequest",
+                "NotFound",
+                "Conflict",
+                "BusinessRule",
+                "InternalError",
+                "InvalidCredentials",
+                "Unauthenticated",
+                "AccessDenied"
+            })
     void shouldDefineReusableErrorResponseWithExample(String name) {
         String content = "$.components.responses." + name + ".content['application/json']";
 
@@ -116,10 +145,7 @@ class OpenApiDocsTest {
     }
 
     @Test
-    void shouldAddOnlyInternalErrorToEveryOperation() {
-        Map<String, Object> responses = spec.read(TEST_OPERATION + ".responses");
-
-        assertThat(responses).containsOnlyKeys("200", "500");
+    void shouldAddInternalErrorToEveryOperation() {
         assertThat(spec.read(TEST_OPERATION + ".responses.500.$ref", String.class))
                 .isEqualTo("#/components/responses/InternalError");
     }
