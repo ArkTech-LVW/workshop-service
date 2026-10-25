@@ -173,6 +173,28 @@ class OpenApiDocsTest {
     }
 
     @Test
+    void shouldDocumentUserManagementAsAdminOnly() {
+        String create = "$.paths['/admin/users'].post";
+        String deactivate = "$.paths['/admin/users/{id}/deactivate'].post";
+
+        assertThat(spec.read(create + ".tags", List.class)).containsExactly("Usuários");
+        assertThat(spec.read(create + ".responses", Map.class))
+                .containsOnlyKeys("201", "400", "401", "403", "409", "500");
+        assertThat(spec.read(deactivate + ".responses", Map.class))
+                .containsOnlyKeys("200", "401", "403", "404", "422", "500");
+        assertThat(spec.read("$.paths['/admin/users'].get.parameters[*].name", List.class))
+                .containsExactly("page", "size");
+    }
+
+    @Test
+    void shouldDocumentPasswordChangeForAnyLoggedUser() {
+        String changePassword = "$.paths['/auth/password'].put";
+
+        assertThat(spec.read(changePassword + ".responses", Map.class))
+                .containsOnlyKeys("204", "400", "401", "422", "500");
+    }
+
+    @Test
     void shouldHideErrorController() {
         Map<String, Object> paths = spec.read("$.paths");
 
