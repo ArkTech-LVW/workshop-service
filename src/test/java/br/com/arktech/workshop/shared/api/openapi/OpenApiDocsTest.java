@@ -94,13 +94,13 @@ class OpenApiDocsTest {
         String publicOperation = "$.paths['/test/docs/public'].get";
 
         assertThat(spec.read(publicOperation + ".security", List.class)).isEmpty();
-        assertThat(spec.read(publicOperation + ".responses", Map.class)).containsOnlyKeys("200", "500");
+        assertThat(spec.read(publicOperation + ".responses", Map.class)).containsOnlyKeys("200", "429", "500");
         assertThat(spec.read(TEST_OPERATION, Map.class)).doesNotContainKey("security");
     }
 
     @Test
     void shouldAdd401ToAuthenticatedEndpoint() {
-        assertThat(spec.read(TEST_OPERATION + ".responses", Map.class)).containsOnlyKeys("200", "401", "500");
+        assertThat(spec.read(TEST_OPERATION + ".responses", Map.class)).containsOnlyKeys("200", "401", "429", "500");
         assertThat(spec.read(TEST_OPERATION + ".responses.401.$ref", String.class))
                 .isEqualTo("#/components/responses/Unauthenticated");
     }
@@ -109,7 +109,7 @@ class OpenApiDocsTest {
     void shouldAdd401And403ToRoleEndpoint() {
         String adminOperation = "$.paths['/test/docs/admin'].get";
 
-        assertThat(spec.read(adminOperation + ".responses", Map.class)).containsOnlyKeys("200", "401", "403", "500");
+        assertThat(spec.read(adminOperation + ".responses", Map.class)).containsOnlyKeys("200", "401", "403", "429", "500");
         assertThat(spec.read(adminOperation + ".responses.403.$ref", String.class))
                 .isEqualTo("#/components/responses/AccessDenied");
     }
@@ -124,7 +124,8 @@ class OpenApiDocsTest {
                 "InternalError",
                 "InvalidCredentials",
                 "Unauthenticated",
-                "AccessDenied"
+                "AccessDenied",
+                "TooManyRequests"
             })
     void shouldDefineReusableErrorResponseWithExample(String name) {
         String content = "$.components.responses." + name + ".content['application/json']";
@@ -133,6 +134,20 @@ class OpenApiDocsTest {
         assertThat(spec.read(content + ".example", Map.class)).containsOnlyKeys("code", "message", "details");
         assertThat(spec.read(content + ".example.code", String.class)).isNotBlank();
         assertThat(spec.read(content + ".example.message", String.class)).isNotBlank();
+    }
+
+    @Test
+    void shouldAddTooManyRequestsWithRetryAfterToEveryOperation() {
+        String tooManyRequests = "$.components.responses.TooManyRequests";
+
+        assertThat(spec.read(TEST_OPERATION + ".responses.429.$ref", String.class))
+                .isEqualTo("#/components/responses/TooManyRequests");
+        assertThat(spec.read("$.paths['/auth/login'].post.responses.429.$ref", String.class))
+                .isEqualTo("#/components/responses/TooManyRequests");
+        assertThat(spec.read(tooManyRequests + ".content['application/json'].example.code", String.class))
+                .isEqualTo("request.tooManyRequests");
+        assertThat(spec.read(tooManyRequests + ".headers.Retry-After.schema.type", String.class))
+                .isEqualTo("integer");
     }
 
     @Test
@@ -179,9 +194,9 @@ class OpenApiDocsTest {
 
         assertThat(spec.read(create + ".tags", List.class)).containsExactly("Usuários");
         assertThat(spec.read(create + ".responses", Map.class))
-                .containsOnlyKeys("201", "400", "401", "403", "409", "500");
+                .containsOnlyKeys("201", "400", "401", "403", "409", "429", "500");
         assertThat(spec.read(deactivate + ".responses", Map.class))
-                .containsOnlyKeys("200", "401", "403", "404", "422", "500");
+                .containsOnlyKeys("200", "401", "403", "404", "422", "429", "500");
         assertThat(spec.read("$.paths['/admin/users'].get.parameters[*].name", List.class))
                 .containsExactly("page", "size");
     }
@@ -191,7 +206,7 @@ class OpenApiDocsTest {
         String changePassword = "$.paths['/auth/password'].put";
 
         assertThat(spec.read(changePassword + ".responses", Map.class))
-                .containsOnlyKeys("204", "400", "401", "422", "500");
+                .containsOnlyKeys("204", "400", "401", "422", "429", "500");
     }
 
     @Test

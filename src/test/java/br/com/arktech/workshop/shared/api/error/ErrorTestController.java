@@ -5,12 +5,14 @@ import br.com.arktech.workshop.shared.api.validation.CPFOrCNPJ;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
+import br.com.arktech.workshop.shared.domain.exception.TooManyRequestsException;
 import br.com.arktech.workshop.shared.domain.exception.UnauthorizedException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import java.time.Duration;
 import java.util.List;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
@@ -45,6 +47,11 @@ class ErrorTestController {
     @GetMapping("/unauthorized")
     void unauthorized() {
         throw new UnauthorizedException("test.unauthorized");
+    }
+
+    @GetMapping("/tooManyRequests")
+    void tooManyRequests() {
+        throw new TooManyRequestsException(Duration.ofMillis(11_500));
     }
 
     @GetMapping("/unauthenticated")
