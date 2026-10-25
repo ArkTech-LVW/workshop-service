@@ -1,6 +1,7 @@
 package br.com.arktech.workshop.auth.domain.repository;
 
 import br.com.arktech.workshop.auth.domain.model.User;
+import br.com.arktech.workshop.shared.domain.email.Email;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,12 +21,12 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
+    public Optional<User> findByEmail(Email email) {
         return users.stream().filter(user -> user.getEmail().equals(email)).findFirst();
     }
 
     @Override
-    public boolean existsByEmail(String email) {
+    public boolean existsByEmail(Email email) {
         return findByEmail(email).isPresent();
     }
 

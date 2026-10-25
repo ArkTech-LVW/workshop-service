@@ -11,6 +11,7 @@ import br.com.arktech.workshop.IntegrationTest;
 import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
 import br.com.arktech.workshop.auth.domain.model.User;
 import br.com.arktech.workshop.auth.domain.repository.UserRepository;
+import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
 import com.jayway.jsonpath.JsonPath;
@@ -52,7 +53,7 @@ class LoginIntegrationTest {
     void shouldIssueTokenAcceptedByProtectedEndpoints() throws Exception {
         User user = saveUser(true);
 
-        String body = login(user.getEmail(), PASSWORD)
+        String body = login(user.getEmail().value(), PASSWORD)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tokenType").value("Bearer"))
                 .andExpect(jsonPath("$.expiresIn").value(3600))
@@ -70,14 +71,14 @@ class LoginIntegrationTest {
     void shouldIgnoreEmailCase() throws Exception {
         User user = saveUser(true);
 
-        login(user.getEmail().toUpperCase(), PASSWORD).andExpect(status().isOk());
+        login(user.getEmail().value().toUpperCase(), PASSWORD).andExpect(status().isOk());
     }
 
     @Test
     void shouldGiveTheSameAnswerForWrongPasswordAndUnknownEmail() throws Exception {
         User user = saveUser(true);
 
-        login(user.getEmail(), "wrong-password").andExpect(status().isUnauthorized()).andExpect(invalidCredentials());
+        login(user.getEmail().value(), "wrong-password").andExpect(status().isUnauthorized()).andExpect(invalidCredentials());
         login("nobody-" + UUID.randomUUID() + "@workshop.com", PASSWORD)
                 .andExpect(status().isUnauthorized())
                 .andExpect(invalidCredentials());
@@ -87,15 +88,15 @@ class LoginIntegrationTest {
     void shouldRejectInactiveUser() throws Exception {
         User user = saveUser(false);
 
-        login(user.getEmail(), PASSWORD).andExpect(status().isUnauthorized()).andExpect(invalidCredentials());
+        login(user.getEmail().value(), PASSWORD).andExpect(status().isUnauthorized()).andExpect(invalidCredentials());
     }
 
     @Test
     void shouldNeverExposePasswordInResponsesOrLogs(CapturedOutput output) throws Exception {
         User user = saveUser(true);
 
-        String success = login(user.getEmail(), PASSWORD).andReturn().getResponse().getContentAsString();
-        String failure = login(user.getEmail(), PASSWORD + "-wrong").andReturn().getResponse().getContentAsString();
+        String success = login(user.getEmail().value(), PASSWORD).andReturn().getResponse().getContentAsString();
+        String failure = login(user.getEmail().value(), PASSWORD + "-wrong").andReturn().getResponse().getContentAsString();
 
         assertThat(success + failure).doesNotContain(PASSWORD).doesNotContain("argon2");
         assertThat(output.getAll()).doesNotContain(PASSWORD);
@@ -103,7 +104,7 @@ class LoginIntegrationTest {
 
     private User saveUser(boolean active) {
         String email = "user-" + UUID.randomUUID() + "@workshop.com";
-        User user = new User("Ana", email, PASSWORD, Set.of(Role.ATTENDANT), passwordHasher);
+        User user = new User("Ana", new Email(email), PASSWORD, Set.of(Role.ATTENDANT), passwordHasher);
         if (!active) {
             user.deactivate();
         }

@@ -4,8 +4,8 @@ import br.com.arktech.workshop.auth.infrastructure.config.LocalAdminProperties;
 
 import br.com.arktech.workshop.auth.application.createuser.CreateUserCommand;
 import br.com.arktech.workshop.auth.application.createuser.CreateUserUseCase;
-import br.com.arktech.workshop.auth.domain.model.User;
 import br.com.arktech.workshop.auth.domain.repository.UserRepository;
+import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
 import java.util.Set;
@@ -32,7 +32,7 @@ class LocalAdminInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        if (userRepository.existsByEmail(User.normalizeEmail(properties.email()))) {
+        if (userRepository.existsByEmail(new Email(properties.email()))) {
             return;
         }
 

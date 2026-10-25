@@ -10,6 +10,7 @@ import br.com.arktech.workshop.auth.domain.port.FakePasswordHasher;
 import br.com.arktech.workshop.auth.domain.repository.InMemoryUserRepository;
 import br.com.arktech.workshop.auth.domain.model.User;
 import br.com.arktech.workshop.shared.domain.exception.UnauthorizedException;
+import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
 import java.time.Duration;
@@ -27,7 +28,7 @@ class LoginUseCaseTest {
     @Test
     void shouldIssueTokenWithUserIdAndRoles() {
         User user = userRepository.save(
-                new User("Ana", "ana@workshop.com", "secret", Set.of(Role.ADMIN, Role.MECHANIC), passwordHasher));
+                new User("Ana", new Email("ana@workshop.com"), "secret", Set.of(Role.ADMIN, Role.MECHANIC), passwordHasher));
 
         LoginResult result = loginUseCase.execute(new LoginCommand("ana@workshop.com", "secret"));
 
@@ -79,7 +80,7 @@ class LoginUseCaseTest {
     }
 
     private User newUser() {
-        return new User("Ana", "ana@workshop.com", "secret", Set.of(Role.ATTENDANT), passwordHasher);
+        return new User("Ana", new Email("ana@workshop.com"), "secret", Set.of(Role.ATTENDANT), passwordHasher);
     }
 
     private static class RecordingTokenIssuer implements TokenIssuer {

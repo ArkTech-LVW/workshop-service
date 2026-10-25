@@ -7,6 +7,7 @@ import br.com.arktech.workshop.auth.domain.port.FakePasswordHasher;
 import br.com.arktech.workshop.auth.domain.repository.InMemoryUserRepository;
 import br.com.arktech.workshop.auth.domain.model.User;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
+import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
 import java.util.Set;
@@ -23,7 +24,7 @@ class CreateUserUseCaseTest {
     void shouldCreateUserWithHashedPassword() {
         CreateUserResult result = createUserUseCase.execute(command("Ana@Workshop.com"));
 
-        User user = userRepository.findByEmail("ana@workshop.com").orElseThrow();
+        User user = userRepository.findByEmail(new Email("ana@workshop.com")).orElseThrow();
         assertThat(result.id()).isEqualTo(user.getId());
         assertThat(user.getRoles()).containsExactly(Role.ATTENDANT);
         assertThat(user.authenticate("secret", passwordHasher)).isTrue();

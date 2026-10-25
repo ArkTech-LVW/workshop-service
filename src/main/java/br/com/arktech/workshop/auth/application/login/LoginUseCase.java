@@ -7,6 +7,7 @@ import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
 import br.com.arktech.workshop.auth.domain.model.User;
 import br.com.arktech.workshop.auth.domain.repository.UserRepository;
 import br.com.arktech.workshop.shared.application.UseCase;
+import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.shared.domain.exception.UnauthorizedException;
 
 import java.util.Optional;
@@ -35,7 +36,7 @@ public class LoginUseCase implements UseCase<LoginCommand, LoginResult> {
     @Override
     @Transactional(readOnly = true)
     public LoginResult execute(LoginCommand command) {
-        Optional<User> found = userRepository.findByEmail(User.normalizeEmail(command.email()));
+        Optional<User> found = userRepository.findByEmail(new Email(command.email()));
         if (found.isEmpty()) {
             spendPasswordCheckTime(command.password());
             throw new UnauthorizedException(INVALID_CREDENTIALS);

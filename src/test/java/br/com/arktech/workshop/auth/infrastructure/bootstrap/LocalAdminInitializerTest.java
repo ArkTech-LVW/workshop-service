@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import br.com.arktech.workshop.auth.application.createuser.CreateUserUseCase;
 import br.com.arktech.workshop.auth.domain.port.FakePasswordHasher;
 import br.com.arktech.workshop.auth.domain.repository.InMemoryUserRepository;
+import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.auth.domain.model.User;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
@@ -26,7 +27,7 @@ class LocalAdminInitializerTest {
     void shouldCreateAdminWhenMissing() {
         initializer.run(new DefaultApplicationArguments());
 
-        User admin = userRepository.findByEmail("admin@workshop.local").orElseThrow();
+        User admin = userRepository.findByEmail(new Email("admin@workshop.local")).orElseThrow();
         assertThat(admin.getRoles()).containsExactly(Role.ADMIN);
         assertThat(admin.authenticate("admin123", passwordHasher)).isTrue();
     }
