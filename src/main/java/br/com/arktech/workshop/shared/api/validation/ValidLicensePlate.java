@@ -14,7 +14,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 @Documented
-@Constraint(validatedBy = ValidLicensePlateValidator.class)
+@Constraint(validatedBy = LicensePlateValidator.class)
 @Target({FIELD, METHOD, PARAMETER, ANNOTATION_TYPE, TYPE_USE})
 @Retention(RUNTIME)
 public @interface ValidLicensePlate {

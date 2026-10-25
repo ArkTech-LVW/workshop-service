@@ -5,7 +5,7 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.jspecify.annotations.Nullable;
 
-public class ValidLicensePlateValidator implements ConstraintValidator<ValidLicensePlate, String> {
+public class LicensePlateValidator implements ConstraintValidator<ValidLicensePlate, String> {
 
     @Override
     public boolean isValid(@Nullable String value, ConstraintValidatorContext context) {
