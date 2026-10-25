@@ -1,9 +1,11 @@
 package br.com.arktech.workshop.registry.api.customer;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -13,6 +15,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import br.com.arktech.workshop.registry.application.createcustomer.CreateCustomerCommand;
 import br.com.arktech.workshop.registry.application.createcustomer.CreateCustomerUseCase;
 import br.com.arktech.workshop.registry.application.customer.CustomerResult;
+import br.com.arktech.workshop.registry.application.deletecustomer.DeleteCustomerCommand;
+import br.com.arktech.workshop.registry.application.deletecustomer.DeleteCustomerUseCase;
 import br.com.arktech.workshop.registry.application.findcustomer.FindCustomerUseCase;
 import br.com.arktech.workshop.registry.application.listcustomers.ListCustomersQuery;
 import br.com.arktech.workshop.registry.application.listcustomers.ListCustomersUseCase;
@@ -67,6 +71,9 @@ class CustomerControllerTest {
 
     @MockitoBean
     private UpdateCustomerUseCase updateCustomerUseCase;
+
+    @MockitoBean
+    private DeleteCustomerUseCase deleteCustomerUseCase;
 
     @Test
     void shouldCreateCustomer() throws Exception {
@@ -247,6 +254,27 @@ class CustomerControllerTest {
                 .andExpect(json("""
                         {"code": "customer.documentAlreadyExists"}
                         """, JsonCompareMode.LENIENT));
+    }
+
+    @Test
+    void shouldDeleteCustomer() throws Exception {
+        mockMvc.perform(delete("/admin/customers/1"))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+        verify(deleteCustomerUseCase).execute(new DeleteCustomerCommand(1L));
+    }
+
+    @Test
+    void shouldAnswer409WhenCustomerIsInUse() throws Exception {
+        doThrow(new ConflictException("customer.inUse", "1")).when(deleteCustomerUseCase).execute(any());
+
+        mockMvc.perform(delete("/admin/customers/1"))
+                .andExpect(status().isConflict())
+                .andExpect(json("""
+                        {"code": "customer.inUse",
+                         "message": "O cliente 1 tem veículos ou ordens de serviço ligados e não pode ser excluído.",
+                         "details": null}
+                        """));
     }
 
     private static ResultMatcher json(String expected) {

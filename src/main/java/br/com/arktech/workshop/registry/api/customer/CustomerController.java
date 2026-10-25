@@ -2,6 +2,8 @@ package br.com.arktech.workshop.registry.api.customer;
 
 import br.com.arktech.workshop.registry.application.createcustomer.CreateCustomerCommand;
 import br.com.arktech.workshop.registry.application.createcustomer.CreateCustomerUseCase;
+import br.com.arktech.workshop.registry.application.deletecustomer.DeleteCustomerCommand;
+import br.com.arktech.workshop.registry.application.deletecustomer.DeleteCustomerUseCase;
 import br.com.arktech.workshop.registry.application.findcustomer.FindCustomerQuery;
 import br.com.arktech.workshop.registry.application.findcustomer.FindCustomerUseCase;
 import br.com.arktech.workshop.registry.application.listcustomers.ListCustomersQuery;
@@ -23,6 +25,7 @@ class CustomerController implements ICustomerController {
     private final ListCustomersUseCase listCustomersUseCase;
     private final FindCustomerUseCase findCustomerUseCase;
     private final UpdateCustomerUseCase updateCustomerUseCase;
+    private final DeleteCustomerUseCase deleteCustomerUseCase;
 
     @Override
     public CustomerResponse create(CustomerRequest request) {
@@ -47,5 +50,10 @@ class CustomerController implements ICustomerController {
         UpdateCustomerCommand command = new UpdateCustomerCommand(
                 id, request.name(), request.document(), request.email(), request.phone());
         return CustomerResponse.from(updateCustomerUseCase.execute(command));
+    }
+
+    @Override
+    public void delete(Long id) {
+        deleteCustomerUseCase.execute(new DeleteCustomerCommand(id));
     }
 }

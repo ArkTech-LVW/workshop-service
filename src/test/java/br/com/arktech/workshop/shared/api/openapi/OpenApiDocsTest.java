@@ -186,6 +186,8 @@ class OpenApiDocsTest {
                 .containsOnlyKeys("200", "401", "403", "404", "500");
         assertThat(spec.read(customer + ".put.responses", Map.class))
                 .containsOnlyKeys("200", "400", "401", "403", "404", "409", "500");
+        assertThat(spec.read(customer + ".delete.responses", Map.class))
+                .containsOnlyKeys("204", "401", "403", "404", "409", "500");
     }
 
     @Test

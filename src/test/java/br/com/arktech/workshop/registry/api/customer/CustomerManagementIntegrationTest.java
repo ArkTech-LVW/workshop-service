@@ -1,6 +1,7 @@
 package br.com.arktech.workshop.registry.api.customer;
 
 import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -26,6 +27,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -39,12 +41,16 @@ class CustomerManagementIntegrationTest {
     @Autowired
     private TokenIssuer tokenIssuer;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     static Stream<Arguments> customerEndpoints() {
         return Stream.of(
                 Arguments.of(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("{}")),
                 Arguments.of(get("/admin/customers")),
                 Arguments.of(get("/admin/customers/1")),
-                Arguments.of(put("/admin/customers/1").contentType(MediaType.APPLICATION_JSON).content("{}")));
+                Arguments.of(put("/admin/customers/1").contentType(MediaType.APPLICATION_JSON).content("{}")),
+                Arguments.of(delete("/admin/customers/1")));
     }
 
     @ParameterizedTest
@@ -144,6 +150,32 @@ class CustomerManagementIntegrationTest {
                         """.formatted(taken.formatted())))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("customer.documentAlreadyExists"));
+    }
+
+    @Test
+    void shouldDeleteCustomer() throws Exception {
+        Integer id = createCustomer(uniqueCPF().value());
+
+        asAdmin(delete("/admin/customers/{id}", id)).andExpect(status().isNoContent());
+        asAdmin(get("/admin/customers/{id}", id))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("customer.notFound"));
+    }
+
+    @Test
+    void shouldKeepCustomerThatIsStillReferenced() throws Exception {
+        Integer id = createCustomer(uniqueCPF().value());
+        jdbcTemplate.execute("CREATE TABLE customer_reference_test (customer_id BIGINT REFERENCES customer (id))");
+        try {
+            jdbcTemplate.update("INSERT INTO customer_reference_test (customer_id) VALUES (?)", id);
+
+            asAdmin(delete("/admin/customers/{id}", id))
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.code").value("customer.inUse"));
+            asAdmin(get("/admin/customers/{id}", id)).andExpect(status().isOk());
+        } finally {
+            jdbcTemplate.execute("DROP TABLE customer_reference_test");
+        }
     }
 
     @Test

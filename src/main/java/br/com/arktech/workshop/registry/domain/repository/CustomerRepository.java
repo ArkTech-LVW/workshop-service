@@ -21,6 +21,8 @@ public interface CustomerRepository {
 
     Page<Customer> findPage(CustomerFilter filter, Pagination pagination);
 
+    void remove(Customer customer);
+
     default Customer findRequiredById(Long id) {
         return findById(id).orElseThrow(() -> new NotFoundException("customer.notFound", id.toString()));
     }

@@ -56,6 +56,11 @@ public class InMemoryCustomerRepository implements CustomerRepository {
         return new Page<>(content, pagination, matching.size());
     }
 
+    @Override
+    public void remove(Customer customer) {
+        customers.remove(customer);
+    }
+
     public List<Customer> findAll() {
         return List.copyOf(customers);
     }
