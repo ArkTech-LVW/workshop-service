@@ -91,6 +91,20 @@ public class User extends BaseEntity {
         active = false;
     }
 
+    public void changePassword(String currentPassword, String newPassword, PasswordHasher passwordHasher) {
+        if (!active) {
+            throw new BusinessRuleException("user.inactive");
+        }
+        if (!passwordHasher.matches(currentPassword, passwordHash)) {
+            throw new BusinessRuleException("user.wrongCurrentPassword");
+        }
+        if (newPassword.equals(currentPassword)) {
+            throw new BusinessRuleException("user.samePassword");
+        }
+
+        passwordHash = passwordHasher.hash(newPassword);
+    }
+
     private void requireAnotherActiveAdmin(long activeAdminCount) {
         if (isActiveAdmin() && activeAdminCount <= 1) {
             throw new BusinessRuleException("user.lastActiveAdmin");

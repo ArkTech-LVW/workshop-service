@@ -126,6 +126,32 @@ class UserManagementIntegrationTest {
                 .andExpect(jsonPath("$.code").value("user.notFound"));
     }
 
+    @Test
+    void shouldLetUserChangeOwnPassword() throws Exception {
+        String email = uniqueEmail();
+        Integer id = createUser(email);
+        String token = tokenFor(id.longValue(), Role.MECHANIC);
+
+        mockMvc.perform(put("/auth/password")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"currentPassword": "%s", "newPassword": "Another-Secret!"}
+                                """.formatted(PASSWORD)))
+                .andExpect(status().isNoContent());
+
+        login(email, PASSWORD).andExpect(status().isUnauthorized());
+        login(email, "Another-Secret!").andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldRequireTokenToChangePassword() throws Exception {
+        mockMvc.perform(put("/auth/password").contentType(MediaType.APPLICATION_JSON).content("""
+                        {"currentPassword": "%s", "newPassword": "Another-Secret!"}
+                        """.formatted(PASSWORD)))
+                .andExpect(status().isUnauthorized());
+    }
+
     private Integer createUser(String email) throws Exception {
         String body = asAdmin(post("/admin/users").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Ana", "email": "%s", "password": "%s", "roles": ["MECHANIC"]}

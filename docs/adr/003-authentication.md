@@ -85,7 +85,7 @@
 
 Entrou na [KAN-45 (T1.5)](https://arktech-lvw.atlassian.net/browse/KAN-45).
 
-- O ADMIN cadastra, lista, detalha, atualiza (nome e papéis), ativa e desativa usuários em `/admin/users`.
+- O ADMIN cadastra, lista, detalha, atualiza (nome e papéis), ativa e desativa usuários em `/admin/users`. Cada usuário troca a própria senha em `PUT /auth/password`, informando a senha atual. A nova precisa ser diferente da atual (422 `user.samePassword`), e um usuário desativado com token ainda válido não troca a senha (422 `user.inactive`).
 - Não existe exclusão: o usuário desativado não faz login, mas continua referenciado pelo id no histórico dos outros módulos.
 - **Sempre existe pelo menos um ADMIN ativo.** O agregado `User` recusa (422 `user.lastActiveAdmin`) desativar ou tirar o papel ADMIN do último ADMIN ativo. A contagem vem do repositório.
 - Para duas requisições simultâneas não removerem os dois últimos ADMINs, os casos de uso que podem remover um ADMIN pegam um advisory lock do PostgreSQL (`pg_advisory_xact_lock`) antes de carregar o usuário e contar os ADMINs (`UserRepository.countActiveAdminsForUpdate`). O lock vale até o fim da transação, e a contagem, feita depois dele, já vê o que a transação anterior gravou. Um `SELECT ... FOR UPDATE` nas linhas dos ADMINs não serviria: a remoção do papel apaga uma linha da `user_role`, que a segunda transação continuaria enxergando.
@@ -99,6 +99,7 @@ Entrou na [KAN-45 (T1.5)](https://arktech-lvw.atlassian.net/browse/KAN-45).
 
 - Um usuário desativado ou com papéis alterados mantém o token atual até ele expirar (no máximo 1h). Se isso virar problema, as saídas são um token mais curto com refresh token ou consultar o usuário a cada requisição.
 - Trocar a `JWT_SECRET` invalida todos os tokens emitidos.
+- A troca de senha também não invalida os tokens já emitidos.
 - Desativar e alterar papéis passam por um único lock, um de cada vez, mesmo quando o usuário não é ADMIN. Ativar não pega o lock. No volume de uma oficina, essa fila é irrelevante.
 - Rodar o jar num servidor sem `SPRING_PROFILES_ACTIVE=production` cai no perfil `development`, que aceita tokens assinados com a chave pública do repositório. O deploy pela imagem Docker evita isso, porque ela já vem em `production`; quem rodar o jar direto precisa passar o perfil.
 - Configurações específicas de produção (ex.: desligar o Swagger) entram num `application-production.yml` quando forem necessárias.

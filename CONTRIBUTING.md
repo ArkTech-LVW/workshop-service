@@ -77,6 +77,7 @@ public class FindCustomerUseCase implements UseCase<FindCustomerQuery, CustomerR
 
 - Nome: `<Ação><Objeto>UseCase` (`LoginUseCase`, `CreateCustomerUseCase`).
 - Entrada e saída são `record`s da `application`, separados dos DTOs da `api`: `XxxCommand` para o que altera estado, `XxxQuery` para consultas e `XxxResult` para a saída. O controller converte o DTO de entrada em command/query e o result no DTO de resposta.
+- Caso de uso sem saída implementa `UseCase<XxxCommand, @Nullable Void>` e devolve `null` (ex.: `ChangePasswordUseCase`).
 - `@Transactional` fica no `execute` (`readOnly = true` nas consultas).
 - O controller injeta a classe do caso de uso diretamente.
 - Record com senha ou outro dado sensível sobrescreve o `toString` para mascarar o valor, porque o `toString` padrão do record imprime todos os campos.

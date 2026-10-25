@@ -4,12 +4,14 @@ import static com.tngtech.archunit.base.DescribedPredicate.alwaysTrue;
 import static com.tngtech.archunit.base.DescribedPredicate.not;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAPackage;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAnyPackage;
+import static com.tngtech.archunit.lang.conditions.ArchConditions.implement;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noMethods;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 
 import br.com.arktech.workshop.shared.application.UseCase;
+import br.com.arktech.workshop.shared.application.VoidUseCase;
 import br.com.arktech.workshop.shared.domain.BaseEntity;
 
 import com.tngtech.archunit.core.domain.JavaClass;
@@ -105,8 +107,7 @@ class LayerDependencyTest {
             .haveSimpleNameEndingWith("UseCase")
             .and()
             .areNotInterfaces()
-            .should()
-            .implement(UseCase.class)
+            .should(implement(UseCase.class).or(implement(VoidUseCase.class)))
             .andShould()
             .resideInAPackage(APPLICATION)
             .allowEmptyShould(true);
