@@ -3,6 +3,7 @@ package br.com.arktech.workshop.auth.application.createuser;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import br.com.arktech.workshop.auth.application.user.UserResult;
 import br.com.arktech.workshop.auth.domain.port.FakePasswordHasher;
 import br.com.arktech.workshop.auth.domain.repository.InMemoryUserRepository;
 import br.com.arktech.workshop.auth.domain.model.User;
@@ -22,7 +23,7 @@ class CreateUserUseCaseTest {
 
     @Test
     void shouldCreateUserWithHashedPassword() {
-        CreateUserResult result = createUserUseCase.execute(command("Ana@Workshop.com"));
+        UserResult result = createUserUseCase.execute(command("Ana@Workshop.com"));
 
         User user = userRepository.findByEmail(new Email("ana@workshop.com")).orElseThrow();
         assertThat(result.id()).isEqualTo(user.getId());

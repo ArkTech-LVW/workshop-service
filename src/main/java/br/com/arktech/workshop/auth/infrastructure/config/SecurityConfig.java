@@ -1,22 +1,26 @@
 package br.com.arktech.workshop.auth.infrastructure.config;
 
+import br.com.arktech.workshop.auth.infrastructure.ratelimit.RateLimitFilter;
 import br.com.arktech.workshop.auth.infrastructure.security.EndpointAuthorizationManager;
 
 import jakarta.servlet.DispatcherType;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
+@EnableConfigurationProperties(RateLimitProperties.class)
 class SecurityConfig {
 
     @Bean
@@ -24,6 +28,7 @@ class SecurityConfig {
             HttpSecurity http,
             JwtAuthenticationConverter jwtAuthenticationConverter,
             EndpointAuthorizationManager endpointAuthorizationManager,
+            RateLimitProperties rateLimitProperties,
             @Qualifier("handlerExceptionResolver") HandlerExceptionResolver exceptionResolver)
             throws Exception {
         AuthenticationEntryPoint authenticationEntryPoint =
@@ -50,6 +55,9 @@ class SecurityConfig {
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler))
+                .addFilterAfter(
+                        new RateLimitFilter(rateLimitProperties, exceptionResolver),
+                        BearerTokenAuthenticationFilter.class)
                 .build();
     }
 }
