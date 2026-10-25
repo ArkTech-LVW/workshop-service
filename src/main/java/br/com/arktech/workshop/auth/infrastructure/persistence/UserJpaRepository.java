@@ -28,8 +28,6 @@ interface UserJpaRepository extends JpaRepository<User, Long>, UserRepository {
         return countActiveByRole(Role.ADMIN);
     }
 
-    // Transaction-scoped advisory lock: released on commit or rollback. The count runs in a new statement,
-    // so it sees what the previous holder committed.
     @Query(value = "SELECT 1 FROM pg_advisory_xact_lock(hashtext('user.activeAdmins'))", nativeQuery = true)
     int lockActiveAdmins();
 
