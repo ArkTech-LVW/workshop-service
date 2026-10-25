@@ -53,13 +53,17 @@ O código de referência do 500 aparece também no log do servidor: informe-o ao
 **404, recurso não encontrado**
 
 ```json
-{ "code": "customer.notFound", "message": "Cliente não encontrado.", "details": null }
+{ "code": "customer.notFound", "message": "Cliente 1234 não encontrado.", "details": null }
 ```
 
 **409, conflito**
 
 ```json
-{ "code": "customer.documentAlreadyExists", "message": "Já existe um cliente com esse CPF/CNPJ.", "details": null }
+{
+  "code": "customer.documentAlreadyExists",
+  "message": "Já existe um cliente com o CPF/CNPJ 529.982.247-25.",
+  "details": null
+}
 ```
 
 **422, regra de negócio**
