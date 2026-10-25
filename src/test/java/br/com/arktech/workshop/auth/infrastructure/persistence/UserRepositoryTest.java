@@ -98,7 +98,6 @@ class UserRepositoryTest {
         assertThat(userRepository.countActiveAdminsForUpdate()).isEqualTo(before + 2);
     }
 
-    // Other integration tests commit users too, so this one only looks at the last pages, where its names sort.
     @Test
     void shouldPageUsersOrderedByName() {
         userRepository.save(newNamedUser("zzz-c", "page-c@workshop.com"));

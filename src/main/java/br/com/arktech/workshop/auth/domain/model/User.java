@@ -69,14 +69,12 @@ public class User extends BaseEntity {
         this.name = name;
     }
 
-    // activeAdminCount includes this user when it is an active ADMIN.
     public void changeRoles(Set<Role> roles, long activeAdminCount) {
         requireRoles(roles);
         if (!roles.contains(Role.ADMIN)) {
             requireAnotherActiveAdmin(activeAdminCount);
         }
 
-        // Keeps the roles that stay, so the (user_id, role) unique key is not hit by a delete-then-insert.
         this.roles.removeIf(userRole -> !roles.contains(userRole.getRole()));
         Set<Role> current = getRoles();
         roles.stream()
@@ -88,7 +86,6 @@ public class User extends BaseEntity {
         active = true;
     }
 
-    // activeAdminCount includes this user when it is an active ADMIN.
     public void deactivate(long activeAdminCount) {
         requireAnotherActiveAdmin(activeAdminCount);
         active = false;

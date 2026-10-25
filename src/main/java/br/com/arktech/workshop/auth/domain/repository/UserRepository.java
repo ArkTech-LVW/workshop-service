@@ -19,15 +19,11 @@ public interface UserRepository {
 
     boolean existsByEmail(Email email);
 
-    // Ordered by name.
     Page<User> findPage(Pagination pagination);
 
-    // Waits until concurrent callers commit, so two transactions cannot remove the last active ADMIN together.
-    // Call it before loading the user that will change.
     long countActiveAdminsForUpdate();
 
     default User findRequiredById(Long id) {
-        // As a String, so MessageFormat does not group the digits (1.234).
         return findById(id).orElseThrow(() -> new NotFoundException("user.notFound", id.toString()));
     }
 }
