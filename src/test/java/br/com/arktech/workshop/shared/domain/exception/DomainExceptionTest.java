@@ -2,6 +2,7 @@ package br.com.arktech.workshop.shared.domain.exception;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Duration;
 import org.junit.jupiter.api.Test;
 
 class DomainExceptionTest {
@@ -18,6 +19,13 @@ class DomainExceptionTest {
     void shouldUseCodeAsMessage() {
         assertThat(new ConflictException("customer.duplicatedDocument").getMessage())
                 .isEqualTo("customer.duplicatedDocument");
+    }
+
+    @Test
+    void shouldRoundRetryAfterUpToWholeSeconds() {
+        assertThat(new TooManyRequestsException(Duration.ofMillis(11_001)).getRetryAfterSeconds()).isEqualTo(12);
+        assertThat(new TooManyRequestsException(Duration.ofSeconds(12)).getRetryAfterSeconds()).isEqualTo(12);
+        assertThat(new TooManyRequestsException(Duration.ZERO).getRetryAfterSeconds()).isEqualTo(1);
     }
 
     @Test

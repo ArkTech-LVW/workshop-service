@@ -1,12 +1,14 @@
 package br.com.arktech.workshop.auth.application.login;
 
 import br.com.arktech.workshop.auth.application.port.AccessToken;
+import br.com.arktech.workshop.auth.application.port.LoginRateLimiter;
 import br.com.arktech.workshop.auth.application.port.TokenIssuer;
 
 import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
 import br.com.arktech.workshop.auth.domain.model.User;
 import br.com.arktech.workshop.auth.domain.repository.UserRepository;
 import br.com.arktech.workshop.shared.application.UseCase;
+import br.com.arktech.workshop.shared.application.security.ClientAddress;
 import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.shared.domain.exception.UnauthorizedException;
 
@@ -23,18 +25,30 @@ public class LoginUseCase implements UseCase<LoginCommand, LoginResult> {
     private final UserRepository userRepository;
     private final PasswordHasher passwordHasher;
     private final TokenIssuer tokenIssuer;
+    private final LoginRateLimiter loginRateLimiter;
+    private final ClientAddress clientAddress;
     private final String dummyHash;
 
-    public LoginUseCase(UserRepository userRepository, PasswordHasher passwordHasher, TokenIssuer tokenIssuer) {
+    public LoginUseCase(
+            UserRepository userRepository,
+            PasswordHasher passwordHasher,
+            TokenIssuer tokenIssuer,
+            LoginRateLimiter loginRateLimiter,
+            ClientAddress clientAddress) {
         this.userRepository = userRepository;
         this.passwordHasher = passwordHasher;
         this.tokenIssuer = tokenIssuer;
+        this.loginRateLimiter = loginRateLimiter;
+        this.clientAddress = clientAddress;
         this.dummyHash = passwordHasher.hash(UUID.randomUUID().toString());
     }
 
     @Override
     public LoginResult execute(LoginCommand command) {
-        Optional<User> found = userRepository.findByEmail(new Email(command.email()));
+        Email email = new Email(command.email());
+        loginRateLimiter.consume(email, clientAddress.ip());
+
+        Optional<User> found = userRepository.findByEmail(email);
         if (found.isEmpty()) {
             spendPasswordCheckTime(command.password());
             throw new UnauthorizedException(INVALID_CREDENTIALS);

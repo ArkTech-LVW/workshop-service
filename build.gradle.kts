@@ -34,6 +34,8 @@ dependencies {
     implementation(libs.spring.boot.starter.security.oauth2.resource.server)
     implementation(libs.bouncycastle.bcprov)
     implementation(libs.springdoc.openapi.starter.webmvc.ui)
+    implementation(libs.bucket4j.core)
+    implementation(libs.caffeine)
     implementation(libs.jspecify)
     implementation(libs.spring.boot.starter.data.jpa)
     implementation(libs.spring.boot.starter.flyway)

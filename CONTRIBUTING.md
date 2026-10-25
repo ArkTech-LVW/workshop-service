@@ -8,6 +8,12 @@ Convenções combinadas para que todos codem no mesmo padrão.
 - A única exceção são os **textos** dos arquivos de i18n (`messages_pt_BR.properties`).
 - Commits, descrições de PR e documentação ficam a critério de quem escreve.
 
+## Comentários
+
+- **O código não leva comentários.** Nomes de classes, métodos e variáveis explicam o que o código faz, e o motivo de uma decisão vai para o ADR, o PR ou o commit.
+- Isso vale também para Javadoc e para comentários nos arquivos de configuração (`application.yml`).
+- Se o código precisa de comentário para ser entendido, melhore os nomes ou extraia um método antes.
+
 ## Estrutura de pacotes
 
 O pacote base é `br.com.arktech.workshop`, organizado **por módulo**, com as camadas dentro de cada módulo e subpacotes dentro das camadas:
@@ -174,6 +180,7 @@ O domínio e a `application` lançam as exceções de `shared/domain/exception`,
 | `ConflictException` | 409 | Conflita com o estado atual (ex.: CPF ou placa já cadastrados) |
 | `BusinessRuleException` | 422 | Viola uma regra de negócio (ex.: transição de status inválida) |
 | `UnauthorizedException` | 401 | O próprio caso de uso recusa a identificação (ex.: login com credenciais inválidas) |
+| `TooManyRequestsException` | 429 | Passou do limite de tentativas (ex.: login por e-mail + IP). Recebe o tempo até liberar, que sai no header `Retry-After` |
 
 O 401 e o 403 de token ausente, inválido ou sem o papel exigido saem do Spring Security, não dessas exceções (ver [Segurança](#segurança)).
 
@@ -188,7 +195,7 @@ throw new NotFoundException("customer.notFound", id.toString());
 
 ### Como documentar os erros
 
-A documentação da API (`/docs`) é gerada pelo springdoc a partir das interfaces dos controllers. Os erros já têm respostas prontas, com schema e exemplo, no `OpenApiConfig`: `BadRequest` (400), `InvalidCredentials` (401 do login), `NotFound` (404), `Conflict` (409) e `BusinessRule` (422), além do `Unauthenticated` (401) e do `AccessDenied` (403), que entram sozinhos (ver abaixo). Cada endpoint declara só os erros que de fato pode retornar, como o `findById` do exemplo de [Controllers](#controllers):
+A documentação da API (`/docs`) é gerada pelo springdoc a partir das interfaces dos controllers. Os erros já têm respostas prontas, com schema e exemplo, no `OpenApiConfig`: `BadRequest` (400), `InvalidCredentials` (401 do login), `NotFound` (404), `Conflict` (409) e `BusinessRule` (422), além do `Unauthenticated` (401), do `AccessDenied` (403) e do `TooManyRequests` (429), que entram sozinhos (ver abaixo). Cada endpoint declara só os erros que de fato pode retornar, como o `findById` do exemplo de [Controllers](#controllers):
 
 ```java
 @ApiResponse(responseCode = "200")
@@ -202,7 +209,7 @@ openapi.customer.findById=Busca um cliente
 
 - Os textos da documentação (`summary`, `description`) não ficam no código: vão para o `openapi/openapi.properties`, com chaves `openapi.<context>.<camelCase>`, e são referenciados com `${...}`. Esse arquivo é só da documentação; as mensagens devolvidas ao cliente continuam no `messages_pt_BR.properties`.
 - Uma chave inexistente aparece crua na doc (`${openapi.customer.findById}`) e quebra o `OpenApiDocsTest`.
-- O 500 (`InternalError`) entra sozinho em todas as operações.
+- O 429 (`TooManyRequests`) e o 500 (`InternalError`) entram sozinhos em todas as operações.
 - O cadeado e as respostas de segurança saem da anotação de acesso do endpoint: `@PublicEndpoint` fica sem cadeado; `@Authenticated` ganha o 401 (`Unauthenticated`); `@AllowedRoles` ganha o 401 e o 403 (`AccessDenied`). Não declare esses três à mão.
 
 ### Mensagens de validação
@@ -252,9 +259,34 @@ interface ICustomerController {
 
 - As rotas protegidas exigem um token JWT no header `Authorization: Bearer <token>`.
 - Sem token, ou com token inválido ou expirado: 401 (`auth.unauthenticated` ou `auth.invalidToken`). Com token, mas sem permissão: 403 (`auth.accessDenied`). Os dois saem pelo `GlobalExceptionHandler`, como os demais erros.
+- O caso de uso que precisa do IP do cliente injeta `ClientAddress` (`shared/application/security`) e chama `clientAddress.ip()`. Atrás de proxy confiável, já é o IP real (ver [Rate limit](#rate-limit)).
 - O caso de uso que precisa registrar quem fez a ação injeta `CurrentUser` (`shared/application/security`) e chama `currentUser.id()`. O id vem do token (`sub`). Os outros módulos guardam esse `Long`, nunca o `User`.
 - Senhas com hash Argon2id, pelo `PasswordHasher` do `auth`. Nunca logue nem devolva senha ou hash.
 - O token (HS256) leva o id do usuário (`sub`) e os papéis (`roles`) e vale 1h (`security.jwt.expiration`). A chave vem da variável `JWT_SECRET` (mínimo de 32 bytes). Só o perfil `development`, padrão para rodar localmente, traz uma chave de desenvolvimento; em qualquer outro perfil, sem a variável a aplicação não sobe. Os perfis estão no README.
+
+### Rate limit
+
+Os motivos estão no [ADR 003](docs/adr/003-authentication.md#rate-limit).
+
+- Toda rota tem limite, sem anotação: o `RateLimitFilter` conta por usuário logado ou, sem token, por IP. O health fica de fora.
+- Rota sem configuração própria usa o limite geral (`security.rate-limit.general`).
+- Para dar um limite próprio a uma rota, cadastre-a em `security.rate-limit.routes`, com um nome, o `path` (padrão do Spring MVC, aceita `{id}` e `**`), o `method` (opcional; sem ele, vale para todos) e os valores:
+
+  ```yaml
+  security:
+    rate-limit:
+      routes:
+        login:
+          method: POST
+          path: /auth/login
+          capacity: 20
+          period: PT1M
+  ```
+
+- A rota cadastrada usa só o limite dela, sem gastar o geral. Quando mais de uma casa, vale a mais específica (`/admin/users` antes de `/admin/**`, e com `method` antes de sem).
+- Um limite que depende do corpo da requisição não cabe no filtro. Ele vira uma porta na `application` do módulo, implementada na `infrastructure` com o `RateLimit`, que lança `TooManyRequestsException`. É o caso do login por e-mail + IP (`login-per-email-and-ip`, porta `LoginRateLimiter`). Nunca bloqueie a conta nem limite só pelo identificador do usuário (e-mail, CPF): qualquer um conseguiria travar outra pessoa de propósito.
+- Os contadores ficam em memória e valem por instância.
+- Nos testes de integração, o `application-test.yml` sobe os limites para todos os testes, que chamam do mesmo IP. Para testar o limite, use `@TestPropertySource` com valores baixos e um IP próprio por teste (`request.setRemoteAddr`), como no `RateLimitIntegrationTest`.
 
 ## Banco de dados e persistência
 

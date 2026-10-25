@@ -1,0 +1,9 @@
+security:
+  rate-limit:
+    general:
+      capacity: 10000
+    login-per-email-and-ip:
+      capacity: 10000
+    routes:
+      login:
+        capacity: 10000
