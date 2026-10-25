@@ -17,9 +17,10 @@ br.com.arktech.workshop
 ├── shared                    o que todos os módulos usam (erros, i18n, segurança, BaseEntity, UseCase)
 └── <module>                  ex.: auth, customer, vehicle, serviceorder
     ├── api                   controllers e DTOs de entrada/saída
-    │   └── <recurso>         um pacote por controller, com os DTOs dele (ex.: authentication)
+    │   └── <recurso>         um pacote por controller, com os DTOs dele (ex.: user, authentication)
     ├── application           casos de uso, orquestração e transações
     │   ├── <caso de uso>     um pacote por caso de uso (ex.: login, createuser)
+    │   ├── <objeto>          result usado por vários casos de uso (ex.: user/UserResult)
     │   └── port              interfaces que os casos de uso usam e a infraestrutura implementa
     ├── domain                entidades, regras de negócio e contratos
     │   ├── model             entidades, value objects e enums
@@ -32,8 +33,8 @@ br.com.arktech.workshop
 ```
 
 - **Port** é uma interface que a camada declara para dizer do que precisa, sem saber como é feito (ex.: `PasswordHasher` no domínio, `TokenIssuer` na `application`). A implementação fica na `infrastructure`. Repositórios também são ports, mas ficam no próprio `repository`.
-- O pacote de um caso de uso tem o nome dele em minúsculas, sem separador (`createuser`), e guarda o `XxxUseCase`, o `XxxCommand`/`XxxQuery` e o `XxxResult`.
-- Na `api`, cada controller fica num pacote com o nome do recurso (`authentication`), junto com os DTOs que só ele usa.
+- O pacote de um caso de uso tem o nome dele em minúsculas, sem separador (`createuser`), e guarda o `XxxUseCase`, o `XxxCommand`/`XxxQuery` e o `XxxResult`. Quando vários casos de uso devolvem o mesmo objeto, o result fica num pacote com o nome do objeto (`user/UserResult`).
+- Na `api`, cada controller fica num pacote com o nome do recurso (`user`, `authentication`), junto com os DTOs que só ele usa.
 - Crie o subpacote junto com o primeiro arquivo dele; não deixe pacotes vazios.
 - Classes usadas só dentro do próprio subpacote ficam package-private; as que outro subpacote do módulo usa ficam `public`. O isolamento entre módulos continua garantido pelo `LayerDependencyTest`.
 - O `shared` segue a mesma divisão em camadas, com subpacotes por assunto (`error`, `i18n`, `exception`...).
@@ -94,6 +95,19 @@ public class FindCustomerUseCase implements UseCase<FindCustomerQuery, CustomerR
 - DTOs como `record`.
 - Datas em ISO-8601.
 - Valores monetários em `BigDecimal`.
+- Criação responde `201` com o recurso criado; ação sem corpo de resposta responde `204`.
+
+### Paginação
+
+Listagens recebem `page` (começa em 0, padrão 0) e `size` (de 1 a 100, padrão 20) como query params e devolvem um `PageResponse` (`shared/api/pagination`):
+
+```json
+{ "content": [ ... ], "page": 0, "size": 20, "totalElements": 42, "totalPages": 3 }
+```
+
+- O repositório do domínio recebe `Pagination` e devolve `Page<T>` (`shared/domain/pagination`), sem Spring Data. O `XxxJpaRepository` converte num método `default` (ver `UserJpaRepository.findPage`).
+- Toda listagem tem ordem estável: ordene por um campo de negócio e desempate pelo `id`.
+- O controller converte com `PageResponse.from(page, XxxResponse::from)`.
 
 ### Controllers
 
@@ -163,10 +177,11 @@ O domínio e a `application` lançam as exceções de `shared/domain/exception`,
 O 401 e o 403 de token ausente, inválido ou sem o papel exigido saem do Spring Security, não dessas exceções (ver [Segurança](#segurança)).
 
 ```java
-throw new NotFoundException("customer.notFound", id);
+throw new NotFoundException("customer.notFound", id.toString());
 ```
 
 - A exceção recebe a chave da mensagem e os argumentos (`{0}`, `{1}`...). Cadastre a chave no `messages_pt_BR.properties`.
+- Ids e outros números que não são quantidade entram como `String` (`id.toString()`): o `MessageFormat` formata números no locale, e o id 1234 sairia como `1.234`.
 - Crie uma subclasse quando o caso se repetir ou quando um nome de negócio deixar o código mais claro: `class InvalidStatusTransitionException extends BusinessRuleException`. O status vem da categoria.
 - Não crie `@ExceptionHandler` nos controllers: o `GlobalExceptionHandler` já trata tudo.
 
@@ -194,6 +209,7 @@ openapi.customer.findById=Busca um cliente
 - As anotações de Bean Validation usam a mensagem padrão (`jakarta.validation.constraints.NotBlank.message`) ou uma chave própria entre chaves: `@NotBlank(message = "{customer.nameRequired}")`. Texto literal é proibido.
 - Ao usar uma anotação pela primeira vez, cadastre a mensagem dela no `messages_pt_BR.properties`. Uma mensagem literal ou uma chave inexistente lança exceção na validação (500), então o teste que dispara a validação acusa o esquecimento.
 - Parâmetros da anotação entram como `{min}`, `{max}`, `{value}`: `Deve ter entre {min} e {max} caracteres.`
+- `@Size` só com `max` usa `message = "{validation.maxLength}"` (`Deve ter no máximo {max} caracteres.`); a mensagem padrão diria "entre 0 e {max}".
 - Em mensagens com argumentos (`{0}`), o apóstrofo precisa ser duplicado (`''`), porque o `MessageFormat` trata `'` como escape. Mensagens de validação e mensagens sem argumentos usam o apóstrofo simples.
 
 ## Segurança

@@ -21,6 +21,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import org.hibernate.annotations.BatchSize;
+
 @Entity
 @Table(name = "\"user\"")
 @Getter
@@ -37,6 +39,7 @@ public class User extends BaseEntity {
     private boolean active;
 
     @Getter(AccessLevel.NONE)
+    @BatchSize(size = 100)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserRole> roles = new ArrayList<>();
 
