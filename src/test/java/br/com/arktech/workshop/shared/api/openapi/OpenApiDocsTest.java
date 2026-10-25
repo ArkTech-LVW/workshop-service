@@ -173,6 +173,20 @@ class OpenApiDocsTest {
     }
 
     @Test
+    void shouldDocumentCustomerManagementAsAdminOnly() {
+        String customers = "$.paths['/admin/customers']";
+        String customer = "$.paths['/admin/customers/{id}']";
+
+        assertThat(spec.read(customers + ".post.tags", List.class)).containsExactly("Clientes");
+        assertThat(spec.read(customers + ".post.responses", Map.class))
+                .containsOnlyKeys("201", "400", "401", "403", "409", "500");
+        assertThat(spec.read(customers + ".get.parameters[*].name", List.class))
+                .containsExactly("document", "page", "size");
+        assertThat(spec.read(customer + ".get.responses", Map.class))
+                .containsOnlyKeys("200", "401", "403", "404", "500");
+    }
+
+    @Test
     void shouldHideErrorController() {
         Map<String, Object> paths = spec.read("$.paths");
 
