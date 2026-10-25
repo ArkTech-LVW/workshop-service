@@ -130,7 +130,9 @@ class OpenApiDocsTest {
         String content = "$.components.responses." + name + ".content['application/json']";
 
         assertThat(spec.read(content + ".schema.$ref", String.class)).isEqualTo("#/components/schemas/ApiError");
-        assertThat(spec.read(content + ".example", Map.class)).containsOnlyKeys("code", "message", "details");
+        assertThat(spec.read(content + ".example", Map.class))
+                .containsKeys("code", "message")
+                .doesNotContainValue(null);
         assertThat(spec.read(content + ".example.code", String.class)).isNotBlank();
         assertThat(spec.read(content + ".example.message", String.class)).isNotBlank();
     }

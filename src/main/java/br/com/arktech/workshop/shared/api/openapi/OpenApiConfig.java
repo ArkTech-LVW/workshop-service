@@ -145,11 +145,14 @@ class OpenApiConfig {
                 .content(new Content().addMediaType(JSON, mediaType));
     }
 
-    private static Map<String, @Nullable Object> asMap(ApiError error) {
-        Map<String, @Nullable Object> map = new LinkedHashMap<>();
+    private static Map<String, Object> asMap(ApiError error) {
+        Map<String, Object> map = new LinkedHashMap<>();
         map.put("code", error.code());
         map.put("message", error.message());
-        map.put("details", error.details());
+        List<ApiFieldError> details = error.details();
+        if (details != null) {
+            map.put("details", details);
+        }
         return map;
     }
 

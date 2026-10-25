@@ -37,7 +37,7 @@ class LoginIntegrationTest {
 
     private static final String PASSWORD = "Sup3r-Secret!";
     private static final String INVALID_CREDENTIALS = """
-            {"code": "auth.invalidCredentials", "message": "E-mail ou senha inválidos.", "details": null}
+            {"code": "auth.invalidCredentials", "message": "E-mail ou senha inválidos."}
             """;
 
     @Autowired

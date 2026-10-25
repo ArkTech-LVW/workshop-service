@@ -34,12 +34,11 @@ class JwtAuthenticationTest {
     private static final String UNAUTHENTICATED = """
             {
               "code": "auth.unauthenticated",
-              "message": "É preciso se autenticar para acessar este recurso.",
-              "details": null
+              "message": "É preciso se autenticar para acessar este recurso."
             }
             """;
     private static final String INVALID_TOKEN = """
-            {"code": "auth.invalidToken", "message": "Token de acesso inválido ou expirado.", "details": null}
+            {"code": "auth.invalidToken", "message": "Token de acesso inválido ou expirado."}
             """;
 
     @Autowired

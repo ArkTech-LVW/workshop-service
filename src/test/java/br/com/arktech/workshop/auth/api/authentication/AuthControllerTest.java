@@ -88,7 +88,7 @@ class AuthControllerTest {
                 """)
                 .andExpect(status().isUnauthorized())
                 .andExpect(json("""
-                        {"code": "auth.invalidCredentials", "message": "E-mail ou senha inválidos.", "details": null}
+                        {"code": "auth.invalidCredentials", "message": "E-mail ou senha inválidos."}
                         """));
     }
 

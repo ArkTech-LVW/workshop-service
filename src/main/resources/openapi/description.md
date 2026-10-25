@@ -12,7 +12,7 @@ Toda resposta de erro tem o mesmo formato, o `ApiError`, sempre em `application/
 |---|---|
 | `code` | Código estável do erro (ex.: `customer.notFound`). **É por ele que o cliente deve decidir o que fazer**; nunca muda para um erro existente. |
 | `message` | Texto em pt-BR para exibir ao usuário. Pode mudar a qualquer momento. |
-| `details` | Lista de `{field, message}` com os campos inválidos, só nos erros de entrada (400). Nos demais é `null`. |
+| `details` | Lista de `{field, message}` com os campos inválidos, só nos erros de entrada (400). Nos demais, o campo não vem na resposta. |
 
 ### Status por categoria
 
@@ -53,13 +53,13 @@ O código de referência do 500 aparece também no log do servidor: informe-o ao
 **404, recurso não encontrado**
 
 ```json
-{ "code": "customer.notFound", "message": "Cliente não encontrado.", "details": null }
+{ "code": "customer.notFound", "message": "Cliente não encontrado." }
 ```
 
 **409, conflito**
 
 ```json
-{ "code": "customer.documentAlreadyExists", "message": "Já existe um cliente com esse CPF/CNPJ.", "details": null }
+{ "code": "customer.documentAlreadyExists", "message": "Já existe um cliente com esse CPF/CNPJ." }
 ```
 
 **422, regra de negócio**
@@ -67,8 +67,7 @@ O código de referência do 500 aparece também no log do servidor: informe-o ao
 ```json
 {
   "code": "serviceOrder.invalidStatusTransition",
-  "message": "Não é possível mudar a OS de FINALIZADA para EM_EXECUÇÃO.",
-  "details": null
+  "message": "Não é possível mudar a OS de FINALIZADA para EM_EXECUÇÃO."
 }
 ```
 
@@ -77,7 +76,6 @@ O código de referência do 500 aparece também no log do servidor: informe-o ao
 ```json
 {
   "code": "server.unexpectedError",
-  "message": "Ocorreu um erro inesperado. Código de referência: a1b2c3d4.",
-  "details": null
+  "message": "Ocorreu um erro inesperado. Código de referência: a1b2c3d4."
 }
 ```
