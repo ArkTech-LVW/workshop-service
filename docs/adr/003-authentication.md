@@ -54,6 +54,7 @@
 
 - `POST /auth/login` recebe e-mail e senha e devolve o token.
 - E-mail inexistente, senha errada e usuário inativo devolvem o mesmo 401 `auth.invalidCredentials`. Quando o e-mail não existe, a senha é comparada com um hash fictício, para o tempo de resposta não revelar se o e-mail está cadastrado.
+- O login não abre transação: o usuário é buscado já com os papéis (`@EntityGraph` no `findByEmail`) e a senha é verificada depois que a conexão volta para o pool. Com `@Transactional`, cada login prenderia uma conexão durante todo o Argon2 (cerca de 50 a 70 ms), e 10 logins simultâneos ocupariam o pool inteiro do Hikari, deixando as outras requisições esperando.
 
 ### ADMIN de desenvolvimento
 

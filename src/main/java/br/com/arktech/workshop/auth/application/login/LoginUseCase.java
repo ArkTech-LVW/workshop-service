@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class LoginUseCase implements UseCase<LoginCommand, LoginResult> {
@@ -34,7 +33,6 @@ public class LoginUseCase implements UseCase<LoginCommand, LoginResult> {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public LoginResult execute(LoginCommand command) {
         Optional<User> found = userRepository.findByEmail(new Email(command.email()));
         if (found.isEmpty()) {
