@@ -96,7 +96,7 @@ class OpenApiDocsTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"BadRequest", "NotFound", "Conflict", "BusinessRule", "InternalError"})
+    @ValueSource(strings = {"BadRequest", "NotFound", "Conflict", "BusinessRule", "InternalError", "InvalidCredentials"})
     void shouldDefineReusableErrorResponseWithExample(String name) {
         String content = "$.components.responses." + name + ".content['application/json']";
 
@@ -132,6 +132,18 @@ class OpenApiDocsTest {
         assertThat(spec.read("$.components.responses.NotFound.description", String.class))
                 .isEqualTo("Recurso não encontrado");
         assertThat(specJson).as("unresolved ${...} placeholder").doesNotContain("${");
+    }
+
+    @Test
+    void shouldDocumentLoginAsPublicWithInvalidCredentials() {
+        String login = "$.paths['/auth/login'].post";
+
+        assertThat(spec.read(login + ".security", List.class)).isEmpty();
+        assertThat(spec.read(login + ".tags", List.class)).containsExactly("Autenticação");
+        assertThat(spec.read(login + ".responses.401.$ref", String.class))
+                .isEqualTo("#/components/responses/InvalidCredentials");
+        assertThat(spec.read(login + ".responses.400.$ref", String.class))
+                .isEqualTo("#/components/responses/BadRequest");
     }
 
     @Test

@@ -54,11 +54,26 @@ Para usar um PostgreSQL próprio, desligue o compose com `SPRING_DOCKER_COMPOSE_
 
 O perfil `development` assina os tokens JWT com uma chave de desenvolvimento, que é pública no repositório. Fora dele, a variável `JWT_SECRET` é obrigatória, com pelo menos 32 bytes (para gerar uma: `openssl rand -base64 48`); sem ela, a aplicação não sobe. Nunca rode num servidor sem `SPRING_PROFILES_ACTIVE=production`: em `development`, qualquer um consegue gerar um token válido.
 
+### Usuário ADMIN local
+
+No perfil `development`, a aplicação cria na subida, se ainda não existir, um usuário ADMIN só para ambiente local: **`admin@workshop.local`**, senha **`admin123`**. No perfil `production`, nenhum usuário é criado.
+
+## Autenticação
+
+```bash
+curl -X POST http://localhost:8080/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email": "admin@workshop.local", "password": "admin123"}'
+# {"accessToken":"eyJ...","tokenType":"Bearer","expiresIn":3600}
+```
+
+Envie o `accessToken` no header `Authorization: Bearer <token>` das rotas protegidas. O token vale 1h.
+
 ## Documentação da API
 
 Com a aplicação no ar, a documentação (Swagger UI) fica em <http://localhost:8080/docs>, com todas as rotas, os contratos e o formato dos erros. A especificação OpenAPI em JSON está em <http://localhost:8080/docs/openapi.json>.
 
-Para chamar rotas protegidas pela própria UI, clique em **Authorize** e cole o token JWT.
+Para chamar rotas protegidas pela própria UI, faça o login em `POST /auth/login`, clique em **Authorize** e cole o `accessToken`.
 
 ## Decisões de arquitetura
 

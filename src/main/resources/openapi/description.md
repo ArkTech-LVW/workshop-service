@@ -2,7 +2,7 @@ API de gestão de oficina mecânica: clientes, veículos, ordens de serviço e e
 
 ## Autenticação
 
-As rotas protegidas exigem um token JWT no header `Authorization: Bearer <token>`. Para testar por aqui, clique em **Authorize** e cole o token. Rotas públicas aparecem sem o cadeado.
+As rotas protegidas exigem um token JWT no header `Authorization: Bearer <token>`. O token é obtido em `POST /auth/login` e vale 1h. Para testar por aqui, faça o login, clique em **Authorize** e cole o `accessToken`. Rotas públicas aparecem sem o cadeado.
 
 ## Erros
 
@@ -20,6 +20,7 @@ Toda resposta de erro tem o mesmo formato, o `ApiError`, sempre em `application/
 |---|---|---|
 | 400 | Entrada inválida: validação, tipo errado, parâmetro ausente | `request.invalidFields`, com `details` |
 | 400 | Corpo JSON malformado ou ausente | `request.malformedBody` |
+| 401 | Login com e-mail ou senha inválidos | `auth.invalidCredentials` |
 | 401 | Sem token numa rota protegida | `auth.unauthenticated` |
 | 401 | Token inválido ou expirado | `auth.invalidToken` |
 | 403 | Token válido, mas sem permissão para a rota | `auth.accessDenied` |

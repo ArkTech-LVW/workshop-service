@@ -3,7 +3,7 @@ package br.com.arktech.workshop.shared.domain.exception;
 import lombok.Getter;
 
 public abstract sealed class DomainException extends RuntimeException
-        permits NotFoundException, ConflictException, BusinessRuleException {
+        permits NotFoundException, ConflictException, BusinessRuleException, UnauthorizedException {
 
     @Getter
     private final String code;

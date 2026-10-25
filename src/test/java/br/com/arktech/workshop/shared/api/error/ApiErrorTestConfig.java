@@ -11,4 +11,4 @@ import org.springframework.context.annotation.Import;
     "br.com.arktech.workshop.shared.infrastructure.i18n",
     "br.com.arktech.workshop.shared.infrastructure.validation"
 })
-class ApiErrorTestConfig {}
+public class ApiErrorTestConfig {}

@@ -50,6 +50,18 @@
 - A chave vem da variável `JWT_SECRET` (mínimo de 32 bytes), sem valor padrão no `application.yml`: sem ela, a aplicação não sobe. Só o perfil `development` traz uma chave de desenvolvimento, para rodar localmente sem configuração.
 - O perfil `development` continua sendo o padrão do `application.yml`, para IDE, `bootRun` e testes manuais funcionarem sem passar nada. A imagem Docker define `SPRING_PROFILES_ACTIVE=production`, e o `docker-compose.yml` a sobrescreve com `development` para o ambiente local. Os testes de integração rodam no perfil `test`, com uma chave própria.
 
+### Login
+
+- `POST /auth/login` recebe e-mail e senha e devolve o token.
+- E-mail inexistente, senha errada e usuário inativo devolvem o mesmo 401 `auth.invalidCredentials`. Quando o e-mail não existe, a senha é comparada com um hash fictício, para o tempo de resposta não revelar se o e-mail está cadastrado.
+- O login não abre transação: o usuário é buscado já com os papéis (`@EntityGraph` no `findByEmail`) e a senha é verificada depois que a conexão volta para o pool. Com `@Transactional`, cada login prenderia uma conexão durante todo o Argon2 (cerca de 50 a 70 ms), e 10 logins simultâneos ocupariam o pool inteiro do Hikari, deixando as outras requisições esperando.
+
+### ADMIN de desenvolvimento
+
+- No perfil `development`, a aplicação cria na subida um ADMIN pelo `CreateUserUseCase`, se ele ainda não existir. As credenciais ficam no `application-development.yml`.
+- Foi preferido a uma migration de seed: passa pelas regras do domínio (normalização do e-mail, papéis, hash da senha) e não depende do esquema das tabelas nem de um hash gerado fora da aplicação.
+- Servidores rodam no perfil `production`, padrão da imagem Docker, onde o ADMIN não é criado. Assim, nenhum servidor sobe com um ADMIN de senha conhecida, desde que siga o deploy pela imagem ou passe o perfil (ver "Token").
+
 ### Usuário logado e isolamento dos módulos
 
 - O módulo `auth` tem o usuário, o JWT e a cadeia do Spring Security. Os outros módulos só conhecem o que está no `shared`: o enum `Role` e a porta `CurrentUser` (`Long id()`), que o `auth` implementa lendo o `sub` do token.
