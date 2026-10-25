@@ -9,7 +9,6 @@ import java.util.TreeSet;
 
 public record UserResult(Long id, String name, String email, boolean active, Set<Role> roles) {
 
-    // Sorted in the enum order, so responses list the roles in a stable order.
     public UserResult {
         roles = Collections.unmodifiableSortedSet(new TreeSet<>(roles));
     }

@@ -71,7 +71,6 @@ class UserRepositoryTest {
         assertThat(updated.getLastUpdated()).isAfter(updated.getDateCreated());
     }
 
-    // Other integration tests commit users too, so this one only looks at the last pages, where its names sort.
     @Test
     void shouldPageUsersOrderedByName() {
         userRepository.save(newNamedUser("zzz-c", "page-c@workshop.com"));
