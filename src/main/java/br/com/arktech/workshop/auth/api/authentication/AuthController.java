@@ -1,4 +1,4 @@
-package br.com.arktech.workshop.auth.api;
+package br.com.arktech.workshop.auth.api.authentication;
 
 import br.com.arktech.workshop.auth.application.login.LoginCommand;
 import br.com.arktech.workshop.auth.application.login.LoginUseCase;

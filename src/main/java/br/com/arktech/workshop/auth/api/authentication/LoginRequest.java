@@ -1,4 +1,4 @@
-package br.com.arktech.workshop.auth.api;
+package br.com.arktech.workshop.auth.api.authentication;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
