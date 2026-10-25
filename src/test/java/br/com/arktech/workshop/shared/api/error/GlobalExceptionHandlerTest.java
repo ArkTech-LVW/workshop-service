@@ -154,6 +154,15 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void shouldRejectInvalidLicensePlateWith400() throws Exception {
+        perform(postJson("/test/errors/licensePlate", """
+                        {"plate": "ABCD123"}
+                        """))
+                .andExpect(status().isBadRequest())
+                .andExpect(json(invalidFields("plate", "Placa inválida.")));
+    }
+
+    @Test
     void shouldReportMethodValidationByParameterName() throws Exception {
         perform(get("/test/errors/param").param("quantity", "-1"))
                 .andExpect(status().isBadRequest())
