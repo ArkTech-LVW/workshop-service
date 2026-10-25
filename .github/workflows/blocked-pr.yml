@@ -40,8 +40,6 @@ jobs:
             gh pr edit "$PR_NUMBER" --remove-label "$BLOCKED_LABEL"
           fi
 
-      # Labels set with GITHUB_TOKEN don't trigger new runs, so this run must
-      # read the current state and decide the check by itself.
       - name: Block merge while labeled
         env:
           GH_TOKEN: ${{ github.token }}
