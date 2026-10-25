@@ -50,6 +50,11 @@ public class InMemoryUserRepository implements UserRepository {
         return new Page<>(content, pagination, users.size());
     }
 
+    @Override
+    public long countActiveAdminsForUpdate() {
+        return users.stream().filter(User::isActiveAdmin).count();
+    }
+
     public List<User> findAll() {
         return List.copyOf(users);
     }

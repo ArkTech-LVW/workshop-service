@@ -44,9 +44,7 @@ public class User extends BaseEntity {
     private List<UserRole> roles = new ArrayList<>();
 
     public User(String name, Email email, String password, Set<Role> roles, PasswordHasher passwordHasher) {
-        if (roles.isEmpty()) {
-            throw new BusinessRuleException("user.roleRequired");
-        }
+        requireRoles(roles);
 
         this.name = name;
         this.email = email;
@@ -59,11 +57,52 @@ public class User extends BaseEntity {
         return roles.stream().map(UserRole::getRole).collect(Collectors.toUnmodifiableSet());
     }
 
+    public boolean isActiveAdmin() {
+        return active && getRoles().contains(Role.ADMIN);
+    }
+
     public boolean authenticate(String password, PasswordHasher passwordHasher) {
         return passwordHasher.matches(password, passwordHash) && active;
     }
 
-    public void deactivate() {
+    public void rename(String name) {
+        this.name = name;
+    }
+
+    // activeAdminCount includes this user when it is an active ADMIN.
+    public void changeRoles(Set<Role> roles, long activeAdminCount) {
+        requireRoles(roles);
+        if (!roles.contains(Role.ADMIN)) {
+            requireAnotherActiveAdmin(activeAdminCount);
+        }
+
+        // Keeps the roles that stay, so the (user_id, role) unique key is not hit by a delete-then-insert.
+        this.roles.removeIf(userRole -> !roles.contains(userRole.getRole()));
+        Set<Role> current = getRoles();
+        roles.stream()
+                .filter(role -> !current.contains(role))
+                .forEach(role -> this.roles.add(new UserRole(this, role)));
+    }
+
+    public void activate() {
+        active = true;
+    }
+
+    // activeAdminCount includes this user when it is an active ADMIN.
+    public void deactivate(long activeAdminCount) {
+        requireAnotherActiveAdmin(activeAdminCount);
         active = false;
+    }
+
+    private void requireAnotherActiveAdmin(long activeAdminCount) {
+        if (isActiveAdmin() && activeAdminCount <= 1) {
+            throw new BusinessRuleException("user.lastActiveAdmin");
+        }
+    }
+
+    private static void requireRoles(Set<Role> roles) {
+        if (roles.isEmpty()) {
+            throw new BusinessRuleException("user.roleRequired");
+        }
     }
 }

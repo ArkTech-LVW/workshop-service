@@ -55,7 +55,7 @@ class LoginUseCaseTest {
     @Test
     void shouldRejectInactiveUser() {
         User user = newUser();
-        user.deactivate();
+        user.deactivate(0);
         userRepository.save(user);
 
         assertInvalidCredentials(new LoginCommand("ana@workshop.com", "secret"));

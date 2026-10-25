@@ -4,10 +4,13 @@ import br.com.arktech.workshop.auth.domain.model.User;
 import br.com.arktech.workshop.auth.domain.repository.UserRepository;
 import br.com.arktech.workshop.shared.domain.pagination.Page;
 import br.com.arktech.workshop.shared.domain.pagination.Pagination;
+import br.com.arktech.workshop.shared.domain.security.Role;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 interface UserJpaRepository extends JpaRepository<User, Long>, UserRepository {
 
@@ -18,4 +21,18 @@ interface UserJpaRepository extends JpaRepository<User, Long>, UserRepository {
         var page = findAll(PageRequest.of(pagination.page(), pagination.size(), PAGE_ORDER));
         return new Page<>(page.getContent(), pagination, page.getTotalElements());
     }
+
+    @Override
+    default long countActiveAdminsForUpdate() {
+        lockActiveAdmins();
+        return countActiveByRole(Role.ADMIN);
+    }
+
+    // Transaction-scoped advisory lock: released on commit or rollback. The count runs in a new statement,
+    // so it sees what the previous holder committed.
+    @Query(value = "SELECT 1 FROM pg_advisory_xact_lock(hashtext('user.activeAdmins'))", nativeQuery = true)
+    int lockActiveAdmins();
+
+    @Query("SELECT count(u) FROM User u JOIN u.roles r WHERE u.active = true AND r.role = :role")
+    long countActiveByRole(@Param("role") Role role);
 }

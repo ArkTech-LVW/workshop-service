@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,4 +52,25 @@ interface IUserController {
     @ApiResponse(responseCode = "404", ref = "NotFound")
     @GetMapping("/{id}")
     UserResponse findById(@PathVariable Long id);
+
+    @Operation(summary = "${openapi.user.update}")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "400", ref = "BadRequest")
+    @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "422", ref = "BusinessRule")
+    @PutMapping("/{id}")
+    UserResponse update(@PathVariable Long id, @Valid @RequestBody UpdateUserRequest request);
+
+    @Operation(summary = "${openapi.user.activate}")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "404", ref = "NotFound")
+    @PostMapping("/{id}/activate")
+    UserResponse activate(@PathVariable Long id);
+
+    @Operation(summary = "${openapi.user.deactivate}", description = "${openapi.user.deactivateDescription}")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "422", ref = "BusinessRule")
+    @PostMapping("/{id}/deactivate")
+    UserResponse deactivate(@PathVariable Long id);
 }
