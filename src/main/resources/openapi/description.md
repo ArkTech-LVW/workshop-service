@@ -20,6 +20,9 @@ Toda resposta de erro tem o mesmo formato, o `ApiError`, sempre em `application/
 |---|---|---|
 | 400 | Entrada inválida: validação, tipo errado, parâmetro ausente | `request.invalidFields`, com `details` |
 | 400 | Corpo JSON malformado ou ausente | `request.malformedBody` |
+| 401 | Sem token numa rota protegida | `auth.unauthenticated` |
+| 401 | Token inválido ou expirado | `auth.invalidToken` |
+| 403 | Token válido, mas sem permissão para a rota | `auth.accessDenied` |
 | 404 | Recurso inexistente | definido pelo módulo (ex.: `customer.notFound`) |
 | 404 | Rota inexistente | `request.routeNotFound` |
 | 405 | Método HTTP não suportado na rota | `request.methodNotSupported` |

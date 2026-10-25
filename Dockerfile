@@ -20,5 +20,6 @@ COPY --from=build /workspace/extracted/snapshot-dependencies/ ./
 COPY --from=build /workspace/extracted/application/ ./
 
 USER spring
+ENV SPRING_PROFILES_ACTIVE=production
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "application.jar"]

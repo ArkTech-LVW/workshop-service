@@ -31,6 +31,8 @@ dependencies {
     implementation(libs.spring.boot.starter.webmvc)
     implementation(libs.spring.boot.starter.actuator)
     implementation(libs.spring.boot.starter.validation)
+    implementation(libs.spring.boot.starter.security.oauth2.resource.server)
+    implementation(libs.bouncycastle.bcprov)
     implementation(libs.springdoc.openapi.starter.webmvc.ui)
     implementation(libs.jspecify)
     implementation(libs.spring.boot.starter.data.jpa)
@@ -66,6 +68,8 @@ tasks.compileJava {
         check("NullAway", CheckSeverity.ERROR)
         option("NullAway:AnnotatedPackages", "br.com.arktech.workshop")
         option("NullAway:JSpecifyMode", "true")
+        option("NullAway:ExternalInitAnnotations", "jakarta.persistence.Entity,jakarta.persistence.MappedSuperclass")
+        option("NullAway:ExcludedFieldAnnotations", "jakarta.persistence.Id")
     }
 }
 
