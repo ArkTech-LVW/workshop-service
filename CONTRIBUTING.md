@@ -170,7 +170,7 @@ throw new NotFoundException("customer.notFound", id);
 
 ### Como documentar os erros
 
-A documentação da API (`/docs`) é gerada pelo springdoc a partir das interfaces dos controllers. Os erros já têm respostas prontas, com schema e exemplo, no `OpenApiConfig`: `BadRequest` (400), `InvalidCredentials` (401 do login), `NotFound` (404), `Conflict` (409) e `BusinessRule` (422). Cada endpoint declara só os erros que de fato pode retornar, como o `findById` do exemplo de [Controllers](#controllers):
+A documentação da API (`/docs`) é gerada pelo springdoc a partir das interfaces dos controllers. Os erros já têm respostas prontas, com schema e exemplo, no `OpenApiConfig`: `BadRequest` (400), `InvalidCredentials` (401 do login), `NotFound` (404), `Conflict` (409) e `BusinessRule` (422), além do `Unauthenticated` (401) e do `AccessDenied` (403), que entram sozinhos (ver abaixo). Cada endpoint declara só os erros que de fato pode retornar, como o `findById` do exemplo de [Controllers](#controllers):
 
 ```java
 @ApiResponse(responseCode = "200")
@@ -227,7 +227,7 @@ interface ICustomerController {
 - Os papéis vêm sempre do enum `Role`, nunca de string.
 - Duas anotações de acesso no mesmo método (ou na mesma interface) e `@AllowedRoles({})` são erro de configuração e também quebram o `EndpointAccessCoverageTest`.
 - Não use as anotações do Spring (`@PreAuthorize`, `@Secured`) nem as do Jakarta (`@PermitAll`, `@RolesAllowed`): elas não são lidas e o endpoint continua bloqueado.
-- Fora dos controllers, ficam abertos só o `/actuator/health/**` e a documentação (`/docs/**`, `/swagger-ui/**`), na `SecurityConfig`. Qualquer outro caminho, inclusive rota inexistente, é negado. Método HTTP errado numa rota existente continua 405.
+- Fora dos controllers, ficam abertos só o `/actuator/health/**` e a documentação (`/docs/**`, `/swagger-ui/**`), na `SecurityConfig`. Qualquer outro caminho, inclusive rota inexistente, é negado. Numa rota existente, a requisição fora do formato (método, `Content-Type`, `Accept`) continua com o erro do MVC (405, 415, 406), mesmo sem token.
 
 ### Token e usuário logado
 
