@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = LicensePlateValidator.class)
 @Target({FIELD, METHOD, PARAMETER, ANNOTATION_TYPE, TYPE_USE})
 @Retention(RUNTIME)
-public @interface ValidLicensePlate {
+public @interface LicensePlate {
 
     String message() default "{licensePlate.invalid}";
 

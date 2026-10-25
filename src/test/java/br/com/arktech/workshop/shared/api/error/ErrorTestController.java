@@ -1,7 +1,7 @@
 package br.com.arktech.workshop.shared.api.error;
 
 import br.com.arktech.workshop.shared.api.validation.CPFOrCNPJ;
-import br.com.arktech.workshop.shared.api.validation.ValidLicensePlate;
+import br.com.arktech.workshop.shared.api.validation.LicensePlate;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
@@ -110,5 +110,5 @@ class ErrorTestController {
 
     record CPFOrCNPJRequest(@CPFOrCNPJ String document) {}
 
-    record LicensePlateRequest(@ValidLicensePlate String plate) {}
+    record LicensePlateRequest(@LicensePlate String plate) {}
 }
