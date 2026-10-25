@@ -26,8 +26,10 @@ public sealed interface EndpointAccess {
     record Undeclared() implements EndpointAccess {}
 
     static EndpointAccess of(HandlerMethod handlerMethod) {
-        EndpointAccess access = declaredOn(handlerMethod.getMethod());
-        return access instanceof Undeclared ? declaredOn(handlerMethod.getBeanType()) : access;
+        // Both are read even when the method decides, so a misconfigured type is always reported.
+        EndpointAccess onType = declaredOn(handlerMethod.getBeanType());
+        EndpointAccess onMethod = declaredOn(handlerMethod.getMethod());
+        return onMethod instanceof Undeclared ? onType : onMethod;
     }
 
     private static EndpointAccess declaredOn(AnnotatedElement element) {

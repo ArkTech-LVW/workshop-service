@@ -53,6 +53,13 @@ class EndpointAccessTest {
     }
 
     @Test
+    void shouldRejectTwoAccessAnnotationsOnTheInterfaceEvenWhenTheMethodDecides() {
+        assertThatIllegalStateException()
+                .isThrownBy(() -> accessOf(new MisconfiguredInterfaceController(), "endpoint"))
+                .withMessageContaining("More than one access annotation");
+    }
+
+    @Test
     void shouldRejectAllowedRolesWithoutRoles() {
         assertThatIllegalStateException()
                 .isThrownBy(() -> accessOf(new MisconfiguredController(), "noRoles"))
@@ -109,6 +116,20 @@ class EndpointAccessTest {
 
         @PublicEndpoint
         public void open() {}
+    }
+
+    @PublicEndpoint
+    @Authenticated
+    interface IMisconfiguredInterfaceController {
+
+        @AllowedRoles(Role.ADMIN)
+        void endpoint();
+    }
+
+    static class MisconfiguredInterfaceController implements IMisconfiguredInterfaceController {
+
+        @Override
+        public void endpoint() {}
     }
 
     static class MisconfiguredController {
