@@ -132,7 +132,7 @@ class CustomerController implements ICustomerController {
 
 ### Postman
 
-A collection do Postman em `docs/postman` tem todas as rotas da API, com o caso de sucesso de cada uma. Toda rota nova entra nela no mesmo PR. Como importar, usar e exportar está no [README da collection](docs/postman/README.md).
+A collection do Postman é gerada pelo import do OpenAPI (`/docs/openapi.json`), então não há arquivo para manter. Para a rota sair pronta para uso, dê `example` a cada campo do corpo e a cada parâmetro (`@Schema(example = ...)` e `@Parameter(example = ...)`): sem ele, o Postman preenche com texto aleatório. Como importar e usar está no [README do Postman](docs/postman/README.md).
 
 ## Erros da API
 
