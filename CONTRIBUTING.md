@@ -102,6 +102,7 @@ As anotações de rota, validação e documentação ficam numa interface `I<Nom
 @RequestMapping("/admin/customers")
 interface ICustomerController {
 
+    @AllowedRoles({Role.ADMIN, Role.ATTENDANT})
     @Operation(summary = "${openapi.customer.findById}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "404", ref = "NotFound")
@@ -123,6 +124,7 @@ class CustomerController implements ICustomerController {
 ```
 
 - Na classe ficam só `@RestController` e `@RequiredArgsConstructor`, sem anotação nos métodos nem nos parâmetros: o Spring lê `@PathVariable`, `@RequestBody`, `@Valid` etc. da interface.
+- Todo endpoint declara quem pode acessá-lo, também na interface (ver [Segurança](#segurança)). Sem declaração, a rota fica bloqueada para todo mundo.
 - Constraints de validação nos parâmetros (`@Positive`, `@NotNull`...) ficam **só** na interface. Repetir na classe faz o Hibernate Validator lançar `ConstraintDeclarationException` (HV000151).
 - Interface e controller ficam package-private, na `api` do módulo.
 
@@ -183,7 +185,7 @@ openapi.customer.findById=Busca um cliente
 - Os textos da documentação (`summary`, `description`) não ficam no código: vão para o `openapi/openapi.properties`, com chaves `openapi.<context>.<camelCase>`, e são referenciados com `${...}`. Esse arquivo é só da documentação; as mensagens devolvidas ao cliente continuam no `messages_pt_BR.properties`.
 - Uma chave inexistente aparece crua na doc (`${openapi.customer.findById}`) e quebra o `OpenApiDocsTest`.
 - O 500 (`InternalError`) entra sozinho em todas as operações.
-- Toda rota exige o token JWT na documentação. Rota pública desliga o requisito com `@SecurityRequirements()` no método ou na classe.
+- O cadeado e as respostas de segurança saem da anotação de acesso do endpoint: `@PublicEndpoint` fica sem cadeado; `@Authenticated` ganha o 401 (`Unauthenticated`); `@AllowedRoles` ganha o 401 e o 403 (`AccessDenied`). Não declare esses três à mão.
 
 ### Mensagens de validação
 
@@ -196,7 +198,40 @@ openapi.customer.findById=Busca um cliente
 
 Os motivos estão no [ADR 003](docs/adr/003-authentication.md).
 
-- As rotas exigem um token JWT no header `Authorization: Bearer <token>`. Ficam abertos só o `/actuator/health/**` e a documentação (`/docs/**`, `/swagger-ui/**`), na `SecurityConfig`.
+### Acesso às rotas
+
+Nenhuma rota é acessível por padrão. Cada endpoint declara quem pode acessá-lo com uma das anotações de `shared/api/security`, no método ou na interface `I<Nome>Controller` inteira:
+
+| Anotação | Quem acessa |
+|---|---|
+| `@PublicEndpoint` | Qualquer um, sem token |
+| `@Authenticated` | Qualquer usuário logado, de qualquer papel |
+| `@AllowedRoles({Role.ADMIN, Role.ATTENDANT})` | Quem tem pelo menos um dos papéis |
+
+```java
+@Authenticated
+@RequestMapping("/admin/customers")
+interface ICustomerController {
+
+    @GetMapping("/{id}")
+    CustomerResponse findById(@PathVariable Long id);      // @Authenticated, da interface
+
+    @AllowedRoles(Role.ADMIN)
+    @DeleteMapping("/{id}")
+    void delete(@PathVariable Long id);                    // a do método vence a da interface
+}
+```
+
+- **Endpoint sem anotação fica bloqueado para todo mundo, inclusive ADMIN** (403 com token, 401 sem). O `EndpointAccessCoverageTest` percorre todos os endpoints e quebra o build quando algum fica sem declaração.
+- Não há hierarquia de papéis: o ADMIN só acessa o que lista `Role.ADMIN`.
+- Os papéis vêm sempre do enum `Role`, nunca de string.
+- Duas anotações de acesso no mesmo método (ou na mesma interface) e `@AllowedRoles({})` são erro de configuração e também quebram o `EndpointAccessCoverageTest`.
+- Não use as anotações do Spring (`@PreAuthorize`, `@Secured`) nem as do Jakarta (`@PermitAll`, `@RolesAllowed`): elas não são lidas e o endpoint continua bloqueado.
+- Fora dos controllers, ficam abertos só o `/actuator/health/**` e a documentação (`/docs/**`, `/swagger-ui/**`), na `SecurityConfig`. Qualquer outro caminho, inclusive rota inexistente, é negado. Método HTTP errado numa rota existente continua 405.
+
+### Token e usuário logado
+
+- As rotas protegidas exigem um token JWT no header `Authorization: Bearer <token>`.
 - Sem token, ou com token inválido ou expirado: 401 (`auth.unauthenticated` ou `auth.invalidToken`). Com token, mas sem permissão: 403 (`auth.accessDenied`). Os dois saem pelo `GlobalExceptionHandler`, como os demais erros.
 - O caso de uso que precisa registrar quem fez a ação injeta `CurrentUser` (`shared/application/security`) e chama `currentUser.id()`. O id vem do token (`sub`). Os outros módulos guardam esse `Long`, nunca o `User`.
 - Senhas com hash Argon2id, pelo `PasswordHasher` do `auth`. Nunca logue nem devolva senha ou hash.
@@ -295,7 +330,8 @@ public record ApiFieldError(@Nullable String field, String message) {}
 - **Unitários:** JUnit puro, sem Spring e sem banco. É o padrão para domínio e regras de negócio.
 - **Camada `api`:** `@WebMvcTest(controllers = ...)` com `@AutoConfigureMockMvc(addFilters = false)` e `@Import(ApiErrorTestConfig.class)` é o padrão para testar controllers, validação e respostas de erro sem banco e sem os filtros de segurança. O caso de uso entra com `@MockitoBean`. Veja o `AuthControllerTest`.
 - **Integração:** anote a classe com `@IntegrationTest` (ou `@IntegrationTest(webEnvironment = RANDOM_PORT)` para chamar via HTTP). A anotação sobe a aplicação inteira contra um PostgreSQL real (Testcontainers), no perfil `test` (sem herdar o `development`) e com uma `JWT_SECRET` de teste, já com `MockMvc` (com a segurança ligada), e marca o teste com a tag JUnit `integration`. O Docker precisa estar rodando.
-- **Rotas protegidas nos testes de integração:** gere o token com o `TokenIssuer` (`tokenIssuer.issue(userId, Set.of(Role.ADMIN))`) e envie no header `Authorization: Bearer <token>`. Veja o `JwtAuthenticationTest`.
+- **Rotas protegidas nos testes de integração:** gere o token com o `TokenIssuer` (`tokenIssuer.issue(userId, Set.of(Role.ADMIN))`) e envie no header `Authorization: Bearer <token>`. Veja o `EndpointAuthorizationTest`.
+- Controllers criados só para teste também declaram o acesso, porque o `EndpointAccessCoverageTest` os percorre junto com os de produção.
 - Use `@IntegrationTest` só quando o teste precisa da aplicação ou do banco de verdade. Testes com a mesma configuração compartilham contexto e container; cada configuração diferente (ex.: outro `webEnvironment`) sobe os seus.
 - **Cobertura:** o `./gradlew build` também gera o relatório do JaCoCo em `build/reports/jacoco/test/html/index.html`, mesmo quando algum teste falha.
 
