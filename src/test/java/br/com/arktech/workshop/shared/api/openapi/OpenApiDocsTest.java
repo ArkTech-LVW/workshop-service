@@ -187,6 +187,14 @@ class OpenApiDocsTest {
     }
 
     @Test
+    void shouldDocumentPasswordChangeForAnyLoggedUser() {
+        String changePassword = "$.paths['/auth/password'].put";
+
+        assertThat(spec.read(changePassword + ".responses", Map.class))
+                .containsOnlyKeys("204", "400", "401", "422", "500");
+    }
+
+    @Test
     void shouldHideErrorController() {
         Map<String, Object> paths = spec.read("$.paths");
 

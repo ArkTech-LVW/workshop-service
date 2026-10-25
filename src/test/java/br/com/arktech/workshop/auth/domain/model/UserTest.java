@@ -173,6 +173,26 @@ class UserTest {
     }
 
     @Test
+    void shouldChangePasswordWhenCurrentPasswordMatches() {
+        User user = newUser();
+
+        user.changePassword("secret", "new-secret", passwordHasher);
+
+        assertThat(user.authenticate("new-secret", passwordHasher)).isTrue();
+        assertThat(user.authenticate("secret", passwordHasher)).isFalse();
+    }
+
+    @Test
+    void shouldNotChangePasswordWhenCurrentPasswordIsWrong() {
+        User user = newUser();
+
+        assertThatThrownBy(() -> user.changePassword("wrong", "new-secret", passwordHasher))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("user.wrongCurrentPassword");
+        assertThat(user.authenticate("secret", passwordHasher)).isTrue();
+    }
+
+    @Test
     void shouldExposeRolesAsReadOnly() {
         User user = newUser();
 
