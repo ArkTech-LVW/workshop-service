@@ -1,8 +1,6 @@
 package br.com.arktech.workshop.shared.application;
 
-import org.jspecify.annotations.Nullable;
-
-public interface UseCase<I, O extends @Nullable Object> {
+public interface UseCase<I, O> {
 
     O execute(I input);
 }
