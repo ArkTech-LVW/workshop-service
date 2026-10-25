@@ -55,10 +55,6 @@ dependencies {
     testRuntimeOnly(libs.junit.platform.launcher)
 }
 
-tasks.bootRun {
-    systemProperty("spring.profiles.active", "development")
-}
-
 tasks.withType<Test> {
     useJUnitPlatform()
     // Run tests with a non pt-BR JVM locale (like Docker/CI) so i18n defaults are actually exercised

@@ -54,11 +54,9 @@ Para usar um PostgreSQL próprio, desligue o compose com `SPRING_DOCKER_COMPOSE_
 
 O perfil `development` assina os tokens JWT com uma chave de desenvolvimento, que é pública no repositório. Fora dele, a variável `JWT_SECRET` é obrigatória, com pelo menos 32 bytes (para gerar uma: `openssl rand -base64 48`); sem ela, a aplicação não sobe. Nunca rode num servidor sem `SPRING_PROFILES_ACTIVE=production`: em `development`, qualquer um consegue gerar um token válido.
 
-### Perfil `development` e usuário ADMIN local
+### Usuário ADMIN local
 
-O `bootRun` e o `docker compose up` ativam o perfil `development`, que cria na subida, se ainda não existir, um usuário ADMIN só para ambiente local: **`admin@workshop.local`**, senha **`admin123`**.
-
-Rodando a aplicação de outro jeito (o jar ou a classe `WorkshopApplication` na IDE sem perfil), nenhum usuário é criado. Na IDE, ative o perfil `development` na configuração de execução (*Active profiles*).
+No perfil `development`, a aplicação cria na subida, se ainda não existir, um usuário ADMIN só para ambiente local: **`admin@workshop.local`**, senha **`admin123`**. No perfil `production`, nenhum usuário é criado.
 
 ## Autenticação
 

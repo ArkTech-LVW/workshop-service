@@ -59,7 +59,7 @@
 
 - No perfil `development`, a aplicação cria na subida um ADMIN pelo `CreateUserUseCase`, se ele ainda não existir. As credenciais ficam no `application-development.yml`.
 - Foi preferido a uma migration de seed: passa pelas regras do domínio (normalização do e-mail, papéis, hash da senha) e não depende do esquema das tabelas nem de um hash gerado fora da aplicação.
-- O perfil `development` deixou de ser o padrão do `application.yml` e passou a ser ativado só pelo `bootRun` e pelo `docker-compose.yml`. Assim, nenhum outro ambiente sobe com um ADMIN de senha conhecida.
+- Servidores rodam no perfil `production`, padrão da imagem Docker, onde o ADMIN não é criado. Assim, nenhum servidor sobe com um ADMIN de senha conhecida, desde que siga o deploy pela imagem ou passe o perfil (ver "Token").
 
 ### Usuário logado e isolamento dos módulos
 
