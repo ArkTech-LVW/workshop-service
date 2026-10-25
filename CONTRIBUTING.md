@@ -139,14 +139,14 @@ Os motivos estão no [ADR 002](docs/adr/002-api-errors.md).
 Toda resposta de erro é um `ApiError` em `application/json`:
 
 ```json
-{ "code": "customer.notFound", "message": "Cliente não encontrado.", "details": null }
+{ "code": "customer.notFound", "message": "Cliente não encontrado." }
 
 { "code": "request.invalidFields", "message": "Existem campos inválidos na requisição.",
   "details": [ { "field": "vehicles[0].plate", "message": "Não pode estar em branco." } ] }
 ```
 
 - `code` é a chave de i18n e é o que o front usa para decidir o comportamento. Nunca mude o `code` de um erro existente.
-- `details` só aparece nos erros de entrada (400); nos demais é `null`.
+- `details` só aparece nos erros de entrada (400); nos demais, o campo não vem na resposta. Os campos saem sempre na ordem `code`, `message`, `details`.
 - Um erro inesperado sai como 500 `server.unexpectedError`, com um código de referência na mensagem. O mesmo código aparece no log `ERROR`, junto com o stack trace.
 
 ### Como lançar erros
