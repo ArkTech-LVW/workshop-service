@@ -1,0 +1,55 @@
+name: Blocked PR
+
+on:
+  pull_request:
+    types: [opened, reopened, edited, synchronize, labeled, unlabeled]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  BLOCKED_LABEL: 'Aguardando outro  PR'
+
+jobs:
+  check:
+    name: Aguardando outro PR
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Sync label with base branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          BASE_CHANGED: ${{ github.event.action == 'edited' && github.event.changes.base != null }}
+        run: |
+          if [ "$BASE_REF" != "$DEFAULT_BRANCH" ]; then
+            gh pr edit "$PR_NUMBER" --add-label "$BLOCKED_LABEL"
+          elif [ "$BASE_CHANGED" = "true" ]; then
+            gh pr edit "$PR_NUMBER" --remove-label "$BLOCKED_LABEL"
+          fi
+
+      # Labels set with GITHUB_TOKEN don't trigger new runs, so this run must
+      # read the current state and decide the check by itself.
+      - name: Block merge while labeled
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          labels=$(gh pr view "$PR_NUMBER" --json labels --jq '.labels[].name')
+          if grep -qxF "$BLOCKED_LABEL" <<< "$labels"; then
+            echo "::error::PR marcado com '$BLOCKED_LABEL'. Faça o merge do PR base e aponte este para a main."
+            exit 1
+          fi
