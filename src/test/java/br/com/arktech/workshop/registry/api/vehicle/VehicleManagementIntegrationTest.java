@@ -58,12 +58,28 @@ class VehicleManagementIntegrationTest {
 
     @ParameterizedTest
     @MethodSource("vehicleEndpoints")
-    void shouldDenyUsersWithoutAdminRole(MockHttpServletRequestBuilder request) throws Exception {
-        String token = tokenFor(Role.ATTENDANT, Role.MECHANIC);
+    void shouldDenyMechanics(MockHttpServletRequestBuilder request) throws Exception {
+        String token = tokenFor(Role.MECHANIC);
 
         mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("auth.accessDenied"));
+    }
+
+    @Test
+    void shouldLetAttendantsCreateAndFindVehicles() throws Exception {
+        Integer customerId = createCustomer();
+
+        String created = asAttendant(post("/admin/vehicles")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(vehicleJson(customerId, uniquePlate(), null)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        Integer id = JsonPath.read(created, "$.id");
+
+        asAttendant(get("/admin/vehicles/{id}", id)).andExpect(status().isOk());
     }
 
     @Test
@@ -181,6 +197,10 @@ class VehicleManagementIntegrationTest {
 
     private ResultActions asAdmin(MockHttpServletRequestBuilder request) throws Exception {
         return mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenFor(Role.ADMIN)));
+    }
+
+    private ResultActions asAttendant(MockHttpServletRequestBuilder request) throws Exception {
+        return mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenFor(Role.ATTENDANT)));
     }
 
     private String tokenFor(Role... roles) {
