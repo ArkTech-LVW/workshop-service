@@ -44,7 +44,7 @@ class GlobalExceptionHandlerTest {
         perform(get("/test/errors/notFound"))
                 .andExpect(status().isNotFound())
                 .andExpect(json("""
-                        {"code": "test.notFound", "message": "Recurso de teste 42 não encontrado.", "details": null}
+                        {"code": "test.notFound", "message": "Recurso de teste 42 não encontrado."}
                         """));
     }
 
@@ -53,7 +53,7 @@ class GlobalExceptionHandlerTest {
         perform(get("/test/errors/conflict"))
                 .andExpect(status().isConflict())
                 .andExpect(json("""
-                        {"code": "test.conflict", "message": "Recurso de teste em conflito.", "details": null}
+                        {"code": "test.conflict", "message": "Recurso de teste em conflito."}
                         """));
     }
 
@@ -62,7 +62,7 @@ class GlobalExceptionHandlerTest {
         perform(get("/test/errors/businessRule"))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(json("""
-                        {"code": "test.businessRule", "message": "Regra de teste violada.", "details": null}
+                        {"code": "test.businessRule", "message": "Regra de teste violada."}
                         """));
     }
 
@@ -71,7 +71,7 @@ class GlobalExceptionHandlerTest {
         perform(get("/test/errors/unauthorized"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(json("""
-                        {"code": "test.unauthorized", "message": "Credenciais de teste inválidas.", "details": null}
+                        {"code": "test.unauthorized", "message": "Credenciais de teste inválidas."}
                         """));
     }
 
@@ -83,8 +83,7 @@ class GlobalExceptionHandlerTest {
                 .andExpect(json("""
                         {
                           "code": "request.tooManyRequests",
-                          "message": "Muitas requisições. Aguarde um pouco e tente novamente.",
-                          "details": null
+                          "message": "Muitas requisições. Aguarde um pouco e tente novamente."
                         }
                         """));
     }
@@ -97,8 +96,7 @@ class GlobalExceptionHandlerTest {
                 .andExpect(json("""
                         {
                           "code": "auth.unauthenticated",
-                          "message": "É preciso se autenticar para acessar este recurso.",
-                          "details": null
+                          "message": "É preciso se autenticar para acessar este recurso."
                         }
                         """));
     }
@@ -110,8 +108,7 @@ class GlobalExceptionHandlerTest {
                 .andExpect(json("""
                         {
                           "code": "auth.accessDenied",
-                          "message": "Você não tem permissão para acessar este recurso.",
-                          "details": null
+                          "message": "Você não tem permissão para acessar este recurso."
                         }
                         """));
     }
@@ -123,8 +120,7 @@ class GlobalExceptionHandlerTest {
                 .andExpect(json("""
                         {
                           "code": "test.invalidStatusTransition",
-                          "message": "Transição de status de teste inválida: FINISHED.",
-                          "details": null
+                          "message": "Transição de status de teste inválida: FINISHED."
                         }
                         """));
     }
@@ -194,11 +190,20 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void shouldWriteFieldsInFixedOrder() throws Exception {
+        perform(get("/test/errors/param").param("quantity", "-1"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("{\"code\":\"request.invalidFields\","
+                        + "\"message\":\"Existem campos inválidos na requisição.\","
+                        + "\"details\":[{\"field\":\"quantity\",\"message\":\"Deve ser maior que zero.\"}]}"));
+    }
+
+    @Test
     void shouldRejectMalformedJson() throws Exception {
         perform(postJson("/test/errors/body", "{\"name\": "))
                 .andExpect(status().isBadRequest())
                 .andExpect(json("""
-                        {"code": "request.malformedBody", "message": "O corpo da requisição está malformado.", "details": null}
+                        {"code": "request.malformedBody", "message": "O corpo da requisição está malformado."}
                         """));
     }
 
@@ -237,7 +242,7 @@ class GlobalExceptionHandlerTest {
         perform(get("/test/errors/doesNotExist"))
                 .andExpect(status().isNotFound())
                 .andExpect(json("""
-                        {"code": "request.routeNotFound", "message": "Rota não encontrada.", "details": null}
+                        {"code": "request.routeNotFound", "message": "Rota não encontrada."}
                         """));
     }
 
@@ -249,8 +254,7 @@ class GlobalExceptionHandlerTest {
                 .andExpect(json("""
                         {
                           "code": "request.methodNotSupported",
-                          "message": "O método POST não é suportado nesta rota.",
-                          "details": null
+                          "message": "O método POST não é suportado nesta rota."
                         }
                         """));
     }
@@ -260,7 +264,7 @@ class GlobalExceptionHandlerTest {
         perform(post("/test/errors/body").contentType(MediaType.TEXT_PLAIN).content("name"))
                 .andExpect(status().isUnsupportedMediaType())
                 .andExpect(json("""
-                        {"code": "request.unsupportedMediaType", "message": "Tipo de conteúdo não suportado.", "details": null}
+                        {"code": "request.unsupportedMediaType", "message": "Tipo de conteúdo não suportado."}
                         """));
     }
 
@@ -269,7 +273,7 @@ class GlobalExceptionHandlerTest {
         perform(get("/test/errors/ok").accept(MediaType.APPLICATION_XML))
                 .andExpect(status().isNotAcceptable())
                 .andExpect(json("""
-                        {"code": "request.notAcceptable", "message": "Formato de resposta não suportado.", "details": null}
+                        {"code": "request.notAcceptable", "message": "Formato de resposta não suportado."}
                         """));
     }
 
