@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Tag(name = "${openapi.vehicle.tag}")
-@AllowedRoles(Role.ADMIN)
+@AllowedRoles({Role.ADMIN, Role.ATTENDANT})
 @RequestMapping("/admin/vehicles")
 interface IVehicleController {
 
