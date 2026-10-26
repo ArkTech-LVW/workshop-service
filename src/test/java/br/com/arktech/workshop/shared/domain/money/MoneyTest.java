@@ -42,6 +42,23 @@ class MoneyTest {
                 .hasMessage("money.tooManyDecimals");
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"0", "150", "150.5", "150.55", "150.5500"})
+    void shouldAcceptValidAmount(String input) {
+        assertThat(Money.isValid(new BigDecimal(input))).isTrue();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"-0.01", "150.555", "0.001"})
+    void shouldRejectInvalidAmount(String input) {
+        assertThat(Money.isValid(new BigDecimal(input))).isFalse();
+    }
+
+    @Test
+    void shouldNotAcceptNullAmount() {
+        assertThat(Money.isValid(null)).isFalse();
+    }
+
     @Test
     void shouldStartFromZero() {
         assertThat(Money.ZERO.amount()).isEqualTo(new BigDecimal("0.00"));

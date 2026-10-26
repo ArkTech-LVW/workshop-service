@@ -5,6 +5,8 @@ import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import org.jspecify.annotations.Nullable;
+
 public record Money(BigDecimal amount) implements Comparable<Money> {
 
     private static final int SCALE = 2;
@@ -20,6 +22,10 @@ public record Money(BigDecimal amount) implements Comparable<Money> {
         } catch (ArithmeticException ex) {
             throw new BusinessRuleException("money.tooManyDecimals");
         }
+    }
+
+    public static boolean isValid(@Nullable BigDecimal amount) {
+        return amount != null && amount.signum() >= 0 && amount.stripTrailingZeros().scale() <= SCALE;
     }
 
     public Money plus(Money other) {
