@@ -1,9 +1,11 @@
 package br.com.arktech.workshop.registry.api.vehicle;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -49,6 +51,8 @@ class VehicleManagementIntegrationTest {
                 Arguments.of(post("/admin/vehicles").contentType(MediaType.APPLICATION_JSON).content("{}")),
                 Arguments.of(get("/admin/vehicles")),
                 Arguments.of(get("/admin/vehicles/1")),
+                Arguments.of(put("/admin/vehicles/1").contentType(MediaType.APPLICATION_JSON).content("{}")),
+                Arguments.of(delete("/admin/vehicles/1")),
                 Arguments.of(get("/admin/customers/1/vehicles")));
     }
 
@@ -173,6 +177,53 @@ class VehicleManagementIntegrationTest {
     }
 
     @Test
+    void shouldRegisterChassisLaterRepaintAndClearChassis() throws Exception {
+        Integer customerId = createCustomer();
+        String plate = uniquePlate();
+        String chassis = uniqueChassis();
+        Integer id = createVehicle(customerId, plate, null);
+
+        asAdmin(put("/admin/vehicles/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateJson(plate, chassis, "Azul")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.chassis").value(chassis))
+                .andExpect(jsonPath("$.color").value("Azul"))
+                .andExpect(jsonPath("$.customerId").value(customerId))
+                .andExpect(jsonPath("$.model").value("Uno"))
+                .andExpect(jsonPath("$.year").value(2010));
+        asAdmin(put("/admin/vehicles/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateJson(plate, null, "Azul")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.chassis").value(nullValue()));
+    }
+
+    @Test
+    void shouldRejectUpdateToAnotherVehiclesPlate() throws Exception {
+        Integer customerId = createCustomer();
+        String taken = uniquePlate();
+        createVehicle(customerId, taken, null);
+        Integer id = createVehicle(customerId, uniquePlate(), null);
+
+        asAdmin(put("/admin/vehicles/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateJson(withHyphen(taken), null, "Branco")))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("vehicle.licensePlateAlreadyExists"));
+    }
+
+    @Test
+    void shouldDeleteVehicle() throws Exception {
+        Integer id = createVehicle(createCustomer(), uniquePlate(), null);
+
+        asAdmin(delete("/admin/vehicles/{id}", id)).andExpect(status().isNoContent());
+        asAdmin(get("/admin/vehicles/{id}", id))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("vehicle.notFound"));
+    }
+
+    @Test
     void shouldKeepCustomerThatHasVehicles() throws Exception {
         Integer customerId = createCustomer();
         createVehicle(customerId, uniquePlate(), null);
@@ -210,6 +261,12 @@ class VehicleManagementIntegrationTest {
                 {"customerId": %d, "licensePlate": "%s", "chassis": %s, "brand": "Fiat", "model": "Uno",
                  "year": 2010, "color": "Branco"}
                 """.formatted(customerId, licensePlate, chassis == null ? "null" : "\"" + chassis + "\"");
+    }
+
+    private static String updateJson(String licensePlate, @Nullable String chassis, String color) {
+        return """
+                {"licensePlate": "%s", "chassis": %s, "color": "%s"}
+                """.formatted(licensePlate, chassis == null ? "null" : "\"" + chassis + "\"", color);
     }
 
     private ResultActions asAdmin(MockHttpServletRequestBuilder request) throws Exception {

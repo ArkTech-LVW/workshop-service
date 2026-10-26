@@ -242,6 +242,10 @@ class OpenApiDocsTest {
                 .containsExactly("licensePlate", "page", "size");
         assertThat(spec.read(vehicle + ".get.responses", Map.class))
                 .containsOnlyKeys("200", "401", "403", "404", "429", "500");
+        assertThat(spec.read(vehicle + ".put.responses", Map.class))
+                .containsOnlyKeys("200", "400", "401", "403", "404", "409", "429", "500");
+        assertThat(spec.read(vehicle + ".delete.responses", Map.class))
+                .containsOnlyKeys("204", "401", "403", "404", "409", "429", "500");
         assertThat(spec.read(customerVehicles + ".get.tags", List.class)).containsExactly("Veículos");
         assertThat(spec.read(customerVehicles + ".get.parameters[*].name", List.class))
                 .containsExactly("customerId", "page", "size");
