@@ -160,7 +160,7 @@ class VehicleControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(json("""
                         {"code": "vehicle.licensePlateAlreadyExists",
-                         "message": "Já existe um veículo com a placa ABC1D23.", "details": null}
+                         "message": "Já existe um veículo com a placa ABC1D23."}
                         """));
     }
 
@@ -173,7 +173,7 @@ class VehicleControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(json("""
                         {"code": "vehicle.chassisAlreadyExists",
-                         "message": "Já existe um veículo com o chassi 9BWZZZ372VT004251.", "details": null}
+                         "message": "Já existe um veículo com o chassi 9BWZZZ372VT004251."}
                         """));
     }
 
@@ -191,7 +191,7 @@ class VehicleControllerTest {
         mockMvc.perform(get("/admin/vehicles/1234"))
                 .andExpect(status().isNotFound())
                 .andExpect(json("""
-                        {"code": "vehicle.notFound", "message": "Veículo 1234 não encontrado.", "details": null}
+                        {"code": "vehicle.notFound", "message": "Veículo 1234 não encontrado."}
                         """));
     }
 
