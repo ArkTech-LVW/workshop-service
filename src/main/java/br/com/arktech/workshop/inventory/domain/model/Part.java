@@ -47,6 +47,28 @@ public class Part extends BaseEntity {
         this.minimumStock = minimumStock;
     }
 
+    public void changeSku(Sku sku) {
+        this.sku = sku;
+    }
+
+    public void rename(String name) {
+        this.name = name;
+    }
+
+    public void classify(PartType type, MeasurementUnit unit) {
+        this.type = type;
+        this.unit = unit;
+    }
+
+    public void changeSalePrice(Money salePrice) {
+        this.salePrice = salePrice;
+    }
+
+    public void changeMinimumStock(int minimumStock) {
+        requireNonNegative(minimumStock);
+        this.minimumStock = minimumStock;
+    }
+
     private static void requireNonNegative(int minimumStock) {
         if (minimumStock < 0) {
             throw new BusinessRuleException("part.minimumStockNegative");

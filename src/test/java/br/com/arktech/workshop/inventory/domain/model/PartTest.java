@@ -37,6 +37,36 @@ class PartTest {
     }
 
     @Test
+    void shouldChangeDataWithoutTouchingStockQuantity() {
+        Part part = new Part(SKU, "Óleo 5W30 1L", PartType.SUPPLY, MeasurementUnit.LITER, PRICE, 10);
+        Money newPrice = new Money(new BigDecimal("49.90"));
+
+        part.changeSku(new Sku("OLEO-5W40-1L"));
+        part.rename("Óleo 5W40 1L");
+        part.classify(PartType.PART, MeasurementUnit.UNIT);
+        part.changeSalePrice(newPrice);
+        part.changeMinimumStock(0);
+
+        assertThat(part.getSku()).isEqualTo(new Sku("OLEO-5W40-1L"));
+        assertThat(part.getName()).isEqualTo("Óleo 5W40 1L");
+        assertThat(part.getType()).isEqualTo(PartType.PART);
+        assertThat(part.getUnit()).isEqualTo(MeasurementUnit.UNIT);
+        assertThat(part.getSalePrice()).isEqualTo(newPrice);
+        assertThat(part.getMinimumStock()).isZero();
+        assertThat(part.getStockQuantity()).isZero();
+    }
+
+    @Test
+    void shouldRejectChangeToNegativeMinimumStock() {
+        Part part = new Part(SKU, "Óleo 5W30 1L", PartType.SUPPLY, MeasurementUnit.LITER, PRICE, 10);
+
+        assertThatThrownBy(() -> part.changeMinimumStock(-1))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("part.minimumStockNegative");
+        assertThat(part.getMinimumStock()).isEqualTo(10);
+    }
+
+    @Test
     void shouldRejectNegativeMinimumStock() {
         assertThatThrownBy(() -> new Part(SKU, "Óleo 5W30 1L", PartType.SUPPLY, MeasurementUnit.LITER, PRICE, -1))
                 .isInstanceOf(BusinessRuleException.class)

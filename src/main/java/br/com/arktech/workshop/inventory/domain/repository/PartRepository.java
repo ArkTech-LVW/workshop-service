@@ -16,7 +16,11 @@ public interface PartRepository {
 
     boolean existsBySku(Sku sku);
 
+    boolean existsBySkuAndIdNot(Sku sku, Long id);
+
     Page<Part> findPage(PartFilter filter, Pagination pagination);
+
+    void remove(Part part);
 
     default Part findRequiredById(Long id) {
         return findById(id).orElseThrow(() -> new NotFoundException("part.notFound", id.toString()));

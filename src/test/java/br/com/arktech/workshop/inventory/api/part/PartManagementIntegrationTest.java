@@ -1,7 +1,9 @@
 package br.com.arktech.workshop.inventory.api.part;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -22,6 +24,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -35,11 +38,16 @@ class PartManagementIntegrationTest {
     @Autowired
     private TokenIssuer tokenIssuer;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     static Stream<Arguments> partEndpoints() {
         return Stream.of(
                 Arguments.of(post("/admin/parts").contentType(MediaType.APPLICATION_JSON).content("{}")),
                 Arguments.of(get("/admin/parts")),
-                Arguments.of(get("/admin/parts/1")));
+                Arguments.of(get("/admin/parts/1")),
+                Arguments.of(put("/admin/parts/1").contentType(MediaType.APPLICATION_JSON).content("{}")),
+                Arguments.of(delete("/admin/parts/1")));
     }
 
     @ParameterizedTest
@@ -104,10 +112,83 @@ class PartManagementIntegrationTest {
     }
 
     @Test
+    void shouldUpdatePartWithoutChangingStockQuantity() throws Exception {
+        Integer id = createPart(uniqueSku());
+        jdbcTemplate.update("UPDATE part SET stock_quantity = 7 WHERE id = ?", id);
+        String newSku = uniqueSku();
+
+        asAdmin(put("/admin/parts/{id}", id).contentType(MediaType.APPLICATION_JSON).content("""
+                        {"sku": "%s", "name": "Filtro de ar", "type": "PART", "unit": "UNIT", "salePrice": 58.5,
+                         "minimumStock": 3, "stockQuantity": 99}
+                        """.formatted(newSku.toLowerCase())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sku").value(newSku))
+                .andExpect(jsonPath("$.name").value("Filtro de ar"))
+                .andExpect(jsonPath("$.salePrice").value(58.50))
+                .andExpect(jsonPath("$.minimumStock").value(3))
+                .andExpect(jsonPath("$.stockQuantity").value(7));
+        asAdmin(get("/admin/parts/{id}", id)).andExpect(jsonPath("$.stockQuantity").value(7));
+    }
+
+    @Test
+    void shouldRejectSkuOfAnotherPartOnUpdate() throws Exception {
+        String taken = uniqueSku();
+        createPart(taken);
+        Integer id = createPart(uniqueSku());
+
+        asAdmin(put("/admin/parts/{id}", id).contentType(MediaType.APPLICATION_JSON).content(partJson(taken)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("part.skuAlreadyExists"));
+    }
+
+    @Test
+    void shouldDeletePart() throws Exception {
+        Integer id = createPart(uniqueSku());
+
+        asAdmin(delete("/admin/parts/{id}", id)).andExpect(status().isNoContent());
+        asAdmin(get("/admin/parts/{id}", id))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("part.notFound"));
+    }
+
+    @Test
+    void shouldKeepPartThatIsStillReferenced() throws Exception {
+        Integer id = createPart(uniqueSku());
+        jdbcTemplate.execute("CREATE TABLE part_reference_test (part_id BIGINT REFERENCES part (id))");
+        try {
+            jdbcTemplate.update("INSERT INTO part_reference_test (part_id) VALUES (?)", id);
+
+            asAdmin(delete("/admin/parts/{id}", id))
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.code").value("part.inUse"));
+            asAdmin(get("/admin/parts/{id}", id)).andExpect(status().isOk());
+        } finally {
+            jdbcTemplate.execute("DROP TABLE part_reference_test");
+        }
+    }
+
+    @Test
     void shouldAnswer404ForUnknownPart() throws Exception {
         asAdmin(get("/admin/parts/{id}", Long.MAX_VALUE))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("part.notFound"));
+        asAdmin(put("/admin/parts/{id}", Long.MAX_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(partJson(uniqueSku())))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("part.notFound"));
+        asAdmin(delete("/admin/parts/{id}", Long.MAX_VALUE))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("part.notFound"));
+    }
+
+    private Integer createPart(String sku) throws Exception {
+        String created = asAdmin(post("/admin/parts").contentType(MediaType.APPLICATION_JSON).content(partJson(sku)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        return JsonPath.read(created, "$.id");
     }
 
     private ResultActions asAdmin(MockHttpServletRequestBuilder request) throws Exception {
