@@ -69,6 +69,8 @@ curl -X POST http://localhost:8080/auth/login \
 
 Envie o `accessToken` no header `Authorization: Bearer <token>` das rotas protegidas. O token vale 1h.
 
+O login e as demais rotas têm limite de requisições (`security.rate-limit` no `application.yml`); acima dele, a API responde 429. O limite usa o IP do cliente: atrás de um proxy reverso, o `X-Forwarded-For` só é aceito de endereços privados. Se o proxy usar outro endereço, configure `SERVER_TOMCAT_REMOTEIP_INTERNAL_PROXIES` com ele.
+
 ## Documentação da API
 
 Com a aplicação no ar, a documentação (Swagger UI) fica em <http://localhost:8080/docs>, com todas as rotas, os contratos e o formato dos erros. A especificação OpenAPI em JSON está em <http://localhost:8080/docs/openapi.json>.

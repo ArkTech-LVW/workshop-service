@@ -4,6 +4,8 @@ API de gestão de oficina mecânica: clientes, veículos, ordens de serviço e e
 
 As rotas protegidas exigem um token JWT no header `Authorization: Bearer <token>`. O token é obtido em `POST /auth/login` e vale 1h. Para testar por aqui, faça o login, clique em **Authorize** e cole o `accessToken`. Rotas públicas aparecem sem o cadeado.
 
+Todas as rotas têm limite de requisições por usuário (ou por IP, sem token), e o login tem um limite mais restrito, por e-mail e IP. Acima do limite, a resposta é 429 com o header `Retry-After`, mesmo com a senha correta.
+
 ## Erros
 
 Toda resposta de erro tem o mesmo formato, o `ApiError`, sempre em `application/json`:
@@ -31,6 +33,7 @@ Toda resposta de erro tem o mesmo formato, o `ApiError`, sempre em `application/
 | 415 | `Content-Type` não suportado | `request.unsupportedMediaType` |
 | 409 | Conflito com o estado atual (ex.: CPF já cadastrado) | definido pelo módulo |
 | 422 | Regra de negócio violada | definido pelo módulo |
+| 429 | Limite de requisições excedido. O header `Retry-After` diz em quantos segundos tentar de novo | `request.tooManyRequests` |
 | 500 | Erro inesperado | `server.unexpectedError`, com um código de referência na mensagem |
 
 O código de referência do 500 aparece também no log do servidor: informe-o ao suporte.
@@ -53,13 +56,13 @@ O código de referência do 500 aparece também no log do servidor: informe-o ao
 **404, recurso não encontrado**
 
 ```json
-{ "code": "customer.notFound", "message": "Cliente não encontrado." }
+{ "code": "customer.notFound", "message": "Cliente 1234 não encontrado." }
 ```
 
 **409, conflito**
 
 ```json
-{ "code": "customer.documentAlreadyExists", "message": "Já existe um cliente com esse CPF/CNPJ." }
+{ "code": "customer.documentAlreadyExists", "message": "Já existe um cliente com o CPF/CNPJ 529.982.247-25." }
 ```
 
 **422, regra de negócio**

@@ -1,16 +1,22 @@
 package br.com.arktech.workshop.auth.api.authentication;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import br.com.arktech.workshop.auth.application.changepassword.ChangePasswordCommand;
+import br.com.arktech.workshop.auth.application.changepassword.ChangePasswordUseCase;
 import br.com.arktech.workshop.auth.application.login.LoginCommand;
 import br.com.arktech.workshop.auth.application.login.LoginResult;
 import br.com.arktech.workshop.auth.application.login.LoginUseCase;
 import br.com.arktech.workshop.shared.api.error.ApiErrorTestConfig;
+import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.UnauthorizedException;
 
 import java.time.Duration;
@@ -37,6 +43,60 @@ class AuthControllerTest {
 
     @MockitoBean
     private LoginUseCase loginUseCase;
+
+    @MockitoBean
+    private ChangePasswordUseCase changePasswordUseCase;
+
+    @Test
+    void shouldChangePasswordWithNoContent() throws Exception {
+        mockMvc.perform(put("/auth/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"currentPassword": "secret", "newPassword": "new-secret"}
+                                """))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+        verify(changePasswordUseCase).execute(new ChangePasswordCommand("secret", "new-secret"));
+    }
+
+    @Test
+    void shouldRequireNewPasswordWithMinimumLength() throws Exception {
+        mockMvc.perform(put("/auth/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"currentPassword": "", "newPassword": "short"}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(json(
+                        """
+                        {
+                          "code": "request.invalidFields",
+                          "details": [
+                            {"field": "currentPassword", "message": "Não pode estar em branco."},
+                            {"field": "newPassword", "message": "Deve ter entre 8 e 128 caracteres."}
+                          ]
+                        }
+                        """,
+                        JsonCompareMode.LENIENT));
+        verifyNoInteractions(changePasswordUseCase);
+    }
+
+    @Test
+    void shouldAnswer422WhenCurrentPasswordIsWrong() throws Exception {
+        doThrow(new BusinessRuleException("user.wrongCurrentPassword"))
+                .when(changePasswordUseCase)
+                .execute(any());
+
+        mockMvc.perform(put("/auth/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"currentPassword": "wrong", "newPassword": "new-secret"}
+                                """))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(json("""
+                        {"code": "user.wrongCurrentPassword", "message": "A senha atual está incorreta.", "details": null}
+                        """));
+    }
 
     @Test
     void shouldReturnBearerTokenWithExpirationInSeconds() throws Exception {

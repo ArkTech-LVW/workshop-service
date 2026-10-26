@@ -24,11 +24,25 @@ spring:
 
 server:
   port: 8080
+  forward-headers-strategy: native
 
 security:
   jwt:
     secret: ${JWT_SECRET}
     expiration: PT1H
+  rate-limit:
+    general:
+      capacity: 100
+      period: PT1M
+    login-per-email-and-ip:
+      capacity: 5
+      period: PT1M
+    routes:
+      login:
+        method: POST
+        path: /auth/login
+        capacity: 20
+        period: PT1M
 
 springdoc:
   api-docs:

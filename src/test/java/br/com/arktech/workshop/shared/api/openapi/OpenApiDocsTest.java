@@ -94,13 +94,13 @@ class OpenApiDocsTest {
         String publicOperation = "$.paths['/test/docs/public'].get";
 
         assertThat(spec.read(publicOperation + ".security", List.class)).isEmpty();
-        assertThat(spec.read(publicOperation + ".responses", Map.class)).containsOnlyKeys("200", "500");
+        assertThat(spec.read(publicOperation + ".responses", Map.class)).containsOnlyKeys("200", "429", "500");
         assertThat(spec.read(TEST_OPERATION, Map.class)).doesNotContainKey("security");
     }
 
     @Test
     void shouldAdd401ToAuthenticatedEndpoint() {
-        assertThat(spec.read(TEST_OPERATION + ".responses", Map.class)).containsOnlyKeys("200", "401", "500");
+        assertThat(spec.read(TEST_OPERATION + ".responses", Map.class)).containsOnlyKeys("200", "401", "429", "500");
         assertThat(spec.read(TEST_OPERATION + ".responses.401.$ref", String.class))
                 .isEqualTo("#/components/responses/Unauthenticated");
     }
@@ -109,7 +109,7 @@ class OpenApiDocsTest {
     void shouldAdd401And403ToRoleEndpoint() {
         String adminOperation = "$.paths['/test/docs/admin'].get";
 
-        assertThat(spec.read(adminOperation + ".responses", Map.class)).containsOnlyKeys("200", "401", "403", "500");
+        assertThat(spec.read(adminOperation + ".responses", Map.class)).containsOnlyKeys("200", "401", "403", "429", "500");
         assertThat(spec.read(adminOperation + ".responses.403.$ref", String.class))
                 .isEqualTo("#/components/responses/AccessDenied");
     }
@@ -124,7 +124,8 @@ class OpenApiDocsTest {
                 "InternalError",
                 "InvalidCredentials",
                 "Unauthenticated",
-                "AccessDenied"
+                "AccessDenied",
+                "TooManyRequests"
             })
     void shouldDefineReusableErrorResponseWithExample(String name) {
         String content = "$.components.responses." + name + ".content['application/json']";
@@ -135,6 +136,20 @@ class OpenApiDocsTest {
                 .doesNotContainValue(null);
         assertThat(spec.read(content + ".example.code", String.class)).isNotBlank();
         assertThat(spec.read(content + ".example.message", String.class)).isNotBlank();
+    }
+
+    @Test
+    void shouldAddTooManyRequestsWithRetryAfterToEveryOperation() {
+        String tooManyRequests = "$.components.responses.TooManyRequests";
+
+        assertThat(spec.read(TEST_OPERATION + ".responses.429.$ref", String.class))
+                .isEqualTo("#/components/responses/TooManyRequests");
+        assertThat(spec.read("$.paths['/auth/login'].post.responses.429.$ref", String.class))
+                .isEqualTo("#/components/responses/TooManyRequests");
+        assertThat(spec.read(tooManyRequests + ".content['application/json'].example.code", String.class))
+                .isEqualTo("request.tooManyRequests");
+        assertThat(spec.read(tooManyRequests + ".headers.Retry-After.schema.type", String.class))
+                .isEqualTo("integer");
     }
 
     @Test
@@ -172,6 +187,46 @@ class OpenApiDocsTest {
                 .isEqualTo("#/components/responses/InvalidCredentials");
         assertThat(spec.read(login + ".responses.400.$ref", String.class))
                 .isEqualTo("#/components/responses/BadRequest");
+    }
+
+    @Test
+    void shouldDocumentUserManagementAsAdminOnly() {
+        String create = "$.paths['/admin/users'].post";
+        String deactivate = "$.paths['/admin/users/{id}/deactivate'].post";
+
+        assertThat(spec.read(create + ".tags", List.class)).containsExactly("Usuários");
+        assertThat(spec.read(create + ".responses", Map.class))
+                .containsOnlyKeys("201", "400", "401", "403", "409", "429", "500");
+        assertThat(spec.read(deactivate + ".responses", Map.class))
+                .containsOnlyKeys("200", "401", "403", "404", "422", "429", "500");
+        assertThat(spec.read("$.paths['/admin/users'].get.parameters[*].name", List.class))
+                .containsExactly("page", "size");
+    }
+
+    @Test
+    void shouldDocumentPasswordChangeForAnyLoggedUser() {
+        String changePassword = "$.paths['/auth/password'].put";
+
+        assertThat(spec.read(changePassword + ".responses", Map.class))
+                .containsOnlyKeys("204", "400", "401", "422", "429", "500");
+    }
+
+    @Test
+    void shouldDocumentCustomerManagementAsAdminOnly() {
+        String customers = "$.paths['/admin/customers']";
+        String customer = "$.paths['/admin/customers/{id}']";
+
+        assertThat(spec.read(customers + ".post.tags", List.class)).containsExactly("Clientes");
+        assertThat(spec.read(customers + ".post.responses", Map.class))
+                .containsOnlyKeys("201", "400", "401", "403", "409", "429", "500");
+        assertThat(spec.read(customers + ".get.parameters[*].name", List.class))
+                .containsExactly("document", "page", "size");
+        assertThat(spec.read(customer + ".get.responses", Map.class))
+                .containsOnlyKeys("200", "401", "403", "404", "429", "500");
+        assertThat(spec.read(customer + ".put.responses", Map.class))
+                .containsOnlyKeys("200", "400", "401", "403", "404", "409", "429", "500");
+        assertThat(spec.read(customer + ".delete.responses", Map.class))
+                .containsOnlyKeys("204", "401", "403", "404", "409", "429", "500");
     }
 
     @Test

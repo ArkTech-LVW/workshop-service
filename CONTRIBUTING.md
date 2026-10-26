@@ -8,6 +8,12 @@ Convenções combinadas para que todos codem no mesmo padrão.
 - A única exceção são os **textos** dos arquivos de i18n (`messages_pt_BR.properties`).
 - Commits, descrições de PR e documentação ficam a critério de quem escreve.
 
+## Comentários
+
+- **O código não leva comentários.** Nomes de classes, métodos e variáveis explicam o que o código faz, e o motivo de uma decisão vai para o ADR, o PR ou o commit.
+- Isso vale também para Javadoc e para comentários nos arquivos de configuração (`application.yml`).
+- Se o código precisa de comentário para ser entendido, melhore os nomes ou extraia um método antes.
+
 ## Estrutura de pacotes
 
 O pacote base é `br.com.arktech.workshop`, organizado **por módulo**, com as camadas dentro de cada módulo e subpacotes dentro das camadas:
@@ -15,11 +21,12 @@ O pacote base é `br.com.arktech.workshop`, organizado **por módulo**, com as c
 ```
 br.com.arktech.workshop
 ├── shared                    o que todos os módulos usam (erros, i18n, segurança, BaseEntity, UseCase)
-└── <module>                  ex.: auth, customer, vehicle, serviceorder
+└── <module>                  ex.: auth, registry, serviceorder
     ├── api                   controllers e DTOs de entrada/saída
-    │   └── <recurso>         um pacote por controller, com os DTOs dele (ex.: authentication)
+    │   └── <recurso>         um pacote por controller, com os DTOs dele (ex.: user, authentication)
     ├── application           casos de uso, orquestração e transações
     │   ├── <caso de uso>     um pacote por caso de uso (ex.: login, createuser)
+    │   ├── <objeto>          result usado por vários casos de uso (ex.: user/UserResult)
     │   └── port              interfaces que os casos de uso usam e a infraestrutura implementa
     ├── domain                entidades, regras de negócio e contratos
     │   ├── model             entidades, value objects e enums
@@ -32,8 +39,8 @@ br.com.arktech.workshop
 ```
 
 - **Port** é uma interface que a camada declara para dizer do que precisa, sem saber como é feito (ex.: `PasswordHasher` no domínio, `TokenIssuer` na `application`). A implementação fica na `infrastructure`. Repositórios também são ports, mas ficam no próprio `repository`.
-- O pacote de um caso de uso tem o nome dele em minúsculas, sem separador (`createuser`), e guarda o `XxxUseCase`, o `XxxCommand`/`XxxQuery` e o `XxxResult`.
-- Na `api`, cada controller fica num pacote com o nome do recurso (`authentication`), junto com os DTOs que só ele usa.
+- O pacote de um caso de uso tem o nome dele em minúsculas, sem separador (`createuser`), e guarda o `XxxUseCase`, o `XxxCommand`/`XxxQuery` e o `XxxResult`. Quando vários casos de uso devolvem o mesmo objeto, o result fica num pacote com o nome do objeto (`user/UserResult`).
+- Na `api`, cada controller fica num pacote com o nome do recurso (`user`, `authentication`), junto com os DTOs que só ele usa.
 - Crie o subpacote junto com o primeiro arquivo dele; não deixe pacotes vazios.
 - Classes usadas só dentro do próprio subpacote ficam package-private; as que outro subpacote do módulo usa ficam `public`. O isolamento entre módulos continua garantido pelo `LayerDependencyTest`.
 - O `shared` segue a mesma divisão em camadas, com subpacotes por assunto (`error`, `i18n`, `exception`...).
@@ -76,6 +83,7 @@ public class FindCustomerUseCase implements UseCase<FindCustomerQuery, CustomerR
 
 - Nome: `<Ação><Objeto>UseCase` (`LoginUseCase`, `CreateCustomerUseCase`).
 - Entrada e saída são `record`s da `application`, separados dos DTOs da `api`: `XxxCommand` para o que altera estado, `XxxQuery` para consultas e `XxxResult` para a saída. O controller converte o DTO de entrada em command/query e o result no DTO de resposta.
+- Caso de uso sem saída implementa `UseCase<XxxCommand, @Nullable Void>` e devolve `null` (ex.: `ChangePasswordUseCase`).
 - `@Transactional` fica no `execute` (`readOnly = true` nas consultas).
 - O controller injeta a classe do caso de uso diretamente.
 - Record com senha ou outro dado sensível sobrescreve o `toString` para mascarar o valor, porque o `toString` padrão do record imprime todos os campos.
@@ -94,6 +102,19 @@ public class FindCustomerUseCase implements UseCase<FindCustomerQuery, CustomerR
 - DTOs como `record`.
 - Datas em ISO-8601.
 - Valores monetários em `BigDecimal`.
+- Criação responde `201` com o recurso criado; ação sem corpo de resposta responde `204`.
+
+### Paginação
+
+Listagens recebem `page` (começa em 0, padrão 0) e `size` (de 1 a 100, padrão 20) como query params e devolvem um `PageResponse` (`shared/api/pagination`):
+
+```json
+{ "content": [ ... ], "page": 0, "size": 20, "totalElements": 42, "totalPages": 3 }
+```
+
+- O repositório do domínio recebe `Pagination` e devolve `Page<T>` (`shared/domain/pagination`), sem Spring Data. O `XxxJpaRepository` converte num método `default` (ver `UserJpaRepository.findPage`).
+- Toda listagem tem ordem estável: ordene por um campo de negócio e desempate pelo `id`.
+- O controller converte com `PageResponse.from(page, XxxResponse::from)`.
 
 ### Controllers
 
@@ -130,6 +151,10 @@ class CustomerController implements ICustomerController {
 - Constraints de validação nos parâmetros (`@Positive`, `@NotNull`...) ficam **só** na interface. Repetir na classe faz o Hibernate Validator lançar `ConstraintDeclarationException` (HV000151).
 - Interface e controller ficam package-private, na `api` do módulo.
 
+### Postman
+
+A collection do Postman é gerada pelo import do OpenAPI (`/docs/openapi.json`), então não há arquivo para manter. Para a rota sair pronta para uso, dê `example` a cada campo do corpo e a cada parâmetro (`@Schema(example = ...)` e `@Parameter(example = ...)`): sem ele, o Postman preenche com texto aleatório. Como importar e usar está no [README do Postman](docs/postman/README.md).
+
 ## Erros da API
 
 Os motivos estão no [ADR 002](docs/adr/002-api-errors.md).
@@ -139,7 +164,7 @@ Os motivos estão no [ADR 002](docs/adr/002-api-errors.md).
 Toda resposta de erro é um `ApiError` em `application/json`:
 
 ```json
-{ "code": "customer.notFound", "message": "Cliente não encontrado." }
+{ "code": "customer.notFound", "message": "Cliente 1234 não encontrado." }
 
 { "code": "request.invalidFields", "message": "Existem campos inválidos na requisição.",
   "details": [ { "field": "vehicles[0].plate", "message": "Não pode estar em branco." } ] }
@@ -159,20 +184,22 @@ O domínio e a `application` lançam as exceções de `shared/domain/exception`,
 | `ConflictException` | 409 | Conflita com o estado atual (ex.: CPF ou placa já cadastrados) |
 | `BusinessRuleException` | 422 | Viola uma regra de negócio (ex.: transição de status inválida) |
 | `UnauthorizedException` | 401 | O próprio caso de uso recusa a identificação (ex.: login com credenciais inválidas) |
+| `TooManyRequestsException` | 429 | Passou do limite de tentativas (ex.: login por e-mail + IP). Recebe o tempo até liberar, que sai no header `Retry-After` |
 
 O 401 e o 403 de token ausente, inválido ou sem o papel exigido saem do Spring Security, não dessas exceções (ver [Segurança](#segurança)).
 
 ```java
-throw new NotFoundException("customer.notFound", id);
+throw new NotFoundException("customer.notFound", id.toString());
 ```
 
 - A exceção recebe a chave da mensagem e os argumentos (`{0}`, `{1}`...). Cadastre a chave no `messages_pt_BR.properties`.
+- Ids e outros números que não são quantidade entram como `String` (`id.toString()`): o `MessageFormat` formata números no locale, e o id 1234 sairia como `1.234`.
 - Crie uma subclasse quando o caso se repetir ou quando um nome de negócio deixar o código mais claro: `class InvalidStatusTransitionException extends BusinessRuleException`. O status vem da categoria.
 - Não crie `@ExceptionHandler` nos controllers: o `GlobalExceptionHandler` já trata tudo.
 
 ### Como documentar os erros
 
-A documentação da API (`/docs`) é gerada pelo springdoc a partir das interfaces dos controllers. Os erros já têm respostas prontas, com schema e exemplo, no `OpenApiConfig`: `BadRequest` (400), `InvalidCredentials` (401 do login), `NotFound` (404), `Conflict` (409) e `BusinessRule` (422), além do `Unauthenticated` (401) e do `AccessDenied` (403), que entram sozinhos (ver abaixo). Cada endpoint declara só os erros que de fato pode retornar, como o `findById` do exemplo de [Controllers](#controllers):
+A documentação da API (`/docs`) é gerada pelo springdoc a partir das interfaces dos controllers. Os erros já têm respostas prontas, com schema e exemplo, no `OpenApiConfig`: `BadRequest` (400), `InvalidCredentials` (401 do login), `NotFound` (404), `Conflict` (409) e `BusinessRule` (422), além do `Unauthenticated` (401), do `AccessDenied` (403) e do `TooManyRequests` (429), que entram sozinhos (ver abaixo). Cada endpoint declara só os erros que de fato pode retornar, como o `findById` do exemplo de [Controllers](#controllers):
 
 ```java
 @ApiResponse(responseCode = "200")
@@ -186,7 +213,7 @@ openapi.customer.findById=Busca um cliente
 
 - Os textos da documentação (`summary`, `description`) não ficam no código: vão para o `openapi/openapi.properties`, com chaves `openapi.<context>.<camelCase>`, e são referenciados com `${...}`. Esse arquivo é só da documentação; as mensagens devolvidas ao cliente continuam no `messages_pt_BR.properties`.
 - Uma chave inexistente aparece crua na doc (`${openapi.customer.findById}`) e quebra o `OpenApiDocsTest`.
-- O 500 (`InternalError`) entra sozinho em todas as operações.
+- O 429 (`TooManyRequests`) e o 500 (`InternalError`) entram sozinhos em todas as operações.
 - O cadeado e as respostas de segurança saem da anotação de acesso do endpoint: `@PublicEndpoint` fica sem cadeado; `@Authenticated` ganha o 401 (`Unauthenticated`); `@AllowedRoles` ganha o 401 e o 403 (`AccessDenied`). Não declare esses três à mão.
 
 ### Mensagens de validação
@@ -194,6 +221,7 @@ openapi.customer.findById=Busca um cliente
 - As anotações de Bean Validation usam a mensagem padrão (`jakarta.validation.constraints.NotBlank.message`) ou uma chave própria entre chaves: `@NotBlank(message = "{customer.nameRequired}")`. Texto literal é proibido.
 - Ao usar uma anotação pela primeira vez, cadastre a mensagem dela no `messages_pt_BR.properties`. Uma mensagem literal ou uma chave inexistente lança exceção na validação (500), então o teste que dispara a validação acusa o esquecimento.
 - Parâmetros da anotação entram como `{min}`, `{max}`, `{value}`: `Deve ter entre {min} e {max} caracteres.`
+- `@Size` só com `max` usa `message = "{validation.maxLength}"` (`Deve ter no máximo {max} caracteres.`); a mensagem padrão diria "entre 0 e {max}".
 - Em mensagens com argumentos (`{0}`), o apóstrofo precisa ser duplicado (`''`), porque o `MessageFormat` trata `'` como escape. Mensagens de validação e mensagens sem argumentos usam o apóstrofo simples.
 
 ## Segurança
@@ -235,9 +263,34 @@ interface ICustomerController {
 
 - As rotas protegidas exigem um token JWT no header `Authorization: Bearer <token>`.
 - Sem token, ou com token inválido ou expirado: 401 (`auth.unauthenticated` ou `auth.invalidToken`). Com token, mas sem permissão: 403 (`auth.accessDenied`). Os dois saem pelo `GlobalExceptionHandler`, como os demais erros.
+- O caso de uso que precisa do IP do cliente injeta `ClientAddress` (`shared/application/security`) e chama `clientAddress.ip()`. Atrás de proxy confiável, já é o IP real (ver [Rate limit](#rate-limit)).
 - O caso de uso que precisa registrar quem fez a ação injeta `CurrentUser` (`shared/application/security`) e chama `currentUser.id()`. O id vem do token (`sub`). Os outros módulos guardam esse `Long`, nunca o `User`.
 - Senhas com hash Argon2id, pelo `PasswordHasher` do `auth`. Nunca logue nem devolva senha ou hash.
 - O token (HS256) leva o id do usuário (`sub`) e os papéis (`roles`) e vale 1h (`security.jwt.expiration`). A chave vem da variável `JWT_SECRET` (mínimo de 32 bytes). Só o perfil `development`, padrão para rodar localmente, traz uma chave de desenvolvimento; em qualquer outro perfil, sem a variável a aplicação não sobe. Os perfis estão no README.
+
+### Rate limit
+
+Os motivos estão no [ADR 003](docs/adr/003-authentication.md#rate-limit).
+
+- Toda rota tem limite, sem anotação: o `RateLimitFilter` conta por usuário logado ou, sem token, por IP. O health fica de fora.
+- Rota sem configuração própria usa o limite geral (`security.rate-limit.general`).
+- Para dar um limite próprio a uma rota, cadastre-a em `security.rate-limit.routes`, com um nome, o `path` (padrão do Spring MVC, aceita `{id}` e `**`), o `method` (opcional; sem ele, vale para todos) e os valores:
+
+  ```yaml
+  security:
+    rate-limit:
+      routes:
+        login:
+          method: POST
+          path: /auth/login
+          capacity: 20
+          period: PT1M
+  ```
+
+- A rota cadastrada usa só o limite dela, sem gastar o geral. Quando mais de uma casa, vale a mais específica (`/admin/users` antes de `/admin/**`, e com `method` antes de sem).
+- Um limite que depende do corpo da requisição não cabe no filtro. Ele vira uma porta na `application` do módulo, implementada na `infrastructure` com o `RateLimit`, que lança `TooManyRequestsException`. É o caso do login por e-mail + IP (`login-per-email-and-ip`, porta `LoginRateLimiter`). Nunca bloqueie a conta nem limite só pelo identificador do usuário (e-mail, CPF): qualquer um conseguiria travar outra pessoa de propósito.
+- Os contadores ficam em memória e valem por instância.
+- Nos testes de integração, o `application-test.yml` sobe os limites para todos os testes, que chamam do mesmo IP. Para testar o limite, use `@TestPropertySource` com valores baixos e um IP próprio por teste (`request.setRemoteAddr`), como no `RateLimitIntegrationTest`.
 
 ## Banco de dados e persistência
 
@@ -296,6 +349,8 @@ interface CustomerJpaRepository extends JpaRepository<Customer, Long>, CustomerR
 - Value objects são `record`s com a regra (normalização e validação) no construtor compacto: não existe um `Email` fora do padrão. Quem recebe um `String` de fora cria o value object (`new Email(command.email())`) antes de usar ou consultar.
 - Value object de **uma coluna** (ex.: `Email`, em `shared/domain/email`) é persistido por um `AttributeConverter` com `@Converter(autoApply = true)`, ao lado do `record`: a entidade só declara o campo (`private Email email;`) e o repositório recebe o value object (`findByEmail(Email email)`). Value object de **várias colunas** (ex.: valor e moeda) é `@Embeddable`.
 - A `application` injeta sempre a interface do domínio (`CustomerRepository`), e as transações (`@Transactional`) ficam nos casos de uso. Dentro da transação, o Hibernate grava as alterações sozinho no commit; chame `save` mesmo assim, para deixar a intenção explícita.
+- Filtros de listagem (query params opcionais) viram um `XxxFilter` do domínio, com os value objects já criados (ex.: `CustomerFilter`). O `XxxJpaRepository` monta a consulta com `Specification`, só com os filtros informados (ver `CustomerJpaRepository.findPage`).
+- A exclusão é física. O repositório do domínio declara `remove(Xxx)`, e o `XxxJpaRepository` o implementa num método `default` que chama `delete` e `flush` e converte a `DataIntegrityViolationException` em `ConflictException` (ver `CustomerJpaRepository.remove`). Assim, quando outra tabela ainda referencia o registro, a FK do banco impede a exclusão e a API responde 409, sem um módulo consultar o outro. O `flush` é o que faz a FK falhar dentro do caso de uso; sem ele, o erro só apareceria no commit, como 500.
 
 ## Lombok
 

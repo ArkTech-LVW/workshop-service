@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -26,6 +27,17 @@ class CPFCNPJTest {
         assertThat(document.value()).isEqualTo(value);
         assertThat(document.formatted()).isEqualTo(formatted);
         assertThat(document.personType()).isEqualTo(personType);
+    }
+
+    @Test
+    void shouldConvertToAndFromColumn() {
+        CPFCNPJConverter converter = new CPFCNPJConverter();
+
+        assertThat(converter.convertToDatabaseColumn(CPFCNPJ.of("529.982.247-25"))).isEqualTo("52998224725");
+        assertThat(converter.convertToEntityAttribute("52998224725")).isEqualTo(new CPF("52998224725"));
+        assertThat(converter.convertToEntityAttribute("12ABC34501DE35")).isEqualTo(new CNPJ("12ABC34501DE35"));
+        assertThat(converter.convertToDatabaseColumn(null)).isNull();
+        assertThat(converter.convertToEntityAttribute(null)).isNull();
     }
 
     @ParameterizedTest

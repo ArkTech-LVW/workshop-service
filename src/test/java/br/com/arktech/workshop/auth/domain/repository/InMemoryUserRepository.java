@@ -2,8 +2,11 @@ package br.com.arktech.workshop.auth.domain.repository;
 
 import br.com.arktech.workshop.auth.domain.model.User;
 import br.com.arktech.workshop.shared.domain.email.Email;
+import br.com.arktech.workshop.shared.domain.pagination.Page;
+import br.com.arktech.workshop.shared.domain.pagination.Pagination;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,9 +18,16 @@ public class InMemoryUserRepository implements UserRepository {
 
     @Override
     public User save(User user) {
-        ReflectionTestUtils.setField(user, "id", (long) users.size() + 1);
-        users.add(user);
+        if (!users.contains(user)) {
+            ReflectionTestUtils.setField(user, "id", (long) users.size() + 1);
+            users.add(user);
+        }
         return user;
+    }
+
+    @Override
+    public Optional<User> findById(Long id) {
+        return users.stream().filter(user -> user.getId().equals(id)).findFirst();
     }
 
     @Override
@@ -28,6 +38,21 @@ public class InMemoryUserRepository implements UserRepository {
     @Override
     public boolean existsByEmail(Email email) {
         return findByEmail(email).isPresent();
+    }
+
+    @Override
+    public Page<User> findPage(Pagination pagination) {
+        List<User> content = users.stream()
+                .sorted(Comparator.comparing(User::getName).thenComparing(User::getId))
+                .skip((long) pagination.page() * pagination.size())
+                .limit(pagination.size())
+                .toList();
+        return new Page<>(content, pagination, users.size());
+    }
+
+    @Override
+    public long countActiveAdminsForUpdate() {
+        return users.stream().filter(User::isActiveAdmin).count();
     }
 
     public List<User> findAll() {
