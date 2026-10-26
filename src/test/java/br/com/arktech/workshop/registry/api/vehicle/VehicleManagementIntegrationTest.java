@@ -47,7 +47,9 @@ class VehicleManagementIntegrationTest {
     static Stream<Arguments> vehicleEndpoints() {
         return Stream.of(
                 Arguments.of(post("/admin/vehicles").contentType(MediaType.APPLICATION_JSON).content("{}")),
-                Arguments.of(get("/admin/vehicles/1")));
+                Arguments.of(get("/admin/vehicles")),
+                Arguments.of(get("/admin/vehicles/1")),
+                Arguments.of(get("/admin/customers/1/vehicles")));
     }
 
     @ParameterizedTest
@@ -93,10 +95,41 @@ class VehicleManagementIntegrationTest {
     }
 
     @Test
+    void shouldSearchByLicensePlateAndListVehiclesOfCustomer() throws Exception {
+        Integer ana = createCustomer();
+        Integer bia = createCustomer();
+        String plate = uniquePlate();
+        Integer id = createVehicle(ana, plate, null);
+        createVehicle(bia, uniquePlate(), null);
+
+        asAdmin(get("/admin/vehicles").param("licensePlate", withHyphen(plate).toLowerCase()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.content[0].id").value(id));
+        asAdmin(get("/admin/vehicles").param("licensePlate", uniquePlate()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(0));
+        asAdmin(get("/admin/customers/{id}/vehicles", ana))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.content[0].id").value(id));
+    }
+
+    @Test
+    void shouldListNoVehiclesForCustomerWithoutVehicles() throws Exception {
+        asAdmin(get("/admin/customers/{id}/vehicles", createCustomer()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(0));
+    }
+
+    @Test
     void shouldRequireExistingCustomer() throws Exception {
         asAdmin(post("/admin/vehicles")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(vehicleJson(Long.MAX_VALUE, uniquePlate(), null)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("customer.notFound"));
+        asAdmin(get("/admin/customers/{id}/vehicles", Long.MAX_VALUE))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("customer.notFound"));
     }
