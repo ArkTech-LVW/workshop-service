@@ -1,5 +1,6 @@
 package br.com.arktech.workshop.auth.application.createuser;
 
+import br.com.arktech.workshop.auth.application.user.UserResult;
 import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
 import br.com.arktech.workshop.auth.domain.model.User;
 import br.com.arktech.workshop.auth.domain.repository.UserRepository;
@@ -14,20 +15,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class CreateUserUseCase implements UseCase<CreateUserCommand, CreateUserResult> {
+public class CreateUserUseCase implements UseCase<CreateUserCommand, UserResult> {
 
     private final UserRepository userRepository;
     private final PasswordHasher passwordHasher;
 
     @Override
     @Transactional
-    public CreateUserResult execute(CreateUserCommand command) {
+    public UserResult execute(CreateUserCommand command) {
         Email email = new Email(command.email());
         if (userRepository.existsByEmail(email)) {
             throw new ConflictException("user.emailAlreadyExists", email.value());
         }
 
         User user = new User(command.name(), email, command.password(), command.roles(), passwordHasher);
-        return new CreateUserResult(userRepository.save(user).getId());
+        return UserResult.from(userRepository.save(user));
     }
 }

@@ -106,7 +106,7 @@ class LoginIntegrationTest {
         String email = "user-" + UUID.randomUUID() + "@workshop.com";
         User user = new User("Ana", new Email(email), PASSWORD, Set.of(Role.ATTENDANT), passwordHasher);
         if (!active) {
-            user.deactivate();
+            user.deactivate(0);
         }
 
         return userRepository.save(user);

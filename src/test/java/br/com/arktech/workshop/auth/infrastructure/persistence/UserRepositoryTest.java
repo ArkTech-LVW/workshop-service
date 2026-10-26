@@ -8,6 +8,9 @@ import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
 import br.com.arktech.workshop.auth.domain.model.User;
 import br.com.arktech.workshop.auth.domain.repository.UserRepository;
 import br.com.arktech.workshop.shared.domain.email.Email;
+import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
+import br.com.arktech.workshop.shared.domain.pagination.Page;
+import br.com.arktech.workshop.shared.domain.pagination.Pagination;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
 import jakarta.persistence.EntityManager;
@@ -59,13 +62,63 @@ class UserRepositoryTest {
         flushAndClear();
 
         User user = userRepository.findByEmail(new Email("bia@workshop.com")).orElseThrow();
-        user.deactivate();
+        user.deactivate(0);
         flushAndClear();
 
         User updated = userRepository.findByEmail(new Email("bia@workshop.com")).orElseThrow();
         assertThat(updated.isActive()).isFalse();
         assertThat(updated.getVersion()).isEqualTo(1);
         assertThat(updated.getLastUpdated()).isAfter(updated.getDateCreated());
+    }
+
+    @Test
+    void shouldPersistRoleChangesKeepingTheRolesThatStay() {
+        User user = userRepository.save(newUser("dani@workshop.com", Role.ATTENDANT, Role.MECHANIC));
+        flushAndClear();
+
+        User found = userRepository.findRequiredById(user.getId());
+        found.changeRoles(Set.of(Role.MECHANIC, Role.ADMIN), 0);
+        flushAndClear();
+
+        assertThat(userRepository.findRequiredById(user.getId()).getRoles())
+                .containsExactlyInAnyOrder(Role.MECHANIC, Role.ADMIN);
+    }
+
+    @Test
+    void shouldCountOnlyActiveAdmins() {
+        long before = userRepository.countActiveAdminsForUpdate();
+        userRepository.save(newUser("admin-1@workshop.com", Role.ADMIN, Role.MECHANIC));
+        userRepository.save(newUser("admin-2@workshop.com", Role.ADMIN));
+        userRepository.save(newUser("mechanic@workshop.com", Role.MECHANIC));
+        User inactiveAdmin = newUser("inactive-admin@workshop.com", Role.ADMIN);
+        inactiveAdmin.deactivate(2);
+        userRepository.save(inactiveAdmin);
+        flushAndClear();
+
+        assertThat(userRepository.countActiveAdminsForUpdate()).isEqualTo(before + 2);
+    }
+
+    @Test
+    void shouldPageUsersOrderedByName() {
+        userRepository.save(newNamedUser("zzz-c", "page-c@workshop.com"));
+        userRepository.save(newNamedUser("zzz-a", "page-a@workshop.com"));
+        userRepository.save(newNamedUser("zzz-b", "page-b@workshop.com"));
+        flushAndClear();
+        int total = (int) userRepository.findPage(new Pagination(0, 1)).totalElements();
+
+        Page<User> last = userRepository.findPage(new Pagination(total - 1, 1));
+
+        assertThat(last.totalPages()).isEqualTo(total);
+        assertThat(nameAt(total - 3)).isEqualTo("zzz-a");
+        assertThat(nameAt(total - 2)).isEqualTo("zzz-b");
+        assertThat(last.content()).extracting(User::getName).containsExactly("zzz-c");
+    }
+
+    @Test
+    void shouldReportUnknownUser() {
+        assertThatThrownBy(() -> userRepository.findRequiredById(Long.MAX_VALUE))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("user.notFound");
     }
 
     @Test
@@ -82,6 +135,14 @@ class UserRepositoryTest {
 
     private User newUser(String email, Role... roles) {
         return new User("Ana", new Email(email), "secret", Set.of(roles), passwordHasher);
+    }
+
+    private User newNamedUser(String name, String email) {
+        return new User(name, new Email(email), "secret", Set.of(Role.MECHANIC), passwordHasher);
+    }
+
+    private String nameAt(int index) {
+        return userRepository.findPage(new Pagination(index, 1)).content().getFirst().getName();
     }
 
     private void flushAndClear() {

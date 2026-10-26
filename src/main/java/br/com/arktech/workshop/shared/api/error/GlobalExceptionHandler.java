@@ -4,6 +4,7 @@ import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.exception.DomainException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
+import br.com.arktech.workshop.shared.domain.exception.TooManyRequestsException;
 import br.com.arktech.workshop.shared.domain.exception.UnauthorizedException;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,8 +49,13 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             case ConflictException e -> HttpStatus.CONFLICT;
             case BusinessRuleException e -> HttpStatus.UNPROCESSABLE_CONTENT;
             case UnauthorizedException e -> HttpStatus.UNAUTHORIZED;
+            case TooManyRequestsException e -> HttpStatus.TOO_MANY_REQUESTS;
         };
-        return ApiErrors.response(status, apiErrors.of(ex.getCode(), ex.getArgs()));
+        ResponseEntity.BodyBuilder response = ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON);
+        if (ex instanceof TooManyRequestsException tooManyRequests) {
+            response.header(HttpHeaders.RETRY_AFTER, String.valueOf(tooManyRequests.getRetryAfterSeconds()));
+        }
+        return response.body(apiErrors.of(ex.getCode(), ex.getArgs()));
     }
 
     @ExceptionHandler(AuthenticationException.class)

@@ -7,8 +7,10 @@ import br.com.arktech.workshop.shared.application.i18n.MessageResolver;
 import io.swagger.v3.core.converter.ModelConverters;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.IntegerSchema;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
@@ -32,6 +34,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 
 @Configuration
 @PropertySource(value = "classpath:openapi/openapi.properties", encoding = "UTF-8")
@@ -45,6 +48,7 @@ class OpenApiConfig {
     private static final String INTERNAL_ERROR_REF = "#/components/responses/InternalError";
     private static final String UNAUTHENTICATED_REF = "#/components/responses/Unauthenticated";
     private static final String ACCESS_DENIED_REF = "#/components/responses/AccessDenied";
+    private static final String TOO_MANY_REQUESTS_REF = "#/components/responses/TooManyRequests";
 
     @Bean
     OpenAPI openApi(
@@ -73,15 +77,17 @@ class OpenApiConfig {
     }
 
     @Bean
-    OpenApiCustomizer internalErrorResponseCustomizer() {
+    OpenApiCustomizer globalErrorResponsesCustomizer() {
         return openApi -> {
             if (openApi.getPaths() == null) {
                 return;
             }
             openApi.getPaths().values().stream()
                     .flatMap(path -> path.readOperations().stream())
-                    .forEach(operation ->
-                            operation.getResponses().putIfAbsent("500", new ApiResponse().$ref(INTERNAL_ERROR_REF)));
+                    .forEach(operation -> {
+                        operation.getResponses().putIfAbsent("429", new ApiResponse().$ref(TOO_MANY_REQUESTS_REF));
+                        operation.getResponses().putIfAbsent("500", new ApiResponse().$ref(INTERNAL_ERROR_REF));
+                    });
         };
     }
 
@@ -125,6 +131,11 @@ class OpenApiConfig {
                 ApiError.of("auth.invalidCredentials", messageResolver.get("auth.invalidCredentials"));
         ApiError unauthenticated = ApiError.of("auth.unauthenticated", messageResolver.get("auth.unauthenticated"));
         ApiError accessDenied = ApiError.of("auth.accessDenied", messageResolver.get("auth.accessDenied"));
+        ApiError tooManyRequests =
+                ApiError.of("request.tooManyRequests", messageResolver.get("request.tooManyRequests"));
+        Header retryAfter = new Header()
+                .description(environment.getRequiredProperty("openapi.response.retryAfter"))
+                .schema(new IntegerSchema().example(12));
 
         components
                 .addResponses("BadRequest", errorResponse(environment, "badRequest", invalidFields))
@@ -135,7 +146,11 @@ class OpenApiConfig {
                 .addResponses(
                         "InvalidCredentials", errorResponse(environment, "invalidCredentials", invalidCredentials))
                 .addResponses("Unauthenticated", errorResponse(environment, "unauthenticated", unauthenticated))
-                .addResponses("AccessDenied", errorResponse(environment, "accessDenied", accessDenied));
+                .addResponses("AccessDenied", errorResponse(environment, "accessDenied", accessDenied))
+                .addResponses(
+                        "TooManyRequests",
+                        errorResponse(environment, "tooManyRequests", tooManyRequests)
+                                .addHeaderObject(HttpHeaders.RETRY_AFTER, retryAfter));
     }
 
     private static ApiResponse errorResponse(Environment environment, String name, ApiError example) {

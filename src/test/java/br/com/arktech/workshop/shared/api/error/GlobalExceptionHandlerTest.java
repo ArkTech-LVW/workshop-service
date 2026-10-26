@@ -76,6 +76,20 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void shouldMapTooManyRequestsTo429WithRetryAfterInSeconds() throws Exception {
+        perform(get("/test/errors/tooManyRequests"))
+                .andExpect(status().isTooManyRequests())
+                .andExpect(header().string(HttpHeaders.RETRY_AFTER, "12"))
+                .andExpect(json("""
+                        {
+                          "code": "request.tooManyRequests",
+                          "message": "Muitas requisições. Aguarde um pouco e tente novamente.",
+                          "details": null
+                        }
+                        """));
+    }
+
+    @Test
     void shouldMapAuthenticationFailureTo401WithBearerChallenge() throws Exception {
         perform(get("/test/errors/unauthenticated"))
                 .andExpect(status().isUnauthorized())
