@@ -146,7 +146,7 @@ class UserControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(json("""
                         {"code": "user.emailAlreadyExists",
-                         "message": "Já existe um usuário com o e-mail ana@workshop.com.", "details": null}
+                         "message": "Já existe um usuário com o e-mail ana@workshop.com."}
                         """));
     }
 
@@ -194,7 +194,7 @@ class UserControllerTest {
         mockMvc.perform(get("/admin/users/1234"))
                 .andExpect(status().isNotFound())
                 .andExpect(json("""
-                        {"code": "user.notFound", "message": "Usuário 1234 não encontrado.", "details": null}
+                        {"code": "user.notFound", "message": "Usuário 1234 não encontrado."}
                         """));
     }
 
@@ -220,8 +220,7 @@ class UserControllerTest {
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(json("""
                         {"code": "user.lastActiveAdmin",
-                         "message": "Não é possível remover o último ADMIN ativo. Cadastre ou ative outro ADMIN antes.",
-                         "details": null}
+                         "message": "Não é possível remover o último ADMIN ativo. Cadastre ou ative outro ADMIN antes."}
                         """));
     }
 
