@@ -74,6 +74,7 @@ interface IVehicleController {
     @ApiResponse(responseCode = "204")
     @ApiResponse(responseCode = "404", ref = "NotFound")
     @ApiResponse(responseCode = "409", ref = "Conflict")
+    @AllowedRoles(Role.ADMIN)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     void delete(@Parameter(description = "${openapi.vehicle.id}", example = "1") @PathVariable Long id);

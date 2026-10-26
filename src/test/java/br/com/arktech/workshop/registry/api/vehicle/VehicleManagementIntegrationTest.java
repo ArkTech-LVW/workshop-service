@@ -100,6 +100,22 @@ class VehicleManagementIntegrationTest {
     }
 
     @Test
+    void shouldLetAttendantsUpdateButNotDeleteVehicles() throws Exception {
+        String plate = uniquePlate();
+        Integer id = createVehicle(createCustomer(), plate, null);
+
+        asAttendant(put("/admin/vehicles/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateJson(plate, null, "Azul")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.color").value("Azul"));
+        asAttendant(delete("/admin/vehicles/{id}", id))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("auth.accessDenied"));
+        asAdmin(get("/admin/vehicles/{id}", id)).andExpect(status().isOk());
+    }
+
+    @Test
     void shouldCreateAndFindVehicle() throws Exception {
         Integer customerId = createCustomer();
         String plate = uniquePlate();
