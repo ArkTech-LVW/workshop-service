@@ -14,6 +14,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
@@ -180,6 +182,28 @@ class GlobalExceptionHandlerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(json(invalidFields(
                         "phone", "Telefone inválido. Informe o DDD e o número, como (11) 98765-4321.")));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"-0.01", "150.555", "12345678901", "1E+11"})
+    void shouldRejectInvalidMoneyWith400(String amount) throws Exception {
+        perform(postJson("/test/errors/money", """
+                        {"amount": %s}
+                        """.formatted(amount)))
+                .andExpect(status().isBadRequest())
+                .andExpect(json(invalidFields(
+                        "amount",
+                        "Valor inválido. Informe um valor maior ou igual a zero, com até 10 dígitos inteiros e duas"
+                                + " casas decimais.")));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"0", "150", "150.5", "150.5500", "9999999999.99", "null"})
+    void shouldAcceptValidOrMissingMoney(String amount) throws Exception {
+        mockMvc.perform(postJson("/test/errors/money", """
+                        {"amount": %s}
+                        """.formatted(amount)))
+                .andExpect(status().isOk());
     }
 
     @Test

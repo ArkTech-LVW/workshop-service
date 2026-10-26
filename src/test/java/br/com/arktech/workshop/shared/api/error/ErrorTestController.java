@@ -3,6 +3,7 @@ package br.com.arktech.workshop.shared.api.error;
 import br.com.arktech.workshop.shared.api.security.PublicEndpoint;
 import br.com.arktech.workshop.shared.api.validation.CPFOrCNPJ;
 import br.com.arktech.workshop.shared.api.validation.LicensePlate;
+import br.com.arktech.workshop.shared.api.validation.Money;
 import br.com.arktech.workshop.shared.api.validation.Phone;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
@@ -14,6 +15,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.List;
 import org.springframework.security.access.AccessDeniedException;
@@ -110,6 +112,9 @@ class ErrorTestController {
     @PostMapping("/phone")
     void phone(@Valid @RequestBody PhoneRequest request) {}
 
+    @PostMapping("/money")
+    void money(@Valid @RequestBody MoneyRequest request) {}
+
     static class InvalidStatusTransitionException extends BusinessRuleException {
 
         InvalidStatusTransitionException(String status) {
@@ -132,4 +137,6 @@ class ErrorTestController {
     record LicensePlateRequest(@LicensePlate String plate) {}
 
     record PhoneRequest(@Phone String phone) {}
+
+    record MoneyRequest(@Money BigDecimal amount) {}
 }
