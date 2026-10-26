@@ -85,6 +85,17 @@ class VehicleManagementIntegrationTest {
     }
 
     @Test
+    void shouldLetAttendantsListVehicles() throws Exception {
+        Integer customerId = createCustomer();
+        createVehicle(customerId, uniquePlate(), null);
+
+        asAttendant(get("/admin/vehicles")).andExpect(status().isOk());
+        asAttendant(get("/admin/customers/{id}/vehicles", customerId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
     void shouldCreateAndFindVehicle() throws Exception {
         Integer customerId = createCustomer();
         String plate = uniquePlate();
