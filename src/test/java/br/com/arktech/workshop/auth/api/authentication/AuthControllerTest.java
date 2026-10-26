@@ -94,7 +94,7 @@ class AuthControllerTest {
                                 """))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(json("""
-                        {"code": "user.wrongCurrentPassword", "message": "A senha atual está incorreta.", "details": null}
+                        {"code": "user.wrongCurrentPassword", "message": "A senha atual está incorreta."}
                         """));
     }
 

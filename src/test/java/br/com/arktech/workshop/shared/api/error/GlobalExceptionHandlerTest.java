@@ -83,8 +83,7 @@ class GlobalExceptionHandlerTest {
                 .andExpect(json("""
                         {
                           "code": "request.tooManyRequests",
-                          "message": "Muitas requisições. Aguarde um pouco e tente novamente.",
-                          "details": null
+                          "message": "Muitas requisições. Aguarde um pouco e tente novamente."
                         }
                         """));
     }
