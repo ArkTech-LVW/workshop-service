@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -43,6 +44,8 @@ interface IServiceOfferingController {
     PageResponse<ServiceOfferingResponse> list(
             @Parameter(description = "${openapi.serviceOffering.nameFilter}", example = "óleo")
                     @RequestParam(required = false) @Nullable String name,
+            @Parameter(description = "${openapi.serviceOffering.activeFilter}", example = "true")
+                    @RequestParam(required = false) @Nullable Boolean active,
             @Parameter(description = "${openapi.page.page}") @RequestParam(defaultValue = "0") @PositiveOrZero
                     int page,
             @Parameter(description = "${openapi.page.size}") @RequestParam(defaultValue = "20") @Positive @Max(100)
@@ -53,5 +56,32 @@ interface IServiceOfferingController {
     @ApiResponse(responseCode = "404", ref = "NotFound")
     @GetMapping("/{id}")
     ServiceOfferingResponse findById(
+            @Parameter(description = "${openapi.serviceOffering.id}", example = "1") @PathVariable Long id);
+
+    @Operation(
+            summary = "${openapi.serviceOffering.update}",
+            description = "${openapi.serviceOffering.updateDescription}")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "400", ref = "BadRequest")
+    @ApiResponse(responseCode = "404", ref = "NotFound")
+    @PutMapping("/{id}")
+    ServiceOfferingResponse update(
+            @Parameter(description = "${openapi.serviceOffering.id}", example = "1") @PathVariable Long id,
+            @Valid @RequestBody ServiceOfferingRequest request);
+
+    @Operation(summary = "${openapi.serviceOffering.activate}")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "404", ref = "NotFound")
+    @PostMapping("/{id}/activate")
+    ServiceOfferingResponse activate(
+            @Parameter(description = "${openapi.serviceOffering.id}", example = "1") @PathVariable Long id);
+
+    @Operation(
+            summary = "${openapi.serviceOffering.deactivate}",
+            description = "${openapi.serviceOffering.deactivateDescription}")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "404", ref = "NotFound")
+    @PostMapping("/{id}/deactivate")
+    ServiceOfferingResponse deactivate(
             @Parameter(description = "${openapi.serviceOffering.id}", example = "1") @PathVariable Long id);
 }

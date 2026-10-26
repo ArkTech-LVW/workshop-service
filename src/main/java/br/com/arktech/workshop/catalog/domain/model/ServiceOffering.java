@@ -40,6 +40,32 @@ public class ServiceOffering extends BaseEntity {
         this.active = true;
     }
 
+    public void rename(String name) {
+        this.name = name;
+    }
+
+    public void describe(@Nullable String description) {
+        this.description = description;
+    }
+
+    public void changeLaborPrice(Money laborPrice) {
+        requirePositive(laborPrice);
+        this.laborPrice = laborPrice;
+    }
+
+    public void changeEstimatedMinutes(int estimatedMinutes) {
+        requirePositive(estimatedMinutes);
+        this.estimatedMinutes = estimatedMinutes;
+    }
+
+    public void activate() {
+        active = true;
+    }
+
+    public void deactivate() {
+        active = false;
+    }
+
     private static void requirePositive(Money laborPrice) {
         if (!laborPrice.isPositive()) {
             throw new BusinessRuleException("serviceOffering.laborPriceNotPositive");

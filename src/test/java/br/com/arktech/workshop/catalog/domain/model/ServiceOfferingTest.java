@@ -48,4 +48,44 @@ class ServiceOfferingTest {
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessage("serviceOffering.estimatedMinutesNotPositive");
     }
+
+    @Test
+    void shouldReplaceData() {
+        ServiceOffering serviceOffering = new ServiceOffering("Troca de óleo", "Óleo e filtro", PRICE, 60);
+
+        serviceOffering.rename("Troca de óleo sintético");
+        serviceOffering.describe(null);
+        serviceOffering.changeLaborPrice(new Money(new BigDecimal("180.00")));
+        serviceOffering.changeEstimatedMinutes(75);
+
+        assertThat(serviceOffering.getName()).isEqualTo("Troca de óleo sintético");
+        assertThat(serviceOffering.getDescription()).isNull();
+        assertThat(serviceOffering.getLaborPrice()).isEqualTo(new Money(new BigDecimal("180.00")));
+        assertThat(serviceOffering.getEstimatedMinutes()).isEqualTo(75);
+    }
+
+    @Test
+    void shouldKeepLaborPriceAndMinutesWhenChangesAreInvalid() {
+        ServiceOffering serviceOffering = new ServiceOffering("Troca de óleo", null, PRICE, 60);
+
+        assertThatThrownBy(() -> serviceOffering.changeLaborPrice(Money.ZERO))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("serviceOffering.laborPriceNotPositive");
+        assertThatThrownBy(() -> serviceOffering.changeEstimatedMinutes(0))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("serviceOffering.estimatedMinutesNotPositive");
+        assertThat(serviceOffering.getLaborPrice()).isEqualTo(PRICE);
+        assertThat(serviceOffering.getEstimatedMinutes()).isEqualTo(60);
+    }
+
+    @Test
+    void shouldDeactivateAndActivate() {
+        ServiceOffering serviceOffering = new ServiceOffering("Troca de óleo", null, PRICE, 60);
+
+        serviceOffering.deactivate();
+        assertThat(serviceOffering.isActive()).isFalse();
+
+        serviceOffering.activate();
+        assertThat(serviceOffering.isActive()).isTrue();
+    }
 }

@@ -26,7 +26,8 @@ interface ServiceOfferingJpaRepository
     @Override
     default Page<ServiceOffering> findPage(ServiceOfferingFilter filter, Pagination pagination) {
         var page = findAll(
-                nameContaining(filter.name()), PageRequest.of(pagination.page(), pagination.size(), PAGE_ORDER));
+                nameContaining(filter.name()).and(activeEquals(filter.active())),
+                PageRequest.of(pagination.page(), pagination.size(), PAGE_ORDER));
         return new Page<>(page.getContent(), pagination, page.getTotalElements());
     }
 
@@ -37,6 +38,14 @@ interface ServiceOfferingJpaRepository
 
         String pattern = "%" + escapeLike(name.strip().toLowerCase(Locale.ROOT)) + "%";
         return (root, query, builder) -> builder.like(builder.lower(root.get("name")), pattern, LIKE_ESCAPE);
+    }
+
+    private static Specification<ServiceOffering> activeEquals(@Nullable Boolean active) {
+        if (active == null) {
+            return Specification.unrestricted();
+        }
+
+        return (root, query, builder) -> builder.equal(root.get("active"), active);
     }
 
     private static String escapeLike(String value) {

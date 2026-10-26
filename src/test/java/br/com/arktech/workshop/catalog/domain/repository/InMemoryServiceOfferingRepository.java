@@ -38,6 +38,7 @@ public class InMemoryServiceOfferingRepository implements ServiceOfferingReposit
     public Page<ServiceOffering> findPage(ServiceOfferingFilter filter, Pagination pagination) {
         List<ServiceOffering> matching = serviceOfferings.stream()
                 .filter(serviceOffering -> matchesName(serviceOffering, filter.name()))
+                .filter(serviceOffering -> filter.active() == null || serviceOffering.isActive() == filter.active())
                 .sorted(Comparator.comparing(ServiceOffering::getName).thenComparing(ServiceOffering::getId))
                 .toList();
         List<ServiceOffering> content = matching.stream()

@@ -1,7 +1,9 @@
 package br.com.arktech.workshop.catalog.api.serviceoffering;
 
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -39,7 +41,10 @@ class ServiceOfferingManagementIntegrationTest {
         return Stream.of(
                 Arguments.of(post("/admin/services").contentType(MediaType.APPLICATION_JSON).content("{}")),
                 Arguments.of(get("/admin/services")),
-                Arguments.of(get("/admin/services/1")));
+                Arguments.of(get("/admin/services/1")),
+                Arguments.of(put("/admin/services/1").contentType(MediaType.APPLICATION_JSON).content("{}")),
+                Arguments.of(post("/admin/services/1/activate")),
+                Arguments.of(post("/admin/services/1/deactivate")));
     }
 
     @ParameterizedTest
@@ -88,6 +93,42 @@ class ServiceOfferingManagementIntegrationTest {
     }
 
     @Test
+    void shouldUpdateDataKeepingActiveStatus() throws Exception {
+        Integer id = createServiceOffering(uniqueName("Alinhamento"));
+        String renamed = uniqueName("Alinhamento 3D");
+
+        asAdmin(put("/admin/services/{id}", id).contentType(MediaType.APPLICATION_JSON).content("""
+                        {"name": "%s", "laborPrice": 99.90, "estimatedMinutes": 45}
+                        """.formatted(renamed)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(renamed))
+                .andExpect(jsonPath("$.description").value(nullValue()))
+                .andExpect(jsonPath("$.laborPrice").value(99.90))
+                .andExpect(jsonPath("$.estimatedMinutes").value(45))
+                .andExpect(jsonPath("$.active").value(true));
+    }
+
+    @Test
+    void shouldDeactivateAndActivateServiceOffering() throws Exception {
+        String name = uniqueName("Balanceamento");
+        Integer id = createServiceOffering(name);
+
+        asAdmin(post("/admin/services/{id}/deactivate", id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.active").value(false));
+        asAdmin(get("/admin/services").param("name", name).param("active", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(0));
+        asAdmin(get("/admin/services").param("name", name).param("active", "false"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(id));
+
+        asAdmin(post("/admin/services/{id}/activate", id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.active").value(true));
+    }
+
+    @Test
     void shouldRejectInvalidLaborPrice() throws Exception {
         asAdmin(post("/admin/services").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Troca de óleo", "laborPrice": -10, "estimatedMinutes": 60}
@@ -101,6 +142,20 @@ class ServiceOfferingManagementIntegrationTest {
         asAdmin(get("/admin/services/{id}", Long.MAX_VALUE))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("serviceOffering.notFound"));
+        asAdmin(post("/admin/services/{id}/deactivate", Long.MAX_VALUE))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("serviceOffering.notFound"));
+    }
+
+    private Integer createServiceOffering(String name) throws Exception {
+        String body = asAdmin(post("/admin/services").contentType(MediaType.APPLICATION_JSON).content("""
+                        {"name": "%s", "laborPrice": 80, "estimatedMinutes": 30}
+                        """.formatted(name)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        return JsonPath.read(body, "$.id");
     }
 
     private ResultActions asAdmin(MockHttpServletRequestBuilder request) throws Exception {

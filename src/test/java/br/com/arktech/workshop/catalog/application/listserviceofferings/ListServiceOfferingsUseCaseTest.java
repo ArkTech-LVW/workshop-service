@@ -25,7 +25,7 @@ class ListServiceOfferingsUseCaseTest {
         save("Balanceamento");
 
         Page<ServiceOfferingResult> page =
-                listServiceOfferingsUseCase.execute(new ListServiceOfferingsQuery(null, 1, 2));
+                listServiceOfferingsUseCase.execute(new ListServiceOfferingsQuery(null, null, 1, 2));
 
         assertThat(page.content()).extracting(ServiceOfferingResult::name).containsExactly("Troca de óleo");
         assertThat(page.totalElements()).isEqualTo(3);
@@ -39,7 +39,7 @@ class ListServiceOfferingsUseCaseTest {
         save("Alinhamento");
 
         Page<ServiceOfferingResult> page =
-                listServiceOfferingsUseCase.execute(new ListServiceOfferingsQuery("TROCA", 0, 20));
+                listServiceOfferingsUseCase.execute(new ListServiceOfferingsQuery("TROCA", null, 0, 20));
 
         assertThat(page.content())
                 .extracting(ServiceOfferingResult::name)
@@ -48,17 +48,32 @@ class ListServiceOfferingsUseCaseTest {
     }
 
     @Test
+    void shouldFilterByNameAndActive() {
+        save("Troca de óleo");
+        save("Troca de pastilhas").deactivate();
+        save("Alinhamento");
+
+        Page<ServiceOfferingResult> active =
+                listServiceOfferingsUseCase.execute(new ListServiceOfferingsQuery("troca", true, 0, 20));
+        Page<ServiceOfferingResult> inactive =
+                listServiceOfferingsUseCase.execute(new ListServiceOfferingsQuery(null, false, 0, 20));
+
+        assertThat(active.content()).extracting(ServiceOfferingResult::name).containsExactly("Troca de óleo");
+        assertThat(inactive.content()).extracting(ServiceOfferingResult::name).containsExactly("Troca de pastilhas");
+    }
+
+    @Test
     void shouldReturnEmptyPageWhenNothingMatches() {
         save("Alinhamento");
 
         Page<ServiceOfferingResult> page =
-                listServiceOfferingsUseCase.execute(new ListServiceOfferingsQuery("freio", 0, 20));
+                listServiceOfferingsUseCase.execute(new ListServiceOfferingsQuery("freio", null, 0, 20));
 
         assertThat(page.content()).isEmpty();
         assertThat(page.totalElements()).isZero();
     }
 
-    private void save(String name) {
-        serviceOfferingRepository.save(new ServiceOffering(name, null, new Money(new BigDecimal("100")), 30));
+    private ServiceOffering save(String name) {
+        return serviceOfferingRepository.save(new ServiceOffering(name, null, new Money(new BigDecimal("100")), 30));
     }
 }

@@ -69,6 +69,47 @@ class ServiceOfferingRepositoryTest {
     }
 
     @Test
+    void shouldPersistChangesAndDeactivation() {
+        ServiceOffering saved = serviceOfferingRepository.save(newServiceOffering("Troca de óleo"));
+        flushAndClear();
+
+        ServiceOffering found = serviceOfferingRepository.findRequiredById(saved.getId());
+        found.changeLaborPrice(new Money(new BigDecimal("180.9")));
+        found.deactivate();
+        serviceOfferingRepository.save(found);
+        flushAndClear();
+
+        ServiceOffering updated = serviceOfferingRepository.findRequiredById(saved.getId());
+        assertThat(updated.getLaborPrice()).isEqualTo(new Money(new BigDecimal("180.90")));
+        assertThat(updated.isActive()).isFalse();
+        assertThat(updated.getVersion()).isEqualTo(1L);
+    }
+
+    @Test
+    void shouldFilterByActive() {
+        String prefix = uniquePrefix();
+        serviceOfferingRepository.save(newServiceOffering(prefix + " Troca de óleo"));
+        serviceOfferingRepository.save(newServiceOffering(prefix + " Troca de pastilhas")).deactivate();
+        serviceOfferingRepository.save(newServiceOffering(prefix + " Alinhamento"));
+        flushAndClear();
+
+        Page<ServiceOffering> activeTroca =
+                serviceOfferingRepository.findPage(new ServiceOfferingFilter(prefix + " troca", true), FIRST_PAGE);
+        Page<ServiceOffering> inactive =
+                serviceOfferingRepository.findPage(new ServiceOfferingFilter(prefix, false), FIRST_PAGE);
+        Page<ServiceOffering> all =
+                serviceOfferingRepository.findPage(new ServiceOfferingFilter(prefix, null), FIRST_PAGE);
+
+        assertThat(activeTroca.content())
+                .extracting(ServiceOffering::getName)
+                .containsExactly(prefix + " Troca de óleo");
+        assertThat(inactive.content())
+                .extracting(ServiceOffering::getName)
+                .containsExactly(prefix + " Troca de pastilhas");
+        assertThat(all.totalElements()).isEqualTo(3);
+    }
+
+    @Test
     void shouldPageOrderedByName() {
         String prefix = uniquePrefix();
         serviceOfferingRepository.save(newServiceOffering(prefix + "c"));
@@ -77,7 +118,7 @@ class ServiceOfferingRepositoryTest {
         flushAndClear();
 
         Page<ServiceOffering> second =
-                serviceOfferingRepository.findPage(new ServiceOfferingFilter(prefix), new Pagination(1, 2));
+                serviceOfferingRepository.findPage(new ServiceOfferingFilter(prefix, null), new Pagination(1, 2));
 
         assertThat(second.totalElements()).isEqualTo(3);
         assertThat(second.totalPages()).isEqualTo(2);
@@ -93,9 +134,9 @@ class ServiceOfferingRepositoryTest {
         flushAndClear();
 
         Page<ServiceOffering> byName = serviceOfferingRepository.findPage(
-                new ServiceOfferingFilter(prefix.toUpperCase() + " TROCA"), FIRST_PAGE);
+                new ServiceOfferingFilter(prefix.toUpperCase() + " TROCA", null), FIRST_PAGE);
         Page<ServiceOffering> byAccentedName =
-                serviceOfferingRepository.findPage(new ServiceOfferingFilter(prefix + " óleo"), FIRST_PAGE);
+                serviceOfferingRepository.findPage(new ServiceOfferingFilter(prefix + " óleo", null), FIRST_PAGE);
 
         assertThat(byName.content())
                 .extracting(ServiceOffering::getName)
@@ -113,7 +154,7 @@ class ServiceOfferingRepositoryTest {
         flushAndClear();
 
         Page<ServiceOffering> found =
-                serviceOfferingRepository.findPage(new ServiceOfferingFilter(prefix + " 100%"), FIRST_PAGE);
+                serviceOfferingRepository.findPage(new ServiceOfferingFilter(prefix + " 100%", null), FIRST_PAGE);
 
         assertThat(found.content()).extracting(ServiceOffering::getName).containsExactly(prefix + " 100% sintético");
     }
