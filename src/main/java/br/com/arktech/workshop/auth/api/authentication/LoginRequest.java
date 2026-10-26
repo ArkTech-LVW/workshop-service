@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 
 record LoginRequest(
         @Schema(description = "${openapi.auth.email}", example = "admin@workshop.local") @NotBlank @Email String email,
-        @Schema(description = "${openapi.auth.password}") @NotBlank String password) {
+        @Schema(description = "${openapi.auth.password}", example = "admin123") @NotBlank String password) {
 
     @Override
     public String toString() {

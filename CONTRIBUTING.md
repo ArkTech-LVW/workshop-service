@@ -21,7 +21,7 @@ O pacote base é `br.com.arktech.workshop`, organizado **por módulo**, com as c
 ```
 br.com.arktech.workshop
 ├── shared                    o que todos os módulos usam (erros, i18n, segurança, BaseEntity, UseCase)
-└── <module>                  ex.: auth, customer, vehicle, serviceorder
+└── <module>                  ex.: auth, registry, serviceorder
     ├── api                   controllers e DTOs de entrada/saída
     │   └── <recurso>         um pacote por controller, com os DTOs dele (ex.: user, authentication)
     ├── application           casos de uso, orquestração e transações
@@ -151,6 +151,10 @@ class CustomerController implements ICustomerController {
 - Constraints de validação nos parâmetros (`@Positive`, `@NotNull`...) ficam **só** na interface. Repetir na classe faz o Hibernate Validator lançar `ConstraintDeclarationException` (HV000151).
 - Interface e controller ficam package-private, na `api` do módulo.
 
+### Postman
+
+A collection do Postman é gerada pelo import do OpenAPI (`/docs/openapi.json`), então não há arquivo para manter. Para a rota sair pronta para uso, dê `example` a cada campo do corpo e a cada parâmetro (`@Schema(example = ...)` e `@Parameter(example = ...)`): sem ele, o Postman preenche com texto aleatório. Como importar e usar está no [README do Postman](docs/postman/README.md).
+
 ## Erros da API
 
 Os motivos estão no [ADR 002](docs/adr/002-api-errors.md).
@@ -160,7 +164,7 @@ Os motivos estão no [ADR 002](docs/adr/002-api-errors.md).
 Toda resposta de erro é um `ApiError` em `application/json`:
 
 ```json
-{ "code": "customer.notFound", "message": "Cliente não encontrado.", "details": null }
+{ "code": "customer.notFound", "message": "Cliente 1234 não encontrado.", "details": null }
 
 { "code": "request.invalidFields", "message": "Existem campos inválidos na requisição.",
   "details": [ { "field": "vehicles[0].plate", "message": "Não pode estar em branco." } ] }
@@ -345,6 +349,7 @@ interface CustomerJpaRepository extends JpaRepository<Customer, Long>, CustomerR
 - Value objects são `record`s com a regra (normalização e validação) no construtor compacto: não existe um `Email` fora do padrão. Quem recebe um `String` de fora cria o value object (`new Email(command.email())`) antes de usar ou consultar.
 - Value object de **uma coluna** (ex.: `Email`, em `shared/domain/email`) é persistido por um `AttributeConverter` com `@Converter(autoApply = true)`, ao lado do `record`: a entidade só declara o campo (`private Email email;`) e o repositório recebe o value object (`findByEmail(Email email)`). Value object de **várias colunas** (ex.: valor e moeda) é `@Embeddable`.
 - A `application` injeta sempre a interface do domínio (`CustomerRepository`), e as transações (`@Transactional`) ficam nos casos de uso. Dentro da transação, o Hibernate grava as alterações sozinho no commit; chame `save` mesmo assim, para deixar a intenção explícita.
+- Filtros de listagem (query params opcionais) viram um `XxxFilter` do domínio, com os value objects já criados (ex.: `CustomerFilter`). O `XxxJpaRepository` monta a consulta com `Specification`, só com os filtros informados (ver `CustomerJpaRepository.findPage`).
 
 ## Lombok
 
