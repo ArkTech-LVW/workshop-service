@@ -17,9 +17,11 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -56,4 +58,22 @@ interface ICustomerController {
     @GetMapping("/{id}")
     CustomerResponse findById(
             @Parameter(description = "${openapi.customer.id}", example = "1") @PathVariable Long id);
+
+    @Operation(summary = "${openapi.customer.update}")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "400", ref = "BadRequest")
+    @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "409", ref = "Conflict")
+    @PutMapping("/{id}")
+    CustomerResponse update(
+            @Parameter(description = "${openapi.customer.id}", example = "1") @PathVariable Long id,
+            @Valid @RequestBody CustomerRequest request);
+
+    @Operation(summary = "${openapi.customer.delete}", description = "${openapi.customer.deleteDescription}")
+    @ApiResponse(responseCode = "204")
+    @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "409", ref = "Conflict")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{id}")
+    void delete(@Parameter(description = "${openapi.customer.id}", example = "1") @PathVariable Long id);
 }

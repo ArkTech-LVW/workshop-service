@@ -2,10 +2,14 @@ package br.com.arktech.workshop.registry.api.customer;
 
 import br.com.arktech.workshop.registry.application.createcustomer.CreateCustomerCommand;
 import br.com.arktech.workshop.registry.application.createcustomer.CreateCustomerUseCase;
+import br.com.arktech.workshop.registry.application.deletecustomer.DeleteCustomerCommand;
+import br.com.arktech.workshop.registry.application.deletecustomer.DeleteCustomerUseCase;
 import br.com.arktech.workshop.registry.application.findcustomer.FindCustomerQuery;
 import br.com.arktech.workshop.registry.application.findcustomer.FindCustomerUseCase;
 import br.com.arktech.workshop.registry.application.listcustomers.ListCustomersQuery;
 import br.com.arktech.workshop.registry.application.listcustomers.ListCustomersUseCase;
+import br.com.arktech.workshop.registry.application.updatecustomer.UpdateCustomerCommand;
+import br.com.arktech.workshop.registry.application.updatecustomer.UpdateCustomerUseCase;
 import br.com.arktech.workshop.shared.api.pagination.PageResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -20,6 +24,8 @@ class CustomerController implements ICustomerController {
     private final CreateCustomerUseCase createCustomerUseCase;
     private final ListCustomersUseCase listCustomersUseCase;
     private final FindCustomerUseCase findCustomerUseCase;
+    private final UpdateCustomerUseCase updateCustomerUseCase;
+    private final DeleteCustomerUseCase deleteCustomerUseCase;
 
     @Override
     public CustomerResponse create(CustomerRequest request) {
@@ -37,5 +43,17 @@ class CustomerController implements ICustomerController {
     @Override
     public CustomerResponse findById(Long id) {
         return CustomerResponse.from(findCustomerUseCase.execute(new FindCustomerQuery(id)));
+    }
+
+    @Override
+    public CustomerResponse update(Long id, CustomerRequest request) {
+        UpdateCustomerCommand command = new UpdateCustomerCommand(
+                id, request.name(), request.document(), request.email(), request.phone());
+        return CustomerResponse.from(updateCustomerUseCase.execute(command));
+    }
+
+    @Override
+    public void delete(Long id) {
+        deleteCustomerUseCase.execute(new DeleteCustomerCommand(id));
     }
 }

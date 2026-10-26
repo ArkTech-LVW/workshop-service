@@ -41,4 +41,18 @@ public class Customer extends BaseEntity {
         this.email = email;
         this.phone = phone;
     }
+
+    public void rename(String name) {
+        this.name = name;
+    }
+
+    public void changeDocument(CPFCNPJ document) {
+        this.document = document;
+        this.personType = document.personType();
+    }
+
+    public void changeContact(Email email, @Nullable Phone phone) {
+        this.email = email;
+        this.phone = phone;
+    }
 }

@@ -10,6 +10,7 @@ import br.com.arktech.workshop.registry.domain.repository.CustomerRepository;
 import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
 import br.com.arktech.workshop.shared.domain.document.PersonType;
 import br.com.arktech.workshop.shared.domain.email.Email;
+import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.pagination.Page;
 import br.com.arktech.workshop.shared.domain.pagination.Pagination;
@@ -83,6 +84,16 @@ class CustomerRepositoryTest {
     }
 
     @Test
+    void shouldCheckDocumentIgnoringItsOwnCustomer() {
+        Customer saved = customerRepository.save(newCustomer("Ana", "529.982.247-25"));
+        flushAndClear();
+        CPFCNPJ document = CPFCNPJ.of("52998224725");
+
+        assertThat(customerRepository.existsByDocumentAndIdNot(document, saved.getId())).isFalse();
+        assertThat(customerRepository.existsByDocumentAndIdNot(document, saved.getId() + 1)).isTrue();
+    }
+
+    @Test
     void shouldPageCustomersOrderedByName() {
         customerRepository.save(newCustomer("zzz-c", "529.982.247-25"));
         customerRepository.save(newCustomer("zzz-a", "123.456.789-09"));
@@ -125,6 +136,30 @@ class CustomerRepositoryTest {
                     entityManager.flush();
                 })
                 .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void shouldRemoveCustomer() {
+        Customer saved = customerRepository.save(newCustomer("Ana", "529.982.247-25"));
+        flushAndClear();
+
+        customerRepository.remove(customerRepository.findRequiredById(saved.getId()));
+        flushAndClear();
+
+        assertThat(customerRepository.findById(saved.getId())).isEmpty();
+    }
+
+    @Test
+    void shouldRefuseToRemoveReferencedCustomer() {
+        Customer saved = customerRepository.save(newCustomer("Ana", "529.982.247-25"));
+        flushAndClear();
+        jdbcTemplate.execute("CREATE TABLE customer_reference (customer_id BIGINT REFERENCES customer (id))");
+        jdbcTemplate.update("INSERT INTO customer_reference (customer_id) VALUES (?)", saved.getId());
+        Customer customer = customerRepository.findRequiredById(saved.getId());
+
+        assertThatThrownBy(() -> customerRepository.remove(customer))
+                .isInstanceOf(ConflictException.class)
+                .hasMessage("customer.inUse");
     }
 
     @Test

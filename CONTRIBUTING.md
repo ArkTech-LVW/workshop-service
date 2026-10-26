@@ -350,6 +350,7 @@ interface CustomerJpaRepository extends JpaRepository<Customer, Long>, CustomerR
 - Value object de **uma coluna** (ex.: `Email`, em `shared/domain/email`) é persistido por um `AttributeConverter` com `@Converter(autoApply = true)`, ao lado do `record`: a entidade só declara o campo (`private Email email;`) e o repositório recebe o value object (`findByEmail(Email email)`). Value object de **várias colunas** (ex.: valor e moeda) é `@Embeddable`.
 - A `application` injeta sempre a interface do domínio (`CustomerRepository`), e as transações (`@Transactional`) ficam nos casos de uso. Dentro da transação, o Hibernate grava as alterações sozinho no commit; chame `save` mesmo assim, para deixar a intenção explícita.
 - Filtros de listagem (query params opcionais) viram um `XxxFilter` do domínio, com os value objects já criados (ex.: `CustomerFilter`). O `XxxJpaRepository` monta a consulta com `Specification`, só com os filtros informados (ver `CustomerJpaRepository.findPage`).
+- A exclusão é física. O repositório do domínio declara `remove(Xxx)`, e o `XxxJpaRepository` o implementa num método `default` que chama `delete` e `flush` e converte a `DataIntegrityViolationException` em `ConflictException` (ver `CustomerJpaRepository.remove`). Assim, quando outra tabela ainda referencia o registro, a FK do banco impede a exclusão e a API responde 409, sem um módulo consultar o outro. O `flush` é o que faz a FK falhar dentro do caso de uso; sem ele, o erro só apareceria no commit, como 500.
 
 ## Lombok
 
