@@ -138,7 +138,7 @@ class ServiceOfferingControllerTest {
                             {"field": "description", "message": "Deve ter no máximo 2000 caracteres."},
                             {"field": "estimatedMinutes", "message": "Deve ser maior que zero."},
                             {"field": "laborPrice",
-                             "message": "Deve ter no máximo 10 dígitos inteiros e 2 casas decimais."},
+                             "message": "Valor inválido. Informe um valor maior ou igual a zero, com até 10 dígitos inteiros e duas casas decimais."},
                             {"field": "name", "message": "Deve ter no máximo 150 caracteres."}
                           ]
                         }
@@ -159,6 +159,24 @@ class ServiceOfferingControllerTest {
                         """
                         {"code": "request.invalidFields",
                          "details": [{"field": "laborPrice", "message": "Deve ser maior que zero."}]}
+                        """,
+                        JsonCompareMode.LENIENT));
+        verifyNoInteractions(createServiceOfferingUseCase);
+    }
+
+    @Test
+    void shouldRejectLaborPriceThatDoesNotFitTheColumn() throws Exception {
+        mockMvc.perform(post("/admin/services")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"name": "Troca de óleo", "laborPrice": 12345678901, "estimatedMinutes": 60}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(json(
+                        """
+                        {"code": "request.invalidFields",
+                         "details": [{"field": "laborPrice",
+                                      "message": "Valor inválido. Informe um valor maior ou igual a zero, com até 10 dígitos inteiros e duas casas decimais."}]}
                         """,
                         JsonCompareMode.LENIENT));
         verifyNoInteractions(createServiceOfferingUseCase);
