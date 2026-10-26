@@ -7,11 +7,14 @@ import br.com.arktech.workshop.IntegrationTest;
 import br.com.arktech.workshop.registry.domain.model.Customer;
 import br.com.arktech.workshop.registry.domain.model.Vehicle;
 import br.com.arktech.workshop.registry.domain.repository.CustomerRepository;
+import br.com.arktech.workshop.registry.domain.repository.VehicleFilter;
 import br.com.arktech.workshop.registry.domain.repository.VehicleRepository;
 import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
 import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
+import br.com.arktech.workshop.shared.domain.pagination.Page;
+import br.com.arktech.workshop.shared.domain.pagination.Pagination;
 import br.com.arktech.workshop.shared.domain.vehicle.Chassis;
 import br.com.arktech.workshop.shared.domain.vehicle.LicensePlate;
 
@@ -99,6 +102,29 @@ class VehicleRepositoryTest {
         assertThat(vehicleRepository.existsByLicensePlate(new LicensePlate("XYZ9876"))).isFalse();
         assertThat(vehicleRepository.existsByChassis(new Chassis("1HGCM82633A004352"))).isTrue();
         assertThat(vehicleRepository.existsByChassis(new Chassis("1M8GDM9AXKP042788"))).isFalse();
+    }
+
+    @Test
+    void shouldFilterByLicensePlateAndCustomerOrderedByPlate() {
+        vehicleRepository.save(newVehicle(ana, "ZZZ9C99", null));
+        vehicleRepository.save(newVehicle(ana, "ZZZ9A99", null));
+        vehicleRepository.save(newVehicle(bia, "ZZZ9B99", null));
+        flushAndClear();
+
+        Page<Vehicle> byCustomer =
+                vehicleRepository.findPage(new VehicleFilter(null, ana.getId()), new Pagination(0, 20));
+        Page<Vehicle> byPlate = vehicleRepository.findPage(
+                new VehicleFilter(new LicensePlate("ZZZ9B99"), null), new Pagination(0, 20));
+        Page<Vehicle> byBoth = vehicleRepository.findPage(
+                new VehicleFilter(new LicensePlate("ZZZ9B99"), ana.getId()), new Pagination(0, 20));
+
+        assertThat(byCustomer.content())
+                .extracting(vehicle -> vehicle.getLicensePlate().value())
+                .containsExactly("ZZZ9A99", "ZZZ9C99");
+        assertThat(byCustomer.totalElements()).isEqualTo(2);
+        assertThat(byPlate.content()).extracting(Vehicle::getCustomerId).containsExactly(bia.getId());
+        assertThat(byBoth.content()).isEmpty();
+        assertThat(byBoth.totalElements()).isZero();
     }
 
     @Test
