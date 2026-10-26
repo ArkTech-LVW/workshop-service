@@ -47,4 +47,20 @@ class VehicleTest {
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessage("vehicle.invalidYear");
     }
+
+    @Test
+    void shouldChangeIdentificationAndColorKeepingOwnerAndDescription() {
+        Vehicle vehicle = new Vehicle(1L, new LicensePlate("ABC1D23"), null, "Fiat", "Uno", 2010, "Branco");
+
+        vehicle.changeIdentification(new LicensePlate("XYZ9876"), new Chassis("1HGCM82633A004352"));
+        vehicle.repaint("Preto");
+
+        assertThat(vehicle.getLicensePlate()).isEqualTo(new LicensePlate("XYZ9876"));
+        assertThat(vehicle.getChassis()).isEqualTo(new Chassis("1HGCM82633A004352"));
+        assertThat(vehicle.getColor()).isEqualTo("Preto");
+        assertThat(vehicle.getCustomerId()).isEqualTo(1L);
+        assertThat(vehicle.getBrand()).isEqualTo("Fiat");
+        assertThat(vehicle.getModel()).isEqualTo("Uno");
+        assertThat(vehicle.getYear()).isEqualTo(2010);
+    }
 }
