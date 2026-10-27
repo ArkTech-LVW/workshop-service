@@ -9,3 +9,7 @@ CREATE TABLE service_offering (
     last_updated       TIMESTAMPTZ    NOT NULL,
     version            BIGINT         NOT NULL
 );
+
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+CREATE INDEX idx_service_offering_name ON service_offering USING GIN (lower(name) gin_trgm_ops);

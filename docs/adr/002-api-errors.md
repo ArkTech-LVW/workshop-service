@@ -41,7 +41,7 @@ Sem tratamento próprio, a API devolve o erro padrão do Spring Boot (`timestamp
 
 ## Decisão
 
-1. **Formato próprio `ApiError{code, message, details}`** para toda resposta de erro, sempre `application/json`. `code` é a chave de i18n, `message` é o texto em pt_BR e `details` é a lista de `{field, message}` nos erros de entrada, ou `null`.
+1. **Formato próprio `ApiError{code, message, details}`** para toda resposta de erro, sempre `application/json`. `code` é a chave de i18n, `message` é o texto em pt_BR e `details` é a lista de `{field, message}` nos erros de entrada; nos demais, o campo não é enviado. Os campos saem sempre na ordem `code`, `message`, `details` (KAN-60).
 2. **Hierarquia selada em `shared/domain/exception`:** `DomainException` (sealed) com `NotFoundException` → 404, `ConflictException` → 409, `BusinessRuleException` → 422 e `UnauthorizedException` → 401 (acrescentada na KAN-50, para o login), todas `non-sealed`. A exceção carrega só a chave e os argumentos, e a tradução acontece na `api`.
 3. **`GlobalExceptionHandler` em `shared/api/error`, estendendo `ResponseEntityExceptionHandler`:**
    - Erros de entrada (Bean Validation no corpo e nos parâmetros, tipo inválido, parâmetro ausente, valor JSON inválido) saem como 400 `request.invalidFields` com `details`. JSON sintaticamente quebrado ou corpo ausente sai como 400 `request.malformedBody`.

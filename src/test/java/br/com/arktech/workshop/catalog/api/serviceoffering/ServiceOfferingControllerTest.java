@@ -238,6 +238,19 @@ class ServiceOfferingControllerTest {
     }
 
     @Test
+    void shouldRejectNameFilterLongerThanTheColumn() throws Exception {
+        mockMvc.perform(get("/admin/services").param("name", "a".repeat(151)))
+                .andExpect(status().isBadRequest())
+                .andExpect(json(
+                        """
+                        {"code": "request.invalidFields",
+                         "details": [{"field": "name", "message": "Deve ter no máximo 150 caracteres."}]}
+                        """,
+                        JsonCompareMode.LENIENT));
+        verifyNoInteractions(listServiceOfferingsUseCase);
+    }
+
+    @Test
     void shouldFindServiceOffering() throws Exception {
         when(findServiceOfferingUseCase.execute(any())).thenReturn(OIL_CHANGE);
 
@@ -252,8 +265,7 @@ class ServiceOfferingControllerTest {
         mockMvc.perform(get("/admin/services/1234"))
                 .andExpect(status().isNotFound())
                 .andExpect(json("""
-                        {"code": "serviceOffering.notFound", "message": "Serviço 1234 não encontrado.",
-                         "details": null}
+                        {"code": "serviceOffering.notFound", "message": "Serviço 1234 não encontrado."}
                         """));
     }
 

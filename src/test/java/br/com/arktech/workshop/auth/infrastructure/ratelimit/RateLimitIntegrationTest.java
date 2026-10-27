@@ -44,8 +44,7 @@ class RateLimitIntegrationTest {
     private static final String TOO_MANY_REQUESTS = """
             {
               "code": "request.tooManyRequests",
-              "message": "Muitas requisições. Aguarde um pouco e tente novamente.",
-              "details": null
+              "message": "Muitas requisições. Aguarde um pouco e tente novamente."
             }
             """;
     private static final AtomicInteger NEXT_IP = new AtomicInteger(1);

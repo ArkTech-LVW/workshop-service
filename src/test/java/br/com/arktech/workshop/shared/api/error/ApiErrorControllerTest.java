@@ -71,7 +71,7 @@ class ApiErrorControllerTest {
         perform(get("/error").requestAttr(RequestDispatcher.ERROR_STATUS_CODE, 404))
                 .andExpect(status().isNotFound())
                 .andExpect(json("""
-                        {"code": "request.routeNotFound", "message": "Rota não encontrada.", "details": null}
+                        {"code": "request.routeNotFound", "message": "Rota não encontrada."}
                         """));
     }
 
@@ -82,8 +82,7 @@ class ApiErrorControllerTest {
                 .andExpect(json("""
                         {
                           "code": "request.methodNotSupported",
-                          "message": "O método POST não é suportado nesta rota.",
-                          "details": null
+                          "message": "O método POST não é suportado nesta rota."
                         }
                         """));
     }
@@ -95,8 +94,7 @@ class ApiErrorControllerTest {
                 .andExpect(json("""
                         {
                           "code": "auth.unauthenticated",
-                          "message": "É preciso se autenticar para acessar este recurso.",
-                          "details": null
+                          "message": "É preciso se autenticar para acessar este recurso."
                         }
                         """));
     }
@@ -108,8 +106,7 @@ class ApiErrorControllerTest {
                 .andExpect(json("""
                         {
                           "code": "auth.accessDenied",
-                          "message": "Você não tem permissão para acessar este recurso.",
-                          "details": null
+                          "message": "Você não tem permissão para acessar este recurso."
                         }
                         """));
     }
@@ -119,7 +116,7 @@ class ApiErrorControllerTest {
         perform(get("/error").requestAttr(RequestDispatcher.ERROR_STATUS_CODE, 429))
                 .andExpect(status().isTooManyRequests())
                 .andExpect(json("""
-                        {"code": "request.error", "message": "Não foi possível processar a requisição.", "details": null}
+                        {"code": "request.error", "message": "Não foi possível processar a requisição."}
                         """));
     }
 

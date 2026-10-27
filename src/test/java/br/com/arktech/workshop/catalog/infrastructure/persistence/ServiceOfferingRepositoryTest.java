@@ -160,6 +160,16 @@ class ServiceOfferingRepositoryTest {
     }
 
     @Test
+    void shouldUseTrigramIndexForNameFilter() {
+        jdbcTemplate.execute("SET LOCAL enable_seqscan = off");
+
+        String plan = String.join("\n", jdbcTemplate.queryForList(
+                "EXPLAIN SELECT id FROM service_offering WHERE lower(name) LIKE '%óleo%' ESCAPE '\\'", String.class));
+
+        assertThat(plan).contains("idx_service_offering_name");
+    }
+
+    @Test
     void shouldRejectNonPositiveLaborPriceInDatabase() {
         ServiceOffering saved = serviceOfferingRepository.save(newServiceOffering("Troca de óleo"));
         flushAndClear();

@@ -154,7 +154,7 @@ class CustomerControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(json("""
                         {"code": "customer.documentAlreadyExists",
-                         "message": "Já existe um cliente com o CPF/CNPJ 529.982.247-25.", "details": null}
+                         "message": "Já existe um cliente com o CPF/CNPJ 529.982.247-25."}
                         """));
     }
 
@@ -218,7 +218,7 @@ class CustomerControllerTest {
         mockMvc.perform(get("/admin/customers/1234"))
                 .andExpect(status().isNotFound())
                 .andExpect(json("""
-                        {"code": "customer.notFound", "message": "Cliente 1234 não encontrado.", "details": null}
+                        {"code": "customer.notFound", "message": "Cliente 1234 não encontrado."}
                         """));
     }
 
@@ -272,8 +272,7 @@ class CustomerControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(json("""
                         {"code": "customer.inUse",
-                         "message": "O cliente 1 tem veículos ou ordens de serviço ligados e não pode ser excluído.",
-                         "details": null}
+                         "message": "O cliente 1 tem veículos ou ordens de serviço ligados e não pode ser excluído."}
                         """));
     }
 

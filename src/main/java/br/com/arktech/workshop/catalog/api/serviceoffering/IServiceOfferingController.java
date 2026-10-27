@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatus;
@@ -43,7 +44,8 @@ interface IServiceOfferingController {
     @GetMapping
     PageResponse<ServiceOfferingResponse> list(
             @Parameter(description = "${openapi.serviceOffering.nameFilter}", example = "óleo")
-                    @RequestParam(required = false) @Nullable String name,
+                    @RequestParam(required = false) @Size(max = 150, message = "{validation.maxLength}") @Nullable
+                    String name,
             @Parameter(description = "${openapi.serviceOffering.activeFilter}", example = "true")
                     @RequestParam(required = false) @Nullable Boolean active,
             @Parameter(description = "${openapi.page.page}") @RequestParam(defaultValue = "0") @PositiveOrZero
