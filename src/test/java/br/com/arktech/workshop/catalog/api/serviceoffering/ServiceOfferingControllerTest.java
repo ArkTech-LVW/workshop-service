@@ -292,6 +292,23 @@ class ServiceOfferingControllerTest {
     }
 
     @Test
+    void shouldRejectUpdatedDescriptionLongerThan2000Characters() throws Exception {
+        mockMvc.perform(put("/admin/services/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"name": "Troca de óleo", "description": "%s", "laborPrice": 150, "estimatedMinutes": 60}
+                                """.formatted("a".repeat(2001))))
+                .andExpect(status().isBadRequest())
+                .andExpect(json(
+                        """
+                        {"code": "request.invalidFields",
+                         "details": [{"field": "description", "message": "Deve ter no máximo 2000 caracteres."}]}
+                        """,
+                        JsonCompareMode.LENIENT));
+        verifyNoInteractions(updateServiceOfferingUseCase);
+    }
+
+    @Test
     void shouldAnswer404WhenUpdatingUnknownServiceOffering() throws Exception {
         when(updateServiceOfferingUseCase.execute(any()))
                 .thenThrow(new NotFoundException("serviceOffering.notFound", "1"));
