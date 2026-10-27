@@ -21,7 +21,7 @@ public class ListServiceOfferingsUseCase implements UseCase<ListServiceOfferings
     @Override
     @Transactional(readOnly = true)
     public Page<ServiceOfferingResult> execute(ListServiceOfferingsQuery query) {
-        ServiceOfferingFilter filter = new ServiceOfferingFilter(query.name());
+        ServiceOfferingFilter filter = new ServiceOfferingFilter(query.name(), query.active());
         Pagination pagination = new Pagination(query.page(), query.size());
         return serviceOfferingRepository.findPage(filter, pagination).map(ServiceOfferingResult::from);
     }

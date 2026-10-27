@@ -6,15 +6,22 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import br.com.arktech.workshop.catalog.application.activateserviceoffering.ActivateServiceOfferingCommand;
+import br.com.arktech.workshop.catalog.application.activateserviceoffering.ActivateServiceOfferingUseCase;
 import br.com.arktech.workshop.catalog.application.createserviceoffering.CreateServiceOfferingCommand;
 import br.com.arktech.workshop.catalog.application.createserviceoffering.CreateServiceOfferingUseCase;
+import br.com.arktech.workshop.catalog.application.deactivateserviceoffering.DeactivateServiceOfferingCommand;
+import br.com.arktech.workshop.catalog.application.deactivateserviceoffering.DeactivateServiceOfferingUseCase;
 import br.com.arktech.workshop.catalog.application.findserviceoffering.FindServiceOfferingUseCase;
 import br.com.arktech.workshop.catalog.application.listserviceofferings.ListServiceOfferingsQuery;
 import br.com.arktech.workshop.catalog.application.listserviceofferings.ListServiceOfferingsUseCase;
 import br.com.arktech.workshop.catalog.application.serviceoffering.ServiceOfferingResult;
+import br.com.arktech.workshop.catalog.application.updateserviceoffering.UpdateServiceOfferingCommand;
+import br.com.arktech.workshop.catalog.application.updateserviceoffering.UpdateServiceOfferingUseCase;
 import br.com.arktech.workshop.shared.api.error.ApiErrorTestConfig;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.pagination.Page;
@@ -60,6 +67,15 @@ class ServiceOfferingControllerTest {
 
     @MockitoBean
     private FindServiceOfferingUseCase findServiceOfferingUseCase;
+
+    @MockitoBean
+    private UpdateServiceOfferingUseCase updateServiceOfferingUseCase;
+
+    @MockitoBean
+    private ActivateServiceOfferingUseCase activateServiceOfferingUseCase;
+
+    @MockitoBean
+    private DeactivateServiceOfferingUseCase deactivateServiceOfferingUseCase;
 
     @Test
     void shouldCreateServiceOffering() throws Exception {
@@ -168,7 +184,7 @@ class ServiceOfferingControllerTest {
 
     @Test
     void shouldListWithDefaultPagination() throws Exception {
-        when(listServiceOfferingsUseCase.execute(new ListServiceOfferingsQuery(null, 0, 20)))
+        when(listServiceOfferingsUseCase.execute(new ListServiceOfferingsQuery(null, null, 0, 20)))
                 .thenReturn(new Page<>(List.of(OIL_CHANGE), new Pagination(0, 20), 1));
 
         mockMvc.perform(get("/admin/services"))
@@ -179,15 +195,28 @@ class ServiceOfferingControllerTest {
     }
 
     @Test
-    void shouldFilterByName() throws Exception {
-        when(listServiceOfferingsUseCase.execute(new ListServiceOfferingsQuery("óleo", 0, 20)))
+    void shouldFilterByNameAndActive() throws Exception {
+        when(listServiceOfferingsUseCase.execute(new ListServiceOfferingsQuery("óleo", true, 0, 20)))
                 .thenReturn(new Page<>(List.of(OIL_CHANGE), new Pagination(0, 20), 1));
 
-        mockMvc.perform(get("/admin/services").param("name", "óleo"))
+        mockMvc.perform(get("/admin/services").param("name", "óleo").param("active", "true"))
                 .andExpect(status().isOk())
                 .andExpect(json("""
                         {"content": [%s], "totalElements": 1}
                         """.formatted(OIL_CHANGE_JSON), JsonCompareMode.LENIENT));
+    }
+
+    @Test
+    void shouldRejectInvalidActiveFilter() throws Exception {
+        mockMvc.perform(get("/admin/services").param("active", "maybe"))
+                .andExpect(status().isBadRequest())
+                .andExpect(json(
+                        """
+                        {"code": "request.invalidFields",
+                         "details": [{"field": "active", "message": "Valor inválido."}]}
+                        """,
+                        JsonCompareMode.LENIENT));
+        verifyNoInteractions(listServiceOfferingsUseCase);
     }
 
     @Test
@@ -238,6 +267,81 @@ class ServiceOfferingControllerTest {
                 .andExpect(json("""
                         {"code": "serviceOffering.notFound", "message": "Serviço 1234 não encontrado."}
                         """));
+    }
+
+    @Test
+    void shouldUpdateServiceOffering() throws Exception {
+        when(updateServiceOfferingUseCase.execute(any())).thenReturn(OIL_CHANGE);
+
+        mockMvc.perform(put("/admin/services/1").contentType(MediaType.APPLICATION_JSON).content(OIL_CHANGE_REQUEST))
+                .andExpect(status().isOk())
+                .andExpect(json(OIL_CHANGE_JSON));
+        verify(updateServiceOfferingUseCase)
+                .execute(new UpdateServiceOfferingCommand(
+                        1L, "Troca de óleo", "Óleo e filtro", new BigDecimal("150.00"), 60));
+    }
+
+    @Test
+    void shouldValidateUpdatedServiceOffering() throws Exception {
+        mockMvc.perform(put("/admin/services/1").contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(json("""
+                        {"code": "request.invalidFields"}
+                        """, JsonCompareMode.LENIENT));
+        verifyNoInteractions(updateServiceOfferingUseCase);
+    }
+
+    @Test
+    void shouldRejectUpdatedDescriptionLongerThan2000Characters() throws Exception {
+        mockMvc.perform(put("/admin/services/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"name": "Troca de óleo", "description": "%s", "laborPrice": 150, "estimatedMinutes": 60}
+                                """.formatted("a".repeat(2001))))
+                .andExpect(status().isBadRequest())
+                .andExpect(json(
+                        """
+                        {"code": "request.invalidFields",
+                         "details": [{"field": "description", "message": "Deve ter no máximo 2000 caracteres."}]}
+                        """,
+                        JsonCompareMode.LENIENT));
+        verifyNoInteractions(updateServiceOfferingUseCase);
+    }
+
+    @Test
+    void shouldAnswer404WhenUpdatingUnknownServiceOffering() throws Exception {
+        when(updateServiceOfferingUseCase.execute(any()))
+                .thenThrow(new NotFoundException("serviceOffering.notFound", "1"));
+
+        mockMvc.perform(put("/admin/services/1").contentType(MediaType.APPLICATION_JSON).content(OIL_CHANGE_REQUEST))
+                .andExpect(status().isNotFound())
+                .andExpect(json("""
+                        {"code": "serviceOffering.notFound"}
+                        """, JsonCompareMode.LENIENT));
+    }
+
+    @Test
+    void shouldActivateServiceOffering() throws Exception {
+        when(activateServiceOfferingUseCase.execute(any())).thenReturn(OIL_CHANGE);
+
+        mockMvc.perform(post("/admin/services/1/activate"))
+                .andExpect(status().isOk())
+                .andExpect(json(OIL_CHANGE_JSON));
+        verify(activateServiceOfferingUseCase).execute(new ActivateServiceOfferingCommand(1L));
+    }
+
+    @Test
+    void shouldDeactivateServiceOffering() throws Exception {
+        ServiceOfferingResult inactive = new ServiceOfferingResult(
+                1L, "Troca de óleo", "Óleo e filtro", new BigDecimal("150.00"), 60, false);
+        when(deactivateServiceOfferingUseCase.execute(any())).thenReturn(inactive);
+
+        mockMvc.perform(post("/admin/services/1/deactivate"))
+                .andExpect(status().isOk())
+                .andExpect(json("""
+                        {"id": 1, "active": false}
+                        """, JsonCompareMode.LENIENT));
+        verify(deactivateServiceOfferingUseCase).execute(new DeactivateServiceOfferingCommand(1L));
     }
 
     private static ResultMatcher json(String expected) {
