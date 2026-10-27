@@ -59,6 +59,15 @@ public class Vehicle extends BaseEntity {
         return year >= FIRST_YEAR && year <= Year.now().getValue() + 1;
     }
 
+    public void changeIdentification(LicensePlate licensePlate, @Nullable Chassis chassis) {
+        this.licensePlate = licensePlate;
+        this.chassis = chassis;
+    }
+
+    public void repaint(String color) {
+        this.color = color;
+    }
+
     private static int requireValidYear(int year) {
         if (!isValidYear(year)) {
             throw new BusinessRuleException("vehicle.invalidYear");

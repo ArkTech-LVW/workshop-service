@@ -39,8 +39,20 @@ public class InMemoryVehicleRepository implements VehicleRepository {
     }
 
     @Override
+    public boolean existsByLicensePlateAndIdNot(LicensePlate licensePlate, Long id) {
+        return vehicles.stream()
+                .anyMatch(vehicle -> vehicle.getLicensePlate().equals(licensePlate) && !vehicle.getId().equals(id));
+    }
+
+    @Override
     public boolean existsByChassis(Chassis chassis) {
         return vehicles.stream().anyMatch(vehicle -> chassis.equals(vehicle.getChassis()));
+    }
+
+    @Override
+    public boolean existsByChassisAndIdNot(Chassis chassis, Long id) {
+        return vehicles.stream()
+                .anyMatch(vehicle -> chassis.equals(vehicle.getChassis()) && !vehicle.getId().equals(id));
     }
 
     @Override
@@ -57,6 +69,11 @@ public class InMemoryVehicleRepository implements VehicleRepository {
                 .limit(pagination.size())
                 .toList();
         return new Page<>(content, pagination, matching.size());
+    }
+
+    @Override
+    public void remove(Vehicle vehicle) {
+        vehicles.remove(vehicle);
     }
 
     public List<Vehicle> findAll() {

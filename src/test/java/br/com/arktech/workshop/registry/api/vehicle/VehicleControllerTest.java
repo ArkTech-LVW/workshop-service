@@ -1,19 +1,26 @@
 package br.com.arktech.workshop.registry.api.vehicle;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import br.com.arktech.workshop.registry.application.createvehicle.CreateVehicleCommand;
 import br.com.arktech.workshop.registry.application.createvehicle.CreateVehicleUseCase;
+import br.com.arktech.workshop.registry.application.deletevehicle.DeleteVehicleCommand;
+import br.com.arktech.workshop.registry.application.deletevehicle.DeleteVehicleUseCase;
 import br.com.arktech.workshop.registry.application.findvehicle.FindVehicleUseCase;
 import br.com.arktech.workshop.registry.application.listvehicles.ListVehiclesQuery;
 import br.com.arktech.workshop.registry.application.listvehicles.ListVehiclesUseCase;
+import br.com.arktech.workshop.registry.application.updatevehicle.UpdateVehicleCommand;
+import br.com.arktech.workshop.registry.application.updatevehicle.UpdateVehicleUseCase;
 import br.com.arktech.workshop.registry.application.vehicle.VehicleResult;
 import br.com.arktech.workshop.shared.api.error.ApiErrorTestConfig;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
@@ -50,6 +57,9 @@ class VehicleControllerTest {
             {"customerId": 1, "licensePlate": "abc-1d23", "chassis": "9BWZZZ372VT004251",
              "brand": "Volkswagen", "model": "Gol", "year": 2020, "color": "Prata"}
             """;
+    private static final String UPDATE_REQUEST = """
+            {"licensePlate": "abc-1d23", "chassis": "9BWZZZ372VT004251", "color": "Prata"}
+            """;
     private static final String INVALID_YEAR = "Ano inválido. Informe um ano entre 1981 e o ano que vem.";
 
     @Autowired
@@ -63,6 +73,12 @@ class VehicleControllerTest {
 
     @MockitoBean
     private FindVehicleUseCase findVehicleUseCase;
+
+    @MockitoBean
+    private UpdateVehicleUseCase updateVehicleUseCase;
+
+    @MockitoBean
+    private DeleteVehicleUseCase deleteVehicleUseCase;
 
     @Test
     void shouldCreateVehicle() throws Exception {
@@ -269,6 +285,99 @@ class VehicleControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(json("""
                         {"code": "vehicle.notFound", "message": "Veículo 1234 não encontrado."}
+                        """));
+    }
+
+    @Test
+    void shouldUpdateVehicle() throws Exception {
+        when(updateVehicleUseCase.execute(any())).thenReturn(GOL);
+
+        mockMvc.perform(put("/admin/vehicles/1").contentType(MediaType.APPLICATION_JSON).content(UPDATE_REQUEST))
+                .andExpect(status().isOk())
+                .andExpect(json(GOL_JSON));
+        verify(updateVehicleUseCase).execute(new UpdateVehicleCommand(1L, "abc-1d23", "9BWZZZ372VT004251", "Prata"));
+    }
+
+    @Test
+    void shouldUpdateVehicleWithoutChassis() throws Exception {
+        when(updateVehicleUseCase.execute(any())).thenReturn(GOL);
+
+        mockMvc.perform(put("/admin/vehicles/1").contentType(MediaType.APPLICATION_JSON).content("""
+                        {"licensePlate": "ABC1D23", "color": "Prata"}
+                        """))
+                .andExpect(status().isOk());
+        verify(updateVehicleUseCase).execute(new UpdateVehicleCommand(1L, "ABC1D23", null, "Prata"));
+    }
+
+    @Test
+    void shouldRequirePlateAndColorOnUpdate() throws Exception {
+        mockMvc.perform(put("/admin/vehicles/1").contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(json(
+                        """
+                        {
+                          "code": "request.invalidFields",
+                          "details": [
+                            {"field": "color", "message": "Não pode estar em branco."},
+                            {"field": "licensePlate", "message": "Não pode estar em branco."}
+                          ]
+                        }
+                        """,
+                        JsonCompareMode.LENIENT));
+        verifyNoInteractions(updateVehicleUseCase);
+    }
+
+    @Test
+    void shouldValidateUpdatedVehicle() throws Exception {
+        mockMvc.perform(put("/admin/vehicles/1").contentType(MediaType.APPLICATION_JSON).content("""
+                        {"licensePlate": "AB-12345", "chassis": "9BWZZZ370VT004251", "color": "%s"}
+                        """.formatted("a".repeat(31))))
+                .andExpect(status().isBadRequest())
+                .andExpect(json(
+                        """
+                        {
+                          "code": "request.invalidFields",
+                          "details": [
+                            {"field": "chassis",
+                             "message": "Chassi inválido. Informe os 17 caracteres do chassi, sem as letras I, O e Q."},
+                            {"field": "color", "message": "Deve ter no máximo 30 caracteres."},
+                            {"field": "licensePlate", "message": "Placa inválida."}
+                          ]
+                        }
+                        """,
+                        JsonCompareMode.LENIENT));
+        verifyNoInteractions(updateVehicleUseCase);
+    }
+
+    @Test
+    void shouldAnswer409WhenUpdatingToAnotherVehiclesPlate() throws Exception {
+        when(updateVehicleUseCase.execute(any()))
+                .thenThrow(new ConflictException("vehicle.licensePlateAlreadyExists", "ABC1D23"));
+
+        mockMvc.perform(put("/admin/vehicles/1").contentType(MediaType.APPLICATION_JSON).content(UPDATE_REQUEST))
+                .andExpect(status().isConflict())
+                .andExpect(json("""
+                        {"code": "vehicle.licensePlateAlreadyExists"}
+                        """, JsonCompareMode.LENIENT));
+    }
+
+    @Test
+    void shouldDeleteVehicle() throws Exception {
+        mockMvc.perform(delete("/admin/vehicles/1"))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+        verify(deleteVehicleUseCase).execute(new DeleteVehicleCommand(1L));
+    }
+
+    @Test
+    void shouldAnswer409WhenVehicleIsInUse() throws Exception {
+        doThrow(new ConflictException("vehicle.inUse", "1")).when(deleteVehicleUseCase).execute(any());
+
+        mockMvc.perform(delete("/admin/vehicles/1"))
+                .andExpect(status().isConflict())
+                .andExpect(json("""
+                        {"code": "vehicle.inUse",
+                         "message": "O veículo 1 tem ordens de serviço ligadas e não pode ser excluído."}
                         """));
     }
 

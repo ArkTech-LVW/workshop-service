@@ -18,9 +18,15 @@ public interface VehicleRepository {
 
     boolean existsByLicensePlate(LicensePlate licensePlate);
 
+    boolean existsByLicensePlateAndIdNot(LicensePlate licensePlate, Long id);
+
     boolean existsByChassis(Chassis chassis);
 
+    boolean existsByChassisAndIdNot(Chassis chassis, Long id);
+
     Page<Vehicle> findPage(VehicleFilter filter, Pagination pagination);
+
+    void remove(Vehicle vehicle);
 
     default Vehicle findRequiredById(Long id) {
         return findById(id).orElseThrow(() -> new NotFoundException("vehicle.notFound", id.toString()));

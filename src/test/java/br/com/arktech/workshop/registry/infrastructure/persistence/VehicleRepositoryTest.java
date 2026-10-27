@@ -105,6 +105,19 @@ class VehicleRepositoryTest {
     }
 
     @Test
+    void shouldCheckLicensePlateAndChassisIgnoringItsOwnVehicle() {
+        Vehicle saved = vehicleRepository.save(newVehicle(ana, "ABC1234", "1HGCM82633A004352"));
+        flushAndClear();
+        LicensePlate licensePlate = new LicensePlate("ABC1234");
+        Chassis chassis = new Chassis("1HGCM82633A004352");
+
+        assertThat(vehicleRepository.existsByLicensePlateAndIdNot(licensePlate, saved.getId())).isFalse();
+        assertThat(vehicleRepository.existsByLicensePlateAndIdNot(licensePlate, saved.getId() + 1)).isTrue();
+        assertThat(vehicleRepository.existsByChassisAndIdNot(chassis, saved.getId())).isFalse();
+        assertThat(vehicleRepository.existsByChassisAndIdNot(chassis, saved.getId() + 1)).isTrue();
+    }
+
+    @Test
     void shouldFilterByLicensePlateAndCustomerOrderedByPlate() {
         vehicleRepository.save(newVehicle(ana, "ZZZ9C99", null));
         vehicleRepository.save(newVehicle(ana, "ZZZ9A99", null));
@@ -182,6 +195,30 @@ class VehicleRepositoryTest {
         assertThatThrownBy(() -> customerRepository.remove(customer))
                 .isInstanceOf(ConflictException.class)
                 .hasMessage("customer.inUse");
+    }
+
+    @Test
+    void shouldRemoveVehicle() {
+        Vehicle saved = vehicleRepository.save(newVehicle(ana, "ABC1234", null));
+        flushAndClear();
+
+        vehicleRepository.remove(vehicleRepository.findRequiredById(saved.getId()));
+        flushAndClear();
+
+        assertThat(vehicleRepository.findById(saved.getId())).isEmpty();
+    }
+
+    @Test
+    void shouldRefuseToRemoveReferencedVehicle() {
+        Vehicle saved = vehicleRepository.save(newVehicle(ana, "ABC1234", null));
+        flushAndClear();
+        jdbcTemplate.execute("CREATE TABLE vehicle_reference (vehicle_id BIGINT REFERENCES vehicle (id))");
+        jdbcTemplate.update("INSERT INTO vehicle_reference (vehicle_id) VALUES (?)", saved.getId());
+        Vehicle vehicle = vehicleRepository.findRequiredById(saved.getId());
+
+        assertThatThrownBy(() -> vehicleRepository.remove(vehicle))
+                .isInstanceOf(ConflictException.class)
+                .hasMessage("vehicle.inUse");
     }
 
     @Test
