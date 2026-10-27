@@ -51,7 +51,7 @@ class WithdrawStockUseCaseTest {
                         StockMovement::getType,
                         StockMovement::getQuantity,
                         StockMovement::getServiceOrderId,
-                        StockMovement::getCreatedBy)
+                        StockMovement::getCreatedByUserId)
                 .containsExactly(
                         tuple(filter.getId(), StockMovementType.OUT, 1, SERVICE_ORDER_ID, USER_ID),
                         tuple(oil.getId(), StockMovementType.OUT, 6, SERVICE_ORDER_ID, USER_ID));

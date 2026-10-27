@@ -14,7 +14,7 @@ public record StockMovementResult(
         int quantity,
         @Nullable String reason,
         @Nullable Long serviceOrderId,
-        Long createdBy,
+        Long createdByUserId,
         @Nullable Instant dateCreated) {
 
     public static StockMovementResult from(StockMovement movement) {
@@ -25,7 +25,7 @@ public record StockMovementResult(
                 movement.getQuantity(),
                 movement.getReason(),
                 movement.getServiceOrderId(),
-                movement.getCreatedBy(),
+                movement.getCreatedByUserId(),
                 movement.getDateCreated());
     }
 }

@@ -40,7 +40,7 @@ class ListStockMovementsUseCaseTest {
 
         assertThat(page.totalElements()).isEqualTo(2);
         assertThat(page.content())
-                .extracting(StockMovementResult::reason, StockMovementResult::createdBy)
+                .extracting(StockMovementResult::reason, StockMovementResult::createdByUserId)
                 .containsExactly(tuple("Avaria", 8L), tuple("NF 1", 7L));
     }
 

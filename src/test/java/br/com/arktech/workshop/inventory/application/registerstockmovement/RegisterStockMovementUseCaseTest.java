@@ -39,7 +39,7 @@ class RegisterStockMovementUseCaseTest {
         assertThat(result.type()).isEqualTo(StockMovementType.IN);
         assertThat(result.quantity()).isEqualTo(10);
         assertThat(result.reason()).isEqualTo("NF 1234");
-        assertThat(result.createdBy()).isEqualTo(USER_ID);
+        assertThat(result.createdByUserId()).isEqualTo(USER_ID);
         assertThat(part.getStockQuantity()).isEqualTo(10);
         assertThat(stockMovementRepository.findAll()).hasSize(1);
     }

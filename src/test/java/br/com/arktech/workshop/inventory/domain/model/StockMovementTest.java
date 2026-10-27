@@ -39,7 +39,7 @@ class StockMovementTest {
         assertThat(movement.getQuantity()).isEqualTo(4);
         assertThat(movement.getReason()).isEqualTo("NF 1234");
         assertThat(movement.getServiceOrderId()).isNull();
-        assertThat(movement.getCreatedBy()).isEqualTo(USER_ID);
+        assertThat(movement.getCreatedByUserId()).isEqualTo(USER_ID);
     }
 
     @Test

@@ -31,7 +31,7 @@ public class StockMovement extends BaseEntity {
 
     private @Nullable String reason;
 
-    private Long createdBy;
+    private Long createdByUserId;
 
     private StockMovement(
             Part part,
@@ -45,7 +45,7 @@ public class StockMovement extends BaseEntity {
         this.type = type;
         this.quantity = quantity;
         this.reason = reason;
-        this.createdBy = createdBy;
+        this.createdByUserId = createdBy;
     }
 
     public static StockMovement entry(Part part, int quantity, @Nullable String reason, Long createdBy) {

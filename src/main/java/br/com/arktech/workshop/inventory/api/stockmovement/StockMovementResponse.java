@@ -18,7 +18,7 @@ record StockMovementResponse(
                 @Nullable String reason,
         @Schema(description = "${openapi.stockMovement.serviceOrderId}", example = "null") @Nullable
                 Long serviceOrderId,
-        @Schema(description = "${openapi.stockMovement.createdBy}", example = "1") Long createdBy,
+        @Schema(description = "${openapi.stockMovement.createdByUserId}", example = "1") Long createdByUserId,
         @Schema(description = "${openapi.stockMovement.dateCreated}", example = "2026-10-26T14:30:00Z") @Nullable
                 Instant dateCreated) {
 
@@ -30,7 +30,7 @@ record StockMovementResponse(
                 result.quantity(),
                 result.reason(),
                 result.serviceOrderId(),
-                result.createdBy(),
+                result.createdByUserId(),
                 result.dateCreated());
     }
 }

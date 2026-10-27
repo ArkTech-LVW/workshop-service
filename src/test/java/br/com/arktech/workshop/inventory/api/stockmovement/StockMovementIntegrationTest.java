@@ -102,7 +102,7 @@ class StockMovementIntegrationTest {
         movement(partId, "IN", 10, "Compra do fornecedor, NF 1234")
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.type").value("IN"))
-                .andExpect(jsonPath("$.createdBy").value(adminId))
+                .andExpect(jsonPath("$.createdByUserId").value(adminId))
                 .andExpect(jsonPath("$.dateCreated").isNotEmpty());
         movement(partId, "ADJUSTMENT", 7, "Avaria no transporte").andExpect(status().isCreated());
 
@@ -112,7 +112,7 @@ class StockMovementIntegrationTest {
                 .andExpect(jsonPath("$.content[0].type").value("ADJUSTMENT"))
                 .andExpect(jsonPath("$.content[0].quantity").value(7))
                 .andExpect(jsonPath("$.content[0].reason").value("Avaria no transporte"))
-                .andExpect(jsonPath("$.content[0].createdBy").value(adminId))
+                .andExpect(jsonPath("$.content[0].createdByUserId").value(adminId))
                 .andExpect(jsonPath("$.content[1].type").value("IN"))
                 .andExpect(jsonPath("$.content[1].reason").value("Compra do fornecedor, NF 1234"));
         asAdmin(get("/admin/parts/{id}", partId)).andExpect(jsonPath("$.stockQuantity").value(3));
