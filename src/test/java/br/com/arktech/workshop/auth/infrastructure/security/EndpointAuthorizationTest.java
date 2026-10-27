@@ -25,7 +25,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 class EndpointAuthorizationTest {
 
     private static final String ACCESS_DENIED = """
-            {"code": "auth.accessDenied", "message": "Você não tem permissão para acessar este recurso.", "details": null}
+            {"code": "auth.accessDenied", "message": "Você não tem permissão para acessar este recurso."}
             """;
 
     @Autowired
