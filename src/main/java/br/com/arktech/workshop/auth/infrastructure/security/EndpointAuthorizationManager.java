@@ -43,6 +43,20 @@ public class EndpointAuthorizationManager implements AuthorizationManager<Reques
     private final RequestMappingHandlerMapping handlerMapping;
 
     private final Map<Method, AuthorizationManager<RequestAuthorizationContext>> managers = new ConcurrentHashMap<>();
+    private final Map<Method, EndpointAccess> accesses = new ConcurrentHashMap<>();
+
+    public boolean isPublicEndpoint(HttpServletRequest request) {
+        HandlerExecutionChain chain;
+        try {
+            chain = handlerMapping.getHandler(new LookupRequest(request));
+        } catch (Exception ex) {
+            return false;
+        }
+        return chain != null
+                && chain.getHandler() instanceof HandlerMethod handlerMethod
+                && accesses.computeIfAbsent(handlerMethod.getMethod(), method -> EndpointAccess.of(handlerMethod))
+                        instanceof EndpointAccess.Public;
+    }
 
     @Override
     public @Nullable AuthorizationResult authorize(
