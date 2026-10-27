@@ -8,13 +8,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import br.com.arktech.workshop.IntegrationTest;
 import br.com.arktech.workshop.auth.application.port.TokenIssuer;
+import br.com.arktech.workshop.inventory.application.withdrawstock.WithdrawStockCommand;
+import br.com.arktech.workshop.inventory.application.withdrawstock.WithdrawStockUseCase;
+import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
 import com.jayway.jsonpath.JsonPath;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -41,6 +55,9 @@ class StockMovementIntegrationTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private WithdrawStockUseCase withdrawStockUseCase;
 
     private Long adminId;
 
@@ -135,6 +152,57 @@ class StockMovementIntegrationTest {
 
         List<Integer> ids = JsonPath.read(body, "$.content[*].id");
         assertThat(ids).contains(low).doesNotContain(enough);
+    }
+
+    @Test
+    void shouldLetOnlyOneOfTwoConcurrentWithdrawalsPassWhenStockCoversOne() throws Exception {
+        Integer partId = createPart(0);
+        movement(partId, "IN", 5, null).andExpect(status().isCreated());
+        WithdrawStockCommand.Item threeUnits = new WithdrawStockCommand.Item(partId.longValue(), 3);
+        CountDownLatch start = new CountDownLatch(1);
+
+        List<Throwable> failures = new ArrayList<>();
+        try (ExecutorService executor = Executors.newFixedThreadPool(2)) {
+            List<Future<Void>> results = new ArrayList<>();
+            for (long serviceOrderId = 1; serviceOrderId <= 2; serviceOrderId++) {
+                WithdrawStockCommand command = new WithdrawStockCommand(serviceOrderId, List.of(threeUnits));
+                results.add(executor.submit(withdrawal(command, start)));
+            }
+            start.countDown();
+            for (Future<Void> result : results) {
+                try {
+                    result.get(30, TimeUnit.SECONDS);
+                } catch (ExecutionException ex) {
+                    failures.add(ex.getCause());
+                }
+            }
+        }
+
+        assertThat(failures)
+                .singleElement()
+                .isInstanceOf(BusinessRuleException.class)
+                .hasFieldOrPropertyWithValue("message", "part.insufficientStock");
+        asAdmin(get("/admin/parts/{id}", partId)).andExpect(jsonPath("$.stockQuantity").value(2));
+        Integer withdrawals = jdbcTemplate.queryForObject(
+                "SELECT count(*) FROM stock_movement WHERE part_id = ? AND type = 'OUT'", Integer.class, partId);
+        assertThat(withdrawals).isOne();
+    }
+
+    private Callable<Void> withdrawal(WithdrawStockCommand command, CountDownLatch start) {
+        Jwt jwt = Jwt.withTokenValue("test")
+                .header("alg", "HS256")
+                .subject(adminId.toString())
+                .build();
+        return () -> {
+            SecurityContextHolder.getContext().setAuthentication(new JwtAuthenticationToken(jwt));
+            try {
+                start.await();
+                withdrawStockUseCase.execute(command);
+                return null;
+            } finally {
+                SecurityContextHolder.clearContext();
+            }
+        };
     }
 
     private ResultActions movement(Integer partId, String type, int quantity, String reason) throws Exception {
