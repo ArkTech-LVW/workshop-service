@@ -11,11 +11,15 @@ import br.com.arktech.workshop.IntegrationTest;
 import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
 import br.com.arktech.workshop.auth.domain.model.User;
 import br.com.arktech.workshop.auth.domain.repository.UserRepository;
+import br.com.arktech.workshop.auth.infrastructure.config.JwtConfig;
 import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
 import com.jayway.jsonpath.JsonPath;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -26,6 +30,10 @@ import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.JwsHeader;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -49,6 +57,9 @@ class LoginIntegrationTest {
     @Autowired
     private PasswordHasher passwordHasher;
 
+    @Autowired
+    private JwtEncoder jwtEncoder;
+
     @Test
     void shouldIssueTokenAcceptedByProtectedEndpoints() throws Exception {
         User user = saveUser(true);
@@ -65,6 +76,35 @@ class LoginIntegrationTest {
         mockMvc.perform(get("/test/security/me").header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(content().string(user.getId().toString()));
+    }
+
+    @Test
+    void shouldLoginEvenWithExpiredTokenInAuthorizationHeader() throws Exception {
+        User user = saveUser(true);
+        String body = """
+                {"email": "%s", "password": "%s"}
+                """.formatted(user.getEmail().value(), PASSWORD);
+
+        mockMvc.perform(post("/auth/login")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + expiredToken())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.tokenType").value("Bearer"));
+    }
+
+    @Test
+    void shouldAnswerInvalidCredentialsEvenWithExpiredTokenInAuthorizationHeader() throws Exception {
+        String body = """
+                {"email": "nobody-%s@workshop.com", "password": "%s"}
+                """.formatted(UUID.randomUUID(), PASSWORD);
+
+        mockMvc.perform(post("/auth/login")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + expiredToken())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isUnauthorized())
+                .andExpect(invalidCredentials());
     }
 
     @Test
@@ -117,6 +157,19 @@ class LoginIntegrationTest {
                 {"email": "%s", "password": "%s"}
                 """.formatted(email, password);
         return mockMvc.perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON).content(body));
+    }
+
+    private String expiredToken() {
+        Instant issuedAt = Instant.now().minus(Duration.ofHours(2));
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .subject("1")
+                .issuedAt(issuedAt)
+                .expiresAt(issuedAt.plus(Duration.ofHours(1)))
+                .claim("roles", List.of("ADMIN"))
+                .build();
+        return jwtEncoder
+                .encode(JwtEncoderParameters.from(JwsHeader.with(JwtConfig.ALGORITHM).build(), claims))
+                .getTokenValue();
     }
 
     private static ResultMatcher invalidCredentials() {
