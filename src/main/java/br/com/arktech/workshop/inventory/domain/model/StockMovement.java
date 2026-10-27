@@ -39,33 +39,33 @@ public class StockMovement extends BaseEntity {
             int quantity,
             @Nullable String reason,
             @Nullable Long serviceOrderId,
-            Long createdBy) {
+            Long userId) {
         this.partId = part.getId();
         this.serviceOrderId = serviceOrderId;
         this.type = type;
         this.quantity = quantity;
         this.reason = reason;
-        this.createdByUserId = createdBy;
+        this.createdByUserId = userId;
     }
 
-    public static StockMovement entry(Part part, int quantity, @Nullable String reason, Long createdBy) {
+    public static StockMovement entry(Part part, int quantity, @Nullable String reason, Long userId) {
         part.increaseStock(quantity);
-        return new StockMovement(part, StockMovementType.IN, quantity, normalize(reason), null, createdBy);
+        return new StockMovement(part, StockMovementType.IN, quantity, normalize(reason), null, userId);
     }
 
-    public static StockMovement adjustment(Part part, int quantity, @Nullable String reason, Long createdBy) {
+    public static StockMovement adjustment(Part part, int quantity, @Nullable String reason, Long userId) {
         String normalized = normalize(reason);
         if (normalized == null) {
             throw new BusinessRuleException("stockMovement.reasonRequired");
         }
 
         part.decreaseStock(quantity);
-        return new StockMovement(part, StockMovementType.ADJUSTMENT, quantity, normalized, null, createdBy);
+        return new StockMovement(part, StockMovementType.ADJUSTMENT, quantity, normalized, null, userId);
     }
 
-    public static StockMovement withdrawal(Part part, int quantity, Long serviceOrderId, Long createdBy) {
+    public static StockMovement withdrawal(Part part, int quantity, Long serviceOrderId, Long userId) {
         part.decreaseStock(quantity);
-        return new StockMovement(part, StockMovementType.OUT, quantity, null, serviceOrderId, createdBy);
+        return new StockMovement(part, StockMovementType.OUT, quantity, null, serviceOrderId, userId);
     }
 
     private static @Nullable String normalize(@Nullable String reason) {

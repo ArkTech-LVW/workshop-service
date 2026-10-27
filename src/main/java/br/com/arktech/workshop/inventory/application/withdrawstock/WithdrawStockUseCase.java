@@ -30,13 +30,13 @@ public class WithdrawStockUseCase implements VoidUseCase<WithdrawStockCommand> {
     @Override
     @Transactional
     public void execute(WithdrawStockCommand command) {
-        Long createdBy = currentUser.id();
+        Long userId = currentUser.id();
         Map<Long, Integer> quantityByPart = new TreeMap<>();
         command.items().forEach(item -> quantityByPart.merge(item.partId(), item.quantity(), Math::addExact));
 
         quantityByPart.forEach((partId, quantity) -> {
             Part part = partRepository.findRequiredForUpdateById(partId);
-            StockMovement movement = StockMovement.withdrawal(part, quantity, command.serviceOrderId(), createdBy);
+            StockMovement movement = StockMovement.withdrawal(part, quantity, command.serviceOrderId(), userId);
             partRepository.save(part);
             stockMovementRepository.save(movement);
         });

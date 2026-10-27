@@ -26,11 +26,11 @@ public class RegisterStockMovementUseCase implements UseCase<RegisterStockMoveme
     @Transactional
     public StockMovementResult execute(RegisterStockMovementCommand command) {
         Part part = partRepository.findRequiredForUpdateById(command.partId());
-        Long createdBy = currentUser.id();
+        Long userId = currentUser.id();
 
         StockMovement movement = switch (command.type()) {
-            case IN -> StockMovement.entry(part, command.quantity(), command.reason(), createdBy);
-            case ADJUSTMENT -> StockMovement.adjustment(part, command.quantity(), command.reason(), createdBy);
+            case IN -> StockMovement.entry(part, command.quantity(), command.reason(), userId);
+            case ADJUSTMENT -> StockMovement.adjustment(part, command.quantity(), command.reason(), userId);
             case OUT -> throw new BusinessRuleException("stockMovement.outRequiresServiceOrder");
         };
         partRepository.save(part);
