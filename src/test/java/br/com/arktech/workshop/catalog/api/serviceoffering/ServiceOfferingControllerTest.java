@@ -236,8 +236,7 @@ class ServiceOfferingControllerTest {
         mockMvc.perform(get("/admin/services/1234"))
                 .andExpect(status().isNotFound())
                 .andExpect(json("""
-                        {"code": "serviceOffering.notFound", "message": "Serviço 1234 não encontrado.",
-                         "details": null}
+                        {"code": "serviceOffering.notFound", "message": "Serviço 1234 não encontrado."}
                         """));
     }
 
