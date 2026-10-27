@@ -9,6 +9,8 @@ import br.com.arktech.workshop.shared.domain.money.Money;
 import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class PartTest {
 
@@ -64,6 +66,52 @@ class PartTest {
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessage("part.minimumStockNegative");
         assertThat(part.getMinimumStock()).isEqualTo(10);
+    }
+
+    @Test
+    void shouldIncreaseAndDecreaseStock() {
+        Part part = new Part(SKU, "Óleo 5W30 1L", PartType.SUPPLY, MeasurementUnit.LITER, PRICE, 10);
+
+        part.increaseStock(8);
+        part.decreaseStock(3);
+
+        assertThat(part.getStockQuantity()).isEqualTo(5);
+    }
+
+    @Test
+    void shouldAllowDecreasingTheWholeStock() {
+        Part part = new Part(SKU, "Óleo 5W30 1L", PartType.SUPPLY, MeasurementUnit.LITER, PRICE, 10);
+        part.increaseStock(4);
+
+        part.decreaseStock(4);
+
+        assertThat(part.getStockQuantity()).isZero();
+    }
+
+    @Test
+    void shouldRejectDecreaseGreaterThanStock() {
+        Part part = new Part(SKU, "Óleo 5W30 1L", PartType.SUPPLY, MeasurementUnit.LITER, PRICE, 10);
+        part.increaseStock(2);
+
+        assertThatThrownBy(() -> part.decreaseStock(3))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("part.insufficientStock")
+                .extracting(error -> ((BusinessRuleException) error).getArgs())
+                .isEqualTo(new Object[] {"OLEO-5W30-1L", 2, 3});
+        assertThat(part.getStockQuantity()).isEqualTo(2);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, -1})
+    void shouldRejectNonPositiveStockQuantity(int quantity) {
+        Part part = new Part(SKU, "Óleo 5W30 1L", PartType.SUPPLY, MeasurementUnit.LITER, PRICE, 10);
+
+        assertThatThrownBy(() -> part.increaseStock(quantity))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("stockMovement.quantityNotPositive");
+        assertThatThrownBy(() -> part.decreaseStock(quantity))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("stockMovement.quantityNotPositive");
     }
 
     @Test
