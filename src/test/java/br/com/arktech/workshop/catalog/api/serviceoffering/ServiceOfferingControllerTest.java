@@ -209,6 +209,19 @@ class ServiceOfferingControllerTest {
     }
 
     @Test
+    void shouldRejectNameFilterLongerThanTheColumn() throws Exception {
+        mockMvc.perform(get("/admin/services").param("name", "a".repeat(151)))
+                .andExpect(status().isBadRequest())
+                .andExpect(json(
+                        """
+                        {"code": "request.invalidFields",
+                         "details": [{"field": "name", "message": "Deve ter no máximo 150 caracteres."}]}
+                        """,
+                        JsonCompareMode.LENIENT));
+        verifyNoInteractions(listServiceOfferingsUseCase);
+    }
+
+    @Test
     void shouldFindServiceOffering() throws Exception {
         when(findServiceOfferingUseCase.execute(any())).thenReturn(OIL_CHANGE);
 
