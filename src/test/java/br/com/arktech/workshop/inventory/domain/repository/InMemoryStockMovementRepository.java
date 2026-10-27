@@ -28,7 +28,7 @@ public class InMemoryStockMovementRepository implements StockMovementRepository 
     @Override
     public Page<StockMovement> findPageByPartId(Long partId, Pagination pagination) {
         List<StockMovement> matching = movements.stream()
-                .filter(movement -> movement.getPartId().equals(partId))
+                .filter(movement -> movement.getPart().getId().equals(partId))
                 .sorted(Comparator.comparing(StockMovement::getId).reversed())
                 .toList();
         List<StockMovement> content = matching.stream()

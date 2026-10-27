@@ -18,7 +18,8 @@ interface StockMovementJpaRepository
 
     @Override
     default Page<StockMovement> findPageByPartId(Long partId, Pagination pagination) {
-        Specification<StockMovement> ofPart = (root, query, builder) -> builder.equal(root.get("partId"), partId);
+        Specification<StockMovement> ofPart =
+                (root, query, builder) -> builder.equal(root.get("part").get("id"), partId);
         var page = findAll(ofPart, PageRequest.of(pagination.page(), pagination.size(), PAGE_ORDER));
         return new Page<>(page.getContent(), pagination, page.getTotalElements());
     }

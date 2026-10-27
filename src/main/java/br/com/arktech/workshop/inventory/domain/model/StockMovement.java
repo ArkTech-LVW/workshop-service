@@ -6,6 +6,9 @@ import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import lombok.AccessLevel;
@@ -20,7 +23,9 @@ import org.jspecify.annotations.Nullable;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class StockMovement extends BaseEntity {
 
-    private Long partId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "part_id")
+    private Part part;
 
     private @Nullable Long serviceOrderId;
 
@@ -40,7 +45,7 @@ public class StockMovement extends BaseEntity {
             @Nullable String reason,
             @Nullable Long serviceOrderId,
             Long userId) {
-        this.partId = part.getId();
+        this.part = part;
         this.serviceOrderId = serviceOrderId;
         this.type = type;
         this.quantity = quantity;

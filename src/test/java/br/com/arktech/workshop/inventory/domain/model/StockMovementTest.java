@@ -34,7 +34,7 @@ class StockMovementTest {
         StockMovement movement = StockMovement.entry(part, 4, "  NF 1234 ", USER_ID);
 
         assertThat(part.getStockQuantity()).isEqualTo(9);
-        assertThat(movement.getPartId()).isEqualTo(3L);
+        assertThat(movement.getPart()).isSameAs(part);
         assertThat(movement.getType()).isEqualTo(StockMovementType.IN);
         assertThat(movement.getQuantity()).isEqualTo(4);
         assertThat(movement.getReason()).isEqualTo("NF 1234");

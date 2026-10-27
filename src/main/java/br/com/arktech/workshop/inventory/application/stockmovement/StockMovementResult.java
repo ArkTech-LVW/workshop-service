@@ -20,7 +20,7 @@ public record StockMovementResult(
     public static StockMovementResult from(StockMovement movement) {
         return new StockMovementResult(
                 movement.getId(),
-                movement.getPartId(),
+                movement.getPart().getId(),
                 movement.getType(),
                 movement.getQuantity(),
                 movement.getReason(),

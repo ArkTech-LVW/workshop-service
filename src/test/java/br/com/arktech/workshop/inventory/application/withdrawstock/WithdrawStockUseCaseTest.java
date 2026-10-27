@@ -47,14 +47,14 @@ class WithdrawStockUseCaseTest {
         assertThat(oil.getStockQuantity()).isEqualTo(4);
         assertThat(stockMovementRepository.findAll())
                 .extracting(
-                        StockMovement::getPartId,
+                        StockMovement::getPart,
                         StockMovement::getType,
                         StockMovement::getQuantity,
                         StockMovement::getServiceOrderId,
                         StockMovement::getCreatedByUserId)
                 .containsExactly(
-                        tuple(filter.getId(), StockMovementType.OUT, 1, SERVICE_ORDER_ID, USER_ID),
-                        tuple(oil.getId(), StockMovementType.OUT, 6, SERVICE_ORDER_ID, USER_ID));
+                        tuple(filter, StockMovementType.OUT, 1, SERVICE_ORDER_ID, USER_ID),
+                        tuple(oil, StockMovementType.OUT, 6, SERVICE_ORDER_ID, USER_ID));
     }
 
     @Test
