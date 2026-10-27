@@ -33,6 +33,7 @@ O token vale 1h. Quando as rotas começarem a responder 401, repita o login e tr
 ### 4. Use as rotas
 
 - **Clientes → Cadastra um cliente** cria um cliente com o CPF `529.982.247-25`. Para cadastrar outro, troque o documento no corpo, porque um CPF repetido responde 409.
+- **Veículos → Cadastra um veículo de um cliente** usa o cliente de id `1`, a placa `ABC-1D23` e o chassi `9BWZZZ372VT004251`. Para cadastrar outro, troque a placa e o chassi (ou remova o chassi, que é opcional), porque placa ou chassi repetido responde 409.
 - Nas rotas com `:id`, ajuste o id na aba **Params**.
 - Cada rota traz, em **Examples**, as respostas documentadas no Swagger (sucesso e erros).
 
