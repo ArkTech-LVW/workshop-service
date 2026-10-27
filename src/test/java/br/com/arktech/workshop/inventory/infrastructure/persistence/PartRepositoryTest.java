@@ -10,6 +10,7 @@ import br.com.arktech.workshop.inventory.domain.model.PartType;
 import br.com.arktech.workshop.inventory.domain.model.Sku;
 import br.com.arktech.workshop.inventory.domain.repository.PartFilter;
 import br.com.arktech.workshop.inventory.domain.repository.PartRepository;
+import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.money.Money;
 import br.com.arktech.workshop.shared.domain.pagination.Page;
@@ -82,6 +83,41 @@ class PartRepositoryTest {
 
         assertThat(partRepository.existsBySku(new Sku(prefix + "-A"))).isTrue();
         assertThat(partRepository.existsBySku(new Sku(prefix + "-B"))).isFalse();
+    }
+
+    @Test
+    void shouldCheckSkuOfOtherParts() {
+        String prefix = uniquePrefix();
+        Part first = partRepository.save(newPart(prefix + "-a", "Filtro", PartType.PART));
+        Part second = partRepository.save(newPart(prefix + "-b", "Óleo", PartType.SUPPLY));
+        flushAndClear();
+
+        assertThat(partRepository.existsBySkuAndIdNot(new Sku(prefix + "-A"), first.getId())).isFalse();
+        assertThat(partRepository.existsBySkuAndIdNot(new Sku(prefix + "-A"), second.getId())).isTrue();
+    }
+
+    @Test
+    void shouldRemovePart() {
+        Part saved = partRepository.save(newPart(uniquePrefix(), "Filtro", PartType.PART));
+        flushAndClear();
+
+        partRepository.remove(partRepository.findRequiredById(saved.getId()));
+        flushAndClear();
+
+        assertThat(partRepository.findById(saved.getId())).isEmpty();
+    }
+
+    @Test
+    void shouldRefuseToRemoveReferencedPart() {
+        Part saved = partRepository.save(newPart(uniquePrefix(), "Filtro", PartType.PART));
+        flushAndClear();
+        jdbcTemplate.execute("CREATE TABLE part_reference (part_id BIGINT REFERENCES part (id))");
+        jdbcTemplate.update("INSERT INTO part_reference (part_id) VALUES (?)", saved.getId());
+        Part part = partRepository.findRequiredById(saved.getId());
+
+        assertThatThrownBy(() -> partRepository.remove(part))
+                .isInstanceOf(ConflictException.class)
+                .hasMessage("part.inUse");
     }
 
     @Test

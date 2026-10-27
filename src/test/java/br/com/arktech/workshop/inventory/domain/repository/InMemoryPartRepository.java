@@ -39,6 +39,11 @@ public class InMemoryPartRepository implements PartRepository {
     }
 
     @Override
+    public boolean existsBySkuAndIdNot(Sku sku, Long id) {
+        return parts.stream().anyMatch(part -> part.getSku().equals(sku) && !part.getId().equals(id));
+    }
+
+    @Override
     public Page<Part> findPage(PartFilter filter, Pagination pagination) {
         List<Part> matching = parts.stream()
                 .filter(part -> matchesName(part, filter.name()))
@@ -51,6 +56,11 @@ public class InMemoryPartRepository implements PartRepository {
                 .limit(pagination.size())
                 .toList();
         return new Page<>(content, pagination, matching.size());
+    }
+
+    @Override
+    public void remove(Part part) {
+        parts.remove(part);
     }
 
     public List<Part> findAll() {

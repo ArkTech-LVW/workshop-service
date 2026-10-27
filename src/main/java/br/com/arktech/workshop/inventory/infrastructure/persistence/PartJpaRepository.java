@@ -5,12 +5,14 @@ import br.com.arktech.workshop.inventory.domain.model.PartType;
 import br.com.arktech.workshop.inventory.domain.model.Sku;
 import br.com.arktech.workshop.inventory.domain.repository.PartFilter;
 import br.com.arktech.workshop.inventory.domain.repository.PartRepository;
+import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.pagination.Page;
 import br.com.arktech.workshop.shared.domain.pagination.Pagination;
 
 import java.util.Locale;
 
 import org.jspecify.annotations.Nullable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -28,6 +30,16 @@ interface PartJpaRepository extends JpaRepository<Part, Long>, JpaSpecificationE
                 nameContaining(filter.name()).and(skuEquals(filter.sku())).and(typeEquals(filter.type())),
                 PageRequest.of(pagination.page(), pagination.size(), PAGE_ORDER));
         return new Page<>(page.getContent(), pagination, page.getTotalElements());
+    }
+
+    @Override
+    default void remove(Part part) {
+        try {
+            delete(part);
+            flush();
+        } catch (DataIntegrityViolationException ex) {
+            throw new ConflictException("part.inUse", part.getId().toString());
+        }
     }
 
     private static Specification<Part> nameContaining(@Nullable String name) {
