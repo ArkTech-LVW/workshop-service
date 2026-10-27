@@ -18,11 +18,17 @@ public interface PartRepository {
 
     boolean existsBySkuAndIdNot(Sku sku, Long id);
 
+    Optional<Part> findForUpdateById(Long id);
+
     Page<Part> findPage(PartFilter filter, Pagination pagination);
 
     void remove(Part part);
 
     default Part findRequiredById(Long id) {
         return findById(id).orElseThrow(() -> new NotFoundException("part.notFound", id.toString()));
+    }
+
+    default Part findRequiredForUpdateById(Long id) {
+        return findForUpdateById(id).orElseThrow(() -> new NotFoundException("part.notFound", id.toString()));
     }
 }

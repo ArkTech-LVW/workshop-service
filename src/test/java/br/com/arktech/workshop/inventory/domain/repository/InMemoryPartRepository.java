@@ -44,6 +44,11 @@ public class InMemoryPartRepository implements PartRepository {
     }
 
     @Override
+    public Optional<Part> findForUpdateById(Long id) {
+        return findById(id);
+    }
+
+    @Override
     public Page<Part> findPage(PartFilter filter, Pagination pagination) {
         List<Part> matching = parts.stream()
                 .filter(part -> matchesName(part, filter.name()))
