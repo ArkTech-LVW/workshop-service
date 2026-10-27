@@ -83,6 +83,10 @@ public class Part extends BaseEntity {
         this.stockQuantity -= quantity;
     }
 
+    public boolean isLowStock() {
+        return stockQuantity <= minimumStock;
+    }
+
     private static void requirePositive(int quantity) {
         if (quantity <= 0) {
             throw new BusinessRuleException("stockMovement.quantityNotPositive");

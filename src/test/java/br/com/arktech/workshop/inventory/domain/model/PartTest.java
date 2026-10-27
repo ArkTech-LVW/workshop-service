@@ -115,6 +115,16 @@ class PartTest {
     }
 
     @Test
+    void shouldBeLowStockUpToTheMinimum() {
+        Part part = new Part(SKU, "Óleo 5W30 1L", PartType.SUPPLY, MeasurementUnit.LITER, PRICE, 2);
+
+        part.increaseStock(2);
+        assertThat(part.isLowStock()).isTrue();
+        part.increaseStock(1);
+        assertThat(part.isLowStock()).isFalse();
+    }
+
+    @Test
     void shouldRejectNegativeMinimumStock() {
         assertThatThrownBy(() -> new Part(SKU, "Óleo 5W30 1L", PartType.SUPPLY, MeasurementUnit.LITER, PRICE, -1))
                 .isInstanceOf(BusinessRuleException.class)

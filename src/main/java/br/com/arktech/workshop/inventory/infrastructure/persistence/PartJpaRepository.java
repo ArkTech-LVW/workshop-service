@@ -41,6 +41,14 @@ interface PartJpaRepository extends JpaRepository<Part, Long>, JpaSpecificationE
     Optional<Part> findForUpdateById(Long id);
 
     @Override
+    default Page<Part> findLowStockPage(Pagination pagination) {
+        Specification<Part> lowStock = (root, query, builder) ->
+                builder.lessThanOrEqualTo(root.get("stockQuantity"), root.<Integer>get("minimumStock"));
+        var page = findAll(lowStock, PageRequest.of(pagination.page(), pagination.size(), PAGE_ORDER));
+        return new Page<>(page.getContent(), pagination, page.getTotalElements());
+    }
+
+    @Override
     default void remove(Part part) {
         try {
             delete(part);

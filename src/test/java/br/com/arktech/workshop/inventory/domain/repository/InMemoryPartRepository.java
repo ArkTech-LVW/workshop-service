@@ -50,10 +50,22 @@ public class InMemoryPartRepository implements PartRepository {
 
     @Override
     public Page<Part> findPage(PartFilter filter, Pagination pagination) {
-        List<Part> matching = parts.stream()
-                .filter(part -> matchesName(part, filter.name()))
-                .filter(part -> filter.sku() == null || part.getSku().equals(filter.sku()))
-                .filter(part -> filter.type() == null || part.getType() == filter.type())
+        return page(
+                parts.stream()
+                        .filter(part -> matchesName(part, filter.name()))
+                        .filter(part -> filter.sku() == null || part.getSku().equals(filter.sku()))
+                        .filter(part -> filter.type() == null || part.getType() == filter.type())
+                        .toList(),
+                pagination);
+    }
+
+    @Override
+    public Page<Part> findLowStockPage(Pagination pagination) {
+        return page(parts.stream().filter(Part::isLowStock).toList(), pagination);
+    }
+
+    private static Page<Part> page(List<Part> filtered, Pagination pagination) {
+        List<Part> matching = filtered.stream()
                 .sorted(Comparator.comparing(Part::getName).thenComparing(Part::getId))
                 .toList();
         List<Part> content = matching.stream()

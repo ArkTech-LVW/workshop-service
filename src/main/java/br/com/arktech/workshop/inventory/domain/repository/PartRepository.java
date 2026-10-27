@@ -22,6 +22,8 @@ public interface PartRepository {
 
     Page<Part> findPage(PartFilter filter, Pagination pagination);
 
+    Page<Part> findLowStockPage(Pagination pagination);
+
     void remove(Part part);
 
     default Part findRequiredById(Long id) {
