@@ -69,6 +69,30 @@ public class Part extends BaseEntity {
         this.minimumStock = minimumStock;
     }
 
+    public void increaseStock(int quantity) {
+        requirePositive(quantity);
+        this.stockQuantity = Math.addExact(stockQuantity, quantity);
+    }
+
+    public void decreaseStock(int quantity) {
+        requirePositive(quantity);
+        if (quantity > stockQuantity) {
+            throw new BusinessRuleException("part.insufficientStock", sku.value(), stockQuantity, quantity);
+        }
+
+        this.stockQuantity -= quantity;
+    }
+
+    public boolean isLowStock() {
+        return stockQuantity <= minimumStock;
+    }
+
+    private static void requirePositive(int quantity) {
+        if (quantity <= 0) {
+            throw new BusinessRuleException("stockMovement.quantityNotPositive");
+        }
+    }
+
     private static void requireNonNegative(int minimumStock) {
         if (minimumStock < 0) {
             throw new BusinessRuleException("part.minimumStockNegative");

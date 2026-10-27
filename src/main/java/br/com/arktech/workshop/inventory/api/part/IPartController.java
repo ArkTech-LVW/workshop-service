@@ -59,6 +59,16 @@ interface IPartController {
             @Parameter(description = "${openapi.page.size}") @RequestParam(defaultValue = "20") @Positive @Max(100)
                     int size);
 
+    @Operation(summary = "${openapi.part.lowStock}", description = "${openapi.part.lowStockDescription}")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "400", ref = "BadRequest")
+    @GetMapping("/lowStock")
+    PageResponse<PartResponse> listLowStock(
+            @Parameter(description = "${openapi.page.page}") @RequestParam(defaultValue = "0") @PositiveOrZero
+                    int page,
+            @Parameter(description = "${openapi.page.size}") @RequestParam(defaultValue = "20") @Positive @Max(100)
+                    int size);
+
     @Operation(summary = "${openapi.part.findById}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "404", ref = "NotFound")

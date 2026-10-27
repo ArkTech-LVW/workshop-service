@@ -9,7 +9,10 @@ import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.pagination.Page;
 import br.com.arktech.workshop.shared.domain.pagination.Pagination;
 
+import jakarta.persistence.LockModeType;
+
 import java.util.Locale;
+import java.util.Optional;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -18,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Lock;
 
 interface PartJpaRepository extends JpaRepository<Part, Long>, JpaSpecificationExecutor<Part>, PartRepository {
 
@@ -29,6 +33,18 @@ interface PartJpaRepository extends JpaRepository<Part, Long>, JpaSpecificationE
         var page = findAll(
                 nameContaining(filter.name()).and(skuEquals(filter.sku())).and(typeEquals(filter.type())),
                 PageRequest.of(pagination.page(), pagination.size(), PAGE_ORDER));
+        return new Page<>(page.getContent(), pagination, page.getTotalElements());
+    }
+
+    @Override
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<Part> findForUpdateById(Long id);
+
+    @Override
+    default Page<Part> findLowStockPage(Pagination pagination) {
+        Specification<Part> lowStock = (root, query, builder) ->
+                builder.lessThanOrEqualTo(root.get("stockQuantity"), root.<Integer>get("minimumStock"));
+        var page = findAll(lowStock, PageRequest.of(pagination.page(), pagination.size(), PAGE_ORDER));
         return new Page<>(page.getContent(), pagination, page.getTotalElements());
     }
 

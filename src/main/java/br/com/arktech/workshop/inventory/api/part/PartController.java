@@ -6,6 +6,8 @@ import br.com.arktech.workshop.inventory.application.deletepart.DeletePartComman
 import br.com.arktech.workshop.inventory.application.deletepart.DeletePartUseCase;
 import br.com.arktech.workshop.inventory.application.findpart.FindPartQuery;
 import br.com.arktech.workshop.inventory.application.findpart.FindPartUseCase;
+import br.com.arktech.workshop.inventory.application.listlowstockparts.ListLowStockPartsQuery;
+import br.com.arktech.workshop.inventory.application.listlowstockparts.ListLowStockPartsUseCase;
 import br.com.arktech.workshop.inventory.application.listparts.ListPartsQuery;
 import br.com.arktech.workshop.inventory.application.listparts.ListPartsUseCase;
 import br.com.arktech.workshop.inventory.application.updatepart.UpdatePartCommand;
@@ -24,6 +26,7 @@ class PartController implements IPartController {
 
     private final CreatePartUseCase createPartUseCase;
     private final ListPartsUseCase listPartsUseCase;
+    private final ListLowStockPartsUseCase listLowStockPartsUseCase;
     private final FindPartUseCase findPartUseCase;
     private final UpdatePartUseCase updatePartUseCase;
     private final DeletePartUseCase deletePartUseCase;
@@ -45,6 +48,12 @@ class PartController implements IPartController {
             @Nullable String name, @Nullable String sku, @Nullable PartType type, int page, int size) {
         ListPartsQuery query = new ListPartsQuery(name, sku, type, page, size);
         return PageResponse.from(listPartsUseCase.execute(query), PartResponse::from);
+    }
+
+    @Override
+    public PageResponse<PartResponse> listLowStock(int page, int size) {
+        ListLowStockPartsQuery query = new ListLowStockPartsQuery(page, size);
+        return PageResponse.from(listLowStockPartsUseCase.execute(query), PartResponse::from);
     }
 
     @Override

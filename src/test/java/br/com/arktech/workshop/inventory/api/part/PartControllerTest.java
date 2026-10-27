@@ -17,6 +17,8 @@ import br.com.arktech.workshop.inventory.application.createpart.CreatePartUseCas
 import br.com.arktech.workshop.inventory.application.deletepart.DeletePartCommand;
 import br.com.arktech.workshop.inventory.application.deletepart.DeletePartUseCase;
 import br.com.arktech.workshop.inventory.application.findpart.FindPartUseCase;
+import br.com.arktech.workshop.inventory.application.listlowstockparts.ListLowStockPartsQuery;
+import br.com.arktech.workshop.inventory.application.listlowstockparts.ListLowStockPartsUseCase;
 import br.com.arktech.workshop.inventory.application.listparts.ListPartsQuery;
 import br.com.arktech.workshop.inventory.application.listparts.ListPartsUseCase;
 import br.com.arktech.workshop.inventory.application.part.PartResult;
@@ -79,6 +81,9 @@ class PartControllerTest {
 
     @MockitoBean
     private ListPartsUseCase listPartsUseCase;
+
+    @MockitoBean
+    private ListLowStockPartsUseCase listLowStockPartsUseCase;
 
     @MockitoBean
     private FindPartUseCase findPartUseCase;
@@ -293,6 +298,19 @@ class PartControllerTest {
                         """,
                         JsonCompareMode.LENIENT));
         verifyNoInteractions(listPartsUseCase);
+    }
+
+    @Test
+    void shouldListLowStockPartsInsteadOfLookingUpAnId() throws Exception {
+        when(listLowStockPartsUseCase.execute(new ListLowStockPartsQuery(1, 5)))
+                .thenReturn(new Page<>(List.of(OIL), new Pagination(1, 5), 6));
+
+        mockMvc.perform(get("/admin/parts/lowStock").param("page", "1").param("size", "5"))
+                .andExpect(status().isOk())
+                .andExpect(json("""
+                        {"content": [%s], "page": 1, "size": 5, "totalElements": 6, "totalPages": 2}
+                        """.formatted(OIL_JSON)));
+        verifyNoInteractions(findPartUseCase);
     }
 
     @Test
