@@ -230,6 +230,26 @@ class OpenApiDocsTest {
     }
 
     @Test
+    void shouldDocumentVehicleManagementAsAdminOnly() {
+        String vehicles = "$.paths['/admin/vehicles']";
+        String vehicle = "$.paths['/admin/vehicles/{id}']";
+        String customerVehicles = "$.paths['/admin/customers/{customerId}/vehicles']";
+
+        assertThat(spec.read(vehicles + ".post.tags", List.class)).containsExactly("Veículos");
+        assertThat(spec.read(vehicles + ".post.responses", Map.class))
+                .containsOnlyKeys("201", "400", "401", "403", "404", "409", "429", "500");
+        assertThat(spec.read(vehicles + ".get.parameters[*].name", List.class))
+                .containsExactly("licensePlate", "page", "size");
+        assertThat(spec.read(vehicle + ".get.responses", Map.class))
+                .containsOnlyKeys("200", "401", "403", "404", "429", "500");
+        assertThat(spec.read(customerVehicles + ".get.tags", List.class)).containsExactly("Veículos");
+        assertThat(spec.read(customerVehicles + ".get.parameters[*].name", List.class))
+                .containsExactly("customerId", "page", "size");
+        assertThat(spec.read(customerVehicles + ".get.responses", Map.class))
+                .containsOnlyKeys("200", "400", "401", "403", "404", "429", "500");
+    }
+
+    @Test
     void shouldHideErrorController() {
         Map<String, Object> paths = spec.read("$.paths");
 

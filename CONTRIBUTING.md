@@ -263,6 +263,7 @@ interface ICustomerController {
 
 - As rotas protegidas exigem um token JWT no header `Authorization: Bearer <token>`.
 - Sem token, ou com token inválido ou expirado: 401 (`auth.unauthenticated` ou `auth.invalidToken`). Com token, mas sem permissão: 403 (`auth.accessDenied`). Os dois saem pelo `GlobalExceptionHandler`, como os demais erros.
+- As rotas públicas (`@PublicEndpoint`, `/docs`, `/actuator/health`) ignoram o header `Authorization`: com token inválido ou vencido, respondem como se ele não existisse. Quem decide é o `PublicRouteBearerTokenResolver`, a partir das mesmas regras de acesso da autorização.
 - O caso de uso que precisa do IP do cliente injeta `ClientAddress` (`shared/application/security`) e chama `clientAddress.ip()`. Atrás de proxy confiável, já é o IP real (ver [Rate limit](#rate-limit)).
 - O caso de uso que precisa registrar quem fez a ação injeta `CurrentUser` (`shared/application/security`) e chama `currentUser.id()`. O id vem do token (`sub`). Os outros módulos guardam esse `Long`, nunca o `User`.
 - Senhas com hash Argon2id, pelo `PasswordHasher` do `auth`. Nunca logue nem devolva senha ou hash.

@@ -2,8 +2,11 @@ package br.com.arktech.workshop.auth.infrastructure.config;
 
 import br.com.arktech.workshop.auth.infrastructure.ratelimit.RateLimitFilter;
 import br.com.arktech.workshop.auth.infrastructure.security.EndpointAuthorizationManager;
+import br.com.arktech.workshop.auth.infrastructure.security.PublicRouteBearerTokenResolver;
 
 import jakarta.servlet.DispatcherType;
+
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -17,11 +20,20 @@ import org.springframework.security.oauth2.server.resource.web.authentication.Be
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
 @EnableConfigurationProperties(RateLimitProperties.class)
 class SecurityConfig {
+
+    private static final RequestMatcher PUBLIC_PATHS = new OrRequestMatcher(
+            Stream.of("/actuator/health", "/actuator/health/**", "/docs", "/docs/**", "/swagger-ui/**")
+                    .map(PathPatternRequestMatcher.withDefaults()::matcher)
+                    .map(RequestMatcher.class::cast)
+                    .toList());
 
     @Bean
     SecurityFilterChain securityFilterChain(
@@ -44,11 +56,13 @@ class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(requests -> requests
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
-                        .requestMatchers("/actuator/health", "/actuator/health/**", "/docs", "/docs/**", "/swagger-ui/**")
+                        .requestMatchers(PUBLIC_PATHS)
                         .permitAll()
                         .anyRequest()
                         .access(endpointAuthorizationManager))
                 .oauth2ResourceServer(resourceServer -> resourceServer
+                        .bearerTokenResolver(
+                                new PublicRouteBearerTokenResolver(PUBLIC_PATHS, endpointAuthorizationManager))
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter))
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler))
