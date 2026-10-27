@@ -1,10 +1,13 @@
 package br.com.arktech.workshop.registry.domain.repository;
 
 import br.com.arktech.workshop.registry.domain.model.Vehicle;
+import br.com.arktech.workshop.shared.domain.pagination.Page;
+import br.com.arktech.workshop.shared.domain.pagination.Pagination;
 import br.com.arktech.workshop.shared.domain.vehicle.Chassis;
 import br.com.arktech.workshop.shared.domain.vehicle.LicensePlate;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +41,22 @@ public class InMemoryVehicleRepository implements VehicleRepository {
     @Override
     public boolean existsByChassis(Chassis chassis) {
         return vehicles.stream().anyMatch(vehicle -> chassis.equals(vehicle.getChassis()));
+    }
+
+    @Override
+    public Page<Vehicle> findPage(VehicleFilter filter, Pagination pagination) {
+        List<Vehicle> matching = vehicles.stream()
+                .filter(vehicle ->
+                        filter.licensePlate() == null || vehicle.getLicensePlate().equals(filter.licensePlate()))
+                .filter(vehicle -> filter.customerId() == null || vehicle.getCustomerId().equals(filter.customerId()))
+                .sorted(Comparator.comparing((Vehicle vehicle) -> vehicle.getLicensePlate().value())
+                        .thenComparing(Vehicle::getId))
+                .toList();
+        List<Vehicle> content = matching.stream()
+                .skip((long) pagination.page() * pagination.size())
+                .limit(pagination.size())
+                .toList();
+        return new Page<>(content, pagination, matching.size());
     }
 
     public List<Vehicle> findAll() {

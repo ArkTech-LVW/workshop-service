@@ -12,12 +12,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import br.com.arktech.workshop.registry.application.createvehicle.CreateVehicleCommand;
 import br.com.arktech.workshop.registry.application.createvehicle.CreateVehicleUseCase;
 import br.com.arktech.workshop.registry.application.findvehicle.FindVehicleUseCase;
+import br.com.arktech.workshop.registry.application.listvehicles.ListVehiclesQuery;
+import br.com.arktech.workshop.registry.application.listvehicles.ListVehiclesUseCase;
 import br.com.arktech.workshop.registry.application.vehicle.VehicleResult;
 import br.com.arktech.workshop.shared.api.error.ApiErrorTestConfig;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
+import br.com.arktech.workshop.shared.domain.pagination.Page;
+import br.com.arktech.workshop.shared.domain.pagination.Pagination;
 
 import java.time.Year;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +35,7 @@ import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
-@WebMvcTest(controllers = VehicleController.class)
+@WebMvcTest(controllers = {VehicleController.class, CustomerVehicleController.class})
 @AutoConfigureMockMvc(addFilters = false)
 @Import(ApiErrorTestConfig.class)
 class VehicleControllerTest {
@@ -52,6 +57,9 @@ class VehicleControllerTest {
 
     @MockitoBean
     private CreateVehicleUseCase createVehicleUseCase;
+
+    @MockitoBean
+    private ListVehiclesUseCase listVehiclesUseCase;
 
     @MockitoBean
     private FindVehicleUseCase findVehicleUseCase;
@@ -174,6 +182,75 @@ class VehicleControllerTest {
                 .andExpect(json("""
                         {"code": "vehicle.chassisAlreadyExists",
                          "message": "Já existe um veículo com o chassi 9BWZZZ372VT004251."}
+                        """));
+    }
+
+    @Test
+    void shouldListWithDefaultPagination() throws Exception {
+        when(listVehiclesUseCase.execute(new ListVehiclesQuery(null, null, 0, 20)))
+                .thenReturn(new Page<>(List.of(GOL), new Pagination(0, 20), 1));
+
+        mockMvc.perform(get("/admin/vehicles"))
+                .andExpect(status().isOk())
+                .andExpect(json("""
+                        {"content": [%s], "page": 0, "size": 20, "totalElements": 1, "totalPages": 1}
+                        """.formatted(GOL_JSON)));
+    }
+
+    @Test
+    void shouldFilterByLicensePlate() throws Exception {
+        when(listVehiclesUseCase.execute(new ListVehiclesQuery("abc-1d23", null, 0, 20)))
+                .thenReturn(new Page<>(List.of(GOL), new Pagination(0, 20), 1));
+
+        mockMvc.perform(get("/admin/vehicles").param("licensePlate", "abc-1d23"))
+                .andExpect(status().isOk())
+                .andExpect(json("""
+                        {"content": [%s], "totalElements": 1}
+                        """.formatted(GOL_JSON), JsonCompareMode.LENIENT));
+    }
+
+    @Test
+    void shouldValidateLicensePlateFilterAndPagination() throws Exception {
+        mockMvc.perform(get("/admin/vehicles")
+                        .param("licensePlate", "123")
+                        .param("page", "-1")
+                        .param("size", "101"))
+                .andExpect(status().isBadRequest())
+                .andExpect(json(
+                        """
+                        {
+                          "code": "request.invalidFields",
+                          "details": [
+                            {"field": "licensePlate", "message": "Placa inválida."},
+                            {"field": "page", "message": "Deve ser maior ou igual a zero."},
+                            {"field": "size", "message": "Deve ser no máximo 100."}
+                          ]
+                        }
+                        """,
+                        JsonCompareMode.LENIENT));
+        verifyNoInteractions(listVehiclesUseCase);
+    }
+
+    @Test
+    void shouldListVehiclesOfCustomer() throws Exception {
+        when(listVehiclesUseCase.execute(new ListVehiclesQuery(null, 7L, 0, 20)))
+                .thenReturn(new Page<>(List.of(GOL), new Pagination(0, 20), 1));
+
+        mockMvc.perform(get("/admin/customers/7/vehicles"))
+                .andExpect(status().isOk())
+                .andExpect(json("""
+                        {"content": [%s], "page": 0, "size": 20, "totalElements": 1, "totalPages": 1}
+                        """.formatted(GOL_JSON)));
+    }
+
+    @Test
+    void shouldAnswer404WhenListingVehiclesOfUnknownCustomer() throws Exception {
+        when(listVehiclesUseCase.execute(any())).thenThrow(new NotFoundException("customer.notFound", "1234"));
+
+        mockMvc.perform(get("/admin/customers/1234/vehicles"))
+                .andExpect(status().isNotFound())
+                .andExpect(json("""
+                        {"code": "customer.notFound", "message": "Cliente 1234 não encontrado."}
                         """));
     }
 
