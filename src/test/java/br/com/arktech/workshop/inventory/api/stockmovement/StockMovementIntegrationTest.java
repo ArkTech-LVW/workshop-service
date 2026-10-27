@@ -1,5 +1,6 @@
 package br.com.arktech.workshop.inventory.api.stockmovement;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -11,6 +12,7 @@ import br.com.arktech.workshop.shared.domain.security.Role;
 
 import com.jayway.jsonpath.JsonPath;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -45,7 +47,8 @@ class StockMovementIntegrationTest {
     static Stream<Arguments> stockEndpoints() {
         return Stream.of(
                 Arguments.of(post("/admin/parts/1/stockMovements").contentType(MediaType.APPLICATION_JSON).content("{}")),
-                Arguments.of(get("/admin/parts/1/stockMovements")));
+                Arguments.of(get("/admin/parts/1/stockMovements")),
+                Arguments.of(get("/admin/parts/lowStock")));
     }
 
     @BeforeEach
@@ -115,6 +118,23 @@ class StockMovementIntegrationTest {
 
         asAdmin(get("/admin/parts/{id}", partId)).andExpect(jsonPath("$.stockQuantity").value(2));
         asAdmin(get("/admin/parts/{id}/stockMovements", partId)).andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void shouldListPartsThatNeedRestocking() throws Exception {
+        Integer low = createPart(5);
+        Integer enough = createPart(1);
+        movement(low, "IN", 5, null).andExpect(status().isCreated());
+        movement(enough, "IN", 5, null).andExpect(status().isCreated());
+
+        String body = asAdmin(get("/admin/parts/lowStock").param("size", "100"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<Integer> ids = JsonPath.read(body, "$.content[*].id");
+        assertThat(ids).contains(low).doesNotContain(enough);
     }
 
     private ResultActions movement(Integer partId, String type, int quantity, String reason) throws Exception {
