@@ -16,6 +16,8 @@ public interface VehicleRepository {
 
     Optional<Vehicle> findById(Long id);
 
+    Optional<Vehicle> findByLicensePlate(LicensePlate licensePlate);
+
     boolean existsByLicensePlate(LicensePlate licensePlate);
 
     boolean existsByLicensePlateAndIdNot(LicensePlate licensePlate, Long id);

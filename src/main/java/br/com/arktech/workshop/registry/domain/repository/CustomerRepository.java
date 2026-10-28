@@ -15,6 +15,8 @@ public interface CustomerRepository {
 
     Optional<Customer> findById(Long id);
 
+    Optional<Customer> findByDocument(CPFCNPJ document);
+
     boolean existsByDocument(CPFCNPJ document);
 
     boolean existsByDocumentAndIdNot(CPFCNPJ document, Long id);

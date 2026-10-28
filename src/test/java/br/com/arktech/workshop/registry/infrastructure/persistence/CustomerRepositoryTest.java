@@ -84,6 +84,18 @@ class CustomerRepositoryTest {
     }
 
     @Test
+    void shouldFindCustomerByDocument() {
+        Customer saved = customerRepository.save(newCustomer("Ana", "529.982.247-25"));
+        flushAndClear();
+
+        assertThat(customerRepository.findByDocument(CPFCNPJ.of("52998224725")))
+                .get()
+                .extracting(Customer::getId)
+                .isEqualTo(saved.getId());
+        assertThat(customerRepository.findByDocument(CPFCNPJ.of("12345678909"))).isEmpty();
+    }
+
+    @Test
     void shouldCheckDocumentIgnoringItsOwnCustomer() {
         Customer saved = customerRepository.save(newCustomer("Ana", "529.982.247-25"));
         flushAndClear();

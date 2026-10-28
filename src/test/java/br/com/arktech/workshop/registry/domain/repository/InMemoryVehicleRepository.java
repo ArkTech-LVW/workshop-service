@@ -34,6 +34,11 @@ public class InMemoryVehicleRepository implements VehicleRepository {
     }
 
     @Override
+    public Optional<Vehicle> findByLicensePlate(LicensePlate licensePlate) {
+        return vehicles.stream().filter(vehicle -> vehicle.getLicensePlate().equals(licensePlate)).findFirst();
+    }
+
+    @Override
     public boolean existsByLicensePlate(LicensePlate licensePlate) {
         return vehicles.stream().anyMatch(vehicle -> vehicle.getLicensePlate().equals(licensePlate));
     }

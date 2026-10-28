@@ -33,6 +33,11 @@ public class InMemoryCustomerRepository implements CustomerRepository {
     }
 
     @Override
+    public Optional<Customer> findByDocument(CPFCNPJ document) {
+        return customers.stream().filter(customer -> customer.getDocument().equals(document)).findFirst();
+    }
+
+    @Override
     public boolean existsByDocument(CPFCNPJ document) {
         return customers.stream().anyMatch(customer -> customer.getDocument().equals(document));
     }

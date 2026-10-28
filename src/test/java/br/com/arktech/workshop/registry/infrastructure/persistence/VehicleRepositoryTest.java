@@ -105,6 +105,18 @@ class VehicleRepositoryTest {
     }
 
     @Test
+    void shouldFindVehicleByLicensePlate() {
+        Vehicle saved = vehicleRepository.save(newVehicle(ana, "ABC1234", null));
+        flushAndClear();
+
+        assertThat(vehicleRepository.findByLicensePlate(new LicensePlate("abc-1234")))
+                .get()
+                .extracting(Vehicle::getId)
+                .isEqualTo(saved.getId());
+        assertThat(vehicleRepository.findByLicensePlate(new LicensePlate("XYZ9876"))).isEmpty();
+    }
+
+    @Test
     void shouldCheckLicensePlateAndChassisIgnoringItsOwnVehicle() {
         Vehicle saved = vehicleRepository.save(newVehicle(ana, "ABC1234", "1HGCM82633A004352"));
         flushAndClear();
