@@ -35,6 +35,7 @@ import jakarta.persistence.EntityManager;
 
 import java.math.BigDecimal;
 import java.time.Year;
+import java.time.ZoneId;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -70,6 +71,9 @@ class ServiceOrderRepositoryTest {
 
     @Autowired
     private PartRepository partRepository;
+
+    @Autowired
+    private ServiceOrderJpaRepository serviceOrderJpaRepository;
 
     @Autowired
     private EntityManager entityManager;
@@ -206,14 +210,22 @@ class ServiceOrderRepositoryTest {
     }
 
     @Test
-    void shouldGenerateSequentialNumbersForTheCurrentYear() {
+    void shouldGenerateSequentialNumbersForTheCurrentYearInSaoPaulo() {
         ServiceOrderNumber first = serviceOrderRepository.nextNumber();
         ServiceOrderNumber second = serviceOrderRepository.nextNumber();
 
-        String prefix = "SO-" + Year.now() + "-";
+        String prefix = "SO-" + Year.now(ZoneId.of("America/Sao_Paulo")) + "-";
         assertThat(first.value()).startsWith(prefix);
         assertThat(second.value()).startsWith(prefix);
         assertThat(sequenceOf(second)).isEqualTo(sequenceOf(first) + 1);
+    }
+
+    @Test
+    void shouldStartTheCountOverInEachYear() {
+        assertThat(serviceOrderJpaRepository.incrementNumberCounter(1999)).isEqualTo(1);
+        assertThat(serviceOrderJpaRepository.incrementNumberCounter(1999)).isEqualTo(2);
+        assertThat(serviceOrderJpaRepository.incrementNumberCounter(2000)).isEqualTo(1);
+        assertThat(serviceOrderJpaRepository.incrementNumberCounter(1999)).isEqualTo(3);
     }
 
     @Test

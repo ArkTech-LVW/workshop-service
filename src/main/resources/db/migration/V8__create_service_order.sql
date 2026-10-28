@@ -1,4 +1,10 @@
-CREATE SEQUENCE service_order_number_seq;
+CREATE TABLE service_order_number_counter (
+    year          INTEGER      PRIMARY KEY,
+    last_value    BIGINT       NOT NULL CHECK (last_value > 0),
+    date_created  TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    last_updated  TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    version       BIGINT       NOT NULL DEFAULT 0
+);
 
 CREATE TABLE service_order (
     id                   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
