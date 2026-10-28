@@ -392,6 +392,7 @@ public record ApiFieldError(@Nullable String field, String message) {}
 - **Integração:** anote a classe com `@IntegrationTest` (ou `@IntegrationTest(webEnvironment = RANDOM_PORT)` para chamar via HTTP). A anotação sobe a aplicação inteira contra um PostgreSQL real (Testcontainers), no perfil `test` (sem herdar o `development`) e com uma `JWT_SECRET` de teste, já com `MockMvc` (com a segurança ligada), e marca o teste com a tag JUnit `integration`. O Docker precisa estar rodando.
 - **Rotas protegidas nos testes de integração:** gere o token com o `TokenIssuer` (`tokenIssuer.issue(userId, Set.of(Role.ADMIN))`) e envie no header `Authorization: Bearer <token>`. Veja o `EndpointAuthorizationTest`.
 - Controllers criados só para teste também declaram o acesso, porque o `EndpointAccessCoverageTest` os percorre junto com os de produção.
+- Os testes de integração compartilham o banco e não o limpam entre si: gere CPF, CNPJ, placa e chassi com o `UniqueTestData` (`uniqueCPF()`, `uniquePlate()`...) para um teste não colidir com os dados de outro.
 - Use `@IntegrationTest` só quando o teste precisa da aplicação ou do banco de verdade. Testes com a mesma configuração compartilham contexto e container; cada configuração diferente (ex.: outro `webEnvironment`) sobe os seus.
 - **Cobertura:** o `./gradlew build` também gera o relatório do JaCoCo em `build/reports/jacoco/test/html/index.html`, mesmo quando algum teste falha.
 

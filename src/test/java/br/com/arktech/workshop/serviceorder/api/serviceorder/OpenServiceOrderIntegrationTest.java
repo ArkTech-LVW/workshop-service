@@ -1,5 +1,8 @@
 package br.com.arktech.workshop.serviceorder.api.serviceorder;
 
+import static br.com.arktech.workshop.UniqueTestData.uniqueCPF;
+import static br.com.arktech.workshop.UniqueTestData.uniquePlate;
+import static br.com.arktech.workshop.UniqueTestData.withHyphen;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.Matchers.nullValue;
@@ -22,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,8 +38,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 @IntegrationTest
 class OpenServiceOrderIntegrationTest {
-
-    private static final String LETTERS = "ABCDEFGHJKLMNPRSTUVWXYZ";
 
     @Autowired
     private MockMvc mockMvc;
@@ -229,29 +229,5 @@ class OpenServiceOrderIntegrationTest {
 
     private String tokenFor(Role... roles) {
         return tokenIssuer.issue(userId, Set.of(roles)).value();
-    }
-
-    private static String uniquePlate() {
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-        return "" + randomOf(LETTERS) + randomOf(LETTERS) + randomOf(LETTERS) + random.nextInt(10)
-                + randomOf(LETTERS) + "%02d".formatted(random.nextInt(100));
-    }
-
-    private static String withHyphen(String licensePlate) {
-        return licensePlate.substring(0, 3) + "-" + licensePlate.substring(3);
-    }
-
-    private static char randomOf(String characters) {
-        return characters.charAt(ThreadLocalRandom.current().nextInt(characters.length()));
-    }
-
-    private static CPFCNPJ uniqueCPF() {
-        String base = "%09d".formatted(ThreadLocalRandom.current().nextLong(1_000_000_000L));
-        return IntStream.range(0, 100)
-                .mapToObj(checkDigits -> base + "%02d".formatted(checkDigits))
-                .filter(CPFCNPJ::isValid)
-                .findFirst()
-                .map(CPFCNPJ::of)
-                .orElseThrow();
     }
 }
