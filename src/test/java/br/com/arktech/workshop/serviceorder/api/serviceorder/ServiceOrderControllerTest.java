@@ -19,6 +19,7 @@ import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -48,6 +49,10 @@ class ServiceOrderControllerTest {
             null,
             "Barulho ao frear",
             ServiceOrderStatus.RECEIVED,
+            List.of(),
+            List.of(),
+            new BigDecimal("0.00"),
+            new BigDecimal("0.00"),
             new BigDecimal("0.00"),
             Instant.parse("2026-10-27T14:30:00Z"));
     private static final String CUSTOMER_NOT_REGISTERED = "Nenhum cliente cadastrado com o CPF/CNPJ 529.982.247-25. "
@@ -74,7 +79,8 @@ class ServiceOrderControllerTest {
                 .andExpect(json("""
                         {"id": 1, "publicId": "3f1c2b8e-7d4a-4c9e-9b1f-2a6d8e5c4b3a", "number": "SO-2026-000123",
                          "customerId": 10, "vehicleId": 20, "mechanicId": null,
-                         "problemDescription": "Barulho ao frear", "status": "RECEIVED", "totalPrice": 0.00,
+                         "problemDescription": "Barulho ao frear", "status": "RECEIVED", "services": [], "parts": [],
+                         "servicesTotal": 0.00, "partsTotal": 0.00, "totalPrice": 0.00,
                          "dateCreated": "2026-10-27T14:30:00Z"}
                         """));
         verify(openServiceOrderUseCase)
