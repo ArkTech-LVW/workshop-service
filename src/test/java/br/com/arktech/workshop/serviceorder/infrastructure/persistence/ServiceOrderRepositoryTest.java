@@ -224,6 +224,17 @@ class ServiceOrderRepositoryTest {
     }
 
     @Test
+    void shouldStoreTheHighestTotalPriceTheAggregateAccepts() {
+        Money highest = new Money(new BigDecimal("9999999999.99"));
+        ServiceOrder serviceOrder = newServiceOrder(new ServiceOrderNumber("SO-2026-900005"));
+        serviceOrder.addServiceItem(serviceOfferingId, 1, highest);
+        Long id = serviceOrderRepository.save(serviceOrder).getId();
+        flushAndClear();
+
+        assertThat(serviceOrderRepository.findRequiredById(id).getTotalPrice()).isEqualTo(highest);
+    }
+
+    @Test
     void shouldRejectDuplicatedNumber() {
         serviceOrderRepository.save(newServiceOrder(new ServiceOrderNumber("SO-2026-900003")));
         flushAndClear();

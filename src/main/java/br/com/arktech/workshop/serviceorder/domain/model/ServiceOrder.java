@@ -20,6 +20,7 @@ import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -37,6 +38,8 @@ import org.jspecify.annotations.Nullable;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ServiceOrder extends BaseEntity {
+
+    private static final Money MAX_TOTAL_PRICE = new Money(new BigDecimal("9999999999.99"));
 
     private UUID publicId;
 
@@ -113,13 +116,17 @@ public class ServiceOrder extends BaseEntity {
 
     public void addServiceItem(Long serviceOfferingId, int quantity, Money unitPrice) {
         requireItemChangesAllowed();
-        serviceItems.add(new ServiceItem(this, serviceOfferingId, quantity, unitPrice));
+        ServiceItem item = new ServiceItem(this, serviceOfferingId, quantity, unitPrice);
+        requireTotalPriceWithinLimit(item);
+        serviceItems.add(item);
         recalculateTotalPrice();
     }
 
     public void addPartItem(Long partId, int quantity, Money unitPrice) {
         requireItemChangesAllowed();
-        partItems.add(new PartItem(this, partId, quantity, unitPrice));
+        PartItem item = new PartItem(this, partId, quantity, unitPrice);
+        requireTotalPriceWithinLimit(item);
+        partItems.add(item);
         recalculateTotalPrice();
     }
 
@@ -218,6 +225,12 @@ public class ServiceOrder extends BaseEntity {
     private void requireItemChangesAllowed() {
         if (!status.allowsItemChanges()) {
             throw new BusinessRuleException("serviceOrder.itemsLocked");
+        }
+    }
+
+    private void requireTotalPriceWithinLimit(ServiceOrderItem newItem) {
+        if (totalPrice.plus(newItem.getSubtotal()).isGreaterThan(MAX_TOTAL_PRICE)) {
+            throw new BusinessRuleException("serviceOrder.totalPriceTooHigh");
         }
     }
 

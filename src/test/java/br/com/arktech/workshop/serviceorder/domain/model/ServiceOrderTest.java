@@ -284,6 +284,33 @@ class ServiceOrderTest {
         assertThat(serviceOrder.getTotalPrice()).isEqualTo(LABOR_PRICE);
     }
 
+    @Test
+    void shouldRefuseAnItemThatPushesTheTotalPastWhatTheColumnHolds() {
+        ServiceOrder serviceOrder = newServiceOrder();
+        serviceOrder.addServiceItem(SERVICE_OFFERING_ID, 1, new Money(new BigDecimal("9999999999.00")));
+
+        assertThatThrownBy(() -> serviceOrder.addPartItem(PART_ID, 1, new Money(new BigDecimal("1.00"))))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("serviceOrder.totalPriceTooHigh");
+        assertThat(serviceOrder.getPartItems()).isEmpty();
+        assertThat(serviceOrder.getTotalPrice()).isEqualTo(new Money(new BigDecimal("9999999999.00")));
+
+        serviceOrder.addPartItem(PART_ID, 1, new Money(new BigDecimal("0.99")));
+
+        assertThat(serviceOrder.getTotalPrice()).isEqualTo(new Money(new BigDecimal("9999999999.99")));
+    }
+
+    @Test
+    void shouldRefuseAQuantityWhoseSubtotalIsTooHigh() {
+        ServiceOrder serviceOrder = newServiceOrder();
+
+        assertThatThrownBy(() -> serviceOrder.addServiceItem(SERVICE_OFFERING_ID, Integer.MAX_VALUE, LABOR_PRICE))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("serviceOrder.totalPriceTooHigh");
+        assertThat(serviceOrder.getServiceItems()).isEmpty();
+        assertThat(serviceOrder.getTotalPrice()).isEqualTo(Money.ZERO);
+    }
+
     @ParameterizedTest
     @ValueSource(ints = {0, -1})
     void shouldRejectNonPositiveQuantity(int quantity) {
