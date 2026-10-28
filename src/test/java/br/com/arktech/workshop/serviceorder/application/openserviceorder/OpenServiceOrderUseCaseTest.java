@@ -14,7 +14,6 @@ import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
-import br.com.arktech.workshop.shared.domain.vehicle.LicensePlate;
 
 import java.math.BigDecimal;
 import java.time.Year;
@@ -30,8 +29,7 @@ class OpenServiceOrderUseCaseTest {
     private static final Long ATTENDANT_ID = 7L;
     private static final Long ANA_ID = 10L;
     private static final Long GOL_ID = 20L;
-    private static final OpenServiceOrderCommand.Vehicle GOL =
-            new OpenServiceOrderCommand.Vehicle("abc-1d23", "Volkswagen", "Gol", 2020, "Prata");
+    private static final VehicleDetails GOL = new VehicleDetails("abc-1d23", "Volkswagen", "Gol", 2020, "Prata");
 
     private final InMemoryServiceOrderRepository serviceOrderRepository = new InMemoryServiceOrderRepository();
     private final Map<CPFCNPJ, Long> customers = Map.of(CPFCNPJ.of("52998224725"), ANA_ID);
@@ -56,8 +54,7 @@ class OpenServiceOrderUseCaseTest {
         assertThat(result.problemDescription()).isEqualTo("Barulho ao frear");
         assertThat(result.status()).isEqualTo(ServiceOrderStatus.RECEIVED);
         assertThat(result.totalPrice()).isEqualByComparingTo(BigDecimal.ZERO);
-        assertThat(requestedVehicles)
-                .containsExactly(new VehicleDetails(new LicensePlate("ABC1D23"), "Volkswagen", "Gol", 2020, "Prata"));
+        assertThat(requestedVehicles).containsExactly(GOL);
         assertThat(serviceOrderRepository.findAll())
                 .singleElement()
                 .satisfies(serviceOrder -> assertThat(serviceOrder.getStatusHistory())
@@ -90,7 +87,7 @@ class OpenServiceOrderUseCaseTest {
     @Test
     void shouldNotOpenWhenThePlateBelongsToAnotherCustomer() {
         VehicleDirectory otherCustomersVehicle = (customerId, vehicle) -> {
-            throw new ConflictException("vehicle.licensePlateOfAnotherCustomer", vehicle.licensePlate().value());
+            throw new ConflictException("vehicle.licensePlateOfAnotherCustomer", vehicle.licensePlate());
         };
 
         assertThatThrownBy(() -> useCase(otherCustomersVehicle)
@@ -101,19 +98,11 @@ class OpenServiceOrderUseCaseTest {
     }
 
     @Test
-    void shouldRejectAnInvalidDocumentOrPlateBeforeLookingAnythingUp() {
-        OpenServiceOrderUseCase openServiceOrderUseCase = useCase(vehicleDirectory);
-        OpenServiceOrderCommand.Vehicle invalidPlate =
-                new OpenServiceOrderCommand.Vehicle("AB-12", "Volkswagen", "Gol", 2020, "Prata");
-
-        assertThatThrownBy(() -> openServiceOrderUseCase.execute(
-                        new OpenServiceOrderCommand("123", GOL, "Barulho ao frear")))
+    void shouldRejectAnInvalidDocumentBeforeLookingAnythingUp() {
+        assertThatThrownBy(() -> useCase(vehicleDirectory)
+                        .execute(new OpenServiceOrderCommand("123", GOL, "Barulho ao frear")))
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessage("cpfCnpj.invalid");
-        assertThatThrownBy(() -> openServiceOrderUseCase.execute(
-                        new OpenServiceOrderCommand("52998224725", invalidPlate, "Barulho ao frear")))
-                .isInstanceOf(BusinessRuleException.class)
-                .hasMessage("licensePlate.invalid");
         assertThat(requestedVehicles).isEmpty();
         assertThat(serviceOrderRepository.findAll()).isEmpty();
     }

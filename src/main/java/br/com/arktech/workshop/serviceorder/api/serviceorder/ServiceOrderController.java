@@ -2,6 +2,7 @@ package br.com.arktech.workshop.serviceorder.api.serviceorder;
 
 import br.com.arktech.workshop.serviceorder.application.openserviceorder.OpenServiceOrderCommand;
 import br.com.arktech.workshop.serviceorder.application.openserviceorder.OpenServiceOrderUseCase;
+import br.com.arktech.workshop.shared.application.registry.VehicleDetails;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +19,7 @@ class ServiceOrderController implements IServiceOrderController {
         ServiceOrderVehicleRequest vehicle = request.vehicle();
         OpenServiceOrderCommand command = new OpenServiceOrderCommand(
                 request.customerDocument(),
-                new OpenServiceOrderCommand.Vehicle(
+                new VehicleDetails(
                         vehicle.licensePlate(), vehicle.brand(), vehicle.model(), vehicle.year(), vehicle.color()),
                 request.problemDescription());
         return ServiceOrderResponse.from(openServiceOrderUseCase.execute(command));

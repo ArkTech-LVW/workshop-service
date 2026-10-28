@@ -1,7 +1,6 @@
 package br.com.arktech.workshop.serviceorder.application.openserviceorder;
 
-public record OpenServiceOrderCommand(String customerDocument, Vehicle vehicle, String problemDescription) {
+import br.com.arktech.workshop.shared.application.registry.VehicleDetails;
 
-    public record Vehicle(String licensePlate, String brand, String model, int year, String color) {
-    }
+public record OpenServiceOrderCommand(String customerDocument, VehicleDetails vehicle, String problemDescription) {
 }

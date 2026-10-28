@@ -13,6 +13,7 @@ import br.com.arktech.workshop.serviceorder.application.openserviceorder.OpenSer
 import br.com.arktech.workshop.serviceorder.application.serviceorder.ServiceOrderResult;
 import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderStatus;
 import br.com.arktech.workshop.shared.api.error.ApiErrorTestConfig;
+import br.com.arktech.workshop.shared.application.registry.VehicleDetails;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 
@@ -79,7 +80,7 @@ class ServiceOrderControllerTest {
         verify(openServiceOrderUseCase)
                 .execute(new OpenServiceOrderCommand(
                         "529.982.247-25",
-                        new OpenServiceOrderCommand.Vehicle("abc-1d23", "Volkswagen", "Gol", 2020, "Prata"),
+                        new VehicleDetails("abc-1d23", "Volkswagen", "Gol", 2020, "Prata"),
                         "Barulho ao frear"));
     }
 

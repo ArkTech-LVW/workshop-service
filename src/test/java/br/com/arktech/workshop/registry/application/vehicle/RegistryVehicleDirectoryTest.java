@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import br.com.arktech.workshop.registry.domain.model.Vehicle;
 import br.com.arktech.workshop.registry.domain.repository.InMemoryVehicleRepository;
 import br.com.arktech.workshop.shared.application.registry.VehicleDetails;
+import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.vehicle.LicensePlate;
 
@@ -22,8 +23,8 @@ class RegistryVehicleDirectoryTest {
 
     @Test
     void shouldRegisterAVehicleWithAnUnknownPlateForTheCustomer() {
-        Long id =
-                vehicleDirectory.findOrRegister(ANA_ID, new VehicleDetails(PLATE, "Volkswagen", "Gol", 2020, "Prata"));
+        Long id = vehicleDirectory.findOrRegister(
+                ANA_ID, new VehicleDetails("abc-1d23", "Volkswagen", "Gol", 2020, "Prata"));
 
         assertThat(vehicleRepository.findAll()).singleElement().satisfies(vehicle -> {
             assertThat(vehicle.getId()).isEqualTo(id);
@@ -41,7 +42,8 @@ class RegistryVehicleDirectoryTest {
     void shouldReuseTheVehicleTheCustomerAlreadyHasWithoutChangingIt() {
         Vehicle gol = vehicleRepository.save(new Vehicle(ANA_ID, PLATE, null, "Volkswagen", "Gol", 2020, "Prata"));
 
-        Long id = vehicleDirectory.findOrRegister(ANA_ID, new VehicleDetails(PLATE, "Fiat", "Uno", 2010, "Branco"));
+        Long id = vehicleDirectory.findOrRegister(
+                ANA_ID, new VehicleDetails("ABC-1D23", "Fiat", "Uno", 2010, "Branco"));
 
         assertThat(id).isEqualTo(gol.getId());
         assertThat(vehicleRepository.findAll()).containsExactly(gol);
@@ -54,9 +56,18 @@ class RegistryVehicleDirectoryTest {
         Vehicle gol = vehicleRepository.save(new Vehicle(ANA_ID, PLATE, null, "Volkswagen", "Gol", 2020, "Prata"));
 
         assertThatThrownBy(() -> vehicleDirectory.findOrRegister(
-                        BIA_ID, new VehicleDetails(PLATE, "Volkswagen", "Gol", 2020, "Prata")))
+                        BIA_ID, new VehicleDetails("ABC1D23", "Volkswagen", "Gol", 2020, "Prata")))
                 .isInstanceOf(ConflictException.class)
                 .hasMessage("vehicle.licensePlateOfAnotherCustomer");
         assertThat(vehicleRepository.findAll()).containsExactly(gol);
+    }
+
+    @Test
+    void shouldRejectAnInvalidPlateWithoutRegisteringAnything() {
+        assertThatThrownBy(() -> vehicleDirectory.findOrRegister(
+                        ANA_ID, new VehicleDetails("AB-12", "Volkswagen", "Gol", 2020, "Prata")))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("licensePlate.invalid");
+        assertThat(vehicleRepository.findAll()).isEmpty();
     }
 }

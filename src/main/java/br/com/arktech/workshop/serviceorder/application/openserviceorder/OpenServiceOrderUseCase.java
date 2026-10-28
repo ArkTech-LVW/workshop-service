@@ -5,12 +5,10 @@ import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrder;
 import br.com.arktech.workshop.serviceorder.domain.repository.ServiceOrderRepository;
 import br.com.arktech.workshop.shared.application.UseCase;
 import br.com.arktech.workshop.shared.application.registry.CustomerDirectory;
-import br.com.arktech.workshop.shared.application.registry.VehicleDetails;
 import br.com.arktech.workshop.shared.application.registry.VehicleDirectory;
 import br.com.arktech.workshop.shared.application.security.CurrentUser;
 import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
-import br.com.arktech.workshop.shared.domain.vehicle.LicensePlate;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,12 +28,10 @@ public class OpenServiceOrderUseCase implements UseCase<OpenServiceOrderCommand,
     @Transactional
     public ServiceOrderResult execute(OpenServiceOrderCommand command) {
         CPFCNPJ document = CPFCNPJ.of(command.customerDocument());
-        VehicleDetails vehicle = vehicleDetails(command.vehicle());
-
         Long customerId = customerDirectory
                 .findIdByDocument(document)
                 .orElseThrow(() -> new NotFoundException("serviceOrder.customerNotRegistered", document.formatted()));
-        Long vehicleId = vehicleDirectory.findOrRegister(customerId, vehicle);
+        Long vehicleId = vehicleDirectory.findOrRegister(customerId, command.vehicle());
 
         ServiceOrder serviceOrder = new ServiceOrder(
                 serviceOrderRepository.nextNumber(),
@@ -44,14 +40,5 @@ public class OpenServiceOrderUseCase implements UseCase<OpenServiceOrderCommand,
                 command.problemDescription(),
                 currentUser.id());
         return ServiceOrderResult.from(serviceOrderRepository.save(serviceOrder));
-    }
-
-    private static VehicleDetails vehicleDetails(OpenServiceOrderCommand.Vehicle vehicle) {
-        return new VehicleDetails(
-                new LicensePlate(vehicle.licensePlate()),
-                vehicle.brand(),
-                vehicle.model(),
-                vehicle.year(),
-                vehicle.color());
     }
 }
