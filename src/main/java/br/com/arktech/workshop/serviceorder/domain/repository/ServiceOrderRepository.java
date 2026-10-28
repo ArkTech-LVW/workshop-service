@@ -10,6 +10,8 @@ public interface ServiceOrderRepository {
 
     ServiceOrder save(ServiceOrder serviceOrder);
 
+    ServiceOrder saveAndFlush(ServiceOrder serviceOrder);
+
     Optional<ServiceOrder> findById(Long id);
 
     ServiceOrderNumber nextNumber();
