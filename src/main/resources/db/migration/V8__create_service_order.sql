@@ -25,6 +25,7 @@ CREATE TABLE service_order (
 
 CREATE INDEX idx_service_order_customer_id ON service_order (customer_id);
 CREATE INDEX idx_service_order_vehicle_id ON service_order (vehicle_id);
+CREATE INDEX idx_service_order_mechanic_id ON service_order (mechanic_id);
 
 CREATE TABLE service_item (
     id                   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -38,6 +39,7 @@ CREATE TABLE service_item (
 );
 
 CREATE INDEX idx_service_item_service_order_id ON service_item (service_order_id);
+CREATE INDEX idx_service_item_service_offering_id ON service_item (service_offering_id);
 
 CREATE TABLE part_item (
     id                   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
