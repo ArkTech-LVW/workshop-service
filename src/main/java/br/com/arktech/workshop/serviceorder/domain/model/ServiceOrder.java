@@ -90,7 +90,7 @@ public class ServiceOrder extends BaseEntity {
         this.number = number;
         this.customerId = customerId;
         this.vehicleId = vehicleId;
-        this.problemDescription = problemDescription;
+        this.problemDescription = requireText(problemDescription, "serviceOrder.problemDescriptionRequired");
         this.status = ServiceOrderStatus.RECEIVED;
         this.totalPrice = Money.ZERO;
         statusHistory.add(new StatusChange(this, null, ServiceOrderStatus.RECEIVED, openedByUserId, null));
@@ -161,7 +161,7 @@ public class ServiceOrder extends BaseEntity {
 
     public void rejectQuote(@Nullable Long changedByUserId, String reason) {
         requireStatus(ServiceOrderStatus.AWAITING_APPROVAL, ServiceOrderStatus.QUOTE_REJECTED);
-        requireReason(reason);
+        requireText(reason, "serviceOrder.reasonRequired");
         moveTo(ServiceOrderStatus.QUOTE_REJECTED, changedByUserId, reason);
         events.add(new QuoteRejected(publicId));
     }
@@ -192,7 +192,7 @@ public class ServiceOrder extends BaseEntity {
         if (!status.allowsCancellation()) {
             throw new InvalidStatusTransitionException(status, ServiceOrderStatus.CANCELED);
         }
-        requireReason(reason);
+        requireText(reason, "serviceOrder.reasonRequired");
         moveTo(ServiceOrderStatus.CANCELED, changedByUserId, reason);
         events.add(new ServiceOrderCanceled(publicId));
     }
@@ -203,10 +203,11 @@ public class ServiceOrder extends BaseEntity {
         }
     }
 
-    private static void requireReason(String reason) {
-        if (reason.isBlank()) {
-            throw new BusinessRuleException("serviceOrder.reasonRequired");
+    private static String requireText(@Nullable String text, String code) {
+        if (text == null || text.isBlank()) {
+            throw new BusinessRuleException(code);
         }
+        return text;
     }
 
     private void moveTo(ServiceOrderStatus next, @Nullable Long changedByUserId, @Nullable String description) {
