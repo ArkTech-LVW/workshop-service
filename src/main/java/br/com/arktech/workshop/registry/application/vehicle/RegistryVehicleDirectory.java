@@ -1,5 +1,7 @@
 package br.com.arktech.workshop.registry.application.vehicle;
 
+import br.com.arktech.workshop.registry.application.createvehicle.CreateVehicleCommand;
+import br.com.arktech.workshop.registry.application.createvehicle.CreateVehicleUseCase;
 import br.com.arktech.workshop.registry.domain.model.Vehicle;
 import br.com.arktech.workshop.registry.domain.repository.VehicleRepository;
 import br.com.arktech.workshop.shared.application.registry.VehicleDetails;
@@ -16,26 +18,26 @@ import org.springframework.stereotype.Service;
 class RegistryVehicleDirectory implements VehicleDirectory {
 
     private final VehicleRepository vehicleRepository;
+    private final CreateVehicleUseCase createVehicleUseCase;
 
     @Override
     public Long findOrRegister(Long customerId, VehicleDetails vehicle) {
-        LicensePlate licensePlate = new LicensePlate(vehicle.licensePlate());
         return vehicleRepository
-                .findByLicensePlate(licensePlate)
-                .map(registered -> requireOwnedBy(registered, customerId))
-                .orElseGet(() -> register(customerId, licensePlate, vehicle))
-                .getId();
+                .findByLicensePlate(new LicensePlate(vehicle.licensePlate()))
+                .map(registered -> requireOwnedBy(registered, customerId).getId())
+                .orElseGet(() -> register(customerId, vehicle));
     }
 
-    private Vehicle register(Long customerId, LicensePlate licensePlate, VehicleDetails vehicle) {
-        return vehicleRepository.save(new Vehicle(
+    private Long register(Long customerId, VehicleDetails vehicle) {
+        CreateVehicleCommand command = new CreateVehicleCommand(
                 customerId,
-                licensePlate,
+                vehicle.licensePlate(),
                 null,
                 vehicle.brand(),
                 vehicle.model(),
                 vehicle.year(),
-                vehicle.color()));
+                vehicle.color());
+        return createVehicleUseCase.execute(command).id();
     }
 
     private static Vehicle requireOwnedBy(Vehicle vehicle, Long customerId) {
