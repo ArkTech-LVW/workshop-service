@@ -2,6 +2,7 @@ package br.com.arktech.workshop.registry.api.vehicle;
 
 import br.com.arktech.workshop.shared.api.validation.Chassis;
 import br.com.arktech.workshop.shared.api.validation.LicensePlate;
+import br.com.arktech.workshop.shared.api.validation.VehicleYear;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
