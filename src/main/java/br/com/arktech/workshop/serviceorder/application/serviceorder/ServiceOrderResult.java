@@ -5,6 +5,7 @@ import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderStatus;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import org.jspecify.annotations.Nullable;
@@ -18,8 +19,17 @@ public record ServiceOrderResult(
         @Nullable Long mechanicId,
         String problemDescription,
         ServiceOrderStatus status,
+        List<ServiceItemResult> services,
+        List<PartItemResult> parts,
+        BigDecimal servicesTotal,
+        BigDecimal partsTotal,
         BigDecimal totalPrice,
         @Nullable Instant dateCreated) {
+
+    public ServiceOrderResult {
+        services = List.copyOf(services);
+        parts = List.copyOf(parts);
+    }
 
     public static ServiceOrderResult from(ServiceOrder serviceOrder) {
         return new ServiceOrderResult(
@@ -31,6 +41,10 @@ public record ServiceOrderResult(
                 serviceOrder.getMechanicId(),
                 serviceOrder.getProblemDescription(),
                 serviceOrder.getStatus(),
+                serviceOrder.getServiceItems().stream().map(ServiceItemResult::from).toList(),
+                serviceOrder.getPartItems().stream().map(PartItemResult::from).toList(),
+                serviceOrder.getServicesTotal().amount(),
+                serviceOrder.getPartsTotal().amount(),
                 serviceOrder.getTotalPrice().amount(),
                 serviceOrder.getDateCreated());
     }

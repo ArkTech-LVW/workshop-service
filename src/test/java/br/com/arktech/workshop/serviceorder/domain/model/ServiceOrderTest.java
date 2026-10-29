@@ -35,6 +35,7 @@ import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -278,6 +279,68 @@ class ServiceOrderTest {
                 .isEqualTo(SERVICE_OFFERING_ID + 1);
         assertThat(serviceOrder.getPartItems()).isEmpty();
         assertThat(serviceOrder.getTotalPrice()).isEqualTo(new Money(new BigDecimal("80.00")));
+    }
+
+    @Test
+    void shouldStartTheQuoteAtZeroWithTwoDecimalPlaces() {
+        ServiceOrder serviceOrder = newServiceOrder();
+
+        assertThat(serviceOrder.getServicesTotal().amount()).isEqualTo(new BigDecimal("0.00"));
+        assertThat(serviceOrder.getPartsTotal().amount()).isEqualTo(new BigDecimal("0.00"));
+        assertThat(serviceOrder.getTotalPrice().amount()).isEqualTo(new BigDecimal("0.00"));
+    }
+
+    @Test
+    void shouldTotalServicesAndPartsSeparatelyAcrossManyItems() {
+        ServiceOrder serviceOrder = newServiceOrder();
+
+        serviceOrder.addServiceItem(SERVICE_OFFERING_ID, 2, LABOR_PRICE);
+        serviceOrder.addServiceItem(SERVICE_OFFERING_ID + 1, 1, new Money(new BigDecimal("89.99")));
+        serviceOrder.addServiceItem(SERVICE_OFFERING_ID + 2, 999, new Money(new BigDecimal("0.01")));
+        serviceOrder.addPartItem(PART_ID, 3, PART_PRICE);
+        serviceOrder.addPartItem(PART_ID + 1, 3, new Money(new BigDecimal("33.33")));
+        serviceOrder.addPartItem(PART_ID + 2, 4, new Money(new BigDecimal("12.5")));
+
+        assertThat(serviceOrder.getServiceItems())
+                .extracting(item -> item.getSubtotal().amount())
+                .containsExactly(new BigDecimal("300.00"), new BigDecimal("89.99"), new BigDecimal("9.99"));
+        assertThat(serviceOrder.getPartItems())
+                .extracting(item -> item.getSubtotal().amount())
+                .containsExactly(new BigDecimal("107.70"), new BigDecimal("99.99"), new BigDecimal("50.00"));
+        assertThat(serviceOrder.getServicesTotal().amount()).isEqualTo(new BigDecimal("399.98"));
+        assertThat(serviceOrder.getPartsTotal().amount()).isEqualTo(new BigDecimal("257.69"));
+        assertThat(serviceOrder.getTotalPrice().amount()).isEqualTo(new BigDecimal("657.67"));
+    }
+
+    // Unit prices hold at most two decimal places and quantities are integers, so subtotals are exact and
+    // the quote never rounds: the values below would drift if any step rounded.
+    @ParameterizedTest
+    @CsvSource({"0.01, 1, 0.01", "0.01, 999, 9.99", "33.33, 3, 99.99", "0.05, 7, 0.35", "9.99, 999, 9980.01"})
+    void shouldCalculateEachSubtotalExactlyWithTwoDecimalPlaces(String unitPrice, int quantity, String subtotal) {
+        ServiceOrder serviceOrder = newServiceOrder();
+
+        serviceOrder.addPartItem(PART_ID, quantity, new Money(new BigDecimal(unitPrice)));
+
+        assertThat(serviceOrder.getPartItems().getFirst().getSubtotal().amount()).isEqualTo(new BigDecimal(subtotal));
+        assertThat(serviceOrder.getTotalPrice().amount()).isEqualTo(new BigDecimal(subtotal));
+    }
+
+    @Test
+    void shouldRecalculateTheTotalOnEveryInclusionAndRemoval() {
+        ServiceOrder serviceOrder = newServiceOrder();
+
+        serviceOrder.addServiceItem(SERVICE_OFFERING_ID, 1, LABOR_PRICE);
+        assertThat(serviceOrder.getTotalPrice()).isEqualTo(new Money(new BigDecimal("150.00")));
+        serviceOrder.addPartItem(PART_ID, 2, PART_PRICE);
+        assertThat(serviceOrder.getTotalPrice()).isEqualTo(new Money(new BigDecimal("221.80")));
+        assignIds(serviceOrder.getServiceItems(), 1);
+        assignIds(serviceOrder.getPartItems(), 2);
+
+        serviceOrder.removeServiceItem(1L);
+        assertThat(serviceOrder.getServicesTotal()).isEqualTo(Money.ZERO);
+        assertThat(serviceOrder.getTotalPrice()).isEqualTo(new Money(new BigDecimal("71.80")));
+        serviceOrder.removePartItem(2L);
+        assertThat(serviceOrder.getTotalPrice()).isEqualTo(Money.ZERO);
     }
 
     @Test

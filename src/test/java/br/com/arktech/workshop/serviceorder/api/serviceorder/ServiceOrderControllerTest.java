@@ -12,7 +12,11 @@ import br.com.arktech.workshop.serviceorder.application.cancelserviceorder.Cance
 import br.com.arktech.workshop.serviceorder.application.cancelserviceorder.CancelServiceOrderUseCase;
 import br.com.arktech.workshop.serviceorder.application.openserviceorder.OpenServiceOrderCommand;
 import br.com.arktech.workshop.serviceorder.application.openserviceorder.OpenServiceOrderUseCase;
+import br.com.arktech.workshop.serviceorder.application.serviceorder.PartItemResult;
+import br.com.arktech.workshop.serviceorder.application.serviceorder.ServiceItemResult;
 import br.com.arktech.workshop.serviceorder.application.serviceorder.ServiceOrderResult;
+import br.com.arktech.workshop.serviceorder.application.startdiagnosis.StartDiagnosisCommand;
+import br.com.arktech.workshop.serviceorder.application.startdiagnosis.StartDiagnosisUseCase;
 import br.com.arktech.workshop.serviceorder.domain.model.InvalidStatusTransitionException;
 import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderStatus;
 import br.com.arktech.workshop.shared.api.error.ApiErrorTestConfig;
@@ -22,6 +26,7 @@ import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -51,7 +56,26 @@ class ServiceOrderControllerTest {
             null,
             "Barulho ao frear",
             ServiceOrderStatus.RECEIVED,
+            List.of(),
+            List.of(),
             new BigDecimal("0.00"),
+            new BigDecimal("0.00"),
+            new BigDecimal("0.00"),
+            Instant.parse("2026-10-27T14:30:00Z"));
+    private static final ServiceOrderResult IN_DIAGNOSIS = new ServiceOrderResult(
+            1L,
+            PUBLIC_ID,
+            "SO-2026-000123",
+            10L,
+            20L,
+            5L,
+            "Barulho ao frear",
+            ServiceOrderStatus.IN_DIAGNOSIS,
+            List.of(new ServiceItemResult(1L, 30L, 2, new BigDecimal("150.00"), new BigDecimal("300.00"))),
+            List.of(new PartItemResult(2L, 40L, 3, new BigDecimal("35.90"), new BigDecimal("107.70"))),
+            new BigDecimal("300.00"),
+            new BigDecimal("107.70"),
+            new BigDecimal("407.70"),
             Instant.parse("2026-10-27T14:30:00Z"));
     private static final ServiceOrderResult CANCELED = new ServiceOrderResult(
             1L,
@@ -62,6 +86,10 @@ class ServiceOrderControllerTest {
             null,
             "Barulho ao frear",
             ServiceOrderStatus.CANCELED,
+            List.of(),
+            List.of(),
+            new BigDecimal("0.00"),
+            new BigDecimal("0.00"),
             new BigDecimal("0.00"),
             Instant.parse("2026-10-27T14:30:00Z"));
     private static final String CUSTOMER_NOT_REGISTERED = "Nenhum cliente cadastrado com o CPF/CNPJ 529.982.247-25. "
@@ -80,6 +108,9 @@ class ServiceOrderControllerTest {
     private OpenServiceOrderUseCase openServiceOrderUseCase;
 
     @MockitoBean
+    private StartDiagnosisUseCase startDiagnosisUseCase;
+
+    @MockitoBean
     private CancelServiceOrderUseCase cancelServiceOrderUseCase;
 
     @Test
@@ -91,7 +122,8 @@ class ServiceOrderControllerTest {
                 .andExpect(json("""
                         {"id": 1, "publicId": "3f1c2b8e-7d4a-4c9e-9b1f-2a6d8e5c4b3a", "number": "SO-2026-000123",
                          "customerId": 10, "vehicleId": 20, "mechanicId": null,
-                         "problemDescription": "Barulho ao frear", "status": "RECEIVED", "totalPrice": 0.00,
+                         "problemDescription": "Barulho ao frear", "status": "RECEIVED", "services": [], "parts": [],
+                         "servicesTotal": 0.00, "partsTotal": 0.00, "totalPrice": 0.00,
                          "dateCreated": "2026-10-27T14:30:00Z"}
                         """));
         verify(openServiceOrderUseCase)
@@ -174,6 +206,41 @@ class ServiceOrderControllerTest {
     }
 
     @Test
+    void shouldStartTheDiagnosisAndDetailTheQuote() throws Exception {
+        when(startDiagnosisUseCase.execute(any())).thenReturn(IN_DIAGNOSIS);
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/startDiagnosis", 1L))
+                .andExpect(status().isOk())
+                .andExpect(json("""
+                        {"id": 1, "publicId": "3f1c2b8e-7d4a-4c9e-9b1f-2a6d8e5c4b3a", "number": "SO-2026-000123",
+                         "customerId": 10, "vehicleId": 20, "mechanicId": 5,
+                         "problemDescription": "Barulho ao frear", "status": "IN_DIAGNOSIS",
+                         "services": [{"id": 1, "serviceOfferingId": 30, "quantity": 2, "unitPrice": 150.00,
+                                       "subtotal": 300.00}],
+                         "parts": [{"id": 2, "partId": 40, "quantity": 3, "unitPrice": 35.90, "subtotal": 107.70}],
+                         "servicesTotal": 300.00, "partsTotal": 107.70, "totalPrice": 407.70,
+                         "dateCreated": "2026-10-27T14:30:00Z"}
+                        """));
+        verify(startDiagnosisUseCase).execute(new StartDiagnosisCommand(1L));
+    }
+
+    @Test
+    void shouldAnswer422WhenTheServiceOrderIsNotReceived() throws Exception {
+        when(startDiagnosisUseCase.execute(any()))
+                .thenThrow(new InvalidStatusTransitionException(
+                        ServiceOrderStatus.IN_DIAGNOSIS, ServiceOrderStatus.IN_DIAGNOSIS));
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/startDiagnosis", 1L))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(json(
+                        """
+                        {"code": "serviceOrder.invalidStatusTransition",
+                         "message": "Esta ação não é permitida no status atual da ordem de serviço."}
+                        """,
+                        JsonCompareMode.LENIENT));
+    }
+
+    @Test
     void shouldCancelServiceOrder() throws Exception {
         when(cancelServiceOrderUseCase.execute(any())).thenReturn(CANCELED);
 
@@ -184,7 +251,8 @@ class ServiceOrderControllerTest {
                 .andExpect(json("""
                         {"id": 1, "publicId": "3f1c2b8e-7d4a-4c9e-9b1f-2a6d8e5c4b3a", "number": "SO-2026-000123",
                          "customerId": 10, "vehicleId": 20, "mechanicId": null,
-                         "problemDescription": "Barulho ao frear", "status": "CANCELED", "totalPrice": 0.00,
+                         "problemDescription": "Barulho ao frear", "status": "CANCELED", "services": [], "parts": [],
+                         "servicesTotal": 0.00, "partsTotal": 0.00, "totalPrice": 0.00,
                          "dateCreated": "2026-10-27T14:30:00Z"}
                         """));
         verify(cancelServiceOrderUseCase).execute(new CancelServiceOrderCommand(1L, "Cliente desistiu do serviço"));

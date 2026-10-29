@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import org.jspecify.annotations.Nullable;
@@ -22,6 +23,10 @@ record ServiceOrderResponse(
         @Schema(description = "${openapi.serviceOrder.problemDescription}", example = "Barulho ao frear")
                 String problemDescription,
         @Schema(description = "${openapi.serviceOrder.status}", example = "RECEIVED") ServiceOrderStatus status,
+        @Schema(description = "${openapi.serviceOrder.services}") List<ServiceOrderServiceItemResponse> services,
+        @Schema(description = "${openapi.serviceOrder.parts}") List<ServiceOrderPartItemResponse> parts,
+        @Schema(description = "${openapi.serviceOrder.servicesTotal}", example = "0.00") BigDecimal servicesTotal,
+        @Schema(description = "${openapi.serviceOrder.partsTotal}", example = "0.00") BigDecimal partsTotal,
         @Schema(description = "${openapi.serviceOrder.totalPrice}", example = "0.00") BigDecimal totalPrice,
         @Schema(description = "${openapi.serviceOrder.dateCreated}", example = "2026-10-27T14:30:00Z") @Nullable
                 Instant dateCreated) {
@@ -36,6 +41,12 @@ record ServiceOrderResponse(
                 result.mechanicId(),
                 result.problemDescription(),
                 result.status(),
+                result.services().stream()
+                        .map(ServiceOrderServiceItemResponse::from)
+                        .toList(),
+                result.parts().stream().map(ServiceOrderPartItemResponse::from).toList(),
+                result.servicesTotal(),
+                result.partsTotal(),
                 result.totalPrice(),
                 result.dateCreated());
     }
