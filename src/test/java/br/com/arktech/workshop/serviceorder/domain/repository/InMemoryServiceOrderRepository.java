@@ -7,6 +7,7 @@ import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.springframework.test.util.ReflectionTestUtils;
@@ -15,11 +16,21 @@ public class InMemoryServiceOrderRepository implements ServiceOrderRepository {
 
     private final List<ServiceOrder> serviceOrders = new ArrayList<>();
 
+    private final Consumer<Object> eventPublisher;
+
     private long nextId = 1;
 
     private long nextSequence = 1;
 
     private long nextItemId = 1;
+
+    public InMemoryServiceOrderRepository() {
+        this(event -> {});
+    }
+
+    public InMemoryServiceOrderRepository(Consumer<Object> eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
 
     @Override
     public ServiceOrder save(ServiceOrder serviceOrder) {
@@ -27,6 +38,8 @@ public class InMemoryServiceOrderRepository implements ServiceOrderRepository {
             ReflectionTestUtils.setField(serviceOrder, "id", nextId++);
             serviceOrders.add(serviceOrder);
         }
+        serviceOrder.domainEvents().forEach(eventPublisher);
+        serviceOrder.clearDomainEvents();
         return serviceOrder;
     }
 

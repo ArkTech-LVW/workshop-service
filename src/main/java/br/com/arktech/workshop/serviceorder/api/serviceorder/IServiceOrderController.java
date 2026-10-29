@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,6 +53,41 @@ interface IServiceOrderController {
     @PostMapping("/{id}/sendQuote")
     ServiceOrderResponse sendQuote(
             @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id);
+
+    @Operation(
+            summary = "${openapi.serviceOrder.approveQuote}",
+            description = "${openapi.serviceOrder.approveQuoteDescription}")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "422", ref = "BusinessRule")
+    @PostMapping("/{id}/approve")
+    ServiceOrderResponse approve(
+            @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id);
+
+    @Operation(
+            summary = "${openapi.serviceOrder.rejectQuote}",
+            description = "${openapi.serviceOrder.rejectQuoteDescription}")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "400", ref = "BadRequest")
+    @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "422", ref = "BusinessRule")
+    @PostMapping("/{id}/reject")
+    ServiceOrderResponse reject(
+            @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id,
+            @Valid @RequestBody RejectQuoteRequest request);
+
+    @Operation(
+            summary = "${openapi.serviceOrder.reopenQuote}",
+            description = "${openapi.serviceOrder.reopenQuoteDescription}")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "400", ref = "BadRequest")
+    @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "422", ref = "BusinessRule")
+    @AllowedRoles(Role.ADMIN)
+    @PostMapping("/{id}/reopenQuote")
+    ServiceOrderResponse reopenQuote(
+            @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id,
+            @Valid @RequestBody(required = false) @Nullable ReopenQuoteRequest request);
 
     @Operation(summary = "${openapi.serviceOrder.cancel}", description = "${openapi.serviceOrder.cancelDescription}")
     @ApiResponse(responseCode = "200")

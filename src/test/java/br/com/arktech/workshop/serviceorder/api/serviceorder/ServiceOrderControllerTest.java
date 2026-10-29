@@ -8,12 +8,18 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import br.com.arktech.workshop.serviceorder.application.approvequote.ApproveQuoteCommand;
+import br.com.arktech.workshop.serviceorder.application.approvequote.ApproveQuoteUseCase;
 import br.com.arktech.workshop.serviceorder.application.cancelserviceorder.CancelServiceOrderCommand;
 import br.com.arktech.workshop.serviceorder.application.cancelserviceorder.CancelServiceOrderUseCase;
 import br.com.arktech.workshop.serviceorder.application.openserviceorder.OpenServiceOrderCommand;
 import br.com.arktech.workshop.serviceorder.application.openserviceorder.OpenServiceOrderUseCase;
 import br.com.arktech.workshop.serviceorder.application.serviceorder.PartItemResult;
 import br.com.arktech.workshop.serviceorder.application.serviceorder.ServiceItemResult;
+import br.com.arktech.workshop.serviceorder.application.rejectquote.RejectQuoteCommand;
+import br.com.arktech.workshop.serviceorder.application.rejectquote.RejectQuoteUseCase;
+import br.com.arktech.workshop.serviceorder.application.reopenquote.ReopenQuoteCommand;
+import br.com.arktech.workshop.serviceorder.application.reopenquote.ReopenQuoteUseCase;
 import br.com.arktech.workshop.serviceorder.application.sendquote.SendQuoteCommand;
 import br.com.arktech.workshop.serviceorder.application.sendquote.SendQuoteUseCase;
 import br.com.arktech.workshop.serviceorder.application.serviceorder.ServiceOrderResult;
@@ -130,6 +136,15 @@ class ServiceOrderControllerTest {
 
     @MockitoBean
     private SendQuoteUseCase sendQuoteUseCase;
+
+    @MockitoBean
+    private ApproveQuoteUseCase approveQuoteUseCase;
+
+    @MockitoBean
+    private RejectQuoteUseCase rejectQuoteUseCase;
+
+    @MockitoBean
+    private ReopenQuoteUseCase reopenQuoteUseCase;
 
     @MockitoBean
     private CancelServiceOrderUseCase cancelServiceOrderUseCase;
@@ -310,6 +325,75 @@ class ServiceOrderControllerTest {
                 .andExpect(json("""
                         {"code": "serviceOrder.notFound", "message": "Ordem de serviço 1 não encontrada."}
                         """));
+    }
+
+    @Test
+    void shouldApproveTheQuote() throws Exception {
+        when(approveQuoteUseCase.execute(any())).thenReturn(AWAITING_APPROVAL);
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/approve", 1L)).andExpect(status().isOk());
+
+        verify(approveQuoteUseCase).execute(new ApproveQuoteCommand(1L));
+    }
+
+    @Test
+    void shouldAnswer422NamingThePartWithoutEnoughStock() throws Exception {
+        when(approveQuoteUseCase.execute(any()))
+                .thenThrow(new BusinessRuleException("part.insufficientStock", "FILTRO-01", 1, 3));
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/approve", 1L))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(json("""
+                        {"code": "part.insufficientStock",
+                         "message": "Estoque insuficiente para FILTRO-01: há 1 em estoque e foram pedidos 3."}
+                        """));
+    }
+
+    @Test
+    void shouldRejectTheQuoteWithTheReason() throws Exception {
+        when(rejectQuoteUseCase.execute(any())).thenReturn(AWAITING_APPROVAL);
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/reject", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"reason": "Cliente achou o valor alto"}
+                                """))
+                .andExpect(status().isOk());
+
+        verify(rejectQuoteUseCase).execute(new RejectQuoteCommand(1L, "Cliente achou o valor alto"));
+    }
+
+    @Test
+    void shouldRequireTheRejectionReason() throws Exception {
+        mockMvc.perform(post("/admin/serviceOrders/{id}/reject", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"reason": " "}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(json(
+                        """
+                        {"code": "request.invalidFields",
+                         "details": [{"field": "reason", "message": "Não pode estar em branco."}]}
+                        """,
+                        JsonCompareMode.LENIENT));
+        verifyNoInteractions(rejectQuoteUseCase);
+    }
+
+    @Test
+    void shouldReopenTheQuoteWithOrWithoutDescription() throws Exception {
+        when(reopenQuoteUseCase.execute(any())).thenReturn(IN_DIAGNOSIS);
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/reopenQuote", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"description": "Cliente pediu peça mais barata"}
+                                """))
+                .andExpect(status().isOk());
+        mockMvc.perform(post("/admin/serviceOrders/{id}/reopenQuote", 1L)).andExpect(status().isOk());
+
+        verify(reopenQuoteUseCase).execute(new ReopenQuoteCommand(1L, "Cliente pediu peça mais barata"));
+        verify(reopenQuoteUseCase).execute(new ReopenQuoteCommand(1L, null));
     }
 
     @Test

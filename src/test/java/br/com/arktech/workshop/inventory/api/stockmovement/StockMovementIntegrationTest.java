@@ -1,5 +1,7 @@
 package br.com.arktech.workshop.inventory.api.stockmovement;
 
+import static br.com.arktech.workshop.UniqueTestData.uniqueCPF;
+import static br.com.arktech.workshop.UniqueTestData.uniquePlate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -10,6 +12,7 @@ import br.com.arktech.workshop.IntegrationTest;
 import br.com.arktech.workshop.auth.application.port.TokenIssuer;
 import br.com.arktech.workshop.inventory.application.withdrawstock.WithdrawStockCommand;
 import br.com.arktech.workshop.inventory.application.withdrawstock.WithdrawStockUseCase;
+import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
@@ -37,9 +40,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -164,8 +164,8 @@ class StockMovementIntegrationTest {
         List<Throwable> failures = new ArrayList<>();
         try (ExecutorService executor = Executors.newFixedThreadPool(2)) {
             List<Future<Void>> results = new ArrayList<>();
-            for (long serviceOrderId = 1; serviceOrderId <= 2; serviceOrderId++) {
-                WithdrawStockCommand command = new WithdrawStockCommand(serviceOrderId, List.of(threeUnits));
+            for (Long serviceOrderId : List.of(openServiceOrder(), openServiceOrder())) {
+                WithdrawStockCommand command = new WithdrawStockCommand(serviceOrderId, List.of(threeUnits), adminId);
                 results.add(executor.submit(withdrawal(command, start)));
             }
             start.countDown();
@@ -189,20 +189,30 @@ class StockMovementIntegrationTest {
     }
 
     private Callable<Void> withdrawal(WithdrawStockCommand command, CountDownLatch start) {
-        Jwt jwt = Jwt.withTokenValue("test")
-                .header("alg", "HS256")
-                .subject(adminId.toString())
-                .build();
         return () -> {
-            SecurityContextHolder.getContext().setAuthentication(new JwtAuthenticationToken(jwt));
-            try {
-                start.await();
-                withdrawStockUseCase.execute(command);
-                return null;
-            } finally {
-                SecurityContextHolder.clearContext();
-            }
+            start.await();
+            withdrawStockUseCase.execute(command);
+            return null;
         };
+    }
+
+    private Long openServiceOrder() throws Exception {
+        CPFCNPJ document = uniqueCPF();
+        asAdmin(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
+                        {"name": "Ana", "document": "%s", "email": "ana@email.com"}
+                        """.formatted(document.value())))
+                .andExpect(status().isCreated());
+        String body = asAdmin(post("/admin/serviceOrders").contentType(MediaType.APPLICATION_JSON).content("""
+                        {"customerDocument": "%s",
+                         "vehicle": {"licensePlate": "%s", "brand": "Volkswagen", "model": "Gol", "year": 2020,
+                                     "color": "Prata"},
+                         "problemDescription": "Troca de óleo"}
+                        """.formatted(document.value(), uniquePlate())))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        return ((Number) JsonPath.read(body, "$.id")).longValue();
     }
 
     private ResultActions movement(Integer partId, String type, int quantity, String reason) throws Exception {

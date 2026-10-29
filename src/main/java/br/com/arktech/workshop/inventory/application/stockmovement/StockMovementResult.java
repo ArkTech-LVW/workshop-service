@@ -14,7 +14,7 @@ public record StockMovementResult(
         int quantity,
         @Nullable String reason,
         @Nullable Long serviceOrderId,
-        Long createdByUserId,
+        @Nullable Long createdByUserId,
         @Nullable Instant dateCreated) {
 
     public static StockMovementResult from(StockMovement movement) {

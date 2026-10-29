@@ -23,10 +23,11 @@ class CancelServiceOrderUseCaseTest {
     private static final Long ATTENDANT_ID = 7L;
     private static final String REASON = "Cliente desistiu do serviço";
 
-    private final InMemoryServiceOrderRepository serviceOrderRepository = new InMemoryServiceOrderRepository();
     private final List<Object> publishedEvents = new ArrayList<>();
+    private final InMemoryServiceOrderRepository serviceOrderRepository =
+            new InMemoryServiceOrderRepository(publishedEvents::add);
     private final CancelServiceOrderUseCase useCase =
-            new CancelServiceOrderUseCase(serviceOrderRepository, () -> ATTENDANT_ID, publishedEvents::add);
+            new CancelServiceOrderUseCase(serviceOrderRepository, () -> ATTENDANT_ID);
 
     private ServiceOrder serviceOrder;
 

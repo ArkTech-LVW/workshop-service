@@ -75,7 +75,7 @@ class ServiceOrderTest {
             assertThat(change.getChangedByUserId()).isEqualTo(ATTENDANT_ID);
             assertThat(change.getDescription()).isNull();
         });
-        assertThat(serviceOrder.pullEvents()).isEmpty();
+        assertThat(serviceOrder.domainEvents()).isEmpty();
     }
 
     @ParameterizedTest
@@ -120,7 +120,7 @@ class ServiceOrderTest {
 
         transition.apply(serviceOrder);
 
-        assertThat(serviceOrder.pullEvents())
+        assertThat(serviceOrder.domainEvents())
                 .containsExactlyElementsOf(transition.expectedEvents(serviceOrder.getPublicId()));
     }
 
@@ -138,7 +138,7 @@ class ServiceOrderTest {
                 .hasMessage("serviceOrder.invalidStatusTransition");
         assertThat(serviceOrder.getStatus()).isEqualTo(status);
         assertThat(serviceOrder.getStatusHistory()).containsExactlyElementsOf(previousHistory);
-        assertThat(serviceOrder.pullEvents()).isEmpty();
+        assertThat(serviceOrder.domainEvents()).isEmpty();
     }
 
     @Test
@@ -175,7 +175,7 @@ class ServiceOrderTest {
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessage("serviceOrder.reasonRequired");
         assertThat(serviceOrder.getStatus()).isEqualTo(AWAITING_APPROVAL);
-        assertThat(serviceOrder.pullEvents()).isEmpty();
+        assertThat(serviceOrder.domainEvents()).isEmpty();
     }
 
     @ParameterizedTest
@@ -189,7 +189,7 @@ class ServiceOrderTest {
                 .hasMessage("serviceOrder.reasonRequired");
         assertThat(serviceOrder.getStatus()).isEqualTo(RECEIVED);
         assertThat(serviceOrder.getStatusHistory()).hasSize(1);
-        assertThat(serviceOrder.pullEvents()).isEmpty();
+        assertThat(serviceOrder.domainEvents()).isEmpty();
     }
 
     @Test
@@ -202,7 +202,7 @@ class ServiceOrderTest {
                 .hasMessage("serviceOrder.quoteWithoutItems");
         assertThat(serviceOrder.getStatus()).isEqualTo(IN_DIAGNOSIS);
         assertThat(serviceOrder.getStatusHistory()).hasSize(2);
-        assertThat(serviceOrder.pullEvents()).isEmpty();
+        assertThat(serviceOrder.domainEvents()).isEmpty();
     }
 
     @Test
@@ -234,7 +234,7 @@ class ServiceOrderTest {
                 .extracting(StatusChange::getToStatus)
                 .containsExactly(
                         RECEIVED, IN_DIAGNOSIS, AWAITING_APPROVAL, QUOTE_REJECTED, IN_DIAGNOSIS, AWAITING_APPROVAL);
-        assertThat(serviceOrder.pullEvents())
+        assertThat(serviceOrder.domainEvents())
                 .containsExactly(
                         new QuoteReopened(serviceOrder.getPublicId()), new QuoteSent(serviceOrder.getPublicId()));
     }
@@ -441,12 +441,14 @@ class ServiceOrderTest {
     }
 
     @Test
-    void shouldHandOverEachEventOnlyOnce() {
+    void shouldForgetTheEventsOncePublished() {
         ServiceOrder serviceOrder = serviceOrderIn(IN_DIAGNOSIS);
         serviceOrder.sendQuote(USER_ID, null);
+        assertThat(serviceOrder.domainEvents()).containsExactly(new QuoteSent(serviceOrder.getPublicId()));
 
-        assertThat(serviceOrder.pullEvents()).containsExactly(new QuoteSent(serviceOrder.getPublicId()));
-        assertThat(serviceOrder.pullEvents()).isEmpty();
+        serviceOrder.clearDomainEvents();
+
+        assertThat(serviceOrder.domainEvents()).isEmpty();
     }
 
     @Test
@@ -481,7 +483,7 @@ class ServiceOrderTest {
         ServiceOrder serviceOrder = newServiceOrder();
         serviceOrder.addServiceItem(SERVICE_OFFERING_ID, 1, LABOR_PRICE);
         pathTo(status).forEach(transition -> transition.apply(serviceOrder));
-        serviceOrder.pullEvents();
+        serviceOrder.clearDomainEvents();
         return serviceOrder;
     }
 
