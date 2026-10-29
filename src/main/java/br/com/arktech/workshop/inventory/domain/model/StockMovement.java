@@ -36,7 +36,7 @@ public class StockMovement extends BaseEntity {
 
     private @Nullable String reason;
 
-    private Long createdByUserId;
+    private @Nullable Long createdByUserId;
 
     private StockMovement(
             Part part,
@@ -44,7 +44,7 @@ public class StockMovement extends BaseEntity {
             int quantity,
             @Nullable String reason,
             @Nullable Long serviceOrderId,
-            Long userId) {
+            @Nullable Long userId) {
         this.part = part;
         this.serviceOrderId = serviceOrderId;
         this.type = type;
@@ -68,7 +68,7 @@ public class StockMovement extends BaseEntity {
         return new StockMovement(part, StockMovementType.ADJUSTMENT, quantity, normalized, null, userId);
     }
 
-    public static StockMovement withdrawal(Part part, int quantity, Long serviceOrderId, Long userId) {
+    public static StockMovement withdrawal(Part part, int quantity, Long serviceOrderId, @Nullable Long userId) {
         part.decreaseStock(quantity);
         return new StockMovement(part, StockMovementType.OUT, quantity, null, serviceOrderId, userId);
     }

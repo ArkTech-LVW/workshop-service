@@ -2,7 +2,10 @@ package br.com.arktech.workshop.inventory.application.withdrawstock;
 
 import java.util.List;
 
-public record WithdrawStockCommand(Long serviceOrderId, List<Item> items) {
+import org.jspecify.annotations.Nullable;
+
+/** The user is null when the customer approves the quote without logging in. */
+public record WithdrawStockCommand(Long serviceOrderId, List<Item> items, @Nullable Long userId) {
 
     public WithdrawStockCommand {
         items = List.copyOf(items);

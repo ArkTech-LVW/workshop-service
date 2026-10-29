@@ -29,7 +29,7 @@ class WithdrawStockUseCaseTest {
     private final InMemoryPartRepository partRepository = new InMemoryPartRepository();
     private final InMemoryStockMovementRepository stockMovementRepository = new InMemoryStockMovementRepository();
     private final WithdrawStockUseCase withdrawStockUseCase =
-            new WithdrawStockUseCase(partRepository, stockMovementRepository, () -> USER_ID);
+            new WithdrawStockUseCase(partRepository, stockMovementRepository);
 
     @Test
     void shouldWithdrawEachPartAndMergeRepeatedItems() {
@@ -41,7 +41,8 @@ class WithdrawStockUseCaseTest {
                 List.of(
                         new WithdrawStockCommand.Item(oil.getId(), 4),
                         new WithdrawStockCommand.Item(filter.getId(), 1),
-                        new WithdrawStockCommand.Item(oil.getId(), 2))));
+                        new WithdrawStockCommand.Item(oil.getId(), 2)),
+                USER_ID));
 
         assertThat(filter.getStockQuantity()).isEqualTo(4);
         assertThat(oil.getStockQuantity()).isEqualTo(4);
@@ -58,11 +59,25 @@ class WithdrawStockUseCaseTest {
     }
 
     @Test
+    void shouldWithdrawWithoutUserWhenTheCustomerApproved() {
+        Part filter = savePart("FILTRO-01", 5);
+
+        withdrawStockUseCase.execute(new WithdrawStockCommand(
+                SERVICE_ORDER_ID, List.of(new WithdrawStockCommand.Item(filter.getId(), 2)), null));
+
+        assertThat(filter.getStockQuantity()).isEqualTo(3);
+        assertThat(stockMovementRepository.findAll())
+                .singleElement()
+                .extracting(StockMovement::getCreatedByUserId)
+                .isNull();
+    }
+
+    @Test
     void shouldRejectWithdrawalGreaterThanStock() {
         Part filter = savePart("FILTRO-01", 1);
 
         assertThatThrownBy(() -> withdrawStockUseCase.execute(new WithdrawStockCommand(
-                        SERVICE_ORDER_ID, List.of(new WithdrawStockCommand.Item(filter.getId(), 2)))))
+                        SERVICE_ORDER_ID, List.of(new WithdrawStockCommand.Item(filter.getId(), 2)), USER_ID)))
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessage("part.insufficientStock");
         assertThat(filter.getStockQuantity()).isEqualTo(1);
@@ -70,8 +85,8 @@ class WithdrawStockUseCaseTest {
 
     @Test
     void shouldReportUnknownPart() {
-        assertThatThrownBy(() -> withdrawStockUseCase.execute(
-                        new WithdrawStockCommand(SERVICE_ORDER_ID, List.of(new WithdrawStockCommand.Item(1234L, 1)))))
+        assertThatThrownBy(() -> withdrawStockUseCase.execute(new WithdrawStockCommand(
+                        SERVICE_ORDER_ID, List.of(new WithdrawStockCommand.Item(1234L, 1)), USER_ID)))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("part.notFound");
     }

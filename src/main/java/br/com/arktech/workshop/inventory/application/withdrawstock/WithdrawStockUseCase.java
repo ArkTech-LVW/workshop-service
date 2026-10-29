@@ -5,7 +5,6 @@ import br.com.arktech.workshop.inventory.domain.model.StockMovement;
 import br.com.arktech.workshop.inventory.domain.repository.PartRepository;
 import br.com.arktech.workshop.inventory.domain.repository.StockMovementRepository;
 import br.com.arktech.workshop.shared.application.VoidUseCase;
-import br.com.arktech.workshop.shared.application.security.CurrentUser;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -25,18 +24,17 @@ public class WithdrawStockUseCase implements VoidUseCase<WithdrawStockCommand> {
 
     private final PartRepository partRepository;
     private final StockMovementRepository stockMovementRepository;
-    private final CurrentUser currentUser;
 
     @Override
     @Transactional
     public void execute(WithdrawStockCommand command) {
-        Long userId = currentUser.id();
         Map<Long, Integer> quantityByPart = new TreeMap<>();
         command.items().forEach(item -> quantityByPart.merge(item.partId(), item.quantity(), Math::addExact));
 
         quantityByPart.forEach((partId, quantity) -> {
             Part part = partRepository.findRequiredForUpdateById(partId);
-            StockMovement movement = StockMovement.withdrawal(part, quantity, command.serviceOrderId(), userId);
+            StockMovement movement =
+                    StockMovement.withdrawal(part, quantity, command.serviceOrderId(), command.userId());
             partRepository.save(part);
             stockMovementRepository.save(movement);
         });
