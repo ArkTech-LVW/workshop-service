@@ -43,13 +43,14 @@ br.com.arktech.workshop
 - Na `api`, cada controller fica num pacote com o nome do recurso (`user`, `authentication`), junto com os DTOs que só ele usa.
 - Crie o subpacote junto com o primeiro arquivo dele; não deixe pacotes vazios.
 - Classes usadas só dentro do próprio subpacote ficam package-private; as que outro subpacote do módulo usa ficam `public`. O isolamento entre módulos continua garantido pelo `LayerDependencyTest`.
-- O `shared` segue a mesma divisão em camadas, com subpacotes por assunto (`error`, `i18n`, `exception`...).
+- O `shared` segue a mesma divisão em camadas, com subpacotes por assunto (`error`, `i18n`, `exception`...). A exceção é o `shared/event`, com os eventos de domínio, que fica fora das camadas porque o `domain` do módulo dono também o importa.
 
 ### Isolamento entre módulos
 
 - Um módulo só importa classes dele mesmo e do `shared`, nunca de outro módulo.
 - A referência a algo de outro módulo é pelo id: `Long createdByUserId`, nunca `User createdBy` nem `@ManyToOne` para entidade de outro módulo. A FK continua no banco.
 - O que um módulo precisa de outro vira um contrato (interface) no `shared`, implementado pelo módulo dono. Ex.: `CurrentUser` (`shared/application/security`), implementado no `auth`. Crie o contrato só quando algum módulo precisar dele.
+- Para avisar outro módulo de um fato, o agregado registra um evento cujo `record` fica no `shared/event/<módulo dono>` (ex.: `QuoteApprovedEvent`, em `shared/event/serviceorder`), e o outro módulo o escuta com `@EventListener` (ver [Entidades e repositórios](#entidades-e-repositórios)).
 
 ### Regra de dependência entre camadas
 
@@ -57,7 +58,7 @@ br.com.arktech.workshop
 api ──> application ──> domain <── infrastructure
 ```
 
-- `domain` **não importa** `api`, `application`, `infrastructure`, Spring (`org.springframework..`) nem Hibernate (`org.hibernate..`), com duas exceções: as anotações `org.hibernate.annotations` e as anotações de eventos do Spring Data (`@DomainEvents` e `@AfterDomainEventPublication`). JPA (`jakarta.persistence`) é liberado, porque as entidades são as próprias classes de domínio ([ADR 001](docs/adr/001-database.md)).
+- `domain` **não importa** `api`, `application`, `infrastructure`, Spring (`org.springframework..`) nem Hibernate (`org.hibernate..`), com duas exceções: as anotações `org.hibernate.annotations` e as anotações de eventos do Spring Data (`@DomainEvents` e `@AfterDomainEventPublication`, [ADR 004](docs/adr/004-domain-events.md)). JPA (`jakarta.persistence`) é liberado, porque as entidades são as próprias classes de domínio ([ADR 001](docs/adr/001-database.md)).
 - `application` não importa `api` nem `infrastructure`.
 - `api` não importa `infrastructure`.
 - Entidades JPA (`@Entity`, `@MappedSuperclass`) ficam no `domain`; repositórios Spring Data (`JpaRepository` etc.) só na `infrastructure`.
@@ -347,7 +348,7 @@ interface CustomerJpaRepository extends JpaRepository<Customer, Long>, CustomerR
 - Sem setters: o estado muda por métodos de negócio (`rename`, `deactivate`).
 - O Spring Data implementa os métodos do repositório do domínio através do `XxxJpaRepository`, que fica package-private. Consultas novas entram na interface do domínio com nome de negócio; se precisarem de `@Query`, o método é redeclarado com a anotação no `XxxJpaRepository`.
 - Filhos do mesmo agregado (ex.: `UserRole` no `User`) são entidades mapeadas a partir da raiz (`@OneToMany(mappedBy = ..., cascade = CascadeType.ALL, orphanRemoval = true)`). Entidade de outro módulo, nunca: guarde o id.
-- Eventos de domínio são `record`s do `domain/model` (ex.: `ServiceOrderEvent`). O método de negócio registra o evento numa lista `@Transient` do próprio agregado, exposta por um método `@DomainEvents` e limpa por um `@AfterDomainEventPublication` (ver `ServiceOrder`). O Spring Data publica os eventos no `save`, de forma síncrona e dentro da transação do caso de uso, então o caso de uso não publica nada à mão e **precisa** chamar `save` para os eventos saírem. Não use `AbstractAggregateRoot`: a entidade já estende a `BaseEntity`. Nos testes unitários, o repositório em memória imita essa publicação.
+- Cada evento de domínio é um `record` próprio no `shared/event/<módulo dono>`, com o nome terminado em `Event` (ex.: `QuoteApprovedEvent`). Um evento só existe quando tem ouvinte: crie o `record` junto com o primeiro `@EventListener` que o escuta, e remova-o quando o último ouvinte deixar de existir. Ele leva só o que os ouvintes precisam, em tipos simples, e não implementa nenhuma interface: não crie interface selada por agregado nem marcadora. O método de negócio registra o evento numa lista `@Transient` (`List<Object>`) do próprio agregado, exposta por um método `@DomainEvents` e limpa por um `@AfterDomainEventPublication` (ver `ServiceOrder`). O Spring Data publica os eventos no `save`, de forma síncrona e dentro da transação do caso de uso, então o caso de uso não publica nada à mão e **precisa** chamar `save` para os eventos saírem. A exceção é o fato que não passa pelo `save` de um agregado (ex.: uma alteração em lote por consulta): só nesse caso, o caso de uso publica pelo `ApplicationEventPublisher`, depois de gravar, e o PR explica por quê. Um ouvinte síncrono que falha desfaz a transação inteira. Não use `AbstractAggregateRoot`: a entidade já estende a `BaseEntity`. Nos testes unitários, o repositório em memória imita essa publicação. Os motivos estão no [ADR 004](docs/adr/004-domain-events.md).
 - Value objects são `record`s com a regra (normalização e validação) no construtor compacto: não existe um `Email` fora do padrão. Quem recebe um `String` de fora cria o value object (`new Email(command.email())`) antes de usar ou consultar.
 - Value object de **uma coluna** (ex.: `Email`, em `shared/domain/email`) é persistido por um `AttributeConverter` com `@Converter(autoApply = true)`, ao lado do `record`: a entidade só declara o campo (`private Email email;`) e o repositório recebe o value object (`findByEmail(Email email)`). Value object de **várias colunas** (ex.: um endereço) é `@Embeddable`.
 - Valor monetário no domínio é sempre `Money` (`shared/domain/money`), nunca `BigDecimal` solto: tem duas casas decimais, não aceita negativo e faz as contas na própria classe (`plus`, `minus`, `times`), devolvendo um novo `Money`. Na API, entra e sai como `BigDecimal`, e o campo do DTO leva a anotação `@Money` (`shared/api/validation`), que responde 400 (`money.invalid`) para valor negativo, com mais de duas casas decimais ou com mais de 10 dígitos inteiros; `@NotNull` e `@Positive` entram junto quando o valor é obrigatório ou precisa ser maior que zero. No banco, é uma coluna `NUMERIC(12, 2)`.
