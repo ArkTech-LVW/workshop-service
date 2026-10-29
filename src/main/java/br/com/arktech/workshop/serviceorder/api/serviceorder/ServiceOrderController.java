@@ -2,6 +2,8 @@ package br.com.arktech.workshop.serviceorder.api.serviceorder;
 
 import br.com.arktech.workshop.serviceorder.application.openserviceorder.OpenServiceOrderCommand;
 import br.com.arktech.workshop.serviceorder.application.openserviceorder.OpenServiceOrderUseCase;
+import br.com.arktech.workshop.serviceorder.application.sendquote.SendQuoteCommand;
+import br.com.arktech.workshop.serviceorder.application.sendquote.SendQuoteUseCase;
 import br.com.arktech.workshop.serviceorder.application.startdiagnosis.StartDiagnosisCommand;
 import br.com.arktech.workshop.serviceorder.application.startdiagnosis.StartDiagnosisUseCase;
 import br.com.arktech.workshop.shared.application.registry.VehicleDetails;
@@ -16,6 +18,7 @@ class ServiceOrderController implements IServiceOrderController {
 
     private final OpenServiceOrderUseCase openServiceOrderUseCase;
     private final StartDiagnosisUseCase startDiagnosisUseCase;
+    private final SendQuoteUseCase sendQuoteUseCase;
 
     @Override
     public ServiceOrderResponse open(OpenServiceOrderRequest request) {
@@ -31,5 +34,10 @@ class ServiceOrderController implements IServiceOrderController {
     @Override
     public ServiceOrderResponse startDiagnosis(Long id) {
         return ServiceOrderResponse.from(startDiagnosisUseCase.execute(new StartDiagnosisCommand(id)));
+    }
+
+    @Override
+    public ServiceOrderResponse sendQuote(Long id) {
+        return ServiceOrderResponse.from(sendQuoteUseCase.execute(new SendQuoteCommand(id)));
     }
 }

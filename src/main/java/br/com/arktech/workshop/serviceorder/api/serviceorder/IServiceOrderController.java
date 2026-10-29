@@ -41,4 +41,15 @@ interface IServiceOrderController {
     @PostMapping("/{id}/startDiagnosis")
     ServiceOrderResponse startDiagnosis(
             @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id);
+
+    @Operation(
+            summary = "${openapi.serviceOrder.sendQuote}",
+            description = "${openapi.serviceOrder.sendQuoteDescription}")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "422", ref = "BusinessRule")
+    @AllowedRoles({Role.ADMIN, Role.ATTENDANT, Role.MECHANIC})
+    @PostMapping("/{id}/sendQuote")
+    ServiceOrderResponse sendQuote(
+            @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id);
 }
