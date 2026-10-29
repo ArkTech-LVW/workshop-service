@@ -88,4 +88,14 @@ interface IServiceOrderController {
     ServiceOrderResponse reopenQuote(
             @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id,
             @Valid @RequestBody(required = false) @Nullable ReopenQuoteRequest request);
+
+    @Operation(summary = "${openapi.serviceOrder.cancel}", description = "${openapi.serviceOrder.cancelDescription}")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "400", ref = "BadRequest")
+    @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "422", ref = "BusinessRule")
+    @PostMapping("/{id}/cancel")
+    ServiceOrderResponse cancel(
+            @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id,
+            @Valid @RequestBody CancelServiceOrderRequest request);
 }
