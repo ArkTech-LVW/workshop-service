@@ -24,7 +24,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -102,6 +101,14 @@ public class ServiceOrder extends BaseEntity {
 
     public List<PartItem> getPartItems() {
         return List.copyOf(partItems);
+    }
+
+    public Money getServicesTotal() {
+        return sumSubtotals(serviceItems);
+    }
+
+    public Money getPartsTotal() {
+        return sumSubtotals(partItems);
     }
 
     public List<StatusChange> getStatusHistory() {
@@ -236,8 +243,10 @@ public class ServiceOrder extends BaseEntity {
     }
 
     private void recalculateTotalPrice() {
-        totalPrice = Stream.concat(serviceItems.stream(), partItems.stream())
-                .map(ServiceOrderItem::getSubtotal)
-                .reduce(Money.ZERO, Money::plus);
+        totalPrice = getServicesTotal().plus(getPartsTotal());
+    }
+
+    private static Money sumSubtotals(List<? extends ServiceOrderItem> items) {
+        return items.stream().map(ServiceOrderItem::getSubtotal).reduce(Money.ZERO, Money::plus);
     }
 }
