@@ -1,15 +1,10 @@
 package br.com.arktech.workshop.serviceorder.domain.model;
 
-import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderEvent.QuoteApproved;
-import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderEvent.QuoteRejected;
-import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderEvent.QuoteReopened;
-import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderEvent.QuoteSent;
-import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderEvent.ServiceOrderCanceled;
-import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderEvent.ServiceOrderCompleted;
 import br.com.arktech.workshop.shared.domain.BaseEntity;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.money.Money;
+import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -79,7 +74,7 @@ public class ServiceOrder extends BaseEntity {
 
     @Transient
     @Getter(AccessLevel.NONE)
-    private List<ServiceOrderEvent> events = new ArrayList<>();
+    private List<Object> events = new ArrayList<>();
 
     public ServiceOrder(
             ServiceOrderNumber number,
@@ -118,7 +113,7 @@ public class ServiceOrder extends BaseEntity {
     }
 
     @DomainEvents
-    public List<ServiceOrderEvent> domainEvents() {
+    public List<Object> domainEvents() {
         return List.copyOf(events);
     }
 
@@ -163,26 +158,29 @@ public class ServiceOrder extends BaseEntity {
             throw new BusinessRuleException("serviceOrder.quoteWithoutItems");
         }
         moveTo(ServiceOrderStatus.AWAITING_APPROVAL, changedByUserId, description);
-        events.add(new QuoteSent(publicId));
     }
 
     public void approveQuote(@Nullable Long changedByUserId, @Nullable String description) {
         requireStatus(ServiceOrderStatus.AWAITING_APPROVAL, ServiceOrderStatus.QUOTE_APPROVED);
         moveTo(ServiceOrderStatus.QUOTE_APPROVED, changedByUserId, description);
-        events.add(new QuoteApproved(publicId));
+        events.add(new QuoteApprovedEvent(
+                getId(),
+                publicId,
+                partItems.stream()
+                        .map(item -> new QuoteApprovedEvent.PartQuantity(item.getPartId(), item.getQuantity()))
+                        .toList(),
+                changedByUserId));
     }
 
     public void rejectQuote(@Nullable Long changedByUserId, String reason) {
         requireStatus(ServiceOrderStatus.AWAITING_APPROVAL, ServiceOrderStatus.QUOTE_REJECTED);
         requireText(reason, "serviceOrder.reasonRequired");
         moveTo(ServiceOrderStatus.QUOTE_REJECTED, changedByUserId, reason);
-        events.add(new QuoteRejected(publicId));
     }
 
     public void reopenQuote(Long changedByUserId, @Nullable String description) {
         requireStatus(ServiceOrderStatus.QUOTE_REJECTED, ServiceOrderStatus.IN_DIAGNOSIS);
         moveTo(ServiceOrderStatus.IN_DIAGNOSIS, changedByUserId, description);
-        events.add(new QuoteReopened(publicId));
     }
 
     public void startExecution(Long changedByUserId, @Nullable String description) {
@@ -193,7 +191,6 @@ public class ServiceOrder extends BaseEntity {
     public void complete(Long changedByUserId, @Nullable String description) {
         requireStatus(ServiceOrderStatus.IN_PROGRESS, ServiceOrderStatus.COMPLETED);
         moveTo(ServiceOrderStatus.COMPLETED, changedByUserId, description);
-        events.add(new ServiceOrderCompleted(publicId));
     }
 
     public void deliver(Long changedByUserId, @Nullable String description) {
@@ -207,7 +204,6 @@ public class ServiceOrder extends BaseEntity {
         }
         requireText(reason, "serviceOrder.reasonRequired");
         moveTo(ServiceOrderStatus.CANCELED, changedByUserId, reason);
-        events.add(new ServiceOrderCanceled(publicId));
     }
 
     private void requireStatus(ServiceOrderStatus expected, ServiceOrderStatus next) {

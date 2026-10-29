@@ -12,21 +12,15 @@ import static br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderStat
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderEvent.QuoteApproved;
-import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderEvent.QuoteRejected;
-import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderEvent.QuoteReopened;
-import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderEvent.QuoteSent;
-import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderEvent.ServiceOrderCanceled;
-import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderEvent.ServiceOrderCompleted;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.money.Money;
+import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -121,7 +115,7 @@ class ServiceOrderTest {
         transition.apply(serviceOrder);
 
         assertThat(serviceOrder.domainEvents())
-                .containsExactlyElementsOf(transition.expectedEvents(serviceOrder.getPublicId()));
+                .containsExactlyElementsOf(transition.expectedEvents(serviceOrder));
     }
 
     @ParameterizedTest
@@ -163,6 +157,28 @@ class ServiceOrderTest {
         assertThat(approved.getStatusHistory().getLast().getChangedByUserId()).isNull();
         assertThat(rejected.getStatusHistory().getLast().getChangedByUserId()).isNull();
         assertThat(rejected.getStatusHistory().getLast().getDescription()).isEqualTo("Achou caro");
+    }
+
+    @Test
+    void shouldListThePartsToWithdrawWhenTheQuoteIsApproved() {
+        ServiceOrder serviceOrder = newServiceOrder();
+        ReflectionTestUtils.setField(serviceOrder, "id", 99L);
+        serviceOrder.startDiagnosis(USER_ID, null);
+        serviceOrder.addPartItem(PART_ID, 3, PART_PRICE);
+        serviceOrder.addPartItem(PART_ID + 1, 1, PART_PRICE);
+        serviceOrder.sendQuote(USER_ID, null);
+        serviceOrder.clearDomainEvents();
+
+        serviceOrder.approveQuote(null, null);
+
+        assertThat(serviceOrder.domainEvents())
+                .containsExactly(new QuoteApprovedEvent(
+                        99L,
+                        serviceOrder.getPublicId(),
+                        List.of(
+                                new QuoteApprovedEvent.PartQuantity(PART_ID, 3),
+                                new QuoteApprovedEvent.PartQuantity(PART_ID + 1, 1)),
+                        null));
     }
 
     @ParameterizedTest
@@ -234,9 +250,6 @@ class ServiceOrderTest {
                 .extracting(StatusChange::getToStatus)
                 .containsExactly(
                         RECEIVED, IN_DIAGNOSIS, AWAITING_APPROVAL, QUOTE_REJECTED, IN_DIAGNOSIS, AWAITING_APPROVAL);
-        assertThat(serviceOrder.domainEvents())
-                .containsExactly(
-                        new QuoteReopened(serviceOrder.getPublicId()), new QuoteSent(serviceOrder.getPublicId()));
     }
 
     @Test
@@ -442,9 +455,9 @@ class ServiceOrderTest {
 
     @Test
     void shouldForgetTheEventsOncePublished() {
-        ServiceOrder serviceOrder = serviceOrderIn(IN_DIAGNOSIS);
-        serviceOrder.sendQuote(USER_ID, null);
-        assertThat(serviceOrder.domainEvents()).containsExactly(new QuoteSent(serviceOrder.getPublicId()));
+        ServiceOrder serviceOrder = serviceOrderIn(AWAITING_APPROVAL);
+        serviceOrder.approveQuote(USER_ID, null);
+        assertThat(serviceOrder.domainEvents()).singleElement().isInstanceOf(QuoteApprovedEvent.class);
 
         serviceOrder.clearDomainEvents();
 
@@ -522,22 +535,23 @@ class ServiceOrderTest {
                 Set.of(IN_DIAGNOSIS),
                 AWAITING_APPROVAL,
                 serviceOrder -> serviceOrder.sendQuote(USER_ID, DESCRIPTION),
-                QuoteSent::new),
+                null),
         APPROVE_QUOTE(
                 Set.of(AWAITING_APPROVAL),
                 QUOTE_APPROVED,
                 serviceOrder -> serviceOrder.approveQuote(USER_ID, DESCRIPTION),
-                QuoteApproved::new),
+                serviceOrder -> new QuoteApprovedEvent(
+                        serviceOrder.getId(), serviceOrder.getPublicId(), List.of(), USER_ID)),
         REJECT_QUOTE(
                 Set.of(AWAITING_APPROVAL),
                 QUOTE_REJECTED,
                 serviceOrder -> serviceOrder.rejectQuote(USER_ID, DESCRIPTION),
-                QuoteRejected::new),
+                null),
         REOPEN_QUOTE(
                 Set.of(QUOTE_REJECTED),
                 IN_DIAGNOSIS,
                 serviceOrder -> serviceOrder.reopenQuote(USER_ID, DESCRIPTION),
-                QuoteReopened::new),
+                null),
         START_EXECUTION(
                 Set.of(QUOTE_APPROVED),
                 IN_PROGRESS,
@@ -547,7 +561,7 @@ class ServiceOrderTest {
                 Set.of(IN_PROGRESS),
                 COMPLETED,
                 serviceOrder -> serviceOrder.complete(USER_ID, DESCRIPTION),
-                ServiceOrderCompleted::new),
+                null),
         DELIVER(
                 Set.of(COMPLETED),
                 DELIVERED,
@@ -557,18 +571,18 @@ class ServiceOrderTest {
                 Set.of(RECEIVED, IN_DIAGNOSIS, AWAITING_APPROVAL, QUOTE_REJECTED),
                 CANCELED,
                 serviceOrder -> serviceOrder.cancel(USER_ID, DESCRIPTION),
-                ServiceOrderCanceled::new);
+                null);
 
         private final Set<ServiceOrderStatus> from;
         private final ServiceOrderStatus to;
         private final Consumer<ServiceOrder> action;
-        private final @Nullable Function<UUID, ServiceOrderEvent> event;
+        private final @Nullable Function<ServiceOrder, Object> event;
 
         Transition(
                 Set<ServiceOrderStatus> from,
                 ServiceOrderStatus to,
                 Consumer<ServiceOrder> action,
-                @Nullable Function<UUID, ServiceOrderEvent> event) {
+                @Nullable Function<ServiceOrder, Object> event) {
             this.from = from;
             this.to = to;
             this.action = action;
@@ -579,8 +593,8 @@ class ServiceOrderTest {
             action.accept(serviceOrder);
         }
 
-        List<ServiceOrderEvent> expectedEvents(UUID publicId) {
-            return event == null ? List.of() : List.of(event.apply(publicId));
+        List<Object> expectedEvents(ServiceOrder serviceOrder) {
+            return event == null ? List.of() : List.of(event.apply(serviceOrder));
         }
     }
 }
