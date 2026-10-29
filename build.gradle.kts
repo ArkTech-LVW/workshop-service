@@ -80,7 +80,10 @@ tasks.compileTestJava {
 }
 
 tasks.test {
+    systemProperty("user.timezone", "America/Sao_Paulo")
+
     finalizedBy(tasks.jacocoTestReport)
+
     addTestListener(object : TestListener {
         override fun afterSuite(suite: TestDescriptor, result: TestResult) {
             if (suite.parent != null) return
