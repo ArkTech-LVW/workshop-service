@@ -8,7 +8,6 @@ import br.com.arktech.workshop.shared.application.security.CurrentUser;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,15 +17,12 @@ public class SendQuoteUseCase implements UseCase<SendQuoteCommand, ServiceOrderR
 
     private final ServiceOrderRepository serviceOrderRepository;
     private final CurrentUser currentUser;
-    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
     public ServiceOrderResult execute(SendQuoteCommand command) {
         ServiceOrder serviceOrder = serviceOrderRepository.findRequiredById(command.serviceOrderId());
         serviceOrder.sendQuote(currentUser.id(), null);
-        ServiceOrder saved = serviceOrderRepository.save(serviceOrder);
-        serviceOrder.pullEvents().forEach(eventPublisher::publishEvent);
-        return ServiceOrderResult.from(saved);
+        return ServiceOrderResult.from(serviceOrderRepository.save(serviceOrder));
     }
 }

@@ -31,6 +31,8 @@ import lombok.NoArgsConstructor;
 
 import org.hibernate.annotations.BatchSize;
 import org.jspecify.annotations.Nullable;
+import org.springframework.data.domain.AfterDomainEventPublication;
+import org.springframework.data.domain.DomainEvents;
 
 @Entity
 @Table(name = "service_order")
@@ -115,10 +117,14 @@ public class ServiceOrder extends BaseEntity {
         return List.copyOf(statusHistory);
     }
 
-    public List<ServiceOrderEvent> pullEvents() {
-        List<ServiceOrderEvent> pulled = List.copyOf(events);
+    @DomainEvents
+    public List<ServiceOrderEvent> domainEvents() {
+        return List.copyOf(events);
+    }
+
+    @AfterDomainEventPublication
+    public void clearDomainEvents() {
         events.clear();
-        return pulled;
     }
 
     public void addServiceItem(Long serviceOfferingId, int quantity, Money unitPrice) {

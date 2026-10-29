@@ -2,6 +2,7 @@ package br.com.arktech.workshop;
 
 import static com.tngtech.archunit.base.DescribedPredicate.alwaysTrue;
 import static com.tngtech.archunit.base.DescribedPredicate.not;
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.belongToAnyOf;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAPackage;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAnyPackage;
 import static com.tngtech.archunit.lang.conditions.ArchConditions.implement;
@@ -26,6 +27,8 @@ import com.tngtech.archunit.lang.SimpleConditionEvent;
 import jakarta.persistence.Entity;
 import jakarta.persistence.MappedSuperclass;
 
+import org.springframework.data.domain.AfterDomainEventPublication;
+import org.springframework.data.domain.DomainEvents;
 import org.springframework.data.repository.Repository;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,7 +49,8 @@ class LayerDependencyTest {
             .should()
             .dependOnClassesThat(
                     resideInAnyPackage(API, APPLICATION, INFRASTRUCTURE, "org.springframework..", "org.hibernate..")
-                            .and(not(resideInAPackage("org.hibernate.annotations.."))))
+                            .and(not(resideInAPackage("org.hibernate.annotations..")))
+                            .and(not(belongToAnyOf(DomainEvents.class, AfterDomainEventPublication.class))))
             .allowEmptyShould(true);
 
     @ArchTest
