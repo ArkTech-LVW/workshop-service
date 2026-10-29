@@ -25,10 +25,11 @@ class SendQuoteUseCaseTest {
     private static final Long ATTENDANT_ID = 7L;
     private static final Long MECHANIC_ID = 5L;
 
-    private final InMemoryServiceOrderRepository serviceOrderRepository = new InMemoryServiceOrderRepository();
     private final List<Object> publishedEvents = new ArrayList<>();
+    private final InMemoryServiceOrderRepository serviceOrderRepository =
+            new InMemoryServiceOrderRepository(publishedEvents::add);
     private final SendQuoteUseCase sendQuoteUseCase =
-            new SendQuoteUseCase(serviceOrderRepository, () -> ATTENDANT_ID, publishedEvents::add);
+            new SendQuoteUseCase(serviceOrderRepository, () -> ATTENDANT_ID);
 
     private final ServiceOrder serviceOrder = serviceOrderRepository.save(
             new ServiceOrder(serviceOrderRepository.nextNumber(), 10L, 20L, "Barulho ao frear", 1L));
