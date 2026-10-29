@@ -12,6 +12,8 @@ import br.com.arktech.workshop.serviceorder.application.openserviceorder.OpenSer
 import br.com.arktech.workshop.serviceorder.application.openserviceorder.OpenServiceOrderUseCase;
 import br.com.arktech.workshop.serviceorder.application.serviceorder.PartItemResult;
 import br.com.arktech.workshop.serviceorder.application.serviceorder.ServiceItemResult;
+import br.com.arktech.workshop.serviceorder.application.sendquote.SendQuoteCommand;
+import br.com.arktech.workshop.serviceorder.application.sendquote.SendQuoteUseCase;
 import br.com.arktech.workshop.serviceorder.application.serviceorder.ServiceOrderResult;
 import br.com.arktech.workshop.serviceorder.application.startdiagnosis.StartDiagnosisCommand;
 import br.com.arktech.workshop.serviceorder.application.startdiagnosis.StartDiagnosisUseCase;
@@ -19,6 +21,7 @@ import br.com.arktech.workshop.serviceorder.domain.model.InvalidStatusTransition
 import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderStatus;
 import br.com.arktech.workshop.shared.api.error.ApiErrorTestConfig;
 import br.com.arktech.workshop.shared.application.registry.VehicleDetails;
+import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 
@@ -75,6 +78,21 @@ class ServiceOrderControllerTest {
             new BigDecimal("107.70"),
             new BigDecimal("407.70"),
             Instant.parse("2026-10-27T14:30:00Z"));
+    private static final ServiceOrderResult AWAITING_APPROVAL = new ServiceOrderResult(
+            1L,
+            PUBLIC_ID,
+            "SO-2026-000123",
+            10L,
+            20L,
+            5L,
+            "Barulho ao frear",
+            ServiceOrderStatus.AWAITING_APPROVAL,
+            List.of(new ServiceItemResult(1L, 30L, 2, new BigDecimal("150.00"), new BigDecimal("300.00"))),
+            List.of(new PartItemResult(2L, 40L, 3, new BigDecimal("35.90"), new BigDecimal("107.70"))),
+            new BigDecimal("300.00"),
+            new BigDecimal("107.70"),
+            new BigDecimal("407.70"),
+            Instant.parse("2026-10-27T14:30:00Z"));
     private static final String CUSTOMER_NOT_REGISTERED = "Nenhum cliente cadastrado com o CPF/CNPJ 529.982.247-25. "
             + "Cadastre o cliente antes de abrir a ordem de serviço.";
     private static final String OPEN_REQUEST = """
@@ -92,6 +110,9 @@ class ServiceOrderControllerTest {
 
     @MockitoBean
     private StartDiagnosisUseCase startDiagnosisUseCase;
+
+    @MockitoBean
+    private SendQuoteUseCase sendQuoteUseCase;
 
     @Test
     void shouldOpenServiceOrder() throws Exception {
@@ -218,6 +239,57 @@ class ServiceOrderControllerTest {
                          "message": "Esta ação não é permitida no status atual da ordem de serviço."}
                         """,
                         JsonCompareMode.LENIENT));
+    }
+
+    @Test
+    void shouldSendTheQuote() throws Exception {
+        when(sendQuoteUseCase.execute(any())).thenReturn(AWAITING_APPROVAL);
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/sendQuote", 1L))
+                .andExpect(status().isOk())
+                .andExpect(json(
+                        """
+                        {"id": 1, "status": "AWAITING_APPROVAL", "totalPrice": 407.70}
+                        """,
+                        JsonCompareMode.LENIENT));
+        verify(sendQuoteUseCase).execute(new SendQuoteCommand(1L));
+    }
+
+    @Test
+    void shouldAnswer422WhenTheQuoteHasNoItems() throws Exception {
+        when(sendQuoteUseCase.execute(any())).thenThrow(new BusinessRuleException("serviceOrder.quoteWithoutItems"));
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/sendQuote", 1L))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(json("""
+                        {"code": "serviceOrder.quoteWithoutItems",
+                         "message": "O orçamento precisa ter pelo menos um serviço ou peça."}
+                        """));
+    }
+
+    @Test
+    void shouldAnswer422WhenTheServiceOrderIsNotInDiagnosis() throws Exception {
+        when(sendQuoteUseCase.execute(any()))
+                .thenThrow(new InvalidStatusTransitionException(
+                        ServiceOrderStatus.RECEIVED, ServiceOrderStatus.AWAITING_APPROVAL));
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/sendQuote", 1L))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(json("""
+                        {"code": "serviceOrder.invalidStatusTransition",
+                         "message": "Esta ação não é permitida no status atual da ordem de serviço."}
+                        """));
+    }
+
+    @Test
+    void shouldAnswer404WhenSendingTheQuoteOfAnUnknownServiceOrder() throws Exception {
+        when(sendQuoteUseCase.execute(any())).thenThrow(new NotFoundException("serviceOrder.notFound", "1"));
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/sendQuote", 1L))
+                .andExpect(status().isNotFound())
+                .andExpect(json("""
+                        {"code": "serviceOrder.notFound", "message": "Ordem de serviço 1 não encontrada."}
+                        """));
     }
 
     private static MockHttpServletRequestBuilder open(String body) {
