@@ -1,5 +1,9 @@
 package br.com.arktech.workshop.registry.api.vehicle;
 
+import static br.com.arktech.workshop.UniqueTestData.uniqueCPF;
+import static br.com.arktech.workshop.UniqueTestData.uniqueChassis;
+import static br.com.arktech.workshop.UniqueTestData.uniquePlate;
+import static br.com.arktech.workshop.UniqueTestData.withHyphen;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -11,15 +15,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import br.com.arktech.workshop.IntegrationTest;
 import br.com.arktech.workshop.auth.application.port.TokenIssuer;
-import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
 import br.com.arktech.workshop.shared.domain.security.Role;
-import br.com.arktech.workshop.shared.domain.vehicle.Chassis;
 
 import com.jayway.jsonpath.JsonPath;
 
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.jspecify.annotations.Nullable;
@@ -36,9 +36,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 @IntegrationTest
 class VehicleManagementIntegrationTest {
-
-    private static final String LETTERS = "ABCDEFGHJKLMNPRSTUVWXYZ";
-    private static final String VIN_CHARACTERS = LETTERS + "0123456789";
 
     @Autowired
     private MockMvc mockMvc;
@@ -322,40 +319,5 @@ class VehicleManagementIntegrationTest {
 
     private String tokenFor(Role... roles) {
         return tokenIssuer.issue(1L, Set.of(roles)).value();
-    }
-
-    private static String uniquePlate() {
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-        return "" + randomOf(LETTERS) + randomOf(LETTERS) + randomOf(LETTERS) + random.nextInt(10)
-                + randomOf(LETTERS) + "%02d".formatted(random.nextInt(100));
-    }
-
-    private static String withHyphen(String licensePlate) {
-        return licensePlate.substring(0, 3) + "-" + licensePlate.substring(3);
-    }
-
-    private static String uniqueChassis() {
-        String base = IntStream.range(0, 16)
-                .mapToObj(index -> String.valueOf(randomOf(VIN_CHARACTERS)))
-                .reduce("", String::concat);
-        return "0123456789X".chars()
-                .mapToObj(checkDigit -> base.substring(0, 8) + (char) checkDigit + base.substring(8))
-                .filter(Chassis::isValid)
-                .findFirst()
-                .orElseThrow();
-    }
-
-    private static char randomOf(String characters) {
-        return characters.charAt(ThreadLocalRandom.current().nextInt(characters.length()));
-    }
-
-    private static CPFCNPJ uniqueCPF() {
-        String base = "%09d".formatted(ThreadLocalRandom.current().nextLong(1_000_000_000L));
-        return IntStream.range(0, 100)
-                .mapToObj(checkDigits -> base + "%02d".formatted(checkDigits))
-                .filter(CPFCNPJ::isValid)
-                .findFirst()
-                .map(CPFCNPJ::of)
-                .orElseThrow();
     }
 }

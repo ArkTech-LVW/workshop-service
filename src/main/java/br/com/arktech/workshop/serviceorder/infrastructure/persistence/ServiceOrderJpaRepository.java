@@ -5,7 +5,6 @@ import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderNumber;
 import br.com.arktech.workshop.serviceorder.domain.repository.ServiceOrderRepository;
 
 import java.time.Year;
-import java.time.ZoneId;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,11 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 interface ServiceOrderJpaRepository extends JpaRepository<ServiceOrder, Long>, ServiceOrderRepository {
 
-    ZoneId WORKSHOP_ZONE = ZoneId.of("America/Sao_Paulo");
-
     @Override
     default ServiceOrderNumber nextNumber() {
-        Year year = Year.now(WORKSHOP_ZONE);
+        Year year = Year.now();
         return ServiceOrderNumber.of(year, incrementNumberCounter(year.getValue()));
     }
 

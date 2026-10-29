@@ -4,11 +4,10 @@ import br.com.arktech.workshop.shared.domain.BaseEntity;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.vehicle.Chassis;
 import br.com.arktech.workshop.shared.domain.vehicle.LicensePlate;
+import br.com.arktech.workshop.shared.domain.vehicle.VehicleYears;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-
-import java.time.Year;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,8 +20,6 @@ import org.jspecify.annotations.Nullable;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Vehicle extends BaseEntity {
-
-    public static final int FIRST_YEAR = 1981;
 
     private Long customerId;
 
@@ -55,10 +52,6 @@ public class Vehicle extends BaseEntity {
         this.color = color;
     }
 
-    public static boolean isValidYear(int year) {
-        return year >= FIRST_YEAR && year <= Year.now().getValue() + 1;
-    }
-
     public void changeIdentification(LicensePlate licensePlate, @Nullable Chassis chassis) {
         this.licensePlate = licensePlate;
         this.chassis = chassis;
@@ -69,7 +62,7 @@ public class Vehicle extends BaseEntity {
     }
 
     private static int requireValidYear(int year) {
-        if (!isValidYear(year)) {
+        if (!VehicleYears.isValid(year)) {
             throw new BusinessRuleException("vehicle.invalidYear");
         }
         return year;

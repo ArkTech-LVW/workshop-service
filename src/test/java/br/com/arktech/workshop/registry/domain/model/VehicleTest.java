@@ -16,14 +16,6 @@ class VehicleTest {
     private static final int NEXT_YEAR = Year.now().getValue() + 1;
 
     @Test
-    void shouldAcceptYearsFrom1981UntilNextYear() {
-        assertThat(Vehicle.isValidYear(1981)).isTrue();
-        assertThat(Vehicle.isValidYear(NEXT_YEAR)).isTrue();
-        assertThat(Vehicle.isValidYear(1980)).isFalse();
-        assertThat(Vehicle.isValidYear(NEXT_YEAR + 1)).isFalse();
-    }
-
-    @Test
     void shouldCreateVehicle() {
         Vehicle vehicle = new Vehicle(
                 1L, new LicensePlate("ABC1D23"), new Chassis("9BWZZZ372VT004251"), "Volkswagen", "Gol", 1981, "Prata");

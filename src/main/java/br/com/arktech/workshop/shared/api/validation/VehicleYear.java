@@ -1,4 +1,4 @@
-package br.com.arktech.workshop.registry.api.vehicle;
+package br.com.arktech.workshop.shared.api.validation;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.FIELD;
@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = VehicleYearValidator.class)
 @Target({FIELD, METHOD, PARAMETER, ANNOTATION_TYPE, TYPE_USE})
 @Retention(RUNTIME)
-@interface VehicleYear {
+public @interface VehicleYear {
 
     String message() default "{vehicle.invalidYear}";
 

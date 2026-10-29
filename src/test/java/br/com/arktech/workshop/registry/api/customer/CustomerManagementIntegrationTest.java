@@ -1,5 +1,7 @@
 package br.com.arktech.workshop.registry.api.customer;
 
+import static br.com.arktech.workshop.UniqueTestData.uniqueCNPJ;
+import static br.com.arktech.workshop.UniqueTestData.uniqueCPF;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -16,8 +18,6 @@ import br.com.arktech.workshop.shared.domain.security.Role;
 import com.jayway.jsonpath.JsonPath;
 
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -202,22 +202,5 @@ class CustomerManagementIntegrationTest {
 
     private String tokenFor(Role... roles) {
         return tokenIssuer.issue(1L, Set.of(roles)).value();
-    }
-
-    private static CPFCNPJ uniqueCPF() {
-        return withCheckDigits("%09d".formatted(ThreadLocalRandom.current().nextLong(1_000_000_000L)));
-    }
-
-    private static CPFCNPJ uniqueCNPJ() {
-        return withCheckDigits("%08d0001".formatted(ThreadLocalRandom.current().nextLong(100_000_000L)));
-    }
-
-    private static CPFCNPJ withCheckDigits(String base) {
-        return IntStream.range(0, 100)
-                .mapToObj(checkDigits -> base + "%02d".formatted(checkDigits))
-                .filter(CPFCNPJ::isValid)
-                .findFirst()
-                .map(CPFCNPJ::of)
-                .orElseThrow();
     }
 }
