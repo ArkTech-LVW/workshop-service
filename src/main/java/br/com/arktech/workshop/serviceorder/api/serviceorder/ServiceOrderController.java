@@ -1,5 +1,7 @@
 package br.com.arktech.workshop.serviceorder.api.serviceorder;
 
+import br.com.arktech.workshop.serviceorder.application.cancelserviceorder.CancelServiceOrderCommand;
+import br.com.arktech.workshop.serviceorder.application.cancelserviceorder.CancelServiceOrderUseCase;
 import br.com.arktech.workshop.serviceorder.application.openserviceorder.OpenServiceOrderCommand;
 import br.com.arktech.workshop.serviceorder.application.openserviceorder.OpenServiceOrderUseCase;
 import br.com.arktech.workshop.shared.application.registry.VehicleDetails;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 class ServiceOrderController implements IServiceOrderController {
 
     private final OpenServiceOrderUseCase openServiceOrderUseCase;
+    private final CancelServiceOrderUseCase cancelServiceOrderUseCase;
 
     @Override
     public ServiceOrderResponse open(OpenServiceOrderRequest request) {
@@ -23,5 +26,11 @@ class ServiceOrderController implements IServiceOrderController {
                         vehicle.licensePlate(), vehicle.brand(), vehicle.model(), vehicle.year(), vehicle.color()),
                 request.problemDescription());
         return ServiceOrderResponse.from(openServiceOrderUseCase.execute(command));
+    }
+
+    @Override
+    public ServiceOrderResponse cancel(Long id, CancelServiceOrderRequest request) {
+        return ServiceOrderResponse.from(
+                cancelServiceOrderUseCase.execute(new CancelServiceOrderCommand(id, request.reason())));
     }
 }

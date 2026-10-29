@@ -8,9 +8,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import br.com.arktech.workshop.serviceorder.application.cancelserviceorder.CancelServiceOrderCommand;
+import br.com.arktech.workshop.serviceorder.application.cancelserviceorder.CancelServiceOrderUseCase;
 import br.com.arktech.workshop.serviceorder.application.openserviceorder.OpenServiceOrderCommand;
 import br.com.arktech.workshop.serviceorder.application.openserviceorder.OpenServiceOrderUseCase;
 import br.com.arktech.workshop.serviceorder.application.serviceorder.ServiceOrderResult;
+import br.com.arktech.workshop.serviceorder.domain.model.InvalidStatusTransitionException;
 import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderStatus;
 import br.com.arktech.workshop.shared.api.error.ApiErrorTestConfig;
 import br.com.arktech.workshop.shared.application.registry.VehicleDetails;
@@ -50,6 +53,17 @@ class ServiceOrderControllerTest {
             ServiceOrderStatus.RECEIVED,
             new BigDecimal("0.00"),
             Instant.parse("2026-10-27T14:30:00Z"));
+    private static final ServiceOrderResult CANCELED = new ServiceOrderResult(
+            1L,
+            PUBLIC_ID,
+            "SO-2026-000123",
+            10L,
+            20L,
+            null,
+            "Barulho ao frear",
+            ServiceOrderStatus.CANCELED,
+            new BigDecimal("0.00"),
+            Instant.parse("2026-10-27T14:30:00Z"));
     private static final String CUSTOMER_NOT_REGISTERED = "Nenhum cliente cadastrado com o CPF/CNPJ 529.982.247-25. "
             + "Cadastre o cliente antes de abrir a ordem de serviço.";
     private static final String OPEN_REQUEST = """
@@ -64,6 +78,9 @@ class ServiceOrderControllerTest {
 
     @MockitoBean
     private OpenServiceOrderUseCase openServiceOrderUseCase;
+
+    @MockitoBean
+    private CancelServiceOrderUseCase cancelServiceOrderUseCase;
 
     @Test
     void shouldOpenServiceOrder() throws Exception {
@@ -154,6 +171,81 @@ class ServiceOrderControllerTest {
                         {"code": "vehicle.licensePlateOfAnotherCustomer",
                          "message": "A placa ABC1D23 já está cadastrada para outro cliente."}
                         """));
+    }
+
+    @Test
+    void shouldCancelServiceOrder() throws Exception {
+        when(cancelServiceOrderUseCase.execute(any())).thenReturn(CANCELED);
+
+        mockMvc.perform(cancel("""
+                        {"reason": "Cliente desistiu do serviço"}
+                        """))
+                .andExpect(status().isOk())
+                .andExpect(json("""
+                        {"id": 1, "publicId": "3f1c2b8e-7d4a-4c9e-9b1f-2a6d8e5c4b3a", "number": "SO-2026-000123",
+                         "customerId": 10, "vehicleId": 20, "mechanicId": null,
+                         "problemDescription": "Barulho ao frear", "status": "CANCELED", "totalPrice": 0.00,
+                         "dateCreated": "2026-10-27T14:30:00Z"}
+                        """));
+        verify(cancelServiceOrderUseCase).execute(new CancelServiceOrderCommand(1L, "Cliente desistiu do serviço"));
+    }
+
+    @Test
+    void shouldRequireAReasonToCancel() throws Exception {
+        mockMvc.perform(cancel("""
+                        {"reason": "  "}
+                        """))
+                .andExpect(status().isBadRequest())
+                .andExpect(json(
+                        """
+                        {"code": "request.invalidFields",
+                         "details": [{"field": "reason", "message": "Não pode estar em branco."}]}
+                        """,
+                        JsonCompareMode.LENIENT));
+        mockMvc.perform(cancel("""
+                        {"reason": "%s"}
+                        """.formatted("a".repeat(2001))))
+                .andExpect(status().isBadRequest())
+                .andExpect(json(
+                        """
+                        {"code": "request.invalidFields",
+                         "details": [{"field": "reason", "message": "Deve ter no máximo 2000 caracteres."}]}
+                        """,
+                        JsonCompareMode.LENIENT));
+        verifyNoInteractions(cancelServiceOrderUseCase);
+    }
+
+    @Test
+    void shouldAnswer422WhenTheStatusDoesNotAllowCancellation() throws Exception {
+        when(cancelServiceOrderUseCase.execute(any()))
+                .thenThrow(new InvalidStatusTransitionException(
+                        ServiceOrderStatus.QUOTE_APPROVED, ServiceOrderStatus.CANCELED));
+
+        mockMvc.perform(cancel("""
+                        {"reason": "Cliente desistiu do serviço"}
+                        """))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(json("""
+                        {"code": "serviceOrder.invalidStatusTransition",
+                         "message": "Esta ação não é permitida no status atual da ordem de serviço."}
+                        """));
+    }
+
+    @Test
+    void shouldAnswer404WhenTheServiceOrderDoesNotExist() throws Exception {
+        when(cancelServiceOrderUseCase.execute(any())).thenThrow(new NotFoundException("serviceOrder.notFound", "1"));
+
+        mockMvc.perform(cancel("""
+                        {"reason": "Cliente desistiu do serviço"}
+                        """))
+                .andExpect(status().isNotFound())
+                .andExpect(json("""
+                        {"code": "serviceOrder.notFound", "message": "Ordem de serviço 1 não encontrada."}
+                        """));
+    }
+
+    private static MockHttpServletRequestBuilder cancel(String body) {
+        return post("/admin/serviceOrders/1/cancel").contentType(MediaType.APPLICATION_JSON).content(body);
     }
 
     private static MockHttpServletRequestBuilder open(String body) {
