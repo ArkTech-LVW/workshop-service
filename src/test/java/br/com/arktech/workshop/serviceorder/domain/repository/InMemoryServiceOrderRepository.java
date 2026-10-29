@@ -7,6 +7,7 @@ import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -18,12 +19,23 @@ public class InMemoryServiceOrderRepository implements ServiceOrderRepository {
 
     private long nextSequence = 1;
 
+    private long nextItemId = 1;
+
     @Override
     public ServiceOrder save(ServiceOrder serviceOrder) {
         if (!serviceOrders.contains(serviceOrder)) {
             ReflectionTestUtils.setField(serviceOrder, "id", nextId++);
             serviceOrders.add(serviceOrder);
         }
+        return serviceOrder;
+    }
+
+    @Override
+    public ServiceOrder saveAndFlush(ServiceOrder serviceOrder) {
+        save(serviceOrder);
+        Stream.concat(serviceOrder.getServiceItems().stream(), serviceOrder.getPartItems().stream())
+                .filter(item -> item.getId() == null)
+                .forEach(item -> ReflectionTestUtils.setField(item, "id", nextItemId++));
         return serviceOrder;
     }
 
