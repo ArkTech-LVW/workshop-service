@@ -117,7 +117,6 @@ public class ServiceOrder extends BaseEntity {
         return List.copyOf(statusHistory);
     }
 
-    /** Spring Data publishes these on {@code save} and then clears them, inside the caller's transaction. */
     @DomainEvents
     public List<ServiceOrderEvent> domainEvents() {
         return List.copyOf(events);

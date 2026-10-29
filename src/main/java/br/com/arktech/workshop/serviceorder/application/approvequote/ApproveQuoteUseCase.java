@@ -13,10 +13,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * The inventory withdraws the parts while handling {@link QuoteApprovedEvent} in this same transaction, so a part
- * without enough stock rolls back the approval as a whole.
- */
 @Service
 @RequiredArgsConstructor
 public class ApproveQuoteUseCase implements UseCase<ApproveQuoteCommand, ServiceOrderResult> {

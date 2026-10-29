@@ -50,7 +50,6 @@ class LayerDependencyTest {
             .dependOnClassesThat(
                     resideInAnyPackage(API, APPLICATION, INFRASTRUCTURE, "org.springframework..", "org.hibernate..")
                             .and(not(resideInAPackage("org.hibernate.annotations..")))
-                            // Aggregates hand their events to Spring Data on save; nothing else from Spring is allowed.
                             .and(not(belongToAnyOf(DomainEvents.class, AfterDomainEventPublication.class))))
             .allowEmptyShould(true);
 

@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-/** Synchronous on purpose: the withdrawal runs in the approval transaction and its failure aborts the approval. */
 @Component
 @RequiredArgsConstructor
 class QuoteApprovedListener {

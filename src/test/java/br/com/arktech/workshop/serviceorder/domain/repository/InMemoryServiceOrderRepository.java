@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 
 import org.springframework.test.util.ReflectionTestUtils;
 
-/** Publishes the domain events on {@code save}, as Spring Data does. */
 public class InMemoryServiceOrderRepository implements ServiceOrderRepository {
 
     private final List<ServiceOrder> serviceOrders = new ArrayList<>();
