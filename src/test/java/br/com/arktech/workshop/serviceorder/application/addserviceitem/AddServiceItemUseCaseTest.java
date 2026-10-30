@@ -12,7 +12,10 @@ import br.com.arktech.workshop.shared.domain.money.Money;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 
@@ -23,10 +26,10 @@ class AddServiceItemUseCaseTest {
 
     private final InMemoryServiceOrderRepository serviceOrderRepository = new InMemoryServiceOrderRepository();
     private final List<Long> pricedServices = new ArrayList<>();
-    private final ServiceOfferingDirectory serviceOfferingDirectory = serviceOfferingId -> {
+    private final ServiceOfferingDirectory serviceOfferingDirectory = pricing(serviceOfferingId -> {
         pricedServices.add(serviceOfferingId);
         return LABOR_PRICE;
-    };
+    });
     private final AddServiceItemUseCase addServiceItemUseCase =
             new AddServiceItemUseCase(serviceOrderRepository, serviceOfferingDirectory);
 
@@ -75,9 +78,9 @@ class AddServiceItemUseCaseTest {
 
     @Test
     void shouldNotAddAServiceTheCatalogRefuses() {
-        AddServiceItemUseCase withInactiveService = new AddServiceItemUseCase(serviceOrderRepository, id -> {
+        AddServiceItemUseCase withInactiveService = new AddServiceItemUseCase(serviceOrderRepository, pricing(id -> {
             throw new BusinessRuleException("serviceOffering.inactive", id.toString());
-        });
+        }));
 
         assertThatThrownBy(() ->
                         withInactiveService.execute(new AddServiceItemCommand(serviceOrder.getId(), BRAKES_ID, 1)))
@@ -97,5 +100,19 @@ class AddServiceItemUseCaseTest {
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessage("serviceOrder.itemsLocked");
         assertThat(serviceOrder.getServiceItems()).isEmpty();
+    }
+
+    private static ServiceOfferingDirectory pricing(Function<Long, Money> laborPriceOf) {
+        return new ServiceOfferingDirectory() {
+            @Override
+            public Money laborPriceOf(Long serviceOfferingId) {
+                return laborPriceOf.apply(serviceOfferingId);
+            }
+
+            @Override
+            public Map<Long, String> namesOf(Collection<Long> serviceOfferingIds) {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 }

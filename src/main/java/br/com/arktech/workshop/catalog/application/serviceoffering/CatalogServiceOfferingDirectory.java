@@ -6,6 +6,10 @@ import br.com.arktech.workshop.shared.application.catalog.ServiceOfferingDirecto
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.money.Money;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
@@ -24,5 +28,11 @@ class CatalogServiceOfferingDirectory implements ServiceOfferingDirectory {
         }
 
         return serviceOffering.getLaborPrice();
+    }
+
+    @Override
+    public Map<Long, String> namesOf(Collection<Long> serviceOfferingIds) {
+        return serviceOfferingRepository.findAllById(serviceOfferingIds).stream()
+                .collect(Collectors.toMap(ServiceOffering::getId, ServiceOffering::getName));
     }
 }
