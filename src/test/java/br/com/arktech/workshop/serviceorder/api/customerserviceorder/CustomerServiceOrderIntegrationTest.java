@@ -2,6 +2,7 @@ package br.com.arktech.workshop.serviceorder.api.customerserviceorder;
 
 import static br.com.arktech.workshop.UniqueTestData.uniqueCPF;
 import static br.com.arktech.workshop.UniqueTestData.uniquePlate;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.notNullValue;
@@ -21,6 +22,7 @@ import br.com.arktech.workshop.shared.domain.security.Role;
 
 import com.jayway.jsonpath.JsonPath;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -123,6 +125,8 @@ class CustomerServiceOrderIntegrationTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("serviceOrder.notFound"))
                 .andExpect(jsonPath("$.message").value("Ordem de serviço %s não encontrada.".formatted(publicId)));
+        mockMvc.perform(approve(uniqueCPF().value())).andExpect(status().isNotFound());
+        assertThat(statusOf()).isEqualTo("RECEIVED");
     }
 
     @Test
@@ -156,6 +160,65 @@ class CustomerServiceOrderIntegrationTest {
                 .andExpect(jsonPath("$.quote.totalPrice").value(241.80))
                 .andExpect(jsonPath("$.quote.parts[0].id").doesNotExist())
                 .andExpect(jsonPath("$.quote.parts[0].partId").doesNotExist());
+    }
+
+    @Test
+    void shouldApproveWithoutRecordingAUserEvenWhenAStaffTokenIsSent() throws Exception {
+        Long pad = createPart("Pastilha de freio", "45.90", 10);
+        sendQuoteWithPart(pad, 3);
+
+        mockMvc.perform(approve(document.value())
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenFor(Role.ATTENDANT)))
+                .andExpect(status().isNoContent());
+
+        assertThat(statusOf()).isEqualTo("QUOTE_APPROVED");
+        assertThat(lastStatusChange())
+                .containsEntry("to_status", "QUOTE_APPROVED")
+                .containsEntry("changed_by_user_id", null);
+        assertThat(jdbcTemplate.queryForObject("SELECT stock_quantity FROM part WHERE id = ?", Integer.class, pad))
+                .isEqualTo(7);
+        assertThat(jdbcTemplate.queryForList(
+                        "SELECT quantity, created_by_user_id FROM stock_movement WHERE service_order_id = ?",
+                        serviceOrderId))
+                .singleElement()
+                .satisfies(withdrawal ->
+                        assertThat(withdrawal).containsEntry("quantity", 3).containsEntry("created_by_user_id", null));
+
+        mockMvc.perform(approve(document.value()))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.code").value("serviceOrder.invalidStatusTransition"));
+    }
+
+    @Test
+    void shouldRejectRecordingTheCustomersReason() throws Exception {
+        Long pad = createPart("Pastilha de freio", "45.90", 10);
+        sendQuoteWithPart(pad, 1);
+
+        mockMvc.perform(post("/customer/serviceOrders/{publicId}/reject", publicId)
+                        .header(CUSTOMER_DOCUMENT, document.formatted())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"reason": "Achei o valor alto"}
+                                """))
+                .andExpect(status().isNoContent());
+
+        assertThat(statusOf()).isEqualTo("QUOTE_REJECTED");
+        assertThat(lastStatusChange())
+                .containsEntry("to_status", "QUOTE_REJECTED")
+                .containsEntry("changed_by_user_id", null)
+                .containsEntry("description", "Achei o valor alto");
+        mockMvc.perform(track(document.value()))
+                .andExpect(jsonPath("$.statusHistory[3].status").value("QUOTE_REJECTED"))
+                .andExpect(jsonPath("$.statusHistory[3].description").value("Achei o valor alto"))
+                .andExpect(jsonPath("$.quote.parts[0].name").value("Pastilha de freio"));
+    }
+
+    private void sendQuoteWithPart(Long partId, int quantity) throws Exception {
+        as(Role.MECHANIC, post("/admin/serviceOrders/{id}/startDiagnosis", serviceOrderId))
+                .andExpect(status().isOk());
+        addItem("parts", "partId", partId, quantity);
+        as(Role.ATTENDANT, post("/admin/serviceOrders/{id}/sendQuote", serviceOrderId))
+                .andExpect(status().isOk());
     }
 
     private void addItem(String kind, String idField, Long id, int quantity) throws Exception {
@@ -207,8 +270,26 @@ class CustomerServiceOrderIntegrationTest {
         return partId;
     }
 
+    private String statusOf() {
+        return jdbcTemplate.queryForObject(
+                "SELECT status FROM service_order WHERE id = ?", String.class, serviceOrderId);
+    }
+
+    private Map<String, Object> lastStatusChange() {
+        return jdbcTemplate.queryForMap(
+                """
+                SELECT to_status, changed_by_user_id, description FROM status_change
+                WHERE service_order_id = ? ORDER BY id DESC LIMIT 1
+                """,
+                serviceOrderId);
+    }
+
     private MockHttpServletRequestBuilder track(String customerDocument) {
         return get("/customer/serviceOrders/{publicId}", publicId).header(CUSTOMER_DOCUMENT, customerDocument);
+    }
+
+    private MockHttpServletRequestBuilder approve(String customerDocument) {
+        return post("/customer/serviceOrders/{publicId}/approve", publicId).header(CUSTOMER_DOCUMENT, customerDocument);
     }
 
     private String tokenFor(Role role) {

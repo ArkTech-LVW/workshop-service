@@ -1,18 +1,26 @@
 package br.com.arktech.workshop.serviceorder.api.customerserviceorder;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import br.com.arktech.workshop.serviceorder.application.approvequoteascustomer.ApproveQuoteAsCustomerCommand;
+import br.com.arktech.workshop.serviceorder.application.approvequoteascustomer.ApproveQuoteAsCustomerUseCase;
+import br.com.arktech.workshop.serviceorder.application.rejectquoteascustomer.RejectQuoteAsCustomerCommand;
+import br.com.arktech.workshop.serviceorder.application.rejectquoteascustomer.RejectQuoteAsCustomerUseCase;
 import br.com.arktech.workshop.serviceorder.application.trackserviceorder.QuoteItemResult;
 import br.com.arktech.workshop.serviceorder.application.trackserviceorder.QuoteResult;
 import br.com.arktech.workshop.serviceorder.application.trackserviceorder.StatusChangeResult;
 import br.com.arktech.workshop.serviceorder.application.trackserviceorder.TrackServiceOrderQuery;
 import br.com.arktech.workshop.serviceorder.application.trackserviceorder.TrackServiceOrderResult;
 import br.com.arktech.workshop.serviceorder.application.trackserviceorder.TrackServiceOrderUseCase;
+import br.com.arktech.workshop.serviceorder.domain.model.InvalidStatusTransitionException;
 import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderStatus;
 import br.com.arktech.workshop.shared.api.error.ApiErrorTestConfig;
 import br.com.arktech.workshop.shared.application.registry.VehicleDetails;
@@ -28,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
@@ -82,6 +91,12 @@ class CustomerServiceOrderControllerTest {
 
     @MockitoBean
     private TrackServiceOrderUseCase trackServiceOrderUseCase;
+
+    @MockitoBean
+    private ApproveQuoteAsCustomerUseCase approveQuoteAsCustomerUseCase;
+
+    @MockitoBean
+    private RejectQuoteAsCustomerUseCase rejectQuoteAsCustomerUseCase;
 
     @Test
     void shouldShowTheServiceOrderWithTheDetailedQuoteAndNoInternalField() throws Exception {
@@ -168,8 +183,67 @@ class CustomerServiceOrderControllerTest {
                 .andExpect(json(NOT_FOUND));
     }
 
+    @Test
+    void shouldApproveTheQuote() throws Exception {
+        mockMvc.perform(post("/customer/serviceOrders/{publicId}/approve", PUBLIC_ID)
+                        .header("X-Customer-Document", DOCUMENT))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+        verify(approveQuoteAsCustomerUseCase).execute(new ApproveQuoteAsCustomerCommand(PUBLIC_ID, DOCUMENT));
+    }
+
+    @Test
+    void shouldAnswer422WhenTheQuoteIsNotAwaitingApproval() throws Exception {
+        doThrow(new InvalidStatusTransitionException(
+                        ServiceOrderStatus.QUOTE_APPROVED, ServiceOrderStatus.QUOTE_APPROVED))
+                .when(approveQuoteAsCustomerUseCase)
+                .execute(any());
+
+        mockMvc.perform(post("/customer/serviceOrders/{publicId}/approve", PUBLIC_ID)
+                        .header("X-Customer-Document", DOCUMENT))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(json(
+                        """
+                        {"code": "serviceOrder.invalidStatusTransition"}
+                        """,
+                        JsonCompareMode.LENIENT));
+    }
+
+    @Test
+    void shouldRejectTheQuoteWithTheReason() throws Exception {
+        mockMvc.perform(reject("""
+                        {"reason": "Achei o valor alto"}
+                        """))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+        verify(rejectQuoteAsCustomerUseCase)
+                .execute(new RejectQuoteAsCustomerCommand(PUBLIC_ID, DOCUMENT, "Achei o valor alto"));
+    }
+
+    @Test
+    void shouldRequireTheRejectionReason() throws Exception {
+        mockMvc.perform(reject("""
+                        {"reason": " "}
+                        """))
+                .andExpect(status().isBadRequest())
+                .andExpect(json(
+                        """
+                        {"code": "request.invalidFields",
+                         "details": [{"field": "reason", "message": "Não pode estar em branco."}]}
+                        """,
+                        JsonCompareMode.LENIENT));
+        verifyNoInteractions(rejectQuoteAsCustomerUseCase);
+    }
+
     private static MockHttpServletRequestBuilder track() {
         return get("/customer/serviceOrders/{publicId}", PUBLIC_ID);
+    }
+
+    private static MockHttpServletRequestBuilder reject(String body) {
+        return post("/customer/serviceOrders/{publicId}/reject", PUBLIC_ID)
+                .header("X-Customer-Document", DOCUMENT)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body);
     }
 
     private static ResultMatcher json(String expected) {
