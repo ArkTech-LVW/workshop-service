@@ -6,14 +6,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import br.com.arktech.workshop.serviceorder.application.serviceorder.ServiceOrderResult;
 import br.com.arktech.workshop.serviceorder.domain.model.InvalidStatusTransitionException;
 import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrder;
-import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderEvent.ServiceOrderCanceled;
 import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderStatus;
 import br.com.arktech.workshop.serviceorder.domain.model.StatusChange;
 import br.com.arktech.workshop.serviceorder.domain.repository.InMemoryServiceOrderRepository;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,9 +19,7 @@ class CancelServiceOrderUseCaseTest {
     private static final Long ATTENDANT_ID = 7L;
     private static final String REASON = "Cliente desistiu do serviço";
 
-    private final List<Object> publishedEvents = new ArrayList<>();
-    private final InMemoryServiceOrderRepository serviceOrderRepository =
-            new InMemoryServiceOrderRepository(publishedEvents::add);
+    private final InMemoryServiceOrderRepository serviceOrderRepository = new InMemoryServiceOrderRepository();
     private final CancelServiceOrderUseCase useCase =
             new CancelServiceOrderUseCase(serviceOrderRepository, () -> ATTENDANT_ID);
 
@@ -53,20 +47,12 @@ class CancelServiceOrderUseCaseTest {
     }
 
     @Test
-    void shouldPublishTheCanceledEvent() {
-        useCase.execute(new CancelServiceOrderCommand(serviceOrder.getId(), REASON));
-
-        assertThat(publishedEvents).containsExactly(new ServiceOrderCanceled(serviceOrder.getPublicId()));
-    }
-
-    @Test
-    void shouldRefuseToCancelTwiceWithoutPublishingAgain() {
+    void shouldRefuseToCancelTwice() {
         useCase.execute(new CancelServiceOrderCommand(serviceOrder.getId(), REASON));
 
         assertThatThrownBy(() -> useCase.execute(new CancelServiceOrderCommand(serviceOrder.getId(), REASON)))
                 .isInstanceOf(InvalidStatusTransitionException.class)
                 .hasMessage("serviceOrder.invalidStatusTransition");
-        assertThat(publishedEvents).hasSize(1);
         assertThat(serviceOrder.getStatusHistory())
                 .extracting(StatusChange::getToStatus)
                 .containsExactly(ServiceOrderStatus.RECEIVED, ServiceOrderStatus.CANCELED);
@@ -77,6 +63,5 @@ class CancelServiceOrderUseCaseTest {
         assertThatThrownBy(() -> useCase.execute(new CancelServiceOrderCommand(99L, REASON)))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("serviceOrder.notFound");
-        assertThat(publishedEvents).isEmpty();
     }
 }

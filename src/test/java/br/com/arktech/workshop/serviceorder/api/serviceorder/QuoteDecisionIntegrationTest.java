@@ -14,11 +14,10 @@ import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
 import br.com.arktech.workshop.auth.domain.repository.UserRepository;
 import br.com.arktech.workshop.serviceorder.application.approvequote.ApproveQuoteCommand;
 import br.com.arktech.workshop.serviceorder.application.approvequote.ApproveQuoteUseCase;
-import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderEvent.QuoteApproved;
-import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderEvent.QuoteRejected;
 import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
 import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.shared.domain.security.Role;
+import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
 
 import com.jayway.jsonpath.JsonPath;
 
@@ -100,7 +99,7 @@ class QuoteDecisionIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("QUOTE_APPROVED"));
 
-        assertThat(applicationEvents.stream(QuoteApproved.class)).hasSize(1);
+        assertThat(applicationEvents.stream(QuoteApprovedEvent.class)).hasSize(1);
 
         assertThat(statusOf()).isEqualTo("QUOTE_APPROVED");
         assertThat(lastStatusChange())
@@ -193,7 +192,6 @@ class QuoteDecisionIntegrationTest {
         as(Role.ATTENDANT, reject("Cliente achou o valor alto"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("QUOTE_REJECTED"));
-        assertThat(applicationEvents.stream(QuoteRejected.class)).hasSize(1);
         assertThat(lastStatusChange())
                 .containsEntry("to_status", "QUOTE_REJECTED")
                 .containsEntry("description", "Cliente achou o valor alto");

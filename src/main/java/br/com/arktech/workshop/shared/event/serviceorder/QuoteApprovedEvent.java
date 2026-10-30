@@ -1,4 +1,4 @@
-package br.com.arktech.workshop.shared.application.serviceorder;
+package br.com.arktech.workshop.shared.event.serviceorder;
 
 import java.util.List;
 import java.util.UUID;

@@ -1,6 +1,6 @@
 package br.com.arktech.workshop.inventory.application.withdrawstock;
 
-import br.com.arktech.workshop.shared.application.serviceorder.QuoteApprovedEvent;
+import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
 
 import lombok.RequiredArgsConstructor;
 
