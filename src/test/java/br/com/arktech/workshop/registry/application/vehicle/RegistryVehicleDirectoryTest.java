@@ -89,6 +89,21 @@ class RegistryVehicleDirectoryTest {
         assertThat(vehicleRepository.findAll()).isEmpty();
     }
 
+    @Test
+    void shouldGiveTheDetailsOfARegisteredVehicle() {
+        Vehicle gol = vehicleRepository.save(new Vehicle(anaId, PLATE, null, "Volkswagen", "Gol", 2020, "Prata"));
+
+        assertThat(vehicleDirectory.detailsOf(gol.getId()))
+                .isEqualTo(new VehicleDetails("ABC1D23", "Volkswagen", "Gol", 2020, "Prata"));
+    }
+
+    @Test
+    void shouldReportAnUnknownVehicle() {
+        assertThatThrownBy(() -> vehicleDirectory.detailsOf(99L))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("vehicle.notFound");
+    }
+
     private Customer saveCustomer(String document) {
         return customerRepository.save(
                 new Customer("Cliente", CPFCNPJ.of(document), new Email("cliente@email.com"), null));
