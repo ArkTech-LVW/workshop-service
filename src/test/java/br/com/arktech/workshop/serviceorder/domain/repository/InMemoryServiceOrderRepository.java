@@ -7,6 +7,7 @@ import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -56,6 +57,14 @@ public class InMemoryServiceOrderRepository implements ServiceOrderRepository {
     public Optional<ServiceOrder> findById(Long id) {
         return serviceOrders.stream()
                 .filter(serviceOrder -> serviceOrder.getId().equals(id))
+                .findFirst();
+    }
+
+    @Override
+    public Optional<ServiceOrder> findByPublicIdAndCustomerId(UUID publicId, Long customerId) {
+        return serviceOrders.stream()
+                .filter(serviceOrder -> serviceOrder.getPublicId().equals(publicId))
+                .filter(serviceOrder -> serviceOrder.getCustomerId().equals(customerId))
                 .findFirst();
     }
 
