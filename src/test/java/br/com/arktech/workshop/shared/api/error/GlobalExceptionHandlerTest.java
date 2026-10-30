@@ -262,6 +262,20 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void shouldReportMissingRequestHeaderByItsName() throws Exception {
+        perform(get("/test/errors/header"))
+                .andExpect(status().isBadRequest())
+                .andExpect(json(invalidFields("X-Test-Document", "Parâmetro obrigatório.")));
+    }
+
+    @Test
+    void shouldReportInvalidRequestHeaderByItsName() throws Exception {
+        perform(get("/test/errors/header").header("X-Test-Document", "123"))
+                .andExpect(status().isBadRequest())
+                .andExpect(json(invalidFields("X-Test-Document", "CPF ou CNPJ inválido.")));
+    }
+
+    @Test
     void shouldReportUnknownRoute() throws Exception {
         perform(get("/test/errors/doesNotExist"))
                 .andExpect(status().isNotFound())
