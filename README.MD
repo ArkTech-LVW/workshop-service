@@ -82,6 +82,7 @@ Para chamar rotas protegidas pela própria UI, faça o login em `POST /auth/logi
 - [ADR 001: Banco de dados e persistência](docs/adr/001-database.md)
 - [ADR 002: Padrão de erros da API](docs/adr/002-api-errors.md)
 - [ADR 003: Autenticação e autorização](docs/adr/003-authentication.md)
+- [ADR 004: Eventos de domínio](docs/adr/004-domain-events.md)
 
 ## Contribuindo
 

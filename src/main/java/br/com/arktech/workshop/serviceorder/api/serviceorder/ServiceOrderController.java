@@ -4,6 +4,12 @@ import br.com.arktech.workshop.serviceorder.application.approvequote.ApproveQuot
 import br.com.arktech.workshop.serviceorder.application.approvequote.ApproveQuoteUseCase;
 import br.com.arktech.workshop.serviceorder.application.cancelserviceorder.CancelServiceOrderCommand;
 import br.com.arktech.workshop.serviceorder.application.cancelserviceorder.CancelServiceOrderUseCase;
+import br.com.arktech.workshop.serviceorder.application.completeserviceitem.CompleteServiceItemCommand;
+import br.com.arktech.workshop.serviceorder.application.completeserviceitem.CompleteServiceItemUseCase;
+import br.com.arktech.workshop.serviceorder.application.completeserviceorder.CompleteServiceOrderCommand;
+import br.com.arktech.workshop.serviceorder.application.completeserviceorder.CompleteServiceOrderUseCase;
+import br.com.arktech.workshop.serviceorder.application.deliverserviceorder.DeliverServiceOrderCommand;
+import br.com.arktech.workshop.serviceorder.application.deliverserviceorder.DeliverServiceOrderUseCase;
 import br.com.arktech.workshop.serviceorder.application.findserviceorder.FindServiceOrderQuery;
 import br.com.arktech.workshop.serviceorder.application.findserviceorder.FindServiceOrderUseCase;
 import br.com.arktech.workshop.serviceorder.application.listserviceorders.ListServiceOrdersQuery;
@@ -18,6 +24,8 @@ import br.com.arktech.workshop.serviceorder.application.sendquote.SendQuoteComma
 import br.com.arktech.workshop.serviceorder.application.sendquote.SendQuoteUseCase;
 import br.com.arktech.workshop.serviceorder.application.startdiagnosis.StartDiagnosisCommand;
 import br.com.arktech.workshop.serviceorder.application.startdiagnosis.StartDiagnosisUseCase;
+import br.com.arktech.workshop.serviceorder.application.startexecution.StartExecutionCommand;
+import br.com.arktech.workshop.serviceorder.application.startexecution.StartExecutionUseCase;
 import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderStatus;
 import br.com.arktech.workshop.shared.api.pagination.PageResponse;
 import br.com.arktech.workshop.shared.application.registry.VehicleDetails;
@@ -41,6 +49,10 @@ class ServiceOrderController implements IServiceOrderController {
     private final ApproveQuoteUseCase approveQuoteUseCase;
     private final RejectQuoteUseCase rejectQuoteUseCase;
     private final ReopenQuoteUseCase reopenQuoteUseCase;
+    private final StartExecutionUseCase startExecutionUseCase;
+    private final CompleteServiceItemUseCase completeServiceItemUseCase;
+    private final CompleteServiceOrderUseCase completeServiceOrderUseCase;
+    private final DeliverServiceOrderUseCase deliverServiceOrderUseCase;
     private final CancelServiceOrderUseCase cancelServiceOrderUseCase;
 
     @Override
@@ -97,6 +109,27 @@ class ServiceOrderController implements IServiceOrderController {
     public ServiceOrderResponse reopenQuote(Long id, @Nullable ReopenQuoteRequest request) {
         String description = request == null ? null : request.description();
         return ServiceOrderResponse.from(reopenQuoteUseCase.execute(new ReopenQuoteCommand(id, description)));
+    }
+
+    @Override
+    public ServiceOrderResponse startExecution(Long id) {
+        return ServiceOrderResponse.from(startExecutionUseCase.execute(new StartExecutionCommand(id)));
+    }
+
+    @Override
+    public ServiceOrderResponse completeService(Long id, Long itemId) {
+        return ServiceOrderResponse.from(
+                completeServiceItemUseCase.execute(new CompleteServiceItemCommand(id, itemId)));
+    }
+
+    @Override
+    public ServiceOrderResponse complete(Long id) {
+        return ServiceOrderResponse.from(completeServiceOrderUseCase.execute(new CompleteServiceOrderCommand(id)));
+    }
+
+    @Override
+    public ServiceOrderResponse deliver(Long id) {
+        return ServiceOrderResponse.from(deliverServiceOrderUseCase.execute(new DeliverServiceOrderCommand(id)));
     }
 
     @Override

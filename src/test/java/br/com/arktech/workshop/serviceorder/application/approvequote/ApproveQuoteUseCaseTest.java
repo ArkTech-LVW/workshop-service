@@ -6,13 +6,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import br.com.arktech.workshop.serviceorder.application.serviceorder.ServiceOrderResult;
 import br.com.arktech.workshop.serviceorder.domain.model.InvalidStatusTransitionException;
 import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrder;
-import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderEvent.QuoteApproved;
 import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderStatus;
 import br.com.arktech.workshop.serviceorder.domain.repository.InMemoryServiceOrderRepository;
 import br.com.arktech.workshop.shared.application.security.CurrentUser;
-import br.com.arktech.workshop.shared.application.serviceorder.QuoteApprovedEvent;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.money.Money;
+import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -67,15 +66,13 @@ class ApproveQuoteUseCaseTest {
         useCase(() -> ATTENDANT_ID).execute(new ApproveQuoteCommand(serviceOrder.getId()));
 
         assertThat(publishedEvents)
-                .containsExactly(
-                        new QuoteApproved(serviceOrder.getPublicId()),
-                        new QuoteApprovedEvent(
-                                serviceOrder.getId(),
-                                serviceOrder.getPublicId(),
-                                List.of(
-                                        new QuoteApprovedEvent.PartQuantity(40L, 3),
-                                        new QuoteApprovedEvent.PartQuantity(41L, 1)),
-                                ATTENDANT_ID));
+                .containsExactly(new QuoteApprovedEvent(
+                        serviceOrder.getId(),
+                        serviceOrder.getPublicId(),
+                        List.of(
+                                new QuoteApprovedEvent.PartQuantity(40L, 3),
+                                new QuoteApprovedEvent.PartQuantity(41L, 1)),
+                        ATTENDANT_ID));
     }
 
     @Test
@@ -86,7 +83,7 @@ class ApproveQuoteUseCaseTest {
 
         assertThat(serviceOrder.getStatusHistory().getLast().getChangedByUserId()).isNull();
         assertThat(publishedEvents)
-                .last()
+                .singleElement()
                 .isInstanceOfSatisfying(
                         QuoteApprovedEvent.class, event -> assertThat(event.approvedByUserId()).isNull());
     }
@@ -112,7 +109,7 @@ class ApproveQuoteUseCaseTest {
     }
 
     private ApproveQuoteUseCase useCase(CurrentUser currentUser) {
-        return new ApproveQuoteUseCase(serviceOrderRepository, currentUser, publishedEvents::add);
+        return new ApproveQuoteUseCase(serviceOrderRepository, currentUser);
     }
 
     private void sendQuoteWithParts() {
@@ -121,6 +118,5 @@ class ApproveQuoteUseCaseTest {
         serviceOrder.addPartItem(40L, 3, new Money(new BigDecimal("35.90")));
         serviceOrder.addPartItem(41L, 1, new Money(new BigDecimal("80.00")));
         serviceOrder.sendQuote(ATTENDANT_ID, null);
-        serviceOrder.clearDomainEvents();
     }
 }

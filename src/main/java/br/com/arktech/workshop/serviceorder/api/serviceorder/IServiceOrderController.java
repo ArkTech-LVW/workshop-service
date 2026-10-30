@@ -131,6 +131,48 @@ interface IServiceOrderController {
             @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id,
             @Valid @RequestBody(required = false) @Nullable ReopenQuoteRequest request);
 
+    @Operation(
+            summary = "${openapi.serviceOrder.startExecution}",
+            description = "${openapi.serviceOrder.startExecutionDescription}")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "422", ref = "BusinessRule")
+    @AllowedRoles({Role.ADMIN, Role.MECHANIC})
+    @PostMapping("/{id}/startExecution")
+    ServiceOrderResponse startExecution(
+            @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id);
+
+    @Operation(
+            summary = "${openapi.serviceOrder.completeService}",
+            description = "${openapi.serviceOrder.completeServiceDescription}")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "422", ref = "BusinessRule")
+    @AllowedRoles({Role.ADMIN, Role.MECHANIC})
+    @PostMapping("/{id}/services/{itemId}/complete")
+    ServiceOrderResponse completeService(
+            @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id,
+            @Parameter(description = "${openapi.serviceOrderItem.itemId}", example = "1") @PathVariable Long itemId);
+
+    @Operation(
+            summary = "${openapi.serviceOrder.complete}",
+            description = "${openapi.serviceOrder.completeDescription}")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "422", ref = "BusinessRule")
+    @AllowedRoles({Role.ADMIN, Role.MECHANIC})
+    @PostMapping("/{id}/complete")
+    ServiceOrderResponse complete(
+            @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id);
+
+    @Operation(summary = "${openapi.serviceOrder.deliver}", description = "${openapi.serviceOrder.deliverDescription}")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "422", ref = "BusinessRule")
+    @PostMapping("/{id}/deliver")
+    ServiceOrderResponse deliver(
+            @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id);
+
     @Operation(summary = "${openapi.serviceOrder.cancel}", description = "${openapi.serviceOrder.cancelDescription}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "400", ref = "BadRequest")

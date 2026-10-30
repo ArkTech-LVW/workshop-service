@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import br.com.arktech.workshop.serviceorder.application.serviceorder.ServiceOrderResult;
 import br.com.arktech.workshop.serviceorder.domain.model.InvalidStatusTransitionException;
 import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrder;
-import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderEvent.QuoteSent;
 import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderStatus;
 import br.com.arktech.workshop.serviceorder.domain.model.StatusChange;
 import br.com.arktech.workshop.serviceorder.domain.repository.InMemoryServiceOrderRepository;
@@ -15,8 +14,6 @@ import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.money.Money;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -25,9 +22,7 @@ class SendQuoteUseCaseTest {
     private static final Long ATTENDANT_ID = 7L;
     private static final Long MECHANIC_ID = 5L;
 
-    private final List<Object> publishedEvents = new ArrayList<>();
-    private final InMemoryServiceOrderRepository serviceOrderRepository =
-            new InMemoryServiceOrderRepository(publishedEvents::add);
+    private final InMemoryServiceOrderRepository serviceOrderRepository = new InMemoryServiceOrderRepository();
     private final SendQuoteUseCase sendQuoteUseCase =
             new SendQuoteUseCase(serviceOrderRepository, () -> ATTENDANT_ID);
 
@@ -52,15 +47,6 @@ class SendQuoteUseCaseTest {
     }
 
     @Test
-    void shouldPublishTheQuoteSentEvent() {
-        diagnoseWithAService();
-
-        sendQuoteUseCase.execute(new SendQuoteCommand(serviceOrder.getId()));
-
-        assertThat(publishedEvents).containsExactly(new QuoteSent(serviceOrder.getPublicId()));
-    }
-
-    @Test
     void shouldLockTheItemsAfterSending() {
         diagnoseWithAService();
 
@@ -72,14 +58,13 @@ class SendQuoteUseCaseTest {
     }
 
     @Test
-    void shouldRefuseAQuoteWithoutItemsWithoutPublishing() {
+    void shouldRefuseAQuoteWithoutItems() {
         serviceOrder.startDiagnosis(MECHANIC_ID, null);
 
         assertThatThrownBy(() -> sendQuoteUseCase.execute(new SendQuoteCommand(serviceOrder.getId())))
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessage("serviceOrder.quoteWithoutItems");
         assertThat(serviceOrder.getStatus()).isEqualTo(ServiceOrderStatus.IN_DIAGNOSIS);
-        assertThat(publishedEvents).isEmpty();
     }
 
     @Test
@@ -92,7 +77,6 @@ class SendQuoteUseCaseTest {
         assertThat(serviceOrder.getStatusHistory())
                 .extracting(StatusChange::getToStatus)
                 .containsExactly(ServiceOrderStatus.RECEIVED);
-        assertThat(publishedEvents).isEmpty();
     }
 
     @Test
@@ -100,7 +84,6 @@ class SendQuoteUseCaseTest {
         assertThatThrownBy(() -> sendQuoteUseCase.execute(new SendQuoteCommand(99L)))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("serviceOrder.notFound");
-        assertThat(publishedEvents).isEmpty();
     }
 
     private void diagnoseWithAService() {
