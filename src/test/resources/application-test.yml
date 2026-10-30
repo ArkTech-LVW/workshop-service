@@ -7,3 +7,5 @@ security:
     routes:
       login:
         capacity: 10000
+      customer-service-orders:
+        capacity: 10000
