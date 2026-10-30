@@ -5,6 +5,9 @@ import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.money.Money;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
+import br.com.arktech.workshop.shared.event.serviceorder.QuoteRejectedEvent;
+import br.com.arktech.workshop.shared.event.serviceorder.QuoteSentEvent;
+import br.com.arktech.workshop.shared.event.serviceorder.ServiceOrderCompletedEvent;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -159,6 +162,7 @@ public class ServiceOrder extends BaseEntity {
             throw new BusinessRuleException("serviceOrder.quoteWithoutItems");
         }
         moveTo(ServiceOrderStatus.AWAITING_APPROVAL, changedByUserId, description);
+        events.add(new QuoteSentEvent(getId(), publicId, customerId, totalPrice.amount()));
     }
 
     public void approveQuote(@Nullable Long changedByUserId, @Nullable String description) {
@@ -167,6 +171,8 @@ public class ServiceOrder extends BaseEntity {
         events.add(new QuoteApprovedEvent(
                 getId(),
                 publicId,
+                customerId,
+                totalPrice.amount(),
                 partItems.stream()
                         .map(item -> new QuoteApprovedEvent.PartQuantity(item.getPartId(), item.getQuantity()))
                         .toList(),
@@ -177,6 +183,7 @@ public class ServiceOrder extends BaseEntity {
         requireStatus(ServiceOrderStatus.AWAITING_APPROVAL, ServiceOrderStatus.QUOTE_REJECTED);
         requireText(reason, "serviceOrder.reasonRequired");
         moveTo(ServiceOrderStatus.QUOTE_REJECTED, changedByUserId, reason);
+        events.add(new QuoteRejectedEvent(getId(), publicId, customerId, totalPrice.amount(), reason));
     }
 
     public void reopenQuote(Long changedByUserId, @Nullable String description) {
@@ -199,7 +206,7 @@ public class ServiceOrder extends BaseEntity {
                 .orElseThrow(() -> new NotFoundException("serviceOrder.itemNotFound", itemId.toString()));
         item.complete(completedByUserId, completedAt);
         if (serviceItems.stream().allMatch(ServiceItem::isCompleted)) {
-            moveTo(ServiceOrderStatus.COMPLETED, completedByUserId, null);
+            moveToCompleted(completedByUserId, null);
         }
     }
 
@@ -208,7 +215,7 @@ public class ServiceOrder extends BaseEntity {
         if (!serviceItems.stream().allMatch(ServiceItem::isCompleted)) {
             throw new BusinessRuleException("serviceOrder.pendingServiceItems");
         }
-        moveTo(ServiceOrderStatus.COMPLETED, changedByUserId, description);
+        moveToCompleted(changedByUserId, description);
     }
 
     public void deliver(Long changedByUserId, @Nullable String description) {
@@ -240,6 +247,11 @@ public class ServiceOrder extends BaseEntity {
     private void moveTo(ServiceOrderStatus next, @Nullable Long changedByUserId, @Nullable String description) {
         statusHistory.add(new StatusChange(this, status, next, changedByUserId, description));
         status = next;
+    }
+
+    private void moveToCompleted(Long changedByUserId, @Nullable String description) {
+        moveTo(ServiceOrderStatus.COMPLETED, changedByUserId, description);
+        events.add(new ServiceOrderCompletedEvent(getId(), publicId, customerId, totalPrice.amount()));
     }
 
     private void removeItem(List<? extends ServiceOrderItem> items, Long itemId) {

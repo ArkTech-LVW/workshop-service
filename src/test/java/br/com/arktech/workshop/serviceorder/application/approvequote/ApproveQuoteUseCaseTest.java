@@ -69,6 +69,8 @@ class ApproveQuoteUseCaseTest {
                 .containsExactly(new QuoteApprovedEvent(
                         serviceOrder.getId(),
                         serviceOrder.getPublicId(),
+                        10L,
+                        new BigDecimal("337.70"),
                         List.of(
                                 new QuoteApprovedEvent.PartQuantity(40L, 3),
                                 new QuoteApprovedEvent.PartQuantity(41L, 1)),
@@ -118,5 +120,6 @@ class ApproveQuoteUseCaseTest {
         serviceOrder.addPartItem(40L, 3, new Money(new BigDecimal("35.90")));
         serviceOrder.addPartItem(41L, 1, new Money(new BigDecimal("80.00")));
         serviceOrder.sendQuote(ATTENDANT_ID, null);
+        serviceOrder.clearDomainEvents();
     }
 }
