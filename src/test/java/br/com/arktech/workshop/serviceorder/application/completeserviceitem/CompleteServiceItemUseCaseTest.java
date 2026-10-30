@@ -13,7 +13,7 @@ import br.com.arktech.workshop.shared.domain.money.Money;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ class CompleteServiceItemUseCaseTest {
 
     private final InMemoryServiceOrderRepository serviceOrderRepository = new InMemoryServiceOrderRepository();
     private final CompleteServiceItemUseCase useCase = new CompleteServiceItemUseCase(
-            serviceOrderRepository, () -> MECHANIC_ID, Clock.fixed(NOW, ZoneOffset.UTC));
+            serviceOrderRepository, () -> MECHANIC_ID, Clock.fixed(NOW, ZoneId.systemDefault()));
 
     private ServiceOrder serviceOrder;
     private Long firstItemId;
