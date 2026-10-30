@@ -4,6 +4,10 @@ import br.com.arktech.workshop.serviceorder.application.approvequote.ApproveQuot
 import br.com.arktech.workshop.serviceorder.application.approvequote.ApproveQuoteUseCase;
 import br.com.arktech.workshop.serviceorder.application.cancelserviceorder.CancelServiceOrderCommand;
 import br.com.arktech.workshop.serviceorder.application.cancelserviceorder.CancelServiceOrderUseCase;
+import br.com.arktech.workshop.serviceorder.application.findserviceorder.FindServiceOrderQuery;
+import br.com.arktech.workshop.serviceorder.application.findserviceorder.FindServiceOrderUseCase;
+import br.com.arktech.workshop.serviceorder.application.listserviceorders.ListServiceOrdersQuery;
+import br.com.arktech.workshop.serviceorder.application.listserviceorders.ListServiceOrdersUseCase;
 import br.com.arktech.workshop.serviceorder.application.openserviceorder.OpenServiceOrderCommand;
 import br.com.arktech.workshop.serviceorder.application.openserviceorder.OpenServiceOrderUseCase;
 import br.com.arktech.workshop.serviceorder.application.rejectquote.RejectQuoteCommand;
@@ -14,7 +18,11 @@ import br.com.arktech.workshop.serviceorder.application.sendquote.SendQuoteComma
 import br.com.arktech.workshop.serviceorder.application.sendquote.SendQuoteUseCase;
 import br.com.arktech.workshop.serviceorder.application.startdiagnosis.StartDiagnosisCommand;
 import br.com.arktech.workshop.serviceorder.application.startdiagnosis.StartDiagnosisUseCase;
+import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderStatus;
+import br.com.arktech.workshop.shared.api.pagination.PageResponse;
 import br.com.arktech.workshop.shared.application.registry.VehicleDetails;
+
+import java.time.Instant;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +34,8 @@ import org.springframework.web.bind.annotation.RestController;
 class ServiceOrderController implements IServiceOrderController {
 
     private final OpenServiceOrderUseCase openServiceOrderUseCase;
+    private final ListServiceOrdersUseCase listServiceOrdersUseCase;
+    private final FindServiceOrderUseCase findServiceOrderUseCase;
     private final StartDiagnosisUseCase startDiagnosisUseCase;
     private final SendQuoteUseCase sendQuoteUseCase;
     private final ApproveQuoteUseCase approveQuoteUseCase;
@@ -42,6 +52,25 @@ class ServiceOrderController implements IServiceOrderController {
                         vehicle.licensePlate(), vehicle.brand(), vehicle.model(), vehicle.year(), vehicle.color()),
                 request.problemDescription());
         return ServiceOrderResponse.from(openServiceOrderUseCase.execute(command));
+    }
+
+    @Override
+    public PageResponse<ServiceOrderSummaryResponse> list(
+            @Nullable ServiceOrderStatus status,
+            @Nullable String customerDocument,
+            @Nullable String licensePlate,
+            @Nullable Instant openedFrom,
+            @Nullable Instant openedTo,
+            int page,
+            int size) {
+        ListServiceOrdersQuery query = new ListServiceOrdersQuery(
+                status, customerDocument, licensePlate, openedFrom, openedTo, page, size);
+        return PageResponse.from(listServiceOrdersUseCase.execute(query), ServiceOrderSummaryResponse::from);
+    }
+
+    @Override
+    public ServiceOrderResponse findById(Long id) {
+        return ServiceOrderResponse.from(findServiceOrderUseCase.execute(new FindServiceOrderQuery(id)));
     }
 
     @Override
