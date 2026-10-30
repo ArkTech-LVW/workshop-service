@@ -23,6 +23,7 @@ import br.com.arktech.workshop.serviceorder.application.reopenquote.ReopenQuoteU
 import br.com.arktech.workshop.serviceorder.application.sendquote.SendQuoteCommand;
 import br.com.arktech.workshop.serviceorder.application.sendquote.SendQuoteUseCase;
 import br.com.arktech.workshop.serviceorder.application.serviceorder.ServiceOrderResult;
+import br.com.arktech.workshop.serviceorder.application.serviceorder.StatusChangeResult;
 import br.com.arktech.workshop.serviceorder.application.startdiagnosis.StartDiagnosisCommand;
 import br.com.arktech.workshop.serviceorder.application.startdiagnosis.StartDiagnosisUseCase;
 import br.com.arktech.workshop.serviceorder.domain.model.InvalidStatusTransitionException;
@@ -56,6 +57,14 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 class ServiceOrderControllerTest {
 
     private static final UUID PUBLIC_ID = UUID.fromString("3f1c2b8e-7d4a-4c9e-9b1f-2a6d8e5c4b3a");
+    private static final StatusChangeResult RECEIVED = new StatusChangeResult(
+            null, ServiceOrderStatus.RECEIVED, 7L, null, Instant.parse("2026-10-27T14:30:00Z"));
+    private static final StatusChangeResult DIAGNOSIS_STARTED = new StatusChangeResult(
+            ServiceOrderStatus.RECEIVED,
+            ServiceOrderStatus.IN_DIAGNOSIS,
+            5L,
+            "Pastilhas gastas",
+            Instant.parse("2026-10-27T15:00:00Z"));
     private static final ServiceOrderResult OPENED = new ServiceOrderResult(
             1L,
             PUBLIC_ID,
@@ -70,6 +79,7 @@ class ServiceOrderControllerTest {
             new BigDecimal("0.00"),
             new BigDecimal("0.00"),
             new BigDecimal("0.00"),
+            List.of(RECEIVED),
             Instant.parse("2026-10-27T14:30:00Z"));
     private static final ServiceOrderResult IN_DIAGNOSIS = new ServiceOrderResult(
             1L,
@@ -85,6 +95,7 @@ class ServiceOrderControllerTest {
             new BigDecimal("300.00"),
             new BigDecimal("107.70"),
             new BigDecimal("407.70"),
+            List.of(RECEIVED, DIAGNOSIS_STARTED),
             Instant.parse("2026-10-27T14:30:00Z"));
     private static final ServiceOrderResult AWAITING_APPROVAL = new ServiceOrderResult(
             1L,
@@ -100,6 +111,7 @@ class ServiceOrderControllerTest {
             new BigDecimal("300.00"),
             new BigDecimal("107.70"),
             new BigDecimal("407.70"),
+            List.of(),
             Instant.parse("2026-10-27T14:30:00Z"));
     private static final ServiceOrderResult CANCELED = new ServiceOrderResult(
             1L,
@@ -115,6 +127,7 @@ class ServiceOrderControllerTest {
             new BigDecimal("0.00"),
             new BigDecimal("0.00"),
             new BigDecimal("0.00"),
+            List.of(),
             Instant.parse("2026-10-27T14:30:00Z"));
     private static final String CUSTOMER_NOT_REGISTERED = "Nenhum cliente cadastrado com o CPF/CNPJ 529.982.247-25. "
             + "Cadastre o cliente antes de abrir a ordem de serviço.";
@@ -160,6 +173,8 @@ class ServiceOrderControllerTest {
                          "customerId": 10, "vehicleId": 20, "mechanicId": null,
                          "problemDescription": "Barulho ao frear", "status": "RECEIVED", "services": [], "parts": [],
                          "servicesTotal": 0.00, "partsTotal": 0.00, "totalPrice": 0.00,
+                         "statusHistory": [{"fromStatus": null, "toStatus": "RECEIVED", "changedByUserId": 7,
+                                            "description": null, "changedAt": "2026-10-27T14:30:00Z"}],
                          "dateCreated": "2026-10-27T14:30:00Z"}
                         """));
         verify(openServiceOrderUseCase)
@@ -255,6 +270,11 @@ class ServiceOrderControllerTest {
                                        "subtotal": 300.00}],
                          "parts": [{"id": 2, "partId": 40, "quantity": 3, "unitPrice": 35.90, "subtotal": 107.70}],
                          "servicesTotal": 300.00, "partsTotal": 107.70, "totalPrice": 407.70,
+                         "statusHistory": [
+                           {"fromStatus": null, "toStatus": "RECEIVED", "changedByUserId": 7, "description": null,
+                            "changedAt": "2026-10-27T14:30:00Z"},
+                           {"fromStatus": "RECEIVED", "toStatus": "IN_DIAGNOSIS", "changedByUserId": 5,
+                            "description": "Pastilhas gastas", "changedAt": "2026-10-27T15:00:00Z"}],
                          "dateCreated": "2026-10-27T14:30:00Z"}
                         """));
         verify(startDiagnosisUseCase).execute(new StartDiagnosisCommand(1L));
@@ -408,7 +428,7 @@ class ServiceOrderControllerTest {
                         {"id": 1, "publicId": "3f1c2b8e-7d4a-4c9e-9b1f-2a6d8e5c4b3a", "number": "SO-2026-000123",
                          "customerId": 10, "vehicleId": 20, "mechanicId": null,
                          "problemDescription": "Barulho ao frear", "status": "CANCELED", "services": [], "parts": [],
-                         "servicesTotal": 0.00, "partsTotal": 0.00, "totalPrice": 0.00,
+                         "servicesTotal": 0.00, "partsTotal": 0.00, "totalPrice": 0.00, "statusHistory": [],
                          "dateCreated": "2026-10-27T14:30:00Z"}
                         """));
         verify(cancelServiceOrderUseCase).execute(new CancelServiceOrderCommand(1L, "Cliente desistiu do serviço"));

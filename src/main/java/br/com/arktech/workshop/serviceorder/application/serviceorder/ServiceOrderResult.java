@@ -24,11 +24,13 @@ public record ServiceOrderResult(
         BigDecimal servicesTotal,
         BigDecimal partsTotal,
         BigDecimal totalPrice,
+        List<StatusChangeResult> statusHistory,
         @Nullable Instant dateCreated) {
 
     public ServiceOrderResult {
         services = List.copyOf(services);
         parts = List.copyOf(parts);
+        statusHistory = List.copyOf(statusHistory);
     }
 
     public static ServiceOrderResult from(ServiceOrder serviceOrder) {
@@ -46,6 +48,9 @@ public record ServiceOrderResult(
                 serviceOrder.getServicesTotal().amount(),
                 serviceOrder.getPartsTotal().amount(),
                 serviceOrder.getTotalPrice().amount(),
+                serviceOrder.getStatusHistory().stream()
+                        .map(StatusChangeResult::from)
+                        .toList(),
                 serviceOrder.getDateCreated());
     }
 }
