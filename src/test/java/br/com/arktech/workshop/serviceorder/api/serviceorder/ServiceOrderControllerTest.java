@@ -12,6 +12,12 @@ import br.com.arktech.workshop.serviceorder.application.approvequote.ApproveQuot
 import br.com.arktech.workshop.serviceorder.application.approvequote.ApproveQuoteUseCase;
 import br.com.arktech.workshop.serviceorder.application.cancelserviceorder.CancelServiceOrderCommand;
 import br.com.arktech.workshop.serviceorder.application.cancelserviceorder.CancelServiceOrderUseCase;
+import br.com.arktech.workshop.serviceorder.application.completeserviceitem.CompleteServiceItemCommand;
+import br.com.arktech.workshop.serviceorder.application.completeserviceitem.CompleteServiceItemUseCase;
+import br.com.arktech.workshop.serviceorder.application.completeserviceorder.CompleteServiceOrderCommand;
+import br.com.arktech.workshop.serviceorder.application.completeserviceorder.CompleteServiceOrderUseCase;
+import br.com.arktech.workshop.serviceorder.application.deliverserviceorder.DeliverServiceOrderCommand;
+import br.com.arktech.workshop.serviceorder.application.deliverserviceorder.DeliverServiceOrderUseCase;
 import br.com.arktech.workshop.serviceorder.application.openserviceorder.OpenServiceOrderCommand;
 import br.com.arktech.workshop.serviceorder.application.openserviceorder.OpenServiceOrderUseCase;
 import br.com.arktech.workshop.serviceorder.application.serviceorder.PartItemResult;
@@ -25,6 +31,8 @@ import br.com.arktech.workshop.serviceorder.application.sendquote.SendQuoteUseCa
 import br.com.arktech.workshop.serviceorder.application.serviceorder.ServiceOrderResult;
 import br.com.arktech.workshop.serviceorder.application.startdiagnosis.StartDiagnosisCommand;
 import br.com.arktech.workshop.serviceorder.application.startdiagnosis.StartDiagnosisUseCase;
+import br.com.arktech.workshop.serviceorder.application.startexecution.StartExecutionCommand;
+import br.com.arktech.workshop.serviceorder.application.startexecution.StartExecutionUseCase;
 import br.com.arktech.workshop.serviceorder.domain.model.InvalidStatusTransitionException;
 import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderStatus;
 import br.com.arktech.workshop.shared.api.error.ApiErrorTestConfig;
@@ -80,7 +88,7 @@ class ServiceOrderControllerTest {
             5L,
             "Barulho ao frear",
             ServiceOrderStatus.IN_DIAGNOSIS,
-            List.of(new ServiceItemResult(1L, 30L, 2, new BigDecimal("150.00"), new BigDecimal("300.00"))),
+            List.of(new ServiceItemResult(1L, 30L, 2, new BigDecimal("150.00"), new BigDecimal("300.00"), null)),
             List.of(new PartItemResult(2L, 40L, 3, new BigDecimal("35.90"), new BigDecimal("107.70"))),
             new BigDecimal("300.00"),
             new BigDecimal("107.70"),
@@ -95,11 +103,32 @@ class ServiceOrderControllerTest {
             5L,
             "Barulho ao frear",
             ServiceOrderStatus.AWAITING_APPROVAL,
-            List.of(new ServiceItemResult(1L, 30L, 2, new BigDecimal("150.00"), new BigDecimal("300.00"))),
+            List.of(new ServiceItemResult(1L, 30L, 2, new BigDecimal("150.00"), new BigDecimal("300.00"), null)),
             List.of(new PartItemResult(2L, 40L, 3, new BigDecimal("35.90"), new BigDecimal("107.70"))),
             new BigDecimal("300.00"),
             new BigDecimal("107.70"),
             new BigDecimal("407.70"),
+            Instant.parse("2026-10-27T14:30:00Z"));
+    private static final ServiceOrderResult COMPLETED = new ServiceOrderResult(
+            1L,
+            PUBLIC_ID,
+            "SO-2026-000123",
+            10L,
+            20L,
+            5L,
+            "Barulho ao frear",
+            ServiceOrderStatus.COMPLETED,
+            List.of(new ServiceItemResult(
+                    1L,
+                    30L,
+                    2,
+                    new BigDecimal("150.00"),
+                    new BigDecimal("300.00"),
+                    Instant.parse("2026-10-28T16:45:00Z"))),
+            List.of(),
+            new BigDecimal("300.00"),
+            new BigDecimal("0.00"),
+            new BigDecimal("300.00"),
             Instant.parse("2026-10-27T14:30:00Z"));
     private static final ServiceOrderResult CANCELED = new ServiceOrderResult(
             1L,
@@ -145,6 +174,18 @@ class ServiceOrderControllerTest {
 
     @MockitoBean
     private ReopenQuoteUseCase reopenQuoteUseCase;
+
+    @MockitoBean
+    private StartExecutionUseCase startExecutionUseCase;
+
+    @MockitoBean
+    private CompleteServiceItemUseCase completeServiceItemUseCase;
+
+    @MockitoBean
+    private CompleteServiceOrderUseCase completeServiceOrderUseCase;
+
+    @MockitoBean
+    private DeliverServiceOrderUseCase deliverServiceOrderUseCase;
 
     @MockitoBean
     private CancelServiceOrderUseCase cancelServiceOrderUseCase;
@@ -252,7 +293,7 @@ class ServiceOrderControllerTest {
                          "customerId": 10, "vehicleId": 20, "mechanicId": 5,
                          "problemDescription": "Barulho ao frear", "status": "IN_DIAGNOSIS",
                          "services": [{"id": 1, "serviceOfferingId": 30, "quantity": 2, "unitPrice": 150.00,
-                                       "subtotal": 300.00}],
+                                       "subtotal": 300.00, "completedAt": null}],
                          "parts": [{"id": 2, "partId": 40, "quantity": 3, "unitPrice": 35.90, "subtotal": 107.70}],
                          "servicesTotal": 300.00, "partsTotal": 107.70, "totalPrice": 407.70,
                          "dateCreated": "2026-10-27T14:30:00Z"}
@@ -394,6 +435,103 @@ class ServiceOrderControllerTest {
 
         verify(reopenQuoteUseCase).execute(new ReopenQuoteCommand(1L, "Cliente pediu peça mais barata"));
         verify(reopenQuoteUseCase).execute(new ReopenQuoteCommand(1L, null));
+    }
+
+    @Test
+    void shouldStartTheExecution() throws Exception {
+        when(startExecutionUseCase.execute(any())).thenReturn(IN_DIAGNOSIS);
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/startExecution", 1L)).andExpect(status().isOk());
+
+        verify(startExecutionUseCase).execute(new StartExecutionCommand(1L));
+    }
+
+    @Test
+    void shouldCompleteAServiceShowingWhenItWasCompleted() throws Exception {
+        when(completeServiceItemUseCase.execute(any())).thenReturn(COMPLETED);
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/services/{itemId}/complete", 1L, 3L))
+                .andExpect(status().isOk())
+                .andExpect(json(
+                        """
+                        {"status": "COMPLETED",
+                         "services": [{"id": 1, "serviceOfferingId": 30, "quantity": 2, "unitPrice": 150.00,
+                                       "subtotal": 300.00, "completedAt": "2026-10-28T16:45:00Z"}]}
+                        """,
+                        JsonCompareMode.LENIENT));
+        verify(completeServiceItemUseCase).execute(new CompleteServiceItemCommand(1L, 3L));
+    }
+
+    @Test
+    void shouldAnswer422WhenTheServiceWasAlreadyCompleted() throws Exception {
+        when(completeServiceItemUseCase.execute(any()))
+                .thenThrow(new BusinessRuleException("serviceOrder.serviceItemAlreadyCompleted"));
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/services/{itemId}/complete", 1L, 3L))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(json("""
+                        {"code": "serviceOrder.serviceItemAlreadyCompleted",
+                         "message": "Este serviço já foi concluído."}
+                        """));
+    }
+
+    @Test
+    void shouldAnswer422WhenTheServiceOrderIsNotInExecution() throws Exception {
+        when(completeServiceItemUseCase.execute(any()))
+                .thenThrow(new BusinessRuleException("serviceOrder.serviceItemCompletionNotAllowed"));
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/services/{itemId}/complete", 1L, 3L))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(json("""
+                        {"code": "serviceOrder.serviceItemCompletionNotAllowed",
+                         "message": "Os serviços só podem ser concluídos enquanto a ordem de serviço está em execução."}
+                        """));
+    }
+
+    @Test
+    void shouldAnswer404WhenTheServiceIsNotInTheServiceOrder() throws Exception {
+        when(completeServiceItemUseCase.execute(any()))
+                .thenThrow(new NotFoundException("serviceOrder.itemNotFound", "3"));
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/services/{itemId}/complete", 1L, 3L))
+                .andExpect(status().isNotFound())
+                .andExpect(json("""
+                        {"code": "serviceOrder.itemNotFound", "message": "Item 3 não encontrado na ordem de serviço."}
+                        """));
+    }
+
+    @Test
+    void shouldCompleteTheServiceOrder() throws Exception {
+        when(completeServiceOrderUseCase.execute(any())).thenReturn(COMPLETED);
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/complete", 1L))
+                .andExpect(status().isOk())
+                .andExpect(json("""
+                        {"status": "COMPLETED"}
+                        """, JsonCompareMode.LENIENT));
+        verify(completeServiceOrderUseCase).execute(new CompleteServiceOrderCommand(1L));
+    }
+
+    @Test
+    void shouldAnswer422WhenCompletingWithPendingServices() throws Exception {
+        when(completeServiceOrderUseCase.execute(any()))
+                .thenThrow(new BusinessRuleException("serviceOrder.pendingServiceItems"));
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/complete", 1L))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(json("""
+                        {"code": "serviceOrder.pendingServiceItems",
+                         "message": "Conclua todos os serviços para finalizar a ordem de serviço."}
+                        """));
+    }
+
+    @Test
+    void shouldDeliverTheServiceOrder() throws Exception {
+        when(deliverServiceOrderUseCase.execute(any())).thenReturn(COMPLETED);
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/deliver", 1L)).andExpect(status().isOk());
+
+        verify(deliverServiceOrderUseCase).execute(new DeliverServiceOrderCommand(1L));
     }
 
     @Test

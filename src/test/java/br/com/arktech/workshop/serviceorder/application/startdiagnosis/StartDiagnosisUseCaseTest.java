@@ -56,7 +56,8 @@ class StartDiagnosisUseCaseTest {
                         30L,
                         2,
                         new BigDecimal("150.00"),
-                        new BigDecimal("300.00")));
+                        new BigDecimal("300.00"),
+                        null));
         assertThat(result.parts())
                 .singleElement()
                 .isEqualTo(new PartItemResult(

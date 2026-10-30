@@ -18,6 +18,7 @@ import br.com.arktech.workshop.shared.domain.money.Money;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -48,6 +49,7 @@ class ServiceOrderTest {
     private static final Money LABOR_PRICE = new Money(new BigDecimal("150.00"));
     private static final Money PART_PRICE = new Money(new BigDecimal("35.90"));
     private static final String DESCRIPTION = "Cliente avisado por telefone";
+    private static final Instant COMPLETED_AT = Instant.parse("2026-10-28T16:45:00Z");
 
     @Test
     void shouldOpenAsReceivedWithTheOpeningRecord() {
@@ -235,16 +237,18 @@ class ServiceOrderTest {
     @Test
     void shouldChangeItemsAndSendANewQuoteAfterReopeningARejectedQuote() {
         ServiceOrder serviceOrder = serviceOrderIn(QUOTE_REJECTED);
-        assignIds(serviceOrder.getServiceItems(), 1);
+        assignIds(serviceOrder.getPartItems(), 1);
 
         serviceOrder.reopenQuote(USER_ID, "Proposta com peça usada");
-        serviceOrder.removeServiceItem(1L);
-        serviceOrder.addPartItem(PART_ID, 2, PART_PRICE);
+        serviceOrder.removePartItem(1L);
+        serviceOrder.addPartItem(PART_ID + 1, 2, PART_PRICE);
         serviceOrder.sendQuote(USER_ID, null);
 
         assertThat(serviceOrder.getStatus()).isEqualTo(AWAITING_APPROVAL);
-        assertThat(serviceOrder.getServiceItems()).isEmpty();
-        assertThat(serviceOrder.getPartItems()).singleElement().extracting(PartItem::getQuantity).isEqualTo(2);
+        assertThat(serviceOrder.getPartItems()).singleElement().satisfies(item -> {
+            assertThat(item.getPartId()).isEqualTo(PART_ID + 1);
+            assertThat(item.getQuantity()).isEqualTo(2);
+        });
         assertThat(serviceOrder.getTotalPrice()).isEqualTo(new Money(new BigDecimal("71.80")));
         assertThat(serviceOrder.getStatusHistory())
                 .extracting(StatusChange::getToStatus)
@@ -420,20 +424,20 @@ class ServiceOrderTest {
     void shouldAllowItemChangesWhileReceivedOrInDiagnosis(ServiceOrderStatus status) {
         ServiceOrder serviceOrder = serviceOrderIn(status);
 
-        serviceOrder.addPartItem(PART_ID, 1, PART_PRICE);
-        assignIds(serviceOrder.getServiceItems(), 1);
-        serviceOrder.removeServiceItem(1L);
+        serviceOrder.addServiceItem(SERVICE_OFFERING_ID, 1, LABOR_PRICE);
+        assignIds(serviceOrder.getPartItems(), 1);
+        serviceOrder.removePartItem(1L);
 
-        assertThat(serviceOrder.getServiceItems()).isEmpty();
-        assertThat(serviceOrder.getPartItems()).hasSize(1);
-        assertThat(serviceOrder.getTotalPrice()).isEqualTo(PART_PRICE);
+        assertThat(serviceOrder.getServiceItems()).hasSize(1);
+        assertThat(serviceOrder.getPartItems()).isEmpty();
+        assertThat(serviceOrder.getTotalPrice()).isEqualTo(LABOR_PRICE);
     }
 
     @ParameterizedTest
     @EnumSource(names = {"RECEIVED", "IN_DIAGNOSIS"}, mode = EnumSource.Mode.EXCLUDE)
     void shouldLockItemsInAnyOtherStatus(ServiceOrderStatus status) {
         ServiceOrder serviceOrder = serviceOrderIn(status);
-        assignIds(serviceOrder.getServiceItems(), 1);
+        assignIds(serviceOrder.getPartItems(), 1);
         Money totalPrice = serviceOrder.getTotalPrice();
 
         assertThatThrownBy(() -> serviceOrder.addServiceItem(SERVICE_OFFERING_ID, 1, LABOR_PRICE))
@@ -448,8 +452,8 @@ class ServiceOrderTest {
         assertThatThrownBy(() -> serviceOrder.removePartItem(1L))
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessage("serviceOrder.itemsLocked");
-        assertThat(serviceOrder.getServiceItems()).hasSize(1);
-        assertThat(serviceOrder.getPartItems()).isEmpty();
+        assertThat(serviceOrder.getServiceItems()).isEmpty();
+        assertThat(serviceOrder.getPartItems()).hasSize(1);
         assertThat(serviceOrder.getTotalPrice()).isEqualTo(totalPrice);
     }
 
@@ -476,6 +480,90 @@ class ServiceOrderTest {
                 .isInstanceOf(UnsupportedOperationException.class);
     }
 
+    @Test
+    void shouldCompleteAServiceRecordingWhenAndWhoWithoutFinishingWhileOthersArePending() {
+        ServiceOrder serviceOrder = serviceOrderInProgressWithServices(2);
+        List<StatusChange> previousHistory = serviceOrder.getStatusHistory();
+
+        serviceOrder.completeServiceItem(1L, USER_ID, COMPLETED_AT);
+
+        assertThat(serviceOrder.getServiceItems().getFirst()).satisfies(item -> {
+            assertThat(item.isCompleted()).isTrue();
+            assertThat(item.getCompletedAt()).isEqualTo(COMPLETED_AT);
+            assertThat(item.getCompletedByUserId()).isEqualTo(USER_ID);
+        });
+        assertThat(serviceOrder.getServiceItems().getLast().isCompleted()).isFalse();
+        assertThat(serviceOrder.getStatus()).isEqualTo(IN_PROGRESS);
+        assertThat(serviceOrder.getStatusHistory()).containsExactlyElementsOf(previousHistory);
+        assertThat(serviceOrder.domainEvents()).isEmpty();
+    }
+
+    @Test
+    void shouldCompleteTheServiceOrderWhenTheLastServiceIsCompleted() {
+        ServiceOrder serviceOrder = serviceOrderInProgressWithServices(2);
+        serviceOrder.completeServiceItem(2L, ATTENDANT_ID, COMPLETED_AT);
+
+        serviceOrder.completeServiceItem(1L, USER_ID, COMPLETED_AT.plusSeconds(60));
+
+        assertThat(serviceOrder.getStatus()).isEqualTo(COMPLETED);
+        assertThat(serviceOrder.getServiceItems()).allMatch(ServiceItem::isCompleted);
+        assertThat(serviceOrder.getStatusHistory()).last().satisfies(change -> {
+            assertThat(change.getFromStatus()).isEqualTo(IN_PROGRESS);
+            assertThat(change.getToStatus()).isEqualTo(COMPLETED);
+            assertThat(change.getChangedByUserId()).isEqualTo(USER_ID);
+            assertThat(change.getDescription()).isNull();
+        });
+    }
+
+    @Test
+    void shouldRefuseToCompleteAServiceTwice() {
+        ServiceOrder serviceOrder = serviceOrderInProgressWithServices(2);
+        serviceOrder.completeServiceItem(1L, USER_ID, COMPLETED_AT);
+
+        assertThatThrownBy(() -> serviceOrder.completeServiceItem(1L, ATTENDANT_ID, COMPLETED_AT.plusSeconds(60)))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("serviceOrder.serviceItemAlreadyCompleted");
+        assertThat(serviceOrder.getServiceItems().getFirst()).satisfies(item -> {
+            assertThat(item.getCompletedAt()).isEqualTo(COMPLETED_AT);
+            assertThat(item.getCompletedByUserId()).isEqualTo(USER_ID);
+        });
+    }
+
+    @Test
+    void shouldReportAServiceThatIsNotInTheServiceOrder() {
+        ServiceOrder serviceOrder = serviceOrderInProgressWithServices(1);
+
+        assertThatThrownBy(() -> serviceOrder.completeServiceItem(99L, USER_ID, COMPLETED_AT))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("serviceOrder.itemNotFound");
+        assertThat(serviceOrder.getStatus()).isEqualTo(IN_PROGRESS);
+    }
+
+    @ParameterizedTest
+    @EnumSource(names = "IN_PROGRESS", mode = EnumSource.Mode.EXCLUDE)
+    void shouldRefuseToCompleteAServiceOutsideTheExecution(ServiceOrderStatus status) {
+        ServiceOrder serviceOrder = serviceOrderIn(status);
+
+        assertThatThrownBy(() -> serviceOrder.completeServiceItem(1L, USER_ID, COMPLETED_AT))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("serviceOrder.serviceItemCompletionNotAllowed");
+        assertThat(serviceOrder.getStatus()).isEqualTo(status);
+    }
+
+    @Test
+    void shouldRefuseToCompleteTheServiceOrderWithPendingServices() {
+        ServiceOrder serviceOrder = serviceOrderInProgressWithServices(2);
+        serviceOrder.completeServiceItem(1L, USER_ID, COMPLETED_AT);
+        List<StatusChange> previousHistory = serviceOrder.getStatusHistory();
+
+        assertThatThrownBy(() -> serviceOrder.complete(USER_ID, null))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("serviceOrder.pendingServiceItems");
+        assertThat(serviceOrder.getStatus()).isEqualTo(IN_PROGRESS);
+        assertThat(serviceOrder.getStatusHistory()).containsExactlyElementsOf(previousHistory);
+        assertThat(serviceOrder.domainEvents()).isEmpty();
+    }
+
     static Stream<Arguments> validTransitions() {
         return Arrays.stream(Transition.values())
                 .flatMap(transition -> transition.from.stream().map(origin -> Arguments.of(transition, origin)));
@@ -494,7 +582,20 @@ class ServiceOrderTest {
 
     private static ServiceOrder serviceOrderIn(ServiceOrderStatus status) {
         ServiceOrder serviceOrder = newServiceOrder();
-        serviceOrder.addServiceItem(SERVICE_OFFERING_ID, 1, LABOR_PRICE);
+        serviceOrder.addPartItem(PART_ID, 1, PART_PRICE);
+        return walkTo(serviceOrder, status);
+    }
+
+    private static ServiceOrder serviceOrderInProgressWithServices(int count) {
+        ServiceOrder serviceOrder = newServiceOrder();
+        for (int i = 0; i < count; i++) {
+            serviceOrder.addServiceItem(SERVICE_OFFERING_ID + i, 1, LABOR_PRICE);
+        }
+        assignIds(serviceOrder.getServiceItems(), 1);
+        return walkTo(serviceOrder, IN_PROGRESS);
+    }
+
+    private static ServiceOrder walkTo(ServiceOrder serviceOrder, ServiceOrderStatus status) {
         pathTo(status).forEach(transition -> transition.apply(serviceOrder));
         serviceOrder.clearDomainEvents();
         return serviceOrder;
@@ -541,7 +642,12 @@ class ServiceOrderTest {
                 QUOTE_APPROVED,
                 serviceOrder -> serviceOrder.approveQuote(USER_ID, DESCRIPTION),
                 serviceOrder -> new QuoteApprovedEvent(
-                        serviceOrder.getId(), serviceOrder.getPublicId(), List.of(), USER_ID)),
+                        serviceOrder.getId(),
+                        serviceOrder.getPublicId(),
+                        serviceOrder.getPartItems().stream()
+                                .map(item -> new QuoteApprovedEvent.PartQuantity(item.getPartId(), item.getQuantity()))
+                                .toList(),
+                        USER_ID)),
         REJECT_QUOTE(
                 Set.of(AWAITING_APPROVAL),
                 QUOTE_REJECTED,

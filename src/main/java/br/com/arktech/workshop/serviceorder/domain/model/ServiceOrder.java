@@ -16,6 +16,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -188,8 +189,25 @@ public class ServiceOrder extends BaseEntity {
         moveTo(ServiceOrderStatus.IN_PROGRESS, changedByUserId, description);
     }
 
+    public void completeServiceItem(Long itemId, Long completedByUserId, Instant completedAt) {
+        if (status != ServiceOrderStatus.IN_PROGRESS) {
+            throw new BusinessRuleException("serviceOrder.serviceItemCompletionNotAllowed");
+        }
+        ServiceItem item = serviceItems.stream()
+                .filter(serviceItem -> itemId.equals(serviceItem.getId()))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("serviceOrder.itemNotFound", itemId.toString()));
+        item.complete(completedByUserId, completedAt);
+        if (serviceItems.stream().allMatch(ServiceItem::isCompleted)) {
+            moveTo(ServiceOrderStatus.COMPLETED, completedByUserId, null);
+        }
+    }
+
     public void complete(Long changedByUserId, @Nullable String description) {
         requireStatus(ServiceOrderStatus.IN_PROGRESS, ServiceOrderStatus.COMPLETED);
+        if (!serviceItems.stream().allMatch(ServiceItem::isCompleted)) {
+            throw new BusinessRuleException("serviceOrder.pendingServiceItems");
+        }
         moveTo(ServiceOrderStatus.COMPLETED, changedByUserId, description);
     }
 
