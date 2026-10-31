@@ -18,14 +18,10 @@ interface StockReservationJpaRepository extends JpaRepository<StockReservation, 
     List<Long> findPartIdsByServiceOrderId(@Param("serviceOrderId") Long serviceOrderId);
 
     @Override
-    default List<Long> findPartIdsWithReservationsExpiredBefore(Instant instant, Long afterPartId, int limit) {
-        return findPartIdsExpiredBefore(instant, afterPartId, Limit.of(limit));
+    default List<Long> findPartIdsWithReservationsExpiredBefore(Instant instant, int limit) {
+        return findPartIdsExpiredBefore(instant, Limit.of(limit));
     }
 
-    @Query("""
-            SELECT DISTINCT r.part.id FROM StockReservation r
-            WHERE r.expiresAt < :instant AND r.part.id > :afterPartId
-            ORDER BY r.part.id""")
-    List<Long> findPartIdsExpiredBefore(
-            @Param("instant") Instant instant, @Param("afterPartId") Long afterPartId, Limit limit);
+    @Query("SELECT DISTINCT r.part.id FROM StockReservation r WHERE r.expiresAt < :instant ORDER BY r.part.id")
+    List<Long> findPartIdsExpiredBefore(@Param("instant") Instant instant, Limit limit);
 }

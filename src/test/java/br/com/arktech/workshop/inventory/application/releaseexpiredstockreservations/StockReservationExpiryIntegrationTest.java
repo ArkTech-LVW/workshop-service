@@ -142,7 +142,7 @@ class StockReservationExpiryIntegrationTest {
         ServiceOrder serviceOrder = sentServiceOrderWith(filter, 3);
         expireTheReservationOf(serviceOrder);
         ReleaseExpiredStockReservationsCommand command =
-                new ReleaseExpiredStockReservationsCommand(Instant.now(), 0L, 100);
+                new ReleaseExpiredStockReservationsCommand(Instant.now(), 500);
         CountDownLatch start = new CountDownLatch(1);
 
         List<Throwable> failures = new ArrayList<>();
@@ -173,7 +173,7 @@ class StockReservationExpiryIntegrationTest {
     }
 
     @Test
-    void shouldReleaseOnlyTheGivenNumberOfPartsAfterTheGivenOne() throws Exception {
+    void shouldReleaseOnlyTheGivenNumberOfPartsInIdOrder() throws Exception {
         Long first = createPart(5);
         Long second = createPart(5);
         ServiceOrder firstOrder = sentServiceOrderWith(first, 1);
@@ -182,14 +182,12 @@ class StockReservationExpiryIntegrationTest {
         expireTheReservationOf(secondOrder);
         Instant now = Instant.now();
 
-        ReleaseExpiredStockReservationsResult batch = releaseExpiredStockReservationsUseCase.execute(
-                new ReleaseExpiredStockReservationsCommand(now, first - 1, 1));
+        releaseExpiredStockReservationsUseCase.execute(new ReleaseExpiredStockReservationsCommand(now, 1));
 
-        assertThat(batch).isEqualTo(new ReleaseExpiredStockReservationsResult(1, first));
         assertThat(reservationCount(firstOrder)).isZero();
         assertThat(reservationCount(secondOrder)).isOne();
 
-        releaseExpiredStockReservationsUseCase.execute(new ReleaseExpiredStockReservationsCommand(now, first, 1));
+        releaseExpiredStockReservationsUseCase.execute(new ReleaseExpiredStockReservationsCommand(now, 1));
 
         assertThat(reservationCount(secondOrder)).isZero();
     }
