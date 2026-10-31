@@ -77,6 +77,15 @@ Com a aplicação no ar, a documentação (Swagger UI) fica em <http://localhost
 
 Para chamar rotas protegidas pela própria UI, faça o login em `POST /auth/login`, clique em **Authorize** e cole o `accessToken`.
 
+## Métricas de tempo da OS
+
+As métricas saem do histórico de status de cada OS. A consulta e o índice estão no [ADR 008](docs/adr/008-metrics-queries.md).
+
+- **Quais OS entram:** as que entraram em Finalizada (`COMPLETED`) dentro do período, contado em dias inteiros no fuso da oficina (`America/Sao_Paulo`), com o início e o fim inclusos. Ficam de fora as canceladas e as que pararam em Orçamento rejeitado. Uma OS rejeitada, reaberta e depois executada entra normalmente.
+- **Tempo em um status:** soma de todos os períodos que a OS passou nele. Cada entrada no status conta até a mudança de status seguinte. O status atual da OS não conta, porque o período dele ainda não terminou: o tempo em Finalizada só aparece para as OS já entregues.
+- **Tempo de execução:** tempo em Em execução (`IN_PROGRESS`). Com o orçamento complementar, a OS entra em execução mais de uma vez, e os períodos se somam. A espera pela aprovação do cliente e a fila até o mecânico iniciar (Orçamento aprovado e Complementar aprovado) ficam de fora.
+- **Média:** por status, entre as OS que passaram por ele, junto com a quantidade dessas OS. Os tempos saem com precisão de segundos. Sem OS no período, a média é nula.
+
 ## Decisões de arquitetura
 
 - [ADR 001: Banco de dados e persistência](docs/adr/001-database.md)
@@ -86,6 +95,7 @@ Para chamar rotas protegidas pela própria UI, faça o login em `POST /auth/logi
 - [ADR 005: Acesso do cliente à ordem de serviço](docs/adr/005-customer-access.md)
 - [ADR 006: Orçamento complementar durante a execução](docs/adr/006-supplementary-quote.md)
 - [ADR 007: Versionamento de migrations por timestamp e execução fora de ordem](docs/adr/007-timestamp-migrations.md)
+- [ADR 008: Consultas de métricas sobre tabelas de outros módulos](docs/adr/008-metrics-queries.md)
 - [ADR 008: Reserva de estoque no orçamento](docs/adr/008-stock-reservation.md)
 
 ## Contribuindo
