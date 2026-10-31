@@ -6,6 +6,7 @@ import static java.time.Duration.ofSeconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import br.com.arktech.workshop.IntegrationTest;
+import br.com.arktech.workshop.metrics.application.port.ServiceExecutionTime;
 import br.com.arktech.workshop.metrics.application.port.StatusTime;
 
 import java.time.Duration;
@@ -51,9 +52,33 @@ class GetServiceOrderTimeMetricsIntegrationTest {
     }
 
     @Test
+    void shouldAverageTheExecutionTimeOfTheServiceOrdersThatIncludedEachService() {
+        LocalDate day = LocalDate.of(2001, 3, 8);
+        Long oilChange = fixture.serviceOffering("Troca de óleo", 60);
+        Long alignment = fixture.serviceOffering("Alinhamento", 45);
+        executed(fixture.openedAt(at(day, 7)).withService(oilChange, 1), ofHours(2));
+        executed(fixture.openedAt(at(day, 7)).withService(oilChange, 2).withService(alignment, 1), ofHours(4));
+        executed(fixture.openedAt(at(day, 7)).withService(alignment, 1), ofHours(6));
+        executed(fixture.openedAt(at(day, 7)), ofHours(1));
+        fixture.openedAt(at(day, 7)).withService(oilChange, 1).then("CANCELED", ofHours(1)).save();
+        executed(fixture.openedAt(at(day.plusDays(1), 7)).withService(oilChange, 1), ofHours(8));
+
+        ServiceOrderTimeMetricsResult result = metricsOf(day, day);
+
+        assertThat(result.serviceOrderCount()).isEqualTo(4);
+        assertThat(result.averageExecutionTime()).isEqualTo(ofMinutes(195));
+        assertThat(result.byService())
+                .containsExactly(
+                        new ServiceExecutionTime(alignment, "Alinhamento", 45, ofHours(5), 2),
+                        new ServiceExecutionTime(oilChange, "Troca de óleo", 60, ofHours(3), 2));
+    }
+
+    @Test
     void shouldSumTheExecutionPeriodsInterruptedByASupplementaryQuote() {
         LocalDate day = LocalDate.of(2001, 3, 2);
+        Long brakes = fixture.serviceOffering("Revisão de freios", 90);
         fixture.openedAt(at(day, 7))
+                .withService(brakes, 1)
                 .then("IN_DIAGNOSIS", ofMinutes(10))
                 .then("AWAITING_APPROVAL", ofMinutes(20))
                 .then("QUOTE_APPROVED", ofMinutes(30))
@@ -68,6 +93,8 @@ class GetServiceOrderTimeMetricsIntegrationTest {
 
         assertThat(result.serviceOrderCount()).isEqualTo(1);
         assertThat(result.averageExecutionTime()).isEqualTo(ofHours(3));
+        assertThat(result.byService())
+                .containsExactly(new ServiceExecutionTime(brakes, "Revisão de freios", 90, ofHours(3), 1));
         assertThat(result.timeByStatus())
                 .containsExactly(
                         new StatusTime("RECEIVED", ofMinutes(10), 1),
@@ -179,12 +206,16 @@ class GetServiceOrderTimeMetricsIntegrationTest {
 
         assertThat(result.serviceOrderCount()).isZero();
         assertThat(result.averageExecutionTime()).isNull();
+        assertThat(result.byService()).isEmpty();
         assertThat(result.timeByStatus()).isEmpty();
     }
 
     private void executedFor(LocalDate day, Duration executionTime) {
-        fixture.openedAt(at(day, 7))
-                .then("IN_DIAGNOSIS", ofMinutes(10))
+        executed(fixture.openedAt(at(day, 7)), executionTime);
+    }
+
+    private void executed(ServiceOrderHistoryFixture.History history, Duration executionTime) {
+        history.then("IN_DIAGNOSIS", ofMinutes(10))
                 .then("AWAITING_APPROVAL", ofMinutes(20))
                 .then("QUOTE_APPROVED", ofMinutes(30))
                 .then("IN_PROGRESS", ofMinutes(15))
