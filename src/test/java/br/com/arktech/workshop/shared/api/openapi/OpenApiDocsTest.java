@@ -254,6 +254,22 @@ class OpenApiDocsTest {
     }
 
     @Test
+    void shouldDocumentCustomerServiceOrderRoutesAsPublicInTheirOwnTag() {
+        String serviceOrder = "$.paths['/customer/serviceOrders/{publicId}']";
+
+        for (String operation : List.of(serviceOrder + ".get")) {
+            assertThat(spec.read(operation + ".tags", List.class)).containsExactly("Acompanhamento da OS pelo cliente");
+            assertThat(spec.read(operation + ".security", List.class)).isEmpty();
+            assertThat(spec.read(operation + ".parameters[*].name", List.class))
+                    .containsExactly("publicId", "X-Customer-Document");
+            assertThat(spec.read(operation + ".parameters[1].in", String.class)).isEqualTo("header");
+            assertThat(spec.read(operation + ".parameters[1].example", String.class)).isEqualTo("529.982.247-25");
+        }
+        assertThat(spec.read(serviceOrder + ".get.responses", Map.class))
+                .containsOnlyKeys("200", "400", "404", "429", "500");
+    }
+
+    @Test
     void shouldHideErrorController() {
         Map<String, Object> paths = spec.read("$.paths");
 

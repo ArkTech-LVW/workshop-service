@@ -7,6 +7,7 @@ import br.com.arktech.workshop.shared.domain.pagination.Page;
 import br.com.arktech.workshop.shared.domain.pagination.Pagination;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public interface ServiceOrderRepository {
 
@@ -15,6 +16,8 @@ public interface ServiceOrderRepository {
     ServiceOrder saveAndFlush(ServiceOrder serviceOrder);
 
     Optional<ServiceOrder> findById(Long id);
+
+    Optional<ServiceOrder> findByPublicIdAndCustomerId(UUID publicId, Long customerId);
 
     ServiceOrderNumber nextNumber();
 

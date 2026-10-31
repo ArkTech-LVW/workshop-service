@@ -457,6 +457,18 @@ class ServiceOrderTest {
         assertThat(serviceOrder.getTotalPrice()).isEqualTo(totalPrice);
     }
 
+    @ParameterizedTest
+    @EnumSource(names = {"RECEIVED", "IN_DIAGNOSIS", "CANCELED"}, mode = EnumSource.Mode.EXCLUDE)
+    void shouldShowTheQuoteToTheCustomerOnceItWasSent(ServiceOrderStatus status) {
+        assertThat(status.showsQuoteToCustomer()).isTrue();
+    }
+
+    @ParameterizedTest
+    @EnumSource(names = {"RECEIVED", "IN_DIAGNOSIS", "CANCELED"})
+    void shouldHideTheQuoteFromTheCustomerWhileItIsADraftOrTheServiceOrderIsCanceled(ServiceOrderStatus status) {
+        assertThat(status.showsQuoteToCustomer()).isFalse();
+    }
+
     @Test
     void shouldForgetTheEventsOncePublished() {
         ServiceOrder serviceOrder = serviceOrderIn(AWAITING_APPROVAL);

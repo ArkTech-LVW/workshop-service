@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.context.MessageSourceResolvable;
+import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -24,8 +25,11 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
@@ -93,7 +97,7 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HandlerMethodValidationException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         List<ApiFieldError> details = new ArrayList<>();
         ex.getParameterValidationResults().forEach(result -> {
-            String parameterName = result.getMethodParameter().getParameterName();
+            String parameterName = nameOf(result.getMethodParameter());
             for (MessageSourceResolvable error : result.getResolvableErrors()) {
                 String field = error instanceof FieldError fieldError ? fieldError.getField() : parameterName;
                 details.add(new ApiFieldError(field, messageOf(error)));
@@ -116,6 +120,16 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatusCode status,
             WebRequest request) {
         ApiError body = apiErrors.invalidField(ex.getParameterName(), "request.requiredParameter");
+        return handleExceptionInternal(ex, body, headers, status, request);
+    }
+
+    @Override
+    protected @Nullable ResponseEntity<Object> handleServletRequestBindingException(
+            ServletRequestBindingException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        ApiError body = ex instanceof MissingRequestHeaderException missingHeader
+                ? apiErrors.invalidField(missingHeader.getHeaderName(), "request.requiredParameter")
+                : null;
+
         return handleExceptionInternal(ex, body, headers, status, request);
     }
 
@@ -143,6 +157,11 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static String methodOf(WebRequest request) {
         return request instanceof ServletWebRequest servletRequest ? servletRequest.getRequest().getMethod() : "";
+    }
+
+    private static @Nullable String nameOf(MethodParameter parameter) {
+        RequestHeader header = parameter.getParameterAnnotation(RequestHeader.class);
+        return header == null || header.name().isEmpty() ? parameter.getParameterName() : header.name();
     }
 
     private static String messageOf(MessageSourceResolvable error) {

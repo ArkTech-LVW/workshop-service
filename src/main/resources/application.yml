@@ -43,6 +43,10 @@ security:
         path: /auth/login
         capacity: 20
         period: PT1M
+      customer-service-orders:
+        path: /customer/serviceOrders/**
+        capacity: 20
+        period: PT1M
 
 springdoc:
   api-docs:

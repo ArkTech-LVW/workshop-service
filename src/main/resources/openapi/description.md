@@ -4,6 +4,8 @@ API de gestão de oficina mecânica: clientes, veículos, ordens de serviço e e
 
 As rotas protegidas exigem um token JWT no header `Authorization: Bearer <token>`. O token é obtido em `POST /auth/login` e vale 1h. Para testar por aqui, faça o login, clique em **Authorize** e cole o `accessToken`. Rotas públicas aparecem sem o cadeado.
 
+As rotas do cliente (`/customer/...`) não usam token: o cliente informa o `publicId` da OS na URL e o próprio CPF/CNPJ no header `X-Customer-Document`.
+
 Todas as rotas têm limite de requisições por usuário (ou por IP, sem token), e o login tem um limite mais restrito, por e-mail e IP. Acima do limite, a resposta é 429 com o header `Retry-After`, mesmo com a senha correta.
 
 ## Erros
