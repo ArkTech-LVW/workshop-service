@@ -35,7 +35,7 @@ class ReleaseExpiredStockReservationsUseCaseTest {
         StockReservation stillValid = reserve(filter, 43L, 2, NOW.plus(Duration.ofMinutes(1)));
         reserve(oil, 42L, 4, NOW.minus(Duration.ofDays(1)));
 
-        releaseExpiredStockReservationsUseCase.execute(new ReleaseExpiredStockReservationsCommand(NOW));
+        release(0L, 100);
 
         assertThat(filter.getReservedQuantity()).isEqualTo(2);
         assertThat(oil.getReservedQuantity()).isZero();
@@ -48,7 +48,7 @@ class ReleaseExpiredStockReservationsUseCaseTest {
         Part filter = savePart("FILTRO-01", 10);
         reserve(filter, 42L, 3, NOW);
 
-        releaseExpiredStockReservationsUseCase.execute(new ReleaseExpiredStockReservationsCommand(NOW));
+        release(0L, 100);
 
         assertThat(filter.getReservedQuantity()).isEqualTo(3);
         assertThat(stockReservationRepository.findAll()).hasSize(1);
@@ -59,10 +59,40 @@ class ReleaseExpiredStockReservationsUseCaseTest {
         Part filter = savePart("FILTRO-01", 10);
         reserve(filter, 42L, 3, NOW.plus(Duration.ofDays(7)));
 
-        releaseExpiredStockReservationsUseCase.execute(new ReleaseExpiredStockReservationsCommand(NOW));
-        releaseExpiredStockReservationsUseCase.execute(new ReleaseExpiredStockReservationsCommand(NOW));
+        release(0L, 100);
+        release(0L, 100);
 
         assertThat(filter.getReservedQuantity()).isEqualTo(3);
+    }
+
+    @Test
+    void shouldReleaseAtMostTheLimitOfPartsInIdOrderAfterTheGivenOne() {
+        Part filter = savePart("FILTRO-01", 10);
+        Part oil = savePart("OLEO-5W30", 10);
+        Part pad = savePart("PAST-01", 10);
+        Instant expired = NOW.minus(Duration.ofMinutes(1));
+        reserve(pad, 42L, 1, expired);
+        reserve(oil, 42L, 1, expired);
+        reserve(filter, 43L, 1, expired);
+
+        ReleaseExpiredStockReservationsResult first = release(0L, 2);
+
+        assertThat(first).isEqualTo(new ReleaseExpiredStockReservationsResult(2, oil.getId()));
+        assertThat(filter.getReservedQuantity()).isZero();
+        assertThat(oil.getReservedQuantity()).isZero();
+        assertThat(pad.getReservedQuantity()).isOne();
+
+        ReleaseExpiredStockReservationsResult second = release(first.lastPartId(), 2);
+
+        assertThat(second).isEqualTo(new ReleaseExpiredStockReservationsResult(1, pad.getId()));
+        assertThat(pad.getReservedQuantity()).isZero();
+        assertThat(release(second.lastPartId(), 2))
+                .isEqualTo(new ReleaseExpiredStockReservationsResult(0, pad.getId()));
+    }
+
+    private ReleaseExpiredStockReservationsResult release(Long afterPartId, int limit) {
+        return releaseExpiredStockReservationsUseCase.execute(
+                new ReleaseExpiredStockReservationsCommand(NOW, afterPartId, limit));
     }
 
     private StockReservation reserve(Part part, Long serviceOrderId, int quantity, Instant expiresAt) {

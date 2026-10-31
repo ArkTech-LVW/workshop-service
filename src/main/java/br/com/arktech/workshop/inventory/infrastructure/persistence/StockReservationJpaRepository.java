@@ -6,6 +6,7 @@ import br.com.arktech.workshop.inventory.domain.repository.StockReservationRepos
 import java.time.Instant;
 import java.util.List;
 
+import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,6 +18,14 @@ interface StockReservationJpaRepository extends JpaRepository<StockReservation, 
     List<Long> findPartIdsByServiceOrderId(@Param("serviceOrderId") Long serviceOrderId);
 
     @Override
-    @Query("SELECT DISTINCT r.part.id FROM StockReservation r WHERE r.expiresAt < :instant ORDER BY r.part.id")
-    List<Long> findPartIdsWithReservationsExpiredBefore(@Param("instant") Instant instant);
+    default List<Long> findPartIdsWithReservationsExpiredBefore(Instant instant, Long afterPartId, int limit) {
+        return findPartIdsExpiredBefore(instant, afterPartId, Limit.of(limit));
+    }
+
+    @Query("""
+            SELECT DISTINCT r.part.id FROM StockReservation r
+            WHERE r.expiresAt < :instant AND r.part.id > :afterPartId
+            ORDER BY r.part.id""")
+    List<Long> findPartIdsExpiredBefore(
+            @Param("instant") Instant instant, @Param("afterPartId") Long afterPartId, Limit limit);
 }

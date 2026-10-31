@@ -46,12 +46,14 @@ public class InMemoryStockReservationRepository implements StockReservationRepos
     }
 
     @Override
-    public List<Long> findPartIdsWithReservationsExpiredBefore(Instant instant) {
+    public List<Long> findPartIdsWithReservationsExpiredBefore(Instant instant, Long afterPartId, int limit) {
         return reservations.stream()
                 .filter(reservation -> reservation.getExpiresAt().isBefore(instant))
                 .map(reservation -> reservation.getPart().getId())
+                .filter(partId -> partId > afterPartId)
                 .distinct()
                 .sorted()
+                .limit(limit)
                 .toList();
     }
 

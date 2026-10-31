@@ -64,6 +64,7 @@ inventory:
   stock-reservation:
     validity: P7D
     release-interval: PT15M
+    release-batch-size: 100
 
 springdoc:
   api-docs:

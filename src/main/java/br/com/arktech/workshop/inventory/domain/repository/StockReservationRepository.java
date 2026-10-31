@@ -16,7 +16,7 @@ public interface StockReservationRepository {
 
     List<Long> findPartIdsByServiceOrderId(Long serviceOrderId);
 
-    List<Long> findPartIdsWithReservationsExpiredBefore(Instant instant);
+    List<Long> findPartIdsWithReservationsExpiredBefore(Instant instant, Long afterPartId, int limit);
 
     List<StockReservation> findByPartIdAndExpiresAtBefore(Long partId, Instant instant);
 }
