@@ -11,6 +11,8 @@ import java.time.Instant;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class StockReservationTest {
 
@@ -78,6 +80,16 @@ class StockReservationTest {
         assertThatThrownBy(() -> reservation.change(6, EXPIRES_AT))
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessage("part.insufficientStock");
+        assertThat(reservation.getQuantity()).isEqualTo(3);
+        assertThat(part.getReservedQuantity()).isEqualTo(3);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, -1})
+    void shouldRefuseToChangeToANonPositiveQuantity(int quantity) {
+        StockReservation reservation = StockReservation.reserve(part, SERVICE_ORDER_ID, 3, EXPIRES_AT);
+
+        assertThatThrownBy(() -> reservation.change(quantity, EXPIRES_AT)).isInstanceOf(IllegalArgumentException.class);
         assertThat(reservation.getQuantity()).isEqualTo(3);
         assertThat(part.getReservedQuantity()).isEqualTo(3);
     }
