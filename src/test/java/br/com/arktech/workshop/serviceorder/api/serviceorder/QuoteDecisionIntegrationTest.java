@@ -222,7 +222,7 @@ class QuoteDecisionIntegrationTest {
     }
 
     @Test
-    void shouldRefuseToReopenAQuoteThatWasNotRejected() throws Exception {
+    void shouldRefuseToReopenWithoutAQuote() throws Exception {
         as(Role.ADMIN, reopenQuote())
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("serviceOrder.invalidStatusTransition"));
