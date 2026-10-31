@@ -18,4 +18,4 @@
 ### Checklist
 - [ ] Nenhum segredo ou credencial real foi commitado
 - [ ] Testes adicionados ou atualizados quando aplicável
-- [ ] Migrations novas usam timestamp e não dependem de migration de outro PR que ainda não está na `main`
+- [ ] Migrations novas usam timestamp e só dependem de migrations que já estão na `main` ou na PR predecessora
