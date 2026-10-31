@@ -157,6 +157,17 @@ class ServiceOrderNotificationIntegrationTest {
         assertThat(statusOf(publicId)).isEqualTo("AWAITING_APPROVAL");
     }
 
+    @Test
+    void shouldNotNotifyWhenTheWorkshopWithdrawsTheQuote() throws Exception {
+        sendQuoteWith(createPart(10), 2);
+        awaitDelivery(QUOTE_SENT);
+
+        as(Role.ADMIN, post("/admin/serviceOrders/{id}/reopenQuote", serviceOrderId)).andExpect(status().isOk());
+
+        assertThat(deliveries.poll(WAIT.toMillis(), TimeUnit.MILLISECONDS)).isNull();
+        assertThat(statusOf(publicId)).isEqualTo("IN_DIAGNOSIS");
+    }
+
     private Delivery awaitDelivery(String fragment) throws InterruptedException {
         long deadline = System.nanoTime() + WAIT.toNanos();
         while (true) {
