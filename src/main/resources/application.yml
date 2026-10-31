@@ -21,6 +21,8 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: validate
+  flyway:
+    out-of-order: true
   task:
     execution:
       thread-name-prefix: async-

@@ -37,8 +37,8 @@ Além disso, o esquema precisa ser versionado, testável contra o banco real e r
 
 ### Como fica configurado
 
-- Migrations em `src/main/resources/db/migration`, no padrão `V<n>__<description>.sql`, aplicadas pelo Flyway na subida da aplicação. `spring.jpa.hibernate.ddl-auto=validate`: o Hibernate apenas confere o mapeamento, e o esquema vem só das migrations.
-- `V1__baseline.sql` marca o início com o esquema vazio. Cada módulo cria as próprias tabelas na sua tarefa, a partir da V2.
+- Migrations em `src/main/resources/db/migration`, no padrão `V<n>__<description>.sql`, aplicadas pelo Flyway na subida da aplicação. `spring.jpa.hibernate.ddl-auto=validate`: o Hibernate apenas confere o mapeamento, e o esquema vem só das migrations. O padrão de nome foi substituído pelo [ADR 007](007-timestamp-migrations.md).
+- `V1__baseline.sql` marca o início com o esquema vazio. Cada módulo cria as próprias tabelas na sua tarefa, a partir da V2. Com o [ADR 007](007-timestamp-migrations.md), a baseline passou a ser `V20261021001524__baseline.sql`.
 - Tabelas e colunas em inglês e snake_case, tabelas no singular (`service_order`, `stock_movement`).
 - Conexão pelas variáveis `DB_URL`, `DB_USERNAME` e `DB_PASSWORD`, com padrões para `localhost` em desenvolvimento.
 - `spring.jpa.open-in-view=false`: nenhum acesso lazy fora da transação da `application`.
@@ -69,6 +69,6 @@ Além disso, o esquema precisa ser versionado, testável contra o banco real e r
 - Docker passa a ser pré-requisito para `./gradlew build` (os testes de integração sobem o PostgreSQL), tanto no dev quanto no CI (T0.6).
 - **T0.4:** o `docker-compose.yml` já tem o serviço `postgres`. A T0.4 acrescenta o serviço da aplicação, lendo `DB_URL`, `DB_USERNAME` e `DB_PASSWORD`, e precisa garantir que o `bootRun` continue subindo só o banco (por exemplo, com `profiles` no serviço da aplicação ou um arquivo separado indicado em `spring.docker.compose.file`).
 - IDs sequenciais são enumeráveis. A API do cliente (T3.8) precisa autorizar pelo dono do recurso, nunca pela dificuldade de adivinhar o ID. Resolvido no [ADR 005](005-customer-access.md).
-- Dois PRs em paralelo podem criar a mesma versão de migration. Quem mergear por último renumera a sua antes do merge (o Flyway recusa versões duplicadas e o build quebra).
+- Dois PRs em paralelo podem criar a mesma versão de migration. Quem mergear por último renumera a sua antes do merge (o Flyway recusa versões duplicadas e o build quebra). Substituído pelo [ADR 007](007-timestamp-migrations.md): versão por timestamp e execução fora de ordem.
 - Agregados com coleções, como a OS com itens e histórico (T3.1), mapeiam os filhos como entidades a partir da raiz (`cascade` + `orphanRemoval`).
 - Em aberto: a interface de repositório do domínio não pode usar `Pageable`/`Page` do Spring Data. A primeira listagem paginada (ex.: T3.9) define o tipo de paginação a adotar.
