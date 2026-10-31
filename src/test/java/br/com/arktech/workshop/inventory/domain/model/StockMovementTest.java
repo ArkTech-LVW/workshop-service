@@ -79,6 +79,17 @@ class StockMovementTest {
     }
 
     @Test
+    void shouldRecordTheReturnOfAPartFromAServiceOrderWithoutUser() {
+        StockMovement movement = StockMovement.serviceOrderReturn(part, 3, 42L, null);
+
+        assertThat(part.getStockQuantity()).isEqualTo(8);
+        assertThat(movement.getType()).isEqualTo(StockMovementType.IN);
+        assertThat(movement.getQuantity()).isEqualTo(3);
+        assertThat(movement.getServiceOrderId()).isEqualTo(42L);
+        assertThat(movement.getCreatedByUserId()).isNull();
+    }
+
+    @Test
     void shouldRejectMovementsThatWouldMakeStockNegative() {
         assertThatThrownBy(() -> StockMovement.withdrawal(part, 6, 42L, USER_ID))
                 .isInstanceOf(BusinessRuleException.class)

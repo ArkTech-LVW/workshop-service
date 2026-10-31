@@ -14,6 +14,7 @@ import br.com.arktech.workshop.shared.domain.money.Money;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -111,7 +112,7 @@ class ApproveQuoteUseCaseTest {
     }
 
     private ApproveQuoteUseCase useCase(CurrentUser currentUser) {
-        return new ApproveQuoteUseCase(serviceOrderRepository, currentUser);
+        return new ApproveQuoteUseCase(serviceOrderRepository, currentUser, Clock.systemUTC());
     }
 
     private void sendQuoteWithParts() {
@@ -119,7 +120,7 @@ class ApproveQuoteUseCaseTest {
         serviceOrder.addServiceItem(30L, 1, new Money(new BigDecimal("150.00")));
         serviceOrder.addPartItem(40L, 3, new Money(new BigDecimal("35.90")));
         serviceOrder.addPartItem(41L, 1, new Money(new BigDecimal("80.00")));
-        serviceOrder.sendQuote(ATTENDANT_ID, null);
+        serviceOrder.sendQuote(ATTENDANT_ID, null, null);
         serviceOrder.clearDomainEvents();
     }
 }

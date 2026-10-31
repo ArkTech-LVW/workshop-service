@@ -1,3 +1,13 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        generate_statistics: true
+
+logging:
+  level:
+    org.hibernate.engine.internal.StatisticalLoggingSessionEventListener: warn
+
 security:
   rate-limit:
     general:
@@ -6,4 +16,6 @@ security:
       capacity: 10000
     routes:
       login:
+        capacity: 10000
+      customer-service-orders:
         capacity: 10000

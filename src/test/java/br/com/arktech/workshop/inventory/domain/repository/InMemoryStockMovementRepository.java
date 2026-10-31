@@ -6,7 +6,9 @@ import br.com.arktech.workshop.shared.domain.pagination.Pagination;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -36,6 +38,22 @@ public class InMemoryStockMovementRepository implements StockMovementRepository 
                 .limit(pagination.size())
                 .toList();
         return new Page<>(content, pagination, matching.size());
+    }
+
+    @Override
+    public Map<Long, Integer> findNetWithdrawnByServiceOrderId(Long serviceOrderId) {
+        Map<Long, Integer> netByPart = new HashMap<>();
+        movements.stream()
+                .filter(movement -> serviceOrderId.equals(movement.getServiceOrderId()))
+                .forEach(movement -> {
+                    switch (movement.getType()) {
+                        case OUT -> netByPart.merge(movement.getPart().getId(), movement.getQuantity(), Integer::sum);
+                        case IN -> netByPart.merge(movement.getPart().getId(), -movement.getQuantity(), Integer::sum);
+                        case ADJUSTMENT -> {
+                        }
+                    }
+                });
+        return netByPart;
     }
 
     public List<StockMovement> findAll() {

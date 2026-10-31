@@ -39,8 +39,8 @@ class CompleteServiceItemUseCaseTest {
         serviceOrder.addServiceItem(31L, 1, new Money(new BigDecimal("80.00")));
         serviceOrderRepository.saveAndFlush(serviceOrder);
         serviceOrder.startDiagnosis(MECHANIC_ID, null);
-        serviceOrder.sendQuote(MECHANIC_ID, null);
-        serviceOrder.approveQuote(null, null);
+        serviceOrder.sendQuote(MECHANIC_ID, null, null);
+        serviceOrder.approveQuote(null, null, Instant.now());
         serviceOrder.startExecution(MECHANIC_ID, null);
         serviceOrder.clearDomainEvents();
         firstItemId = serviceOrder.getServiceItems().getFirst().getId();

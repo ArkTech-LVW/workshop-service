@@ -11,6 +11,7 @@ import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.money.Money;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 import org.junit.jupiter.api.Test;
 
@@ -53,8 +54,8 @@ class CompleteServiceOrderUseCaseTest {
 
     private void startTheExecution() {
         serviceOrder.startDiagnosis(MECHANIC_ID, null);
-        serviceOrder.sendQuote(MECHANIC_ID, null);
-        serviceOrder.approveQuote(null, null);
+        serviceOrder.sendQuote(MECHANIC_ID, null, null);
+        serviceOrder.approveQuote(null, null, Instant.now());
         serviceOrder.startExecution(MECHANIC_ID, null);
     }
 }

@@ -6,10 +6,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrder;
 import br.com.arktech.workshop.serviceorder.domain.repository.InMemoryServiceOrderRepository;
 import br.com.arktech.workshop.shared.application.inventory.PartDetails;
+import br.com.arktech.workshop.shared.application.inventory.PartDirectory;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.money.Money;
 
 import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.Map;
+import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 
@@ -65,9 +69,9 @@ class AddPartItemUseCaseTest {
 
     @Test
     void shouldReportAnUnknownPart() {
-        AddPartItemUseCase withUnknownPart = new AddPartItemUseCase(serviceOrderRepository, partId -> {
+        AddPartItemUseCase withUnknownPart = new AddPartItemUseCase(serviceOrderRepository, stocking(partId -> {
             throw new NotFoundException("part.notFound", partId.toString());
-        });
+        }));
 
         assertThatThrownBy(() -> withUnknownPart.execute(new AddPartItemCommand(serviceOrder.getId(), 99L, 1)))
                 .isInstanceOf(NotFoundException.class)
@@ -83,6 +87,21 @@ class AddPartItemUseCaseTest {
     }
 
     private AddPartItemUseCase useCaseWithStock(int availableQuantity) {
-        return new AddPartItemUseCase(serviceOrderRepository, partId -> new PartDetails(SALE_PRICE, availableQuantity));
+        return new AddPartItemUseCase(
+                serviceOrderRepository, stocking(partId -> new PartDetails(SALE_PRICE, availableQuantity)));
+    }
+
+    private static PartDirectory stocking(Function<Long, PartDetails> detailsOf) {
+        return new PartDirectory() {
+            @Override
+            public PartDetails detailsOf(Long partId) {
+                return detailsOf.apply(partId);
+            }
+
+            @Override
+            public Map<Long, String> namesOf(Collection<Long> partIds) {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 }

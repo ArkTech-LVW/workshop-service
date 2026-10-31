@@ -258,6 +258,7 @@ interface ICustomerController {
 - Os papéis vêm sempre do enum `Role`, nunca de string.
 - Duas anotações de acesso no mesmo método (ou na mesma interface) e `@AllowedRoles({})` são erro de configuração e também quebram o `EndpointAccessCoverageTest`.
 - Não use as anotações do Spring (`@PreAuthorize`, `@Secured`) nem as do Jakarta (`@PermitAll`, `@RolesAllowed`): elas não são lidas e o endpoint continua bloqueado.
+- As rotas do cliente (`/customer/...`) são `@PublicEndpoint`: o cliente não tem login e se identifica pelo `publicId` da OS e pelo próprio CPF/CNPJ, no header `X-Customer-Document`. Elas nunca devolvem ids internos (da OS, de cliente, veículo, mecânico, usuário ou dos itens no catálogo e no estoque). Os motivos estão no [ADR 005](docs/adr/005-customer-access.md).
 - Fora dos controllers, ficam abertos só o `/actuator/health/**` e a documentação (`/docs/**`, `/swagger-ui/**`), na `SecurityConfig`. Qualquer outro caminho, inclusive rota inexistente, é negado. Numa rota existente, a requisição fora do formato (método, `Content-Type`, `Accept`) continua com o erro do MVC (405, 415, 406), mesmo sem token.
 
 ### Token e usuário logado

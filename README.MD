@@ -83,6 +83,8 @@ Para chamar rotas protegidas pela própria UI, faça o login em `POST /auth/logi
 - [ADR 002: Padrão de erros da API](docs/adr/002-api-errors.md)
 - [ADR 003: Autenticação e autorização](docs/adr/003-authentication.md)
 - [ADR 004: Eventos de domínio](docs/adr/004-domain-events.md)
+- [ADR 005: Acesso do cliente à ordem de serviço](docs/adr/005-customer-access.md)
+- [ADR 006: Orçamento complementar durante a execução](docs/adr/006-supplementary-quote.md)
 
 ## Contribuindo
 

@@ -35,6 +35,15 @@ public class InMemoryServiceOfferingRepository implements ServiceOfferingReposit
     }
 
     @Override
+    public List<ServiceOffering> findAllById(Iterable<Long> ids) {
+        List<Long> wanted = new ArrayList<>();
+        ids.forEach(wanted::add);
+        return serviceOfferings.stream()
+                .filter(serviceOffering -> wanted.contains(serviceOffering.getId()))
+                .toList();
+    }
+
+    @Override
     public Page<ServiceOffering> findPage(ServiceOfferingFilter filter, Pagination pagination) {
         List<ServiceOffering> matching = serviceOfferings.stream()
                 .filter(serviceOffering -> matchesName(serviceOffering, filter.name()))

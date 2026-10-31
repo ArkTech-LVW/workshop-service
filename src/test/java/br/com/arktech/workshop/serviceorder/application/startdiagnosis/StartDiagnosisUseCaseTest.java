@@ -57,6 +57,7 @@ class StartDiagnosisUseCaseTest {
                         2,
                         new BigDecimal("150.00"),
                         new BigDecimal("300.00"),
+                        null,
                         null));
         assertThat(result.parts())
                 .singleElement()
@@ -65,7 +66,8 @@ class StartDiagnosisUseCaseTest {
                         40L,
                         3,
                         new BigDecimal("35.90"),
-                        new BigDecimal("107.70")));
+                        new BigDecimal("107.70"),
+                        null));
         assertThat(result.servicesTotal()).isEqualTo(new BigDecimal("300.00"));
         assertThat(result.partsTotal()).isEqualTo(new BigDecimal("107.70"));
         assertThat(result.totalPrice()).isEqualTo(new BigDecimal("407.70"));
