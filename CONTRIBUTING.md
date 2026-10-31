@@ -92,8 +92,8 @@ public class FindCustomerUseCase implements UseCase<FindCustomerQuery, CustomerR
 ## Mensagens e i18n
 
 - **Nunca escreva texto de mensagem direto no código.** Toda mensagem exibida ao cliente da API vem do `MessageSource`, sempre via `MessageResolver` (`get(code)` ou `get(code, args...)`), que já aplica o locale da aplicação.
-- Chaves em inglês no formato `<context>.<camelCase>` (ex.: `customer.notFound`) e textos em `src/main/resources/messages_pt_BR.properties`.
-- Ao adicionar um idioma, crie `messages_<locale>.properties`.
+- Chaves em inglês no formato `<context>.<camelCase>` (ex.: `customer.notFound`) e textos em `src/main/resources/messages_pt_BR.properties`. Os textos das notificações (`notification.*`) ficam em `src/main/resources/notifications_pt_BR.properties`.
+- Ao adicionar um idioma, crie `messages_<locale>.properties` e `notifications_<locale>.properties`.
 - O locale da aplicação é fixo em `pt_BR` (`spring.web.locale`), dentro e fora de requisições HTTP. O `MessageResolver` usa sempre esse locale, inclusive nos filtros do Spring Security, que rodam antes do `DispatcherServlet` ([ADR 002](docs/adr/002-api-errors.md)).
 - Chave inexistente lança `NoSuchMessageException`; o código da chave nunca é devolvido como mensagem.
 

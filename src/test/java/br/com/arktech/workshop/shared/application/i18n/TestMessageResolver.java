@@ -12,7 +12,7 @@ public final class TestMessageResolver {
 
     public static MessageResolver withApplicationMessages() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-        messageSource.setBasename("messages");
+        messageSource.setBasenames("messages", "notifications");
         messageSource.setDefaultEncoding(StandardCharsets.UTF_8.name());
         messageSource.setFallbackToSystemLocale(false);
         return new MessageResolver(messageSource, Locale.of("pt", "BR"));
