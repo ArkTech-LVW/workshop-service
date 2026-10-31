@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.tuple;
 
+import br.com.arktech.workshop.shared.application.i18n.MoneyFormatter;
 import br.com.arktech.workshop.shared.application.i18n.TestMessageResolver;
 import br.com.arktech.workshop.shared.application.notification.Notification;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
@@ -14,6 +15,7 @@ import br.com.arktech.workshop.shared.event.serviceorder.ServiceOrderCompletedEv
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -25,9 +27,11 @@ class ServiceOrderNotificationListenerTest {
     private static final Long CUSTOMER_ID = 10L;
     private static final BigDecimal TOTAL_PRICE = new BigDecimal("1234.50");
 
+    private static final MoneyFormatter MONEY_FORMATTER = new MoneyFormatter(Locale.of("pt", "BR"));
+
     private final List<Notification> sentNotifications = new ArrayList<>();
-    private final ServiceOrderNotificationListener listener =
-            new ServiceOrderNotificationListener(TestMessageResolver.withApplicationMessages(), sentNotifications::add);
+    private final ServiceOrderNotificationListener listener = new ServiceOrderNotificationListener(
+            TestMessageResolver.withApplicationMessages(), MONEY_FORMATTER, sentNotifications::add);
 
     @Test
     void shouldNotifyTheCustomerOfEachServiceOrderEvent() {
@@ -59,8 +63,8 @@ class ServiceOrderNotificationListenerTest {
 
     @Test
     void shouldOnlyLogWhenTheNotificationFails() {
-        ServiceOrderNotificationListener failingListener =
-                new ServiceOrderNotificationListener(TestMessageResolver.withApplicationMessages(), notification -> {
+        ServiceOrderNotificationListener failingListener = new ServiceOrderNotificationListener(
+                TestMessageResolver.withApplicationMessages(), MONEY_FORMATTER, notification -> {
                     throw new IllegalStateException("Notifier unavailable");
                 });
 

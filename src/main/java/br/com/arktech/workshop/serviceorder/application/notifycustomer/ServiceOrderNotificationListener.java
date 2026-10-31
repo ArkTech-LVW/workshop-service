@@ -1,6 +1,7 @@
 package br.com.arktech.workshop.serviceorder.application.notifycustomer;
 
 import br.com.arktech.workshop.shared.application.i18n.MessageResolver;
+import br.com.arktech.workshop.shared.application.i18n.MoneyFormatter;
 import br.com.arktech.workshop.shared.application.notification.Notification;
 import br.com.arktech.workshop.shared.application.notification.Notifier;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
@@ -24,6 +25,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 class ServiceOrderNotificationListener {
 
     private final MessageResolver messageResolver;
+    private final MoneyFormatter moneyFormatter;
     private final Notifier notifier;
 
     @Async
@@ -34,7 +36,7 @@ class ServiceOrderNotificationListener {
                 event.customerId(),
                 "notification.serviceOrder.quoteSent",
                 event.publicId(),
-                event.totalPrice());
+                moneyFormatter.format(event.totalPrice()));
     }
 
     @Async
@@ -45,7 +47,7 @@ class ServiceOrderNotificationListener {
                 event.customerId(),
                 "notification.serviceOrder.quoteApproved",
                 event.publicId(),
-                event.totalPrice());
+                moneyFormatter.format(event.totalPrice()));
     }
 
     @Async
@@ -56,7 +58,7 @@ class ServiceOrderNotificationListener {
                 event.customerId(),
                 "notification.serviceOrder.quoteRejected",
                 event.publicId(),
-                event.totalPrice(),
+                moneyFormatter.format(event.totalPrice()),
                 event.reason());
     }
 
@@ -68,7 +70,7 @@ class ServiceOrderNotificationListener {
                 event.customerId(),
                 "notification.serviceOrder.completed",
                 event.publicId(),
-                event.totalPrice());
+                moneyFormatter.format(event.totalPrice()));
     }
 
     private void notify(UUID serviceOrderPublicId, Long customerId, String messageKey, Object... messageArgs) {
