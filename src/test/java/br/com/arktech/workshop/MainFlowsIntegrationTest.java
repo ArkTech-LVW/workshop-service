@@ -183,7 +183,7 @@ class MainFlowsIntegrationTest {
 
         customer(HttpMethod.POST, "/customer/serviceOrders/{publicId}/approve", null)
                 .expect(422)
-                .expectCode("part.insufficientStock");
+                .expectCode("serviceOrder.partsUnavailable");
 
         assertThat(statusOf()).isEqualTo("AWAITING_APPROVAL");
         assertThat(jdbcTemplate.queryForObject(
