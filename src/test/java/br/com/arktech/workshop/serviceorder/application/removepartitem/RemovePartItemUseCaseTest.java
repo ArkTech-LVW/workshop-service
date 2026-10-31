@@ -41,7 +41,7 @@ class RemovePartItemUseCaseTest {
         serviceOrderRepository.saveAndFlush(serviceOrder);
         Long padItemId = serviceOrder.getPartItems().getFirst().getId();
         serviceOrder.startDiagnosis(2L, null);
-        serviceOrder.sendQuote(2L, null);
+        serviceOrder.sendQuote(2L, null, null);
 
         assertThatThrownBy(() ->
                         removePartItemUseCase.execute(new RemovePartItemCommand(serviceOrder.getId(), padItemId)))

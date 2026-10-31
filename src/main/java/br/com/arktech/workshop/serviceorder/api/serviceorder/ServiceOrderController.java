@@ -1,5 +1,7 @@
 package br.com.arktech.workshop.serviceorder.api.serviceorder;
 
+import br.com.arktech.workshop.serviceorder.application.approveoriginalonly.ApproveOriginalOnlyCommand;
+import br.com.arktech.workshop.serviceorder.application.approveoriginalonly.ApproveOriginalOnlyUseCase;
 import br.com.arktech.workshop.serviceorder.application.approvequote.ApproveQuoteCommand;
 import br.com.arktech.workshop.serviceorder.application.approvequote.ApproveQuoteUseCase;
 import br.com.arktech.workshop.serviceorder.application.cancelserviceorder.CancelServiceOrderCommand;
@@ -47,6 +49,7 @@ class ServiceOrderController implements IServiceOrderController {
     private final StartDiagnosisUseCase startDiagnosisUseCase;
     private final SendQuoteUseCase sendQuoteUseCase;
     private final ApproveQuoteUseCase approveQuoteUseCase;
+    private final ApproveOriginalOnlyUseCase approveOriginalOnlyUseCase;
     private final RejectQuoteUseCase rejectQuoteUseCase;
     private final ReopenQuoteUseCase reopenQuoteUseCase;
     private final StartExecutionUseCase startExecutionUseCase;
@@ -91,13 +94,19 @@ class ServiceOrderController implements IServiceOrderController {
     }
 
     @Override
-    public ServiceOrderResponse sendQuote(Long id) {
-        return ServiceOrderResponse.from(sendQuoteUseCase.execute(new SendQuoteCommand(id)));
+    public ServiceOrderResponse sendQuote(Long id, @Nullable SendQuoteRequest request) {
+        return ServiceOrderResponse.from(sendQuoteUseCase.execute(
+                new SendQuoteCommand(id, request == null ? null : request.canProceedWithoutChanges())));
     }
 
     @Override
     public ServiceOrderResponse approve(Long id) {
         return ServiceOrderResponse.from(approveQuoteUseCase.execute(new ApproveQuoteCommand(id)));
+    }
+
+    @Override
+    public ServiceOrderResponse approveOriginalOnly(Long id) {
+        return ServiceOrderResponse.from(approveOriginalOnlyUseCase.execute(new ApproveOriginalOnlyCommand(id)));
     }
 
     @Override

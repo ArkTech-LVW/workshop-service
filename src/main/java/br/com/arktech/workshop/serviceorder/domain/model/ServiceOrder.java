@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -55,6 +56,10 @@ public class ServiceOrder extends BaseEntity {
     private ServiceOrderStatus status;
 
     private Money totalPrice;
+
+    private @Nullable Boolean canProceedWithoutChanges;
+
+    private boolean approvedItemRemoved;
 
     @Getter(AccessLevel.NONE)
     @BatchSize(size = 100)
@@ -110,6 +115,14 @@ public class ServiceOrder extends BaseEntity {
         return sumSubtotals(partItems);
     }
 
+    public Money getApprovedTotal() {
+        return sumSubtotals(items().filter(ServiceOrderItem::isApproved).toList());
+    }
+
+    public Money getPendingTotal() {
+        return sumSubtotals(items().filter(item -> !item.isApproved()).toList());
+    }
+
     public List<StatusChange> getStatusHistory() {
         return List.copyOf(statusHistory);
     }
@@ -154,30 +167,51 @@ public class ServiceOrder extends BaseEntity {
         moveTo(ServiceOrderStatus.IN_DIAGNOSIS, mechanicId, description);
     }
 
-    public void sendQuote(Long changedByUserId, @Nullable String description) {
-        requireStatus(ServiceOrderStatus.IN_DIAGNOSIS, ServiceOrderStatus.AWAITING_APPROVAL);
-        if (serviceItems.isEmpty() && partItems.isEmpty()) {
-            throw new BusinessRuleException("serviceOrder.quoteWithoutItems");
+    public void sendQuote(
+            Long changedByUserId, @Nullable Boolean canProceedWithoutChanges, @Nullable String description) {
+        if (status.allowsSupplementaryQuote()) {
+            sendSupplementaryQuote(changedByUserId, canProceedWithoutChanges, description);
+            return;
         }
+        requireStatus(ServiceOrderStatus.IN_DIAGNOSIS, ServiceOrderStatus.AWAITING_APPROVAL);
+        if (canProceedWithoutChanges != null) {
+            throw new BusinessRuleException("serviceOrder.canProceedWithoutChangesNotAllowed");
+        }
+        requireItems();
         moveTo(ServiceOrderStatus.AWAITING_APPROVAL, changedByUserId, description);
     }
 
-    public void approveQuote(@Nullable Long changedByUserId, @Nullable String description) {
-        requireStatus(ServiceOrderStatus.AWAITING_APPROVAL, ServiceOrderStatus.QUOTE_APPROVED);
-        moveTo(ServiceOrderStatus.QUOTE_APPROVED, changedByUserId, description);
-        events.add(new QuoteApprovedEvent(
-                getId(),
-                publicId,
-                partItems.stream()
-                        .map(item -> new QuoteApprovedEvent.PartQuantity(item.getPartId(), item.getQuantity()))
-                        .toList(),
-                changedByUserId));
+    public void approveQuote(@Nullable Long changedByUserId, @Nullable String description, Instant approvedAt) {
+        ServiceOrderStatus next = switch (status) {
+            case AWAITING_APPROVAL -> ServiceOrderStatus.QUOTE_APPROVED;
+            case AWAITING_SUPPLEMENTARY_APPROVAL -> ServiceOrderStatus.SUPPLEMENTARY_APPROVED;
+            default -> throw new InvalidStatusTransitionException(status, ServiceOrderStatus.QUOTE_APPROVED);
+        };
+        items().filter(item -> !item.isApproved()).forEach(item -> item.approve(approvedAt));
+        concludeApproval(next, changedByUserId, description);
+    }
+
+    public void approveOriginalOnly(@Nullable Long changedByUserId, @Nullable String description) {
+        requireStatus(
+                ServiceOrderStatus.AWAITING_SUPPLEMENTARY_APPROVAL, ServiceOrderStatus.SUPPLEMENTARY_APPROVED);
+        if (!Boolean.TRUE.equals(canProceedWithoutChanges)) {
+            throw new BusinessRuleException("serviceOrder.originalOnlyNotAllowed");
+        }
+        serviceItems.removeIf(item -> !item.isApproved());
+        partItems.removeIf(item -> !item.isApproved());
+        recalculateTotalPrice();
+        concludeApproval(ServiceOrderStatus.SUPPLEMENTARY_APPROVED, changedByUserId, description);
     }
 
     public void rejectQuote(@Nullable Long changedByUserId, String reason) {
-        requireStatus(ServiceOrderStatus.AWAITING_APPROVAL, ServiceOrderStatus.QUOTE_REJECTED);
+        ServiceOrderStatus next = switch (status) {
+            case AWAITING_APPROVAL -> ServiceOrderStatus.QUOTE_REJECTED;
+            case AWAITING_SUPPLEMENTARY_APPROVAL -> ServiceOrderStatus.SUPPLEMENTARY_REJECTED;
+            default -> throw new InvalidStatusTransitionException(status, ServiceOrderStatus.QUOTE_REJECTED);
+        };
         requireText(reason, "serviceOrder.reasonRequired");
-        moveTo(ServiceOrderStatus.QUOTE_REJECTED, changedByUserId, reason);
+        canProceedWithoutChanges = null;
+        moveTo(next, changedByUserId, reason);
     }
 
     public void reopenQuote(Long changedByUserId, @Nullable String description) {
@@ -186,7 +220,9 @@ public class ServiceOrder extends BaseEntity {
     }
 
     public void startExecution(Long changedByUserId, @Nullable String description) {
-        requireStatus(ServiceOrderStatus.QUOTE_APPROVED, ServiceOrderStatus.IN_PROGRESS);
+        if (status != ServiceOrderStatus.QUOTE_APPROVED && status != ServiceOrderStatus.SUPPLEMENTARY_APPROVED) {
+            throw new InvalidStatusTransitionException(status, ServiceOrderStatus.IN_PROGRESS);
+        }
         moveTo(ServiceOrderStatus.IN_PROGRESS, changedByUserId, description);
     }
 
@@ -199,7 +235,7 @@ public class ServiceOrder extends BaseEntity {
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("serviceOrder.itemNotFound", itemId.toString()));
         item.complete(completedByUserId, completedAt);
-        if (serviceItems.stream().allMatch(ServiceItem::isCompleted)) {
+        if (serviceItems.stream().allMatch(ServiceItem::isCompleted) && !hasPendingChanges()) {
             moveTo(ServiceOrderStatus.COMPLETED, completedByUserId, null);
         }
     }
@@ -208,6 +244,9 @@ public class ServiceOrder extends BaseEntity {
         requireStatus(ServiceOrderStatus.IN_PROGRESS, ServiceOrderStatus.COMPLETED);
         if (!serviceItems.stream().allMatch(ServiceItem::isCompleted)) {
             throw new BusinessRuleException("serviceOrder.pendingServiceItems");
+        }
+        if (hasPendingChanges()) {
+            throw new BusinessRuleException("serviceOrder.quoteChangesPendingApproval");
         }
         moveTo(ServiceOrderStatus.COMPLETED, changedByUserId, description);
     }
@@ -224,6 +263,50 @@ public class ServiceOrder extends BaseEntity {
         requireText(reason, "serviceOrder.reasonRequired");
         moveTo(ServiceOrderStatus.CANCELED, changedByUserId, reason);
         events.add(new ServiceOrderCanceledEvent(getId(), publicId, changedByUserId));
+    }
+
+    private void sendSupplementaryQuote(
+            Long changedByUserId, @Nullable Boolean canProceedWithoutChanges, @Nullable String description) {
+        if (status == ServiceOrderStatus.IN_PROGRESS && !hasPendingChanges()) {
+            throw new BusinessRuleException("serviceOrder.noQuoteChanges");
+        }
+        requireItems();
+        if (canProceedWithoutChanges == null) {
+            throw new BusinessRuleException("serviceOrder.canProceedWithoutChangesRequired");
+        }
+        if (canProceedWithoutChanges && approvedItemRemoved) {
+            throw new BusinessRuleException("serviceOrder.originalOnlyNotPossible");
+        }
+        this.canProceedWithoutChanges = canProceedWithoutChanges;
+        moveTo(ServiceOrderStatus.AWAITING_SUPPLEMENTARY_APPROVAL, changedByUserId, description);
+    }
+
+    private void concludeApproval(
+            ServiceOrderStatus next, @Nullable Long changedByUserId, @Nullable String description) {
+        canProceedWithoutChanges = null;
+        approvedItemRemoved = false;
+        moveTo(next, changedByUserId, description);
+        events.add(new QuoteApprovedEvent(
+                getId(),
+                publicId,
+                partItems.stream()
+                        .map(item -> new QuoteApprovedEvent.PartQuantity(item.getPartId(), item.getQuantity()))
+                        .toList(),
+                changedByUserId));
+    }
+
+    private boolean hasPendingChanges() {
+        return approvedItemRemoved || items().anyMatch(item -> !item.isApproved());
+    }
+
+    private Stream<ServiceOrderItem> items() {
+        return Stream.concat(serviceItems.stream(), partItems.stream());
+    }
+
+    private void requireItems() {
+        if (serviceItems.isEmpty() && partItems.isEmpty()) {
+            throw new BusinessRuleException("serviceOrder.quoteWithoutItems");
+        }
     }
 
     private void requireStatus(ServiceOrderStatus expected, ServiceOrderStatus next) {
@@ -246,8 +329,16 @@ public class ServiceOrder extends BaseEntity {
 
     private void removeItem(List<? extends ServiceOrderItem> items, Long itemId) {
         requireItemChangesAllowed();
-        if (!items.removeIf(item -> itemId.equals(item.getId()))) {
-            throw new NotFoundException("serviceOrder.itemNotFound", itemId.toString());
+        ServiceOrderItem item = items.stream()
+                .filter(candidate -> itemId.equals(candidate.getId()))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("serviceOrder.itemNotFound", itemId.toString()));
+        if (item instanceof ServiceItem serviceItem && serviceItem.isCompleted()) {
+            throw new BusinessRuleException("serviceOrder.completedItemLocked");
+        }
+        items.remove(item);
+        if (item.isApproved()) {
+            approvedItemRemoved = true;
         }
         recalculateTotalPrice();
     }

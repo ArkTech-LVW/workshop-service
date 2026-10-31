@@ -1,6 +1,7 @@
 package br.com.arktech.workshop.serviceorder.api.customerserviceorder;
 
 import br.com.arktech.workshop.serviceorder.application.trackserviceorder.QuoteItemResult;
+import br.com.arktech.workshop.serviceorder.application.trackserviceorder.QuoteItemStage;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -11,9 +12,12 @@ record QuoteItemResponse(
                 String name,
         @Schema(description = "${openapi.serviceOrderItem.quantity}", example = "2") int quantity,
         @Schema(description = "${openapi.serviceOrderItem.unitPrice}", example = "45.90") BigDecimal unitPrice,
-        @Schema(description = "${openapi.serviceOrderItem.subtotal}", example = "91.80") BigDecimal subtotal) {
+        @Schema(description = "${openapi.serviceOrderItem.subtotal}", example = "91.80") BigDecimal subtotal,
+        @Schema(description = "${openapi.customerServiceOrder.quoteItemStage}", example = "APPROVED")
+                QuoteItemStage stage) {
 
     static QuoteItemResponse from(QuoteItemResult result) {
-        return new QuoteItemResponse(result.name(), result.quantity(), result.unitPrice(), result.subtotal());
+        return new QuoteItemResponse(
+                result.name(), result.quantity(), result.unitPrice(), result.subtotal(), result.stage());
     }
 }

@@ -12,6 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import br.com.arktech.workshop.serviceorder.application.approveoriginalonly.ApproveOriginalOnlyCommand;
+import br.com.arktech.workshop.serviceorder.application.approveoriginalonly.ApproveOriginalOnlyUseCase;
 import br.com.arktech.workshop.serviceorder.application.approvequote.ApproveQuoteCommand;
 import br.com.arktech.workshop.serviceorder.application.approvequote.ApproveQuoteUseCase;
 import br.com.arktech.workshop.serviceorder.application.cancelserviceorder.CancelServiceOrderCommand;
@@ -100,6 +102,9 @@ class ServiceOrderControllerTest {
             new BigDecimal("0.00"),
             new BigDecimal("0.00"),
             new BigDecimal("0.00"),
+            new BigDecimal("0.00"),
+            new BigDecimal("0.00"),
+            null,
             List.of(RECEIVED),
             Instant.parse("2026-10-27T14:30:00Z"));
     private static final ServiceOrderResult IN_DIAGNOSIS = new ServiceOrderResult(
@@ -111,11 +116,14 @@ class ServiceOrderControllerTest {
             5L,
             "Barulho ao frear",
             ServiceOrderStatus.IN_DIAGNOSIS,
-            List.of(new ServiceItemResult(1L, 30L, 2, new BigDecimal("150.00"), new BigDecimal("300.00"), null)),
-            List.of(new PartItemResult(2L, 40L, 3, new BigDecimal("35.90"), new BigDecimal("107.70"))),
+            List.of(new ServiceItemResult(1L, 30L, 2, new BigDecimal("150.00"), new BigDecimal("300.00"), null, null)),
+            List.of(new PartItemResult(2L, 40L, 3, new BigDecimal("35.90"), new BigDecimal("107.70"), null)),
             new BigDecimal("300.00"),
             new BigDecimal("107.70"),
             new BigDecimal("407.70"),
+            new BigDecimal("407.70"),
+            new BigDecimal("0.00"),
+            null,
             List.of(RECEIVED, DIAGNOSIS_STARTED),
             Instant.parse("2026-10-27T14:30:00Z"));
     private static final ServiceOrderResult AWAITING_APPROVAL = new ServiceOrderResult(
@@ -127,11 +135,14 @@ class ServiceOrderControllerTest {
             5L,
             "Barulho ao frear",
             ServiceOrderStatus.AWAITING_APPROVAL,
-            List.of(new ServiceItemResult(1L, 30L, 2, new BigDecimal("150.00"), new BigDecimal("300.00"), null)),
-            List.of(new PartItemResult(2L, 40L, 3, new BigDecimal("35.90"), new BigDecimal("107.70"))),
+            List.of(new ServiceItemResult(1L, 30L, 2, new BigDecimal("150.00"), new BigDecimal("300.00"), null, null)),
+            List.of(new PartItemResult(2L, 40L, 3, new BigDecimal("35.90"), new BigDecimal("107.70"), null)),
             new BigDecimal("300.00"),
             new BigDecimal("107.70"),
             new BigDecimal("407.70"),
+            new BigDecimal("407.70"),
+            new BigDecimal("0.00"),
+            null,
             List.of(),
             Instant.parse("2026-10-27T14:30:00Z"));
     private static final ServiceOrderResult COMPLETED = new ServiceOrderResult(
@@ -149,11 +160,15 @@ class ServiceOrderControllerTest {
                     2,
                     new BigDecimal("150.00"),
                     new BigDecimal("300.00"),
+                    Instant.parse("2026-10-28T10:15:00Z"),
                     Instant.parse("2026-10-28T16:45:00Z"))),
             List.of(),
             new BigDecimal("300.00"),
             new BigDecimal("0.00"),
             new BigDecimal("300.00"),
+            new BigDecimal("300.00"),
+            new BigDecimal("0.00"),
+            null,
             List.of(),
             Instant.parse("2026-10-27T14:30:00Z"));
     private static final ServiceOrderResult CANCELED = new ServiceOrderResult(
@@ -170,6 +185,9 @@ class ServiceOrderControllerTest {
             new BigDecimal("0.00"),
             new BigDecimal("0.00"),
             new BigDecimal("0.00"),
+            new BigDecimal("0.00"),
+            new BigDecimal("0.00"),
+            null,
             List.of(),
             Instant.parse("2026-10-27T14:30:00Z"));
     private static final String CUSTOMER_NOT_REGISTERED = "Nenhum cliente cadastrado com o CPF/CNPJ 529.982.247-25. "
@@ -203,6 +221,9 @@ class ServiceOrderControllerTest {
     private ApproveQuoteUseCase approveQuoteUseCase;
 
     @MockitoBean
+    private ApproveOriginalOnlyUseCase approveOriginalOnlyUseCase;
+
+    @MockitoBean
     private RejectQuoteUseCase rejectQuoteUseCase;
 
     @MockitoBean
@@ -234,6 +255,7 @@ class ServiceOrderControllerTest {
                          "customerId": 10, "vehicleId": 20, "mechanicId": null,
                          "problemDescription": "Barulho ao frear", "status": "RECEIVED", "services": [], "parts": [],
                          "servicesTotal": 0.00, "partsTotal": 0.00, "totalPrice": 0.00,
+                         "approvedTotal": 0.00, "pendingTotal": 0.00, "canProceedWithoutChanges": null,
                          "statusHistory": [{"fromStatus": null, "toStatus": "RECEIVED", "changedByUserId": 7,
                                             "description": null, "changedAt": "2026-10-27T14:30:00Z"}],
                          "dateCreated": "2026-10-27T14:30:00Z"}
@@ -328,9 +350,11 @@ class ServiceOrderControllerTest {
                          "customerId": 10, "vehicleId": 20, "mechanicId": 5,
                          "problemDescription": "Barulho ao frear", "status": "IN_DIAGNOSIS",
                          "services": [{"id": 1, "serviceOfferingId": 30, "quantity": 2, "unitPrice": 150.00,
-                                       "subtotal": 300.00, "completedAt": null}],
-                         "parts": [{"id": 2, "partId": 40, "quantity": 3, "unitPrice": 35.90, "subtotal": 107.70}],
+                                       "subtotal": 300.00, "approvedAt": null, "completedAt": null}],
+                         "parts": [{"id": 2, "partId": 40, "quantity": 3, "unitPrice": 35.90, "subtotal": 107.70,
+                                    "approvedAt": null}],
                          "servicesTotal": 300.00, "partsTotal": 107.70, "totalPrice": 407.70,
+                         "approvedTotal": 407.70, "pendingTotal": 0.00, "canProceedWithoutChanges": null,
                          "statusHistory": [
                            {"fromStatus": null, "toStatus": "RECEIVED", "changedByUserId": 7, "description": null,
                             "changedAt": "2026-10-27T14:30:00Z"},
@@ -368,7 +392,44 @@ class ServiceOrderControllerTest {
                         {"id": 1, "status": "AWAITING_APPROVAL", "totalPrice": 407.70}
                         """,
                         JsonCompareMode.LENIENT));
-        verify(sendQuoteUseCase).execute(new SendQuoteCommand(1L));
+        verify(sendQuoteUseCase).execute(new SendQuoteCommand(1L, null));
+    }
+
+    @Test
+    void shouldSendTheSupplementaryQuoteSayingWhetherTheServiceCanGoOnWithoutIt() throws Exception {
+        when(sendQuoteUseCase.execute(any())).thenReturn(AWAITING_APPROVAL);
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/sendQuote", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"canProceedWithoutChanges": false}
+                                """))
+                .andExpect(status().isOk());
+        verify(sendQuoteUseCase).execute(new SendQuoteCommand(1L, false));
+    }
+
+    @Test
+    void shouldApproveOnlyTheOriginalQuote() throws Exception {
+        when(approveOriginalOnlyUseCase.execute(any())).thenReturn(AWAITING_APPROVAL);
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/approveOriginalOnly", 1L))
+                .andExpect(status().isOk())
+                .andExpect(json(
+                        """
+                        {"approvedTotal": 407.70, "pendingTotal": 0.00, "canProceedWithoutChanges": null}
+                        """,
+                        JsonCompareMode.LENIENT));
+        verify(approveOriginalOnlyUseCase).execute(new ApproveOriginalOnlyCommand(1L));
+    }
+
+    @Test
+    void shouldAnswer422WhenTheWorkshopDidNotAllowApprovingOnlyTheOriginalQuote() throws Exception {
+        when(approveOriginalOnlyUseCase.execute(any()))
+                .thenThrow(new BusinessRuleException("serviceOrder.originalOnlyNotAllowed"));
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/approveOriginalOnly", 1L))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.code").value("serviceOrder.originalOnlyNotAllowed"));
     }
 
     @Test
@@ -586,7 +647,8 @@ class ServiceOrderControllerTest {
                         {"id": 1, "publicId": "3f1c2b8e-7d4a-4c9e-9b1f-2a6d8e5c4b3a", "number": "SO-2026-000123",
                          "customerId": 10, "vehicleId": 20, "mechanicId": null,
                          "problemDescription": "Barulho ao frear", "status": "CANCELED", "services": [], "parts": [],
-                         "servicesTotal": 0.00, "partsTotal": 0.00, "totalPrice": 0.00, "statusHistory": [],
+                         "servicesTotal": 0.00, "partsTotal": 0.00, "totalPrice": 0.00, "approvedTotal": 0.00,
+                         "pendingTotal": 0.00, "canProceedWithoutChanges": null, "statusHistory": [],
                          "dateCreated": "2026-10-27T14:30:00Z"}
                         """));
         verify(cancelServiceOrderUseCase).execute(new CancelServiceOrderCommand(1L, "Cliente desistiu do serviço"));

@@ -22,7 +22,7 @@ public class SendQuoteUseCase implements UseCase<SendQuoteCommand, ServiceOrderR
     @Transactional
     public ServiceOrderResult execute(SendQuoteCommand command) {
         ServiceOrder serviceOrder = serviceOrderRepository.findRequiredById(command.serviceOrderId());
-        serviceOrder.sendQuote(currentUser.id(), null);
+        serviceOrder.sendQuote(currentUser.id(), command.canProceedWithoutChanges(), null);
         return ServiceOrderResult.from(serviceOrderRepository.save(serviceOrder));
     }
 }

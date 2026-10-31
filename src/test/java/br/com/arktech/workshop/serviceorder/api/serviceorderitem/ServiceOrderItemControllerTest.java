@@ -44,7 +44,8 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 class ServiceOrderItemControllerTest {
 
     private static final String ITEMS_LOCKED =
-            "Os itens só podem ser alterados enquanto a ordem de serviço está recebida ou em diagnóstico.";
+            "Os itens só podem ser alterados enquanto a ordem de serviço está recebida, em diagnóstico, em execução "
+                    + "ou com o orçamento complementar rejeitado.";
 
     @Autowired
     private MockMvc mockMvc;

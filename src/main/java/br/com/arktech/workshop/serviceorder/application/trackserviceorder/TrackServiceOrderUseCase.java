@@ -62,7 +62,10 @@ public class TrackServiceOrderUseCase implements UseCase<TrackServiceOrderQuery,
                         .toList(),
                 serviceOrder.getServicesTotal().amount(),
                 serviceOrder.getPartsTotal().amount(),
-                serviceOrder.getTotalPrice().amount());
+                serviceOrder.getTotalPrice().amount(),
+                serviceOrder.getApprovedTotal().amount(),
+                serviceOrder.getPendingTotal().amount(),
+                serviceOrder.getCanProceedWithoutChanges());
     }
 
     private static String nameOf(Map<Long, String> names, Long id) {

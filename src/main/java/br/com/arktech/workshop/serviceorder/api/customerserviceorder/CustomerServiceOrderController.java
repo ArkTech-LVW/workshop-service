@@ -1,6 +1,8 @@
 package br.com.arktech.workshop.serviceorder.api.customerserviceorder;
 
 import br.com.arktech.workshop.serviceorder.api.serviceorder.RejectQuoteRequest;
+import br.com.arktech.workshop.serviceorder.application.approveoriginalonlyascustomer.ApproveOriginalOnlyAsCustomerCommand;
+import br.com.arktech.workshop.serviceorder.application.approveoriginalonlyascustomer.ApproveOriginalOnlyAsCustomerUseCase;
 import br.com.arktech.workshop.serviceorder.application.approvequoteascustomer.ApproveQuoteAsCustomerCommand;
 import br.com.arktech.workshop.serviceorder.application.approvequoteascustomer.ApproveQuoteAsCustomerUseCase;
 import br.com.arktech.workshop.serviceorder.application.rejectquoteascustomer.RejectQuoteAsCustomerCommand;
@@ -20,6 +22,7 @@ class CustomerServiceOrderController implements ICustomerServiceOrderController 
 
     private final TrackServiceOrderUseCase trackServiceOrderUseCase;
     private final ApproveQuoteAsCustomerUseCase approveQuoteAsCustomerUseCase;
+    private final ApproveOriginalOnlyAsCustomerUseCase approveOriginalOnlyAsCustomerUseCase;
     private final RejectQuoteAsCustomerUseCase rejectQuoteAsCustomerUseCase;
 
     @Override
@@ -31,6 +34,12 @@ class CustomerServiceOrderController implements ICustomerServiceOrderController 
     @Override
     public void approve(UUID publicId, String customerDocument) {
         approveQuoteAsCustomerUseCase.execute(new ApproveQuoteAsCustomerCommand(publicId, customerDocument));
+    }
+
+    @Override
+    public void approveOriginalOnly(UUID publicId, String customerDocument) {
+        approveOriginalOnlyAsCustomerUseCase.execute(
+                new ApproveOriginalOnlyAsCustomerCommand(publicId, customerDocument));
     }
 
     @Override
