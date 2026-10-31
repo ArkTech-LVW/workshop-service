@@ -35,7 +35,7 @@ class ServiceOrderNotificationListenerTest {
 
     @Test
     void shouldNotifyTheCustomerOfEachServiceOrderEvent() {
-        listener.on(new QuoteSentEvent(SERVICE_ORDER_ID, PUBLIC_ID, CUSTOMER_ID, TOTAL_PRICE));
+        listener.on(new QuoteSentEvent(SERVICE_ORDER_ID, PUBLIC_ID, CUSTOMER_ID, TOTAL_PRICE, List.of()));
         listener.on(new QuoteApprovedEvent(SERVICE_ORDER_ID, PUBLIC_ID, CUSTOMER_ID, TOTAL_PRICE, List.of(), null));
         listener.on(new QuoteRejectedEvent(SERVICE_ORDER_ID, PUBLIC_ID, CUSTOMER_ID, TOTAL_PRICE, "Achou caro"));
         listener.on(new ServiceOrderCompletedEvent(SERVICE_ORDER_ID, PUBLIC_ID, CUSTOMER_ID, TOTAL_PRICE));
@@ -69,7 +69,7 @@ class ServiceOrderNotificationListenerTest {
                 });
 
         assertThatCode(() -> failingListener.on(
-                        new QuoteSentEvent(SERVICE_ORDER_ID, PUBLIC_ID, CUSTOMER_ID, TOTAL_PRICE)))
+                        new QuoteSentEvent(SERVICE_ORDER_ID, PUBLIC_ID, CUSTOMER_ID, TOTAL_PRICE, List.of())))
                 .doesNotThrowAnyException();
     }
 }

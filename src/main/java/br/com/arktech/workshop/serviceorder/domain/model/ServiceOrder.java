@@ -183,7 +183,7 @@ public class ServiceOrder extends BaseEntity {
         }
         requireItems();
         moveTo(ServiceOrderStatus.AWAITING_APPROVAL, changedByUserId, description);
-        events.add(new QuoteSentEvent(getId(), publicId, customerId, totalPrice.amount()));
+        events.add(new QuoteSentEvent(getId(), publicId, customerId, totalPrice.amount(), partQuantities()));
     }
 
     public void approveQuote(@Nullable Long changedByUserId, @Nullable String description, Instant approvedAt) {
@@ -285,7 +285,7 @@ public class ServiceOrder extends BaseEntity {
         }
         this.canProceedWithoutChanges = canProceedWithoutChanges;
         moveTo(ServiceOrderStatus.AWAITING_SUPPLEMENTARY_APPROVAL, changedByUserId, description);
-        events.add(new QuoteSentEvent(getId(), publicId, customerId, totalPrice.amount()));
+        events.add(new QuoteSentEvent(getId(), publicId, customerId, totalPrice.amount(), partQuantities()));
     }
 
     private void concludeApproval(
@@ -298,10 +298,14 @@ public class ServiceOrder extends BaseEntity {
                 publicId,
                 customerId,
                 totalPrice.amount(),
-                partItems.stream()
-                        .map(item -> new PartQuantity(item.getPartId(), item.getQuantity()))
-                        .toList(),
+                partQuantities(),
                 changedByUserId));
+    }
+
+    private List<PartQuantity> partQuantities() {
+        return partItems.stream()
+                .map(item -> new PartQuantity(item.getPartId(), item.getQuantity()))
+                .toList();
     }
 
     private boolean hasPendingChanges() {

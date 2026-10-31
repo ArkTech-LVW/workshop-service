@@ -996,7 +996,10 @@ class ServiceOrderTest {
                     serviceOrder.getId(),
                     serviceOrder.getPublicId(),
                     CUSTOMER_ID,
-                    serviceOrder.getTotalPrice().amount());
+                    serviceOrder.getTotalPrice().amount(),
+                    serviceOrder.getPartItems().stream()
+                            .map(item -> new PartQuantity(item.getPartId(), item.getQuantity()))
+                            .toList());
         }
 
         private static Object quoteApproved(ServiceOrder serviceOrder) {
