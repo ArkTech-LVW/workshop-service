@@ -58,8 +58,9 @@ class StockAdjustmentRequestIntegrationTest {
                         .content("{}")));
     }
 
-    static Stream<Arguments> reviewEndpoints() {
+    static Stream<Arguments> adminOnlyEndpoints() {
         return Stream.of(
+                Arguments.of(get("/admin/stockAdjustmentRequests")),
                 Arguments.of(post("/admin/stockAdjustmentRequests/1/approve")),
                 Arguments.of(post("/admin/stockAdjustmentRequests/1/reject")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -82,8 +83,8 @@ class StockAdjustmentRequestIntegrationTest {
     }
 
     @ParameterizedTest
-    @MethodSource("reviewEndpoints")
-    void shouldDenyAttendantOnReview(MockHttpServletRequestBuilder request) throws Exception {
+    @MethodSource("adminOnlyEndpoints")
+    void shouldDenyAttendantOnQueueAndReview(MockHttpServletRequestBuilder request) throws Exception {
         perform(request, attendantId, Role.ATTENDANT)
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("auth.accessDenied"));
@@ -103,7 +104,7 @@ class StockAdjustmentRequestIntegrationTest {
 
         Integer requestId = openRequest(partId, 2, "Avaria no transporte", attendantId, Role.ATTENDANT);
         stockOf(partId).andExpect(jsonPath("$.stockQuantity").value(5));
-        assertThat(pendingRequestIds(attendantId, Role.ATTENDANT)).contains(requestId);
+        assertThat(pendingRequestIds()).contains(requestId);
 
         perform(post("/admin/stockAdjustmentRequests/{id}/approve", requestId), adminId, Role.ADMIN)
                 .andExpect(status().isOk())
@@ -210,14 +211,10 @@ class StockAdjustmentRequestIntegrationTest {
     }
 
     private List<Integer> pendingRequestIds() throws Exception {
-        return pendingRequestIds(adminId, Role.ADMIN);
-    }
-
-    private List<Integer> pendingRequestIds(Long userId, Role role) throws Exception {
         String body = perform(
                         get("/admin/stockAdjustmentRequests").param("status", "PENDING").param("size", "100"),
-                        userId,
-                        role)
+                        adminId,
+                        Role.ADMIN)
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()

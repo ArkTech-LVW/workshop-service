@@ -47,7 +47,7 @@ interface IStockAdjustmentRequestController {
     @Operation(summary = "${openapi.stockAdjustmentRequest.list}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "400", ref = "BadRequest")
-    @AllowedRoles({Role.ADMIN, Role.ATTENDANT})
+    @AllowedRoles(Role.ADMIN)
     @GetMapping("/stockAdjustmentRequests")
     PageResponse<StockAdjustmentRequestResponse> list(
             @Parameter(description = "${openapi.stockAdjustmentRequest.statusFilter}", example = "PENDING")
