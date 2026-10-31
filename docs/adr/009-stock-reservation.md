@@ -47,4 +47,5 @@ A entrega é dividida em quatro partes: o saldo na peça (KAN-94), a reserva no 
 - A falta de peça aparece na inclusão e no envio, na frente do atendente, e não mais na aprovação, na frente do cliente. A exceção é a reserva que venceu.
 - O `insufficientStock` sai da resposta da inclusão de peça, porque a inclusão sem disponível passou a ser recusada.
 - O `{1}` do `part.insufficientStock` passa a ser o disponível, e não o estoque.
+- O `QuoteSentEvent` passa a levar as peças da OS, e o `inventory` reserva num ouvinte síncrono: sem disponível, o envio inteiro é desfeito e o cliente não é notificado.
 - Peça com reserva não pode ser excluída: a FK de `stock_reservation` faz a exclusão responder `409 part.inUse`.
