@@ -35,6 +35,17 @@ class RegistryVehicleDirectory implements VehicleDirectory {
         return vehicleRepository.findByLicensePlate(licensePlate).map(Vehicle::getId);
     }
 
+    @Override
+    public VehicleDetails detailsOf(Long vehicleId) {
+        Vehicle vehicle = vehicleRepository.findRequiredById(vehicleId);
+        return new VehicleDetails(
+                vehicle.getLicensePlate().value(),
+                vehicle.getBrand(),
+                vehicle.getModel(),
+                vehicle.getYear(),
+                vehicle.getColor());
+    }
+
     private Long register(Long customerId, VehicleDetails vehicle) {
         CreateVehicleCommand command = new CreateVehicleCommand(
                 customerId,

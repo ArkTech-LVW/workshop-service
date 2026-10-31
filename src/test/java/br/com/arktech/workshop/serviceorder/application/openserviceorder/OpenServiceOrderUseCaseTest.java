@@ -126,6 +126,11 @@ class OpenServiceOrderUseCaseTest {
             public Optional<Long> findIdByLicensePlate(LicensePlate licensePlate) {
                 throw new UnsupportedOperationException();
             }
+
+            @Override
+            public VehicleDetails detailsOf(Long vehicleId) {
+                throw new UnsupportedOperationException();
+            }
         };
     }
 }

@@ -34,6 +34,13 @@ public class InMemoryPartRepository implements PartRepository {
     }
 
     @Override
+    public List<Part> findAllById(Iterable<Long> ids) {
+        List<Long> wanted = new ArrayList<>();
+        ids.forEach(wanted::add);
+        return parts.stream().filter(part -> wanted.contains(part.getId())).toList();
+    }
+
+    @Override
     public boolean existsBySku(Sku sku) {
         return parts.stream().anyMatch(part -> part.getSku().equals(sku));
     }

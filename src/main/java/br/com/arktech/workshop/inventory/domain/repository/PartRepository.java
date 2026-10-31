@@ -6,6 +6,7 @@ import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.pagination.Page;
 import br.com.arktech.workshop.shared.domain.pagination.Pagination;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PartRepository {
@@ -13,6 +14,8 @@ public interface PartRepository {
     Part save(Part part);
 
     Optional<Part> findById(Long id);
+
+    List<Part> findAllById(Iterable<Long> ids);
 
     boolean existsBySku(Sku sku);
 
