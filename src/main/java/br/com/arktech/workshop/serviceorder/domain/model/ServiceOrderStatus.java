@@ -29,12 +29,14 @@ public enum ServiceOrderStatus {
     }
 
     public boolean allowsCancellation() {
-        return this == RECEIVED
-                || this == IN_DIAGNOSIS
-                || this == AWAITING_APPROVAL
-                || this == QUOTE_REJECTED
-                || this == AWAITING_SUPPLEMENTARY_APPROVAL
-                || this == SUPPLEMENTARY_REJECTED;
+        return Set.of(
+                        RECEIVED,
+                        IN_DIAGNOSIS,
+                        AWAITING_APPROVAL,
+                        QUOTE_REJECTED,
+                        AWAITING_SUPPLEMENTARY_APPROVAL,
+                        SUPPLEMENTARY_REJECTED)
+                .contains(this);
     }
 
     public boolean showsQuoteToCustomer() {
