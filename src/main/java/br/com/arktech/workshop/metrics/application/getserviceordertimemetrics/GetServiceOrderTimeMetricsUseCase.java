@@ -8,6 +8,7 @@ import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class GetServiceOrderTimeMetricsUseCase
         implements UseCase<GetServiceOrderTimeMetricsQuery, ServiceOrderTimeMetricsResult> {
 
     private static final String EXECUTION_STATUS = "IN_PROGRESS";
+    private static final int MAX_PERIOD_DAYS = 366;
 
     private final ServiceOrderHistoryReader serviceOrderHistoryReader;
     private final Clock clock;
@@ -28,10 +30,7 @@ public class GetServiceOrderTimeMetricsUseCase
     @Override
     @Transactional(readOnly = true)
     public ServiceOrderTimeMetricsResult execute(GetServiceOrderTimeMetricsQuery query) {
-        if (query.from().isAfter(query.to())) {
-            throw new BusinessRuleException(
-                    "metrics.invalidPeriod", query.from().toString(), query.to().toString());
-        }
+        requireValidPeriod(query.from(), query.to());
         Instant start = startOf(query.from());
         Instant end = startOf(query.to().plusDays(1));
         long serviceOrderCount = serviceOrderHistoryReader.countCompletedBetween(start, end);
@@ -44,7 +43,17 @@ public class GetServiceOrderTimeMetricsUseCase
                         .map(StatusTime::averageTime)
                         .findFirst()
                         .orElse(null),
+                serviceOrderHistoryReader.averageExecutionTimeByServiceOfCompletedBetween(start, end),
                 timeByStatus);
+    }
+
+    private static void requireValidPeriod(LocalDate from, LocalDate to) {
+        if (from.isAfter(to)) {
+            throw new BusinessRuleException("metrics.invalidPeriod", from.toString(), to.toString());
+        }
+        if (ChronoUnit.DAYS.between(from, to) + 1 > MAX_PERIOD_DAYS) {
+            throw new BusinessRuleException("metrics.periodTooLong", MAX_PERIOD_DAYS);
+        }
     }
 
     private Instant startOf(LocalDate date) {

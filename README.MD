@@ -87,7 +87,9 @@ As métricas saem do histórico de status de cada OS. A consulta e o índice est
 - **Quais OS entram:** as que entraram em Finalizada (`COMPLETED`) dentro do período, contado em dias inteiros no fuso da oficina (`America/Sao_Paulo`), com o início e o fim inclusos. Ficam de fora as canceladas e as que pararam em Orçamento rejeitado. Uma OS rejeitada, reaberta e depois executada entra normalmente.
 - **Tempo em um status:** soma de todos os períodos que a OS passou nele. Cada entrada no status conta até a mudança de status seguinte. O status atual da OS não conta, porque o período dele ainda não terminou: o tempo em Finalizada só aparece para as OS já entregues.
 - **Tempo de execução:** tempo em Em execução (`IN_PROGRESS`). Com o orçamento complementar, a OS entra em execução mais de uma vez, e os períodos se somam. A espera pela aprovação do cliente e a fila até o mecânico iniciar (Orçamento aprovado e Complementar aprovado) ficam de fora.
-- **Média:** por status, entre as OS que passaram por ele, junto com a quantidade dessas OS. Os tempos saem com precisão de segundos. Sem OS no período, a média é nula.
+- **Média:** por status, entre as OS que passaram por ele, junto com a quantidade dessas OS. Sem OS no período, a média é nula.
+- **Por serviço do catálogo:** tempo médio de execução das OS do período que incluíram o serviço, sem peso pela quantidade. Uma OS com vários serviços conta em cada um, com o tempo de execução da OS inteira, porque o item não registra quando começou. Nome e tempo estimado são os atuais do catálogo.
+- **Rota:** `GET /admin/metrics/averageExecutionTime?from=2026-10-01&to=2026-10-31`, só para ADMIN, com no máximo 366 dias. Cada duração sai em minutos inteiros e em `HH:mm`, com as horas sem limite (`27:05`).
 
 ## Decisões de arquitetura
 
