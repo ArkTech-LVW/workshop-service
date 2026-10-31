@@ -6,8 +6,8 @@
 
 ## Contexto
 
-- As métricas do E4 (tempo médio de execução, tempo em cada status) saem do histórico de status da OS (`status_change`), que pertence ao módulo `serviceorder`.
-- O card pede a consulta no módulo `metrics`, mas o `LayerDependencyTest` impede um módulo de importar classes de outro: o `metrics` não enxerga o `ServiceOrder`, o `StatusChange` nem o `ServiceOrderStatus`.
+- As métricas de tempo da OS (tempo médio de execução, tempo em cada status) saem do histórico de status (`status_change`), que pertence ao módulo `serviceorder`.
+- As métricas ficam no módulo `metrics`, mas o `LayerDependencyTest` impede um módulo de importar classes de outro: o `metrics` não enxerga o `ServiceOrder`, o `StatusChange` nem o `ServiceOrderStatus`.
 - Os `@Query(nativeQuery = true)` do projeto ficam em interfaces Spring Data (`JpaRepository<Entidade, Long>`), que precisam de uma entidade do próprio módulo. O `metrics` não tem entidade: só lê agregados.
 - O cálculo precisa ficar no banco, sem carregar as OS na memória ([ADR 001](001-database.md), motivo 3).
 
@@ -49,5 +49,5 @@ O índice foi escolhido por um estudo com dados sintéticos realistas: cerca de 
 
 ## Consequências
 
-- A T4.2 recebe o `GetServiceOrderTimeMetricsUseCase` pronto e só cuida do HTTP. A média por serviço do catálogo, quando entrar, estende a mesma porta.
+- Uma rota de métricas só converte o resultado do `GetServiceOrderTimeMetricsUseCase` em resposta. Agregações novas sobre o mesmo histórico (ex.: média por serviço do catálogo) estendem a mesma porta.
 - Métricas novas sobre tabelas de outros módulos seguem o mesmo padrão: porta no `metrics/application`, `JdbcClient` no `metrics/infrastructure`, teste de integração com dados montados por SQL.
