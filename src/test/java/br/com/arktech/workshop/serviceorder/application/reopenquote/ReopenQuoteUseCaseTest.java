@@ -9,8 +9,11 @@ import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrder;
 import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderStatus;
 import br.com.arktech.workshop.serviceorder.domain.repository.InMemoryServiceOrderRepository;
 import br.com.arktech.workshop.shared.domain.money.Money;
+import br.com.arktech.workshop.shared.event.serviceorder.QuoteWithdrawnEvent;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +49,26 @@ class ReopenQuoteUseCaseTest {
     }
 
     @Test
-    void shouldRefuseAServiceOrderWhoseQuoteWasNotRejected() {
+    void shouldWithdrawTheQuoteTheCustomerIsWaitingFor() {
+        List<Object> publishedEvents = new ArrayList<>();
+        InMemoryServiceOrderRepository repository = new InMemoryServiceOrderRepository(publishedEvents::add);
+        ServiceOrder sent = repository.save(
+                new ServiceOrder(repository.nextNumber(), 10L, 20L, "Barulho ao frear", 1L));
+        sent.startDiagnosis(5L, null);
+        sent.addServiceItem(30L, 1, new Money(new BigDecimal("150.00")));
+        sent.sendQuote(7L, null, null);
+        sent.clearDomainEvents();
+
+        ServiceOrderResult result = new ReopenQuoteUseCase(repository, () -> ADMIN_ID)
+                .execute(new ReopenQuoteCommand(sent.getId(), "Trocar a peça"));
+
+        assertThat(result.status()).isEqualTo(ServiceOrderStatus.IN_DIAGNOSIS);
+        assertThat(sent.getStatusHistory().getLast().getFromStatus()).isEqualTo(ServiceOrderStatus.AWAITING_APPROVAL);
+        assertThat(publishedEvents).containsExactly(new QuoteWithdrawnEvent(sent.getId()));
+    }
+
+    @Test
+    void shouldRefuseAServiceOrderWithoutAQuoteToReopen() {
         assertThatThrownBy(() -> reopenQuoteUseCase.execute(new ReopenQuoteCommand(serviceOrder.getId(), null)))
                 .isInstanceOf(InvalidStatusTransitionException.class)
                 .hasMessage("serviceOrder.invalidStatusTransition");
