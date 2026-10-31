@@ -1,5 +1,6 @@
 package br.com.arktech.workshop.inventory.application.stockmovement;
 
+import br.com.arktech.workshop.inventory.domain.model.StockAdjustmentRequest;
 import br.com.arktech.workshop.inventory.domain.model.StockMovement;
 import br.com.arktech.workshop.inventory.domain.model.StockMovementType;
 
@@ -15,9 +16,12 @@ public record StockMovementResult(
         @Nullable String reason,
         @Nullable Long serviceOrderId,
         @Nullable Long createdByUserId,
+        @Nullable Long stockAdjustmentRequestId,
+        @Nullable Long requestedByUserId,
         @Nullable Instant dateCreated) {
 
     public static StockMovementResult from(StockMovement movement) {
+        StockAdjustmentRequest request = movement.getStockAdjustmentRequest();
         return new StockMovementResult(
                 movement.getId(),
                 movement.getPart().getId(),
@@ -26,6 +30,8 @@ public record StockMovementResult(
                 movement.getReason(),
                 movement.getServiceOrderId(),
                 movement.getCreatedByUserId(),
+                request == null ? null : request.getId(),
+                request == null ? null : request.getRequestedByUserId(),
                 movement.getDateCreated());
     }
 }
