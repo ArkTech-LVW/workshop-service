@@ -4,7 +4,6 @@ import br.com.arktech.workshop.inventory.domain.model.StockReservation;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 public interface StockReservationRepository {
 
@@ -12,7 +11,7 @@ public interface StockReservationRepository {
 
     void delete(StockReservation stockReservation);
 
-    Optional<StockReservation> findByServiceOrderIdAndPartId(Long serviceOrderId, Long partId);
+    List<StockReservation> findByServiceOrderId(Long serviceOrderId);
 
     List<Long> findPartIdsByServiceOrderId(Long serviceOrderId);
 

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
 import br.com.arktech.workshop.inventory.application.serviceorderpart.ServiceOrderPart;
+import br.com.arktech.workshop.inventory.application.releaseserviceorderreservation.ReleaseServiceOrderReservationUseCase;
 import br.com.arktech.workshop.inventory.domain.model.MeasurementUnit;
 import br.com.arktech.workshop.inventory.domain.model.Part;
 import br.com.arktech.workshop.inventory.domain.model.PartType;
@@ -38,7 +39,11 @@ class ReconcileServiceOrderStockUseCaseTest {
     private final InMemoryStockReservationRepository stockReservationRepository =
             new InMemoryStockReservationRepository();
     private final ReconcileServiceOrderStockUseCase reconcileServiceOrderStockUseCase =
-            new ReconcileServiceOrderStockUseCase(partRepository, stockMovementRepository, stockReservationRepository);
+            new ReconcileServiceOrderStockUseCase(
+                    partRepository,
+                    stockMovementRepository,
+                    stockReservationRepository,
+                    new ReleaseServiceOrderReservationUseCase(partRepository, stockReservationRepository));
 
     @Test
     void shouldWithdrawEachPartAndMergeRepeatedItems() {

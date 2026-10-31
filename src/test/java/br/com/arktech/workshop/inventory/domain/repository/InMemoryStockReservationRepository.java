@@ -5,7 +5,6 @@ import br.com.arktech.workshop.inventory.domain.model.StockReservation;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -30,11 +29,10 @@ public class InMemoryStockReservationRepository implements StockReservationRepos
     }
 
     @Override
-    public Optional<StockReservation> findByServiceOrderIdAndPartId(Long serviceOrderId, Long partId) {
+    public List<StockReservation> findByServiceOrderId(Long serviceOrderId) {
         return reservations.stream()
                 .filter(reservation -> reservation.getServiceOrderId().equals(serviceOrderId))
-                .filter(reservation -> reservation.getPart().getId().equals(partId))
-                .findFirst();
+                .toList();
     }
 
     @Override

@@ -1,8 +1,6 @@
-package br.com.arktech.workshop.inventory.application.reserveserviceorderstock;
+package br.com.arktech.workshop.inventory.application.releaseserviceorderreservation;
 
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteRejectedEvent;
-
-import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 
@@ -13,10 +11,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 class QuoteRejectedListener {
 
-    private final ReserveServiceOrderStockUseCase reserveServiceOrderStockUseCase;
+    private final ReleaseServiceOrderReservationUseCase releaseServiceOrderReservationUseCase;
 
     @EventListener
     void on(QuoteRejectedEvent event) {
-        reserveServiceOrderStockUseCase.execute(new ReserveServiceOrderStockCommand(event.serviceOrderId(), List.of()));
+        releaseServiceOrderReservationUseCase.execute(new ReleaseServiceOrderReservationCommand(event.serviceOrderId()));
     }
 }
