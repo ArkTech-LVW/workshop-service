@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.money.Money;
+import br.com.arktech.workshop.shared.event.serviceorder.PartQuantity;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteRejectedEvent;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteSentEvent;
@@ -192,8 +193,8 @@ class ServiceOrderTest {
                         CUSTOMER_ID,
                         new BigDecimal("143.60"),
                         List.of(
-                                new QuoteApprovedEvent.PartQuantity(PART_ID, 3),
-                                new QuoteApprovedEvent.PartQuantity(PART_ID + 1, 1)),
+                                new PartQuantity(PART_ID, 3),
+                                new PartQuantity(PART_ID + 1, 1)),
                         null));
     }
 
@@ -995,7 +996,10 @@ class ServiceOrderTest {
                     serviceOrder.getId(),
                     serviceOrder.getPublicId(),
                     CUSTOMER_ID,
-                    serviceOrder.getTotalPrice().amount());
+                    serviceOrder.getTotalPrice().amount(),
+                    serviceOrder.getPartItems().stream()
+                            .map(item -> new PartQuantity(item.getPartId(), item.getQuantity()))
+                            .toList());
         }
 
         private static Object quoteApproved(ServiceOrder serviceOrder) {
@@ -1005,7 +1009,7 @@ class ServiceOrderTest {
                     CUSTOMER_ID,
                     serviceOrder.getTotalPrice().amount(),
                     serviceOrder.getPartItems().stream()
-                            .map(item -> new QuoteApprovedEvent.PartQuantity(item.getPartId(), item.getQuantity()))
+                            .map(item -> new PartQuantity(item.getPartId(), item.getQuantity()))
                             .toList(),
                     USER_ID);
         }

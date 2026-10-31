@@ -145,6 +145,7 @@ class ServiceOrderNotificationIntegrationTest {
         Long partId = createPart(2);
         sendQuoteWith(partId, 2);
         awaitDelivery(QUOTE_SENT);
+        releaseTheReservationAsIfItExpired();
         jdbcTemplate.update("UPDATE part SET stock_quantity = 1 WHERE id = ?", partId);
 
         as(Role.ATTENDANT, post("/admin/serviceOrders/{id}/approve", serviceOrderId))
@@ -194,6 +195,17 @@ class ServiceOrderNotificationIntegrationTest {
 
     private MockHttpServletRequestBuilder sendQuote() {
         return post("/admin/serviceOrders/{id}/sendQuote", serviceOrderId);
+    }
+
+    private void releaseTheReservationAsIfItExpired() {
+        jdbcTemplate.update(
+                """
+                UPDATE part SET reserved_quantity = part.reserved_quantity - r.quantity
+                FROM stock_reservation r
+                WHERE r.part_id = part.id AND r.service_order_id = ?
+                """,
+                serviceOrderId);
+        jdbcTemplate.update("DELETE FROM stock_reservation WHERE service_order_id = ?", serviceOrderId);
     }
 
     private Long createPart(int stockQuantity) throws Exception {

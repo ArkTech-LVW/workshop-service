@@ -4,8 +4,10 @@ import br.com.arktech.workshop.inventory.domain.model.Part;
 import br.com.arktech.workshop.inventory.domain.model.StockMovement;
 import br.com.arktech.workshop.inventory.domain.repository.PartRepository;
 import br.com.arktech.workshop.inventory.domain.repository.StockMovementRepository;
+import br.com.arktech.workshop.inventory.domain.repository.StockReservationRepository;
 import br.com.arktech.workshop.shared.application.VoidUseCase;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -23,6 +25,7 @@ public class ReconcileServiceOrderStockUseCase implements VoidUseCase<ReconcileS
 
     private final PartRepository partRepository;
     private final StockMovementRepository stockMovementRepository;
+    private final StockReservationRepository stockReservationRepository;
 
     @Override
     @Transactional
@@ -30,14 +33,13 @@ public class ReconcileServiceOrderStockUseCase implements VoidUseCase<ReconcileS
         Map<Long, Integer> requiredByPart = requiredQuantityByPart(command.items());
         Map<Long, Integer> withdrawnByPart =
                 stockMovementRepository.findNetWithdrawnByServiceOrderId(command.serviceOrderId());
+        List<Long> reservedPartIds = stockReservationRepository.findPartIdsByServiceOrderId(command.serviceOrderId());
 
-        for (Long partId : partIdsInLockOrder(requiredByPart, withdrawnByPart)) {
+        for (Long partId : partIdsInLockOrder(requiredByPart.keySet(), withdrawnByPart.keySet(), reservedPartIds)) {
             int required = requiredByPart.getOrDefault(partId, 0);
             int withdrawn = withdrawnByPart.getOrDefault(partId, 0);
-            if (required > withdrawn) {
-                withdraw(partId, required - withdrawn, command);
-            } else if (required < withdrawn) {
-                giveBack(partId, withdrawn - required, command);
+            if (required != withdrawn || reservedPartIds.contains(partId)) {
+                reconcile(partId, required, withdrawn, command);
             }
         }
     }
@@ -50,24 +52,30 @@ public class ReconcileServiceOrderStockUseCase implements VoidUseCase<ReconcileS
     }
 
     private SortedSet<Long> partIdsInLockOrder(
-            Map<Long, Integer> requiredByPart, Map<Long, Integer> withdrawnByPart) {
-        SortedSet<Long> partIds = new TreeSet<>(requiredByPart.keySet());
-        partIds.addAll(withdrawnByPart.keySet());
+            Collection<Long> requiredPartIds, Collection<Long> withdrawnPartIds, Collection<Long> reservedPartIds) {
+        SortedSet<Long> partIds = new TreeSet<>(requiredPartIds);
+        partIds.addAll(withdrawnPartIds);
+        partIds.addAll(reservedPartIds);
         return partIds;
     }
 
-    private void withdraw(Long partId, int quantity, ReconcileServiceOrderStockCommand command) {
+    private void reconcile(Long partId, int required, int withdrawn, ReconcileServiceOrderStockCommand command) {
         Part part = partRepository.findRequiredForUpdateById(partId);
-        save(part, StockMovement.withdrawal(part, quantity, command.serviceOrderId(), command.userId()));
-    }
-
-    private void giveBack(Long partId, int quantity, ReconcileServiceOrderStockCommand command) {
-        Part part = partRepository.findRequiredForUpdateById(partId);
-        save(part, StockMovement.serviceOrderReturn(part, quantity, command.serviceOrderId(), command.userId()));
-    }
-
-    private void save(Part part, StockMovement movement) {
+        releaseReservation(partId, command.serviceOrderId());
+        if (required > withdrawn) {
+            stockMovementRepository.save(StockMovement.withdrawal(
+                    part, required - withdrawn, command.serviceOrderId(), command.userId()));
+        } else if (required < withdrawn) {
+            stockMovementRepository.save(StockMovement.serviceOrderReturn(
+                    part, withdrawn - required, command.serviceOrderId(), command.userId()));
+        }
         partRepository.save(part);
-        stockMovementRepository.save(movement);
+    }
+
+    private void releaseReservation(Long partId, Long serviceOrderId) {
+        stockReservationRepository.findByServiceOrderIdAndPartId(serviceOrderId, partId).ifPresent(reservation -> {
+            reservation.release();
+            stockReservationRepository.delete(reservation);
+        });
     }
 }

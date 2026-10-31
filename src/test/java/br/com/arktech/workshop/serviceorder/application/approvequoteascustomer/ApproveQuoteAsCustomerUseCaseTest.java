@@ -13,6 +13,7 @@ import br.com.arktech.workshop.shared.application.security.CurrentUser;
 import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.money.Money;
+import br.com.arktech.workshop.shared.event.serviceorder.PartQuantity;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
 
 import java.math.BigDecimal;
@@ -68,7 +69,7 @@ class ApproveQuoteAsCustomerUseCaseTest {
                         serviceOrder.getPublicId(),
                         serviceOrder.getCustomerId(),
                         serviceOrder.getTotalPrice().amount(),
-                        List.of(new QuoteApprovedEvent.PartQuantity(40L, 3)),
+                        List.of(new PartQuantity(40L, 3)),
                         null));
     }
 
