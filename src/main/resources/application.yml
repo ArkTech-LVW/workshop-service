@@ -23,6 +23,16 @@ spring:
       ddl-auto: validate
   flyway:
     out-of-order: true
+  task:
+    execution:
+      thread-name-prefix: async-
+      pool:
+        core-size: 2
+        max-size: 8
+        queue-capacity: 500
+      shutdown:
+        await-termination: true
+        await-termination-period: PT10S
 
 server:
   port: 8080

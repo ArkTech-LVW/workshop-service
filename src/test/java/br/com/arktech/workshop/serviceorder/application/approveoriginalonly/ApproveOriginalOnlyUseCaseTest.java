@@ -57,6 +57,8 @@ class ApproveOriginalOnlyUseCaseTest {
                 .containsExactly(new QuoteApprovedEvent(
                         serviceOrder.getId(),
                         serviceOrder.getPublicId(),
+                        serviceOrder.getCustomerId(),
+                        serviceOrder.getTotalPrice().amount(),
                         List.of(new QuoteApprovedEvent.PartQuantity(PAD_ID, 2)),
                         ATTENDANT_ID));
     }
