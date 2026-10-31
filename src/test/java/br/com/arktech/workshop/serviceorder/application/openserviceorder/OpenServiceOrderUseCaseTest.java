@@ -14,6 +14,7 @@ import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
+import br.com.arktech.workshop.shared.domain.vehicle.LicensePlate;
 
 import java.math.BigDecimal;
 import java.time.Year;
@@ -36,7 +37,7 @@ class OpenServiceOrderUseCaseTest {
     private final Map<CPFCNPJ, Long> customers = Map.of(CPFCNPJ.of("52998224725"), ANA_ID);
     private final CustomerDirectory customerDirectory = document -> Optional.ofNullable(customers.get(document));
     private final List<VehicleDetails> requestedVehicles = new ArrayList<>();
-    private final VehicleDirectory vehicleDirectory = registering((customerId, vehicle) -> {
+    private final VehicleDirectory vehicleDirectory = vehicleDirectory((customerId, vehicle) -> {
         requestedVehicles.add(vehicle);
         return GOL_ID;
     });
@@ -87,7 +88,7 @@ class OpenServiceOrderUseCaseTest {
 
     @Test
     void shouldNotOpenWhenThePlateBelongsToAnotherCustomer() {
-        VehicleDirectory otherCustomersVehicle = registering((customerId, vehicle) -> {
+        VehicleDirectory otherCustomersVehicle = vehicleDirectory((customerId, vehicle) -> {
             throw new ConflictException("vehicle.licensePlateOfAnotherCustomer", vehicle.licensePlate());
         });
 
@@ -113,11 +114,17 @@ class OpenServiceOrderUseCaseTest {
                 serviceOrderRepository, customerDirectory, vehicleDirectory, () -> ATTENDANT_ID);
     }
 
-    private static VehicleDirectory registering(BiFunction<Long, VehicleDetails, Long> findOrRegister) {
+    private static VehicleDirectory vehicleDirectory(BiFunction<Long, VehicleDetails, Long> findOrRegister) {
         return new VehicleDirectory() {
+
             @Override
             public Long findOrRegister(Long customerId, VehicleDetails vehicle) {
                 return findOrRegister.apply(customerId, vehicle);
+            }
+
+            @Override
+            public Optional<Long> findIdByLicensePlate(LicensePlate licensePlate) {
+                throw new UnsupportedOperationException();
             }
 
             @Override
