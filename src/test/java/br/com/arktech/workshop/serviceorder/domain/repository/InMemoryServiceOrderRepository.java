@@ -2,9 +2,12 @@ package br.com.arktech.workshop.serviceorder.domain.repository;
 
 import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrder;
 import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderNumber;
+import br.com.arktech.workshop.shared.domain.pagination.Page;
+import br.com.arktech.workshop.shared.domain.pagination.Pagination;
 
 import java.time.Year;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -62,6 +65,24 @@ public class InMemoryServiceOrderRepository implements ServiceOrderRepository {
     @Override
     public ServiceOrderNumber nextNumber() {
         return ServiceOrderNumber.of(Year.now(), nextSequence++);
+    }
+
+    @Override
+    public Page<ServiceOrder> findPage(ServiceOrderFilter filter, Pagination pagination) {
+        List<ServiceOrder> matching = serviceOrders.stream()
+                .filter(serviceOrder -> filter.status() == null || serviceOrder.getStatus() == filter.status())
+                .filter(serviceOrder ->
+                        filter.customerId() == null || serviceOrder.getCustomerId().equals(filter.customerId()))
+                .filter(serviceOrder ->
+                        filter.vehicleId() == null || serviceOrder.getVehicleId().equals(filter.vehicleId()))
+                .sorted(Comparator.comparing((ServiceOrder serviceOrder) -> serviceOrder.getStatus().isClosed())
+                        .thenComparing(ServiceOrder::getId))
+                .toList();
+        List<ServiceOrder> content = matching.stream()
+                .skip((long) pagination.page() * pagination.size())
+                .limit(pagination.size())
+                .toList();
+        return new Page<>(content, pagination, matching.size());
     }
 
     public List<ServiceOrder> findAll() {

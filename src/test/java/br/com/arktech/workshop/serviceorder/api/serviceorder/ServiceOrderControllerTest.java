@@ -1,11 +1,15 @@
 package br.com.arktech.workshop.serviceorder.api.serviceorder;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import br.com.arktech.workshop.serviceorder.application.approvequote.ApproveQuoteCommand;
@@ -18,6 +22,10 @@ import br.com.arktech.workshop.serviceorder.application.completeserviceorder.Com
 import br.com.arktech.workshop.serviceorder.application.completeserviceorder.CompleteServiceOrderUseCase;
 import br.com.arktech.workshop.serviceorder.application.deliverserviceorder.DeliverServiceOrderCommand;
 import br.com.arktech.workshop.serviceorder.application.deliverserviceorder.DeliverServiceOrderUseCase;
+import br.com.arktech.workshop.serviceorder.application.findserviceorder.FindServiceOrderQuery;
+import br.com.arktech.workshop.serviceorder.application.findserviceorder.FindServiceOrderUseCase;
+import br.com.arktech.workshop.serviceorder.application.listserviceorders.ListServiceOrdersQuery;
+import br.com.arktech.workshop.serviceorder.application.listserviceorders.ListServiceOrdersUseCase;
 import br.com.arktech.workshop.serviceorder.application.openserviceorder.OpenServiceOrderCommand;
 import br.com.arktech.workshop.serviceorder.application.openserviceorder.OpenServiceOrderUseCase;
 import br.com.arktech.workshop.serviceorder.application.serviceorder.PartItemResult;
@@ -29,6 +37,8 @@ import br.com.arktech.workshop.serviceorder.application.reopenquote.ReopenQuoteU
 import br.com.arktech.workshop.serviceorder.application.sendquote.SendQuoteCommand;
 import br.com.arktech.workshop.serviceorder.application.sendquote.SendQuoteUseCase;
 import br.com.arktech.workshop.serviceorder.application.serviceorder.ServiceOrderResult;
+import br.com.arktech.workshop.serviceorder.application.serviceorder.ServiceOrderSummaryResult;
+import br.com.arktech.workshop.serviceorder.application.serviceorder.StatusChangeResult;
 import br.com.arktech.workshop.serviceorder.application.startdiagnosis.StartDiagnosisCommand;
 import br.com.arktech.workshop.serviceorder.application.startdiagnosis.StartDiagnosisUseCase;
 import br.com.arktech.workshop.serviceorder.application.startexecution.StartExecutionCommand;
@@ -40,6 +50,8 @@ import br.com.arktech.workshop.shared.application.registry.VehicleDetails;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
+import br.com.arktech.workshop.shared.domain.pagination.Page;
+import br.com.arktech.workshop.shared.domain.pagination.Pagination;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -47,6 +59,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -64,6 +78,14 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 class ServiceOrderControllerTest {
 
     private static final UUID PUBLIC_ID = UUID.fromString("3f1c2b8e-7d4a-4c9e-9b1f-2a6d8e5c4b3a");
+    private static final StatusChangeResult RECEIVED = new StatusChangeResult(
+            null, ServiceOrderStatus.RECEIVED, 7L, null, Instant.parse("2026-10-27T14:30:00Z"));
+    private static final StatusChangeResult DIAGNOSIS_STARTED = new StatusChangeResult(
+            ServiceOrderStatus.RECEIVED,
+            ServiceOrderStatus.IN_DIAGNOSIS,
+            5L,
+            "Pastilhas gastas",
+            Instant.parse("2026-10-27T15:00:00Z"));
     private static final ServiceOrderResult OPENED = new ServiceOrderResult(
             1L,
             PUBLIC_ID,
@@ -78,6 +100,7 @@ class ServiceOrderControllerTest {
             new BigDecimal("0.00"),
             new BigDecimal("0.00"),
             new BigDecimal("0.00"),
+            List.of(RECEIVED),
             Instant.parse("2026-10-27T14:30:00Z"));
     private static final ServiceOrderResult IN_DIAGNOSIS = new ServiceOrderResult(
             1L,
@@ -93,6 +116,7 @@ class ServiceOrderControllerTest {
             new BigDecimal("300.00"),
             new BigDecimal("107.70"),
             new BigDecimal("407.70"),
+            List.of(RECEIVED, DIAGNOSIS_STARTED),
             Instant.parse("2026-10-27T14:30:00Z"));
     private static final ServiceOrderResult AWAITING_APPROVAL = new ServiceOrderResult(
             1L,
@@ -108,6 +132,7 @@ class ServiceOrderControllerTest {
             new BigDecimal("300.00"),
             new BigDecimal("107.70"),
             new BigDecimal("407.70"),
+            List.of(),
             Instant.parse("2026-10-27T14:30:00Z"));
     private static final ServiceOrderResult COMPLETED = new ServiceOrderResult(
             1L,
@@ -129,6 +154,7 @@ class ServiceOrderControllerTest {
             new BigDecimal("300.00"),
             new BigDecimal("0.00"),
             new BigDecimal("300.00"),
+            List.of(),
             Instant.parse("2026-10-27T14:30:00Z"));
     private static final ServiceOrderResult CANCELED = new ServiceOrderResult(
             1L,
@@ -144,6 +170,7 @@ class ServiceOrderControllerTest {
             new BigDecimal("0.00"),
             new BigDecimal("0.00"),
             new BigDecimal("0.00"),
+            List.of(),
             Instant.parse("2026-10-27T14:30:00Z"));
     private static final String CUSTOMER_NOT_REGISTERED = "Nenhum cliente cadastrado com o CPF/CNPJ 529.982.247-25. "
             + "Cadastre o cliente antes de abrir a ordem de serviço.";
@@ -159,6 +186,12 @@ class ServiceOrderControllerTest {
 
     @MockitoBean
     private OpenServiceOrderUseCase openServiceOrderUseCase;
+
+    @MockitoBean
+    private ListServiceOrdersUseCase listServiceOrdersUseCase;
+
+    @MockitoBean
+    private FindServiceOrderUseCase findServiceOrderUseCase;
 
     @MockitoBean
     private StartDiagnosisUseCase startDiagnosisUseCase;
@@ -201,6 +234,8 @@ class ServiceOrderControllerTest {
                          "customerId": 10, "vehicleId": 20, "mechanicId": null,
                          "problemDescription": "Barulho ao frear", "status": "RECEIVED", "services": [], "parts": [],
                          "servicesTotal": 0.00, "partsTotal": 0.00, "totalPrice": 0.00,
+                         "statusHistory": [{"fromStatus": null, "toStatus": "RECEIVED", "changedByUserId": 7,
+                                            "description": null, "changedAt": "2026-10-27T14:30:00Z"}],
                          "dateCreated": "2026-10-27T14:30:00Z"}
                         """));
         verify(openServiceOrderUseCase)
@@ -296,6 +331,11 @@ class ServiceOrderControllerTest {
                                        "subtotal": 300.00, "completedAt": null}],
                          "parts": [{"id": 2, "partId": 40, "quantity": 3, "unitPrice": 35.90, "subtotal": 107.70}],
                          "servicesTotal": 300.00, "partsTotal": 107.70, "totalPrice": 407.70,
+                         "statusHistory": [
+                           {"fromStatus": null, "toStatus": "RECEIVED", "changedByUserId": 7, "description": null,
+                            "changedAt": "2026-10-27T14:30:00Z"},
+                           {"fromStatus": "RECEIVED", "toStatus": "IN_DIAGNOSIS", "changedByUserId": 5,
+                            "description": "Pastilhas gastas", "changedAt": "2026-10-27T15:00:00Z"}],
                          "dateCreated": "2026-10-27T14:30:00Z"}
                         """));
         verify(startDiagnosisUseCase).execute(new StartDiagnosisCommand(1L));
@@ -546,7 +586,7 @@ class ServiceOrderControllerTest {
                         {"id": 1, "publicId": "3f1c2b8e-7d4a-4c9e-9b1f-2a6d8e5c4b3a", "number": "SO-2026-000123",
                          "customerId": 10, "vehicleId": 20, "mechanicId": null,
                          "problemDescription": "Barulho ao frear", "status": "CANCELED", "services": [], "parts": [],
-                         "servicesTotal": 0.00, "partsTotal": 0.00, "totalPrice": 0.00,
+                         "servicesTotal": 0.00, "partsTotal": 0.00, "totalPrice": 0.00, "statusHistory": [],
                          "dateCreated": "2026-10-27T14:30:00Z"}
                         """));
         verify(cancelServiceOrderUseCase).execute(new CancelServiceOrderCommand(1L, "Cliente desistiu do serviço"));
@@ -604,6 +644,108 @@ class ServiceOrderControllerTest {
                 .andExpect(json("""
                         {"code": "serviceOrder.notFound", "message": "Ordem de serviço 1 não encontrada."}
                         """));
+    }
+
+    @Test
+    void shouldListServiceOrdersWithTheGivenFilters() throws Exception {
+        ServiceOrderSummaryResult summary = new ServiceOrderSummaryResult(
+                1L,
+                PUBLIC_ID,
+                "SO-2026-000123",
+                10L,
+                20L,
+                5L,
+                ServiceOrderStatus.IN_DIAGNOSIS,
+                new BigDecimal("407.70"),
+                Instant.parse("2026-10-27T14:30:00Z"));
+        ListServiceOrdersQuery query = new ListServiceOrdersQuery(
+                ServiceOrderStatus.IN_DIAGNOSIS,
+                "529.982.247-25",
+                "abc-1d23",
+                Instant.parse("2026-10-01T03:00:00Z"),
+                Instant.parse("2026-10-31T23:59:59Z"),
+                1,
+                5);
+        when(listServiceOrdersUseCase.execute(query)).thenReturn(new Page<>(List.of(summary), new Pagination(1, 5), 6));
+
+        mockMvc.perform(get("/admin/serviceOrders")
+                        .param("status", "IN_DIAGNOSIS")
+                        .param("customerDocument", "529.982.247-25")
+                        .param("licensePlate", "abc-1d23")
+                        .param("openedFrom", "2026-10-01T00:00:00-03:00")
+                        .param("openedTo", "2026-10-31T23:59:59Z")
+                        .param("page", "1")
+                        .param("size", "5"))
+                .andExpect(status().isOk())
+                .andExpect(json("""
+                        {"content": [{"id": 1, "publicId": "3f1c2b8e-7d4a-4c9e-9b1f-2a6d8e5c4b3a",
+                                      "number": "SO-2026-000123", "customerId": 10, "vehicleId": 20,
+                                      "mechanicId": 5, "status": "IN_DIAGNOSIS", "totalPrice": 407.70,
+                                      "dateCreated": "2026-10-27T14:30:00Z"}],
+                         "page": 1, "size": 5, "totalElements": 6, "totalPages": 2}
+                        """));
+    }
+
+    @Test
+    void shouldListWithoutFiltersUsingTheDefaultPage() throws Exception {
+        ListServiceOrdersQuery query = new ListServiceOrdersQuery(null, null, null, null, null, 0, 20);
+        when(listServiceOrdersUseCase.execute(query)).thenReturn(new Page<>(List.of(), new Pagination(0, 20), 0));
+
+        mockMvc.perform(get("/admin/serviceOrders"))
+                .andExpect(status().isOk())
+                .andExpect(json("""
+                        {"content": [], "page": 0, "size": 20, "totalElements": 0, "totalPages": 0}
+                        """));
+    }
+
+    @Test
+    void shouldValidateFiltersAndPagination() throws Exception {
+        mockMvc.perform(get("/admin/serviceOrders")
+                        .param("customerDocument", "123.456.789-00")
+                        .param("licensePlate", "AB-12345")
+                        .param("page", "-1")
+                        .param("size", "101"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("request.invalidFields"))
+                .andExpect(jsonPath("$.details[*].field")
+                        .value(containsInAnyOrder("customerDocument", "licensePlate", "page", "size")));
+        verifyNoInteractions(listServiceOrdersUseCase);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"status, OPEN", "openedFrom, 2026-10-01", "openedTo, 2026-10-31T23:59:59"})
+    void shouldRejectUnknownStatusAndDatesWithoutOffset(String filter, String value) throws Exception {
+        mockMvc.perform(get("/admin/serviceOrders").param(filter, value))
+                .andExpect(status().isBadRequest())
+                .andExpect(json(
+                        """
+                        {"code": "request.invalidFields", "details": [{"field": "%s", "message": "Valor inválido."}]}
+                        """.formatted(filter),
+                        JsonCompareMode.LENIENT));
+        verifyNoInteractions(listServiceOrdersUseCase);
+    }
+
+    @Test
+    void shouldFindTheWholeServiceOrder() throws Exception {
+        when(findServiceOrderUseCase.execute(new FindServiceOrderQuery(1L))).thenReturn(IN_DIAGNOSIS);
+
+        mockMvc.perform(get("/admin/serviceOrders/{id}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.services[0].serviceOfferingId").value(30))
+                .andExpect(jsonPath("$.parts[0].partId").value(40))
+                .andExpect(jsonPath("$.totalPrice").value(407.70))
+                .andExpect(jsonPath("$.statusHistory[*].toStatus").value(contains("RECEIVED", "IN_DIAGNOSIS")))
+                .andExpect(jsonPath("$.statusHistory[1].changedAt").value("2026-10-27T15:00:00Z"));
+    }
+
+    @Test
+    void shouldAnswer404ForAnUnknownServiceOrder() throws Exception {
+        when(findServiceOrderUseCase.execute(new FindServiceOrderQuery(99L)))
+                .thenThrow(new NotFoundException("serviceOrder.notFound", "99"));
+
+        mockMvc.perform(get("/admin/serviceOrders/{id}", 99L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("serviceOrder.notFound"));
     }
 
     private static MockHttpServletRequestBuilder cancel(String body) {
