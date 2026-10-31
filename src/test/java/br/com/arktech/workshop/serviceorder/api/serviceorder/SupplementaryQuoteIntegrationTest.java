@@ -98,6 +98,20 @@ class SupplementaryQuoteIntegrationTest {
     }
 
     @Test
+    void shouldNotCountTheApprovedPartsAgainstTheAvailableStockWhenAddingDuringTheExecution() throws Exception {
+        addPart(padId, 8);
+
+        as(Role.MECHANIC, post("/admin/serviceOrders/{id}/parts", serviceOrderId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"partId": %d, "quantity": 1}
+                                """.formatted(padId)))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.code").value("part.insufficientStock"));
+        assertThat(stockOf(padId)).isEqualTo(8);
+    }
+
+    @Test
     void shouldWithdrawOnlyTheNewPartsWhenTheSupplementIsApproved() throws Exception {
         Long filterId = createPart(10);
         addPart(filterId, 1);

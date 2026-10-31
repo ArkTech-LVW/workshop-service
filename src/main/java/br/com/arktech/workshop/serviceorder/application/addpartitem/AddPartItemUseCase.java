@@ -26,16 +26,17 @@ public class AddPartItemUseCase implements UseCase<AddPartItemCommand, AddPartIt
         PartDetails part = partDirectory.detailsOf(command.partId());
 
         serviceOrder.addPartItem(command.partId(), command.quantity(), part.salePrice());
+        partDirectory.requireAvailableFor(
+                command.serviceOrderId(), command.partId(), quantityOf(serviceOrder, command.partId()));
         ServiceOrder saved = serviceOrderRepository.saveAndFlush(serviceOrder);
 
-        int requestedQuantity = saved.getPartItems().stream()
-                .filter(item -> item.getPartId().equals(command.partId()))
+        return AddPartItemResult.from(saved.getPartItems().getLast(), saved.getTotalPrice(), part.availableQuantity());
+    }
+
+    private static int quantityOf(ServiceOrder serviceOrder, Long partId) {
+        return serviceOrder.getPartItems().stream()
+                .filter(item -> item.getPartId().equals(partId))
                 .mapToInt(PartItem::getQuantity)
                 .sum();
-        return AddPartItemResult.from(
-                saved.getPartItems().getLast(),
-                saved.getTotalPrice(),
-                part.availableQuantity(),
-                requestedQuantity > part.availableQuantity());
     }
 }

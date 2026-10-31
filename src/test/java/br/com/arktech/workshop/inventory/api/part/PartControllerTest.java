@@ -59,10 +59,13 @@ class PartControllerTest {
             MeasurementUnit.LITER,
             new BigDecimal("45.90"),
             0,
+            0,
+            0,
             10);
     private static final String OIL_JSON = """
             {"id": 1, "sku": "OLEO-5W30-1L", "name": "Óleo 5W30 1L", "type": "SUPPLY", "unit": "LITER",
-             "salePrice": 45.90, "stockQuantity": 0, "minimumStock": 10}
+             "salePrice": 45.90, "stockQuantity": 0, "reservedQuantity": 0, "availableQuantity": 0,
+             "minimumStock": 10}
             """;
     private static final String OIL_REQUEST = """
             {"sku": "oleo-5w30-1l", "name": "Óleo 5W30 1L", "type": "SUPPLY", "unit": "LITER",

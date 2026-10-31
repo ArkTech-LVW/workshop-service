@@ -4,9 +4,11 @@ import br.com.arktech.workshop.shared.domain.BaseEntity;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.money.Money;
+import br.com.arktech.workshop.shared.event.serviceorder.PartQuantity;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteRejectedEvent;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteSentEvent;
+import br.com.arktech.workshop.shared.event.serviceorder.QuoteWithdrawnEvent;
 import br.com.arktech.workshop.shared.event.serviceorder.ServiceOrderCanceledEvent;
 import br.com.arktech.workshop.shared.event.serviceorder.ServiceOrderCompletedEvent;
 
@@ -182,7 +184,7 @@ public class ServiceOrder extends BaseEntity {
         }
         requireItems();
         moveTo(ServiceOrderStatus.AWAITING_APPROVAL, changedByUserId, description);
-        events.add(new QuoteSentEvent(getId(), publicId, customerId, totalPrice.amount()));
+        events.add(new QuoteSentEvent(getId(), publicId, customerId, totalPrice.amount(), partQuantities()));
     }
 
     public void approveQuote(@Nullable Long changedByUserId, @Nullable String description, Instant approvedAt) {
@@ -220,8 +222,18 @@ public class ServiceOrder extends BaseEntity {
     }
 
     public void reopenQuote(Long changedByUserId, @Nullable String description) {
-        requireStatus(ServiceOrderStatus.QUOTE_REJECTED, ServiceOrderStatus.IN_DIAGNOSIS);
-        moveTo(ServiceOrderStatus.IN_DIAGNOSIS, changedByUserId, description);
+        if (status == ServiceOrderStatus.QUOTE_REJECTED) {
+            moveTo(ServiceOrderStatus.IN_DIAGNOSIS, changedByUserId, description);
+            return;
+        }
+        ServiceOrderStatus next = switch (status) {
+            case AWAITING_APPROVAL -> ServiceOrderStatus.IN_DIAGNOSIS;
+            case AWAITING_SUPPLEMENTARY_APPROVAL -> ServiceOrderStatus.IN_PROGRESS;
+            default -> throw new InvalidStatusTransitionException(status, ServiceOrderStatus.IN_DIAGNOSIS);
+        };
+        canProceedWithoutChanges = null;
+        moveTo(next, changedByUserId, description);
+        events.add(new QuoteWithdrawnEvent(getId()));
     }
 
     public void startExecution(Long changedByUserId, @Nullable String description) {
@@ -284,7 +296,7 @@ public class ServiceOrder extends BaseEntity {
         }
         this.canProceedWithoutChanges = canProceedWithoutChanges;
         moveTo(ServiceOrderStatus.AWAITING_SUPPLEMENTARY_APPROVAL, changedByUserId, description);
-        events.add(new QuoteSentEvent(getId(), publicId, customerId, totalPrice.amount()));
+        events.add(new QuoteSentEvent(getId(), publicId, customerId, totalPrice.amount(), partQuantities()));
     }
 
     private void concludeApproval(
@@ -297,10 +309,14 @@ public class ServiceOrder extends BaseEntity {
                 publicId,
                 customerId,
                 totalPrice.amount(),
-                partItems.stream()
-                        .map(item -> new QuoteApprovedEvent.PartQuantity(item.getPartId(), item.getQuantity()))
-                        .toList(),
+                partQuantities(),
                 changedByUserId));
+    }
+
+    private List<PartQuantity> partQuantities() {
+        return partItems.stream()
+                .map(item -> new PartQuantity(item.getPartId(), item.getQuantity()))
+                .toList();
     }
 
     private boolean hasPendingChanges() {

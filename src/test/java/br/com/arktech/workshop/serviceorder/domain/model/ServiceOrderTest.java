@@ -19,9 +19,11 @@ import static org.assertj.core.api.Assertions.tuple;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.money.Money;
+import br.com.arktech.workshop.shared.event.serviceorder.PartQuantity;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteRejectedEvent;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteSentEvent;
+import br.com.arktech.workshop.shared.event.serviceorder.QuoteWithdrawnEvent;
 import br.com.arktech.workshop.shared.event.serviceorder.ServiceOrderCanceledEvent;
 import br.com.arktech.workshop.shared.event.serviceorder.ServiceOrderCompletedEvent;
 
@@ -192,8 +194,8 @@ class ServiceOrderTest {
                         CUSTOMER_ID,
                         new BigDecimal("143.60"),
                         List.of(
-                                new QuoteApprovedEvent.PartQuantity(PART_ID, 3),
-                                new QuoteApprovedEvent.PartQuantity(PART_ID + 1, 1)),
+                                new PartQuantity(PART_ID, 3),
+                                new PartQuantity(PART_ID + 1, 1)),
                         null));
     }
 
@@ -268,6 +270,46 @@ class ServiceOrderTest {
                 .extracting(StatusChange::getToStatus)
                 .containsExactly(
                         RECEIVED, IN_DIAGNOSIS, AWAITING_APPROVAL, QUOTE_REJECTED, IN_DIAGNOSIS, AWAITING_APPROVAL);
+    }
+
+    @Test
+    void shouldChangeItemsAndSendANewQuoteAfterWithdrawingTheSentQuote() {
+        ServiceOrder serviceOrder = serviceOrderIn(AWAITING_APPROVAL);
+        assignIds(serviceOrder.getPartItems(), 1);
+
+        serviceOrder.reopenQuote(USER_ID, "Peça em falta, trocar pela similar");
+        serviceOrder.removePartItem(1L);
+        serviceOrder.addPartItem(PART_ID + 1, 2, PART_PRICE);
+        serviceOrder.sendQuote(USER_ID, null, null);
+
+        assertThat(serviceOrder.getStatus()).isEqualTo(AWAITING_APPROVAL);
+        assertThat(serviceOrder.getPartItems()).singleElement().extracting(PartItem::getPartId).isEqualTo(PART_ID + 1);
+        assertThat(serviceOrder.getStatusHistory())
+                .extracting(StatusChange::getToStatus)
+                .containsExactly(RECEIVED, IN_DIAGNOSIS, AWAITING_APPROVAL, IN_DIAGNOSIS, AWAITING_APPROVAL);
+    }
+
+    @Test
+    void shouldGoOnWithTheApprovedServicesAfterWithdrawingTheSupplementaryQuote() {
+        ServiceOrder serviceOrder = serviceOrderInProgressWithServices(1);
+        serviceOrder.addPartItem(SUPPLEMENTARY_PART_ID, 1, PART_PRICE);
+        serviceOrder.sendQuote(USER_ID, true, null);
+
+        serviceOrder.reopenQuote(USER_ID, "Peça nova em falta");
+        serviceOrder.completeServiceItem(1L, USER_ID, COMPLETED_AT);
+
+        assertThat(serviceOrder.getStatus()).isEqualTo(IN_PROGRESS);
+        assertThat(serviceOrder.getCanProceedWithoutChanges()).isNull();
+        assertThat(serviceOrder.getPartItems())
+                .singleElement()
+                .satisfies(item -> assertThat(item.isApproved()).isFalse());
+        assertThatThrownBy(() -> serviceOrder.complete(USER_ID, null))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("serviceOrder.quoteChangesPendingApproval");
+
+        serviceOrder.sendQuote(USER_ID, false, null);
+
+        assertThat(serviceOrder.getStatus()).isEqualTo(AWAITING_SUPPLEMENTARY_APPROVAL);
     }
 
     @Test
@@ -876,6 +918,12 @@ class ServiceOrderTest {
                 IN_DIAGNOSIS,
                 serviceOrder -> serviceOrder.reopenQuote(USER_ID, DESCRIPTION),
                 null),
+        WITHDRAW_QUOTE(
+                "REOPEN_QUOTE",
+                Set.of(AWAITING_APPROVAL),
+                IN_DIAGNOSIS,
+                serviceOrder -> serviceOrder.reopenQuote(USER_ID, DESCRIPTION),
+                serviceOrder -> new QuoteWithdrawnEvent(serviceOrder.getId())),
         START_EXECUTION(
                 Set.of(QUOTE_APPROVED),
                 IN_PROGRESS,
@@ -935,6 +983,12 @@ class ServiceOrderTest {
                 SUPPLEMENTARY_REJECTED,
                 serviceOrder -> serviceOrder.rejectQuote(USER_ID, DESCRIPTION),
                 Transition::quoteRejected),
+        WITHDRAW_SUPPLEMENTARY_QUOTE(
+                "REOPEN_QUOTE",
+                Set.of(AWAITING_SUPPLEMENTARY_APPROVAL),
+                IN_PROGRESS,
+                serviceOrder -> serviceOrder.reopenQuote(USER_ID, DESCRIPTION),
+                serviceOrder -> new QuoteWithdrawnEvent(serviceOrder.getId())),
         RESUME_EXECUTION(
                 "START_EXECUTION",
                 Set.of(SUPPLEMENTARY_APPROVED),
@@ -995,7 +1049,10 @@ class ServiceOrderTest {
                     serviceOrder.getId(),
                     serviceOrder.getPublicId(),
                     CUSTOMER_ID,
-                    serviceOrder.getTotalPrice().amount());
+                    serviceOrder.getTotalPrice().amount(),
+                    serviceOrder.getPartItems().stream()
+                            .map(item -> new PartQuantity(item.getPartId(), item.getQuantity()))
+                            .toList());
         }
 
         private static Object quoteApproved(ServiceOrder serviceOrder) {
@@ -1005,7 +1062,7 @@ class ServiceOrderTest {
                     CUSTOMER_ID,
                     serviceOrder.getTotalPrice().amount(),
                     serviceOrder.getPartItems().stream()
-                            .map(item -> new QuoteApprovedEvent.PartQuantity(item.getPartId(), item.getQuantity()))
+                            .map(item -> new PartQuantity(item.getPartId(), item.getQuantity()))
                             .toList(),
                     USER_ID);
         }

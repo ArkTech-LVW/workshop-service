@@ -12,10 +12,9 @@ public record AddPartItemResult(
         BigDecimal unitPrice,
         BigDecimal subtotal,
         BigDecimal serviceOrderTotalPrice,
-        int availableQuantity,
-        boolean insufficientStock) {
+        int availableQuantity) {
 
-    static AddPartItemResult from(PartItem item, Money serviceOrderTotalPrice, int availableQuantity, boolean insufficientStock) {
+    static AddPartItemResult from(PartItem item, Money serviceOrderTotalPrice, int availableQuantity) {
         return new AddPartItemResult(
                 item.getId(),
                 item.getPartId(),
@@ -23,7 +22,6 @@ public record AddPartItemResult(
                 item.getUnitPrice().amount(),
                 item.getSubtotal().amount(),
                 serviceOrderTotalPrice.amount(),
-                availableQuantity,
-                insufficientStock);
+                availableQuantity);
     }
 }

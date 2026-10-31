@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -193,6 +195,55 @@ class PartRepositoryTest {
     }
 
     @Test
+    void shouldPersistTheReservedQuantity() {
+        Part part = newPart(uniquePrefix(), "Filtro", PartType.PART);
+        part.increaseStock(5);
+        part.reserve(2);
+        Part saved = partRepository.save(part);
+        flushAndClear();
+
+        Part found = partRepository.findRequiredById(saved.getId());
+
+        assertThat(found.getReservedQuantity()).isEqualTo(2);
+        assertThat(found.getAvailableQuantity()).isEqualTo(3);
+        assertThat(jdbcTemplate.queryForObject(
+                        "SELECT reserved_quantity FROM part WHERE id = ?", Integer.class, saved.getId()))
+                .isEqualTo(2);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {-1, 3})
+    void shouldKeepTheReservedQuantityBetweenZeroAndTheStockInDatabase(int reservedQuantity) {
+        Part part = newPart(uniquePrefix(), "Filtro", PartType.PART);
+        part.increaseStock(2);
+        Part saved = partRepository.save(part);
+        flushAndClear();
+
+        assertThatThrownBy(() -> jdbcTemplate.update(
+                        "UPDATE part SET reserved_quantity = ? WHERE id = ?", reservedQuantity, saved.getId()))
+                .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void shouldListLowStockByTheAvailableQuantity() {
+        String prefix = uniquePrefix();
+        Part reserved = partWithMinimumStock(prefix + "-1", 5, 2);
+        reserved.reserve(3);
+        Part free = partWithMinimumStock(prefix + "-2", 5, 2);
+        free.reserve(2);
+        partRepository.save(reserved);
+        partRepository.save(free);
+        flushAndClear();
+
+        Page<Part> lowStock = partRepository.findLowStockPage(new Pagination(0, 10_000));
+
+        assertThat(lowStock.content())
+                .extracting(Part::getId)
+                .contains(reserved.getId())
+                .doesNotContain(free.getId());
+    }
+
+    @Test
     void shouldReportUnknownPart() {
         assertThatThrownBy(() -> partRepository.findRequiredById(Long.MAX_VALUE))
                 .isInstanceOf(NotFoundException.class)
@@ -201,6 +252,13 @@ class PartRepositoryTest {
 
     private static Part newPart(String sku, String name, PartType type) {
         return new Part(new Sku(sku), name, type, MeasurementUnit.UNIT, new Money(new BigDecimal("10")), 0);
+    }
+
+    private static Part partWithMinimumStock(String sku, int stockQuantity, int minimumStock) {
+        Part part = new Part(
+                new Sku(sku), "Filtro", PartType.PART, MeasurementUnit.UNIT, new Money(new BigDecimal("10")), minimumStock);
+        part.increaseStock(stockQuantity);
+        return part;
     }
 
     private static String uniquePrefix() {

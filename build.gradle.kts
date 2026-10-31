@@ -62,6 +62,7 @@ tasks.withType<Test> {
     // Run tests with a non pt-BR JVM locale (like Docker/CI) so i18n defaults are actually exercised
     systemProperty("user.language", "en")
     systemProperty("user.country", "US")
+    systemProperty("user.timezone", "America/Sao_Paulo")
 }
 
 tasks.compileJava {
@@ -80,8 +81,6 @@ tasks.compileTestJava {
 }
 
 tasks.test {
-    systemProperty("user.timezone", "America/Sao_Paulo")
-
     finalizedBy(tasks.jacocoTestReport)
 
     addTestListener(object : TestListener {
@@ -94,4 +93,12 @@ tasks.test {
             )
         }
     })
+}
+
+tasks.register<Test>("integrationTest") {
+    description = "Runs only the integration tests."
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().runtimeClasspath
+    useJUnitPlatform { includeTags("integration") }
 }

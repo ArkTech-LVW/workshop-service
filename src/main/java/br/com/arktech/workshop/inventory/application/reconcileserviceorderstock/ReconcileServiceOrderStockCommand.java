@@ -1,15 +1,15 @@
 package br.com.arktech.workshop.inventory.application.reconcileserviceorderstock;
 
+import br.com.arktech.workshop.inventory.application.serviceorderpart.ServiceOrderPart;
+
 import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 
-public record ReconcileServiceOrderStockCommand(Long serviceOrderId, List<Item> items, @Nullable Long userId) {
+public record ReconcileServiceOrderStockCommand(
+        Long serviceOrderId, List<ServiceOrderPart> parts, @Nullable Long userId) {
 
     public ReconcileServiceOrderStockCommand {
-        items = List.copyOf(items);
-    }
-
-    public record Item(Long partId, int quantity) {
+        parts = List.copyOf(parts);
     }
 }

@@ -105,7 +105,7 @@ class StockMovementControllerTest {
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(json("""
                         {"code": "part.insufficientStock",
-                         "message": "Estoque insuficiente para FILTRO-01: há 2 em estoque e foram pedidos 3."}
+                         "message": "Estoque insuficiente para FILTRO-01: o disponível é 2 e foram pedidos 3."}
                         """, JsonCompareMode.LENIENT));
     }
 

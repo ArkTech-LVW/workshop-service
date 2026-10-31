@@ -33,6 +33,8 @@ public class Part extends BaseEntity {
 
     private int stockQuantity;
 
+    private int reservedQuantity;
+
     private int minimumStock;
 
     public Part(Sku sku, String name, PartType type, MeasurementUnit unit, Money salePrice, int minimumStock) {
@@ -44,7 +46,12 @@ public class Part extends BaseEntity {
         this.unit = unit;
         this.salePrice = salePrice;
         this.stockQuantity = 0;
+        this.reservedQuantity = 0;
         this.minimumStock = minimumStock;
+    }
+
+    public int getAvailableQuantity() {
+        return stockQuantity - reservedQuantity;
     }
 
     public void changeSku(Sku sku) {
@@ -76,15 +83,34 @@ public class Part extends BaseEntity {
 
     public void decreaseStock(int quantity) {
         requirePositive(quantity);
-        if (quantity > stockQuantity) {
-            throw new BusinessRuleException("part.insufficientStock", sku.value(), stockQuantity, quantity);
-        }
-
+        requireAvailable(quantity);
         this.stockQuantity -= quantity;
     }
 
+    public void reserve(int quantity) {
+        requirePositive(quantity);
+        requireAvailable(quantity);
+        this.reservedQuantity += quantity;
+    }
+
+    public void releaseReservation(int quantity) {
+        requirePositive(quantity);
+        if (quantity > reservedQuantity) {
+            throw new IllegalStateException(
+                    "Cannot release " + quantity + " of part " + sku.value() + ", only " + reservedQuantity + " reserved");
+        }
+
+        this.reservedQuantity -= quantity;
+    }
+
     public boolean isLowStock() {
-        return stockQuantity <= minimumStock;
+        return getAvailableQuantity() <= minimumStock;
+    }
+
+    public void requireAvailable(int quantity) {
+        if (quantity > getAvailableQuantity()) {
+            throw new BusinessRuleException("part.insufficientStock", sku.value(), getAvailableQuantity(), quantity);
+        }
     }
 
     private static void requirePositive(int quantity) {

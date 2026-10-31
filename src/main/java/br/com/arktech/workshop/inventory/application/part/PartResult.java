@@ -14,6 +14,8 @@ public record PartResult(
         MeasurementUnit unit,
         BigDecimal salePrice,
         int stockQuantity,
+        int reservedQuantity,
+        int availableQuantity,
         int minimumStock) {
 
     public static PartResult from(Part part) {
@@ -25,6 +27,8 @@ public record PartResult(
                 part.getUnit(),
                 part.getSalePrice().amount(),
                 part.getStockQuantity(),
+                part.getReservedQuantity(),
+                part.getAvailableQuantity(),
                 part.getMinimumStock());
     }
 }

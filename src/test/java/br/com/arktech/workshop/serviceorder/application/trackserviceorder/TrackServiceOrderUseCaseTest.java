@@ -83,6 +83,11 @@ class TrackServiceOrderUseCaseTest {
                 public Map<Long, String> namesOf(Collection<Long> partIds) {
                     return namesFrom(Map.of(PAD_ID, "Pastilha de freio", OIL_ID, "Óleo 5W30"), partIds);
                 }
+
+                @Override
+                public void requireAvailableFor(Long serviceOrderId, Long partId, int quantity) {
+                    throw new UnsupportedOperationException();
+                }
             });
 
     private final ServiceOrder serviceOrder = serviceOrderRepository.save(

@@ -289,8 +289,8 @@ class ServiceOrderQueryIntegrationTest {
                 .getId();
         Long partId = savePart();
         return transactionTemplate.execute(transaction -> {
-            ServiceOrder serviceOrder = new ServiceOrder(
-                    serviceOrderRepository.nextNumber(), customerId, golId, "Barulho ao frear", userId);
+            ServiceOrder serviceOrder = serviceOrderRepository.save(new ServiceOrder(
+                    serviceOrderRepository.nextNumber(), customerId, golId, "Barulho ao frear", userId));
             IntStream.range(0, services)
                     .forEach(ignored -> serviceOrder.addServiceItem(serviceOfferingId, 1, LABOR_PRICE));
             IntStream.range(0, parts).forEach(ignored -> serviceOrder.addPartItem(partId, 1, PART_PRICE));
@@ -308,9 +308,9 @@ class ServiceOrderQueryIntegrationTest {
 
     private Long savePart() {
         String sku = "PAST-%d".formatted(ThreadLocalRandom.current().nextLong(1_000_000_000L));
-        return partRepository
-                .save(new Part(new Sku(sku), "Pastilha de freio", PartType.PART, MeasurementUnit.UNIT, PART_PRICE, 1))
-                .getId();
+        Part part = new Part(new Sku(sku), "Pastilha de freio", PartType.PART, MeasurementUnit.UNIT, PART_PRICE, 1);
+        part.increaseStock(10);
+        return partRepository.save(part).getId();
     }
 
     private static Instant daysAgo(int days) {
