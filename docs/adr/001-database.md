@@ -68,7 +68,7 @@ Além disso, o esquema precisa ser versionado, testável contra o banco real e r
 
 - Docker passa a ser pré-requisito para `./gradlew build` (os testes de integração sobem o PostgreSQL), tanto no dev quanto no CI (T0.6).
 - **T0.4:** o `docker-compose.yml` já tem o serviço `postgres`. A T0.4 acrescenta o serviço da aplicação, lendo `DB_URL`, `DB_USERNAME` e `DB_PASSWORD`, e precisa garantir que o `bootRun` continue subindo só o banco (por exemplo, com `profiles` no serviço da aplicação ou um arquivo separado indicado em `spring.docker.compose.file`).
-- IDs sequenciais são enumeráveis. A API do cliente (T3.8) precisa autorizar pelo dono do recurso, nunca pela dificuldade de adivinhar o ID.
+- IDs sequenciais são enumeráveis. A API do cliente (T3.8) precisa autorizar pelo dono do recurso, nunca pela dificuldade de adivinhar o ID. Resolvido no [ADR 005](005-customer-access.md).
 - Dois PRs em paralelo podem criar a mesma versão de migration. Quem mergear por último renumera a sua antes do merge (o Flyway recusa versões duplicadas e o build quebra).
 - Agregados com coleções, como a OS com itens e histórico (T3.1), mapeiam os filhos como entidades a partir da raiz (`cascade` + `orphanRemoval`).
 - Em aberto: a interface de repositório do domínio não pode usar `Pageable`/`Page` do Spring Data. A primeira listagem paginada (ex.: T3.9) define o tipo de paginação a adotar.
