@@ -4,6 +4,7 @@ import br.com.arktech.workshop.shared.domain.BaseEntity;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.money.Money;
+import br.com.arktech.workshop.shared.event.serviceorder.PartQuantity;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteRejectedEvent;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteSentEvent;
@@ -182,7 +183,7 @@ public class ServiceOrder extends BaseEntity {
         }
         requireItems();
         moveTo(ServiceOrderStatus.AWAITING_APPROVAL, changedByUserId, description);
-        events.add(new QuoteSentEvent(getId(), publicId, customerId, totalPrice.amount()));
+        events.add(new QuoteSentEvent(getId(), publicId, customerId, totalPrice.amount(), partQuantities()));
     }
 
     public void approveQuote(@Nullable Long changedByUserId, @Nullable String description, Instant approvedAt) {
@@ -284,7 +285,7 @@ public class ServiceOrder extends BaseEntity {
         }
         this.canProceedWithoutChanges = canProceedWithoutChanges;
         moveTo(ServiceOrderStatus.AWAITING_SUPPLEMENTARY_APPROVAL, changedByUserId, description);
-        events.add(new QuoteSentEvent(getId(), publicId, customerId, totalPrice.amount()));
+        events.add(new QuoteSentEvent(getId(), publicId, customerId, totalPrice.amount(), partQuantities()));
     }
 
     private void concludeApproval(
@@ -297,10 +298,14 @@ public class ServiceOrder extends BaseEntity {
                 publicId,
                 customerId,
                 totalPrice.amount(),
-                partItems.stream()
-                        .map(item -> new QuoteApprovedEvent.PartQuantity(item.getPartId(), item.getQuantity()))
-                        .toList(),
+                partQuantities(),
                 changedByUserId));
+    }
+
+    private List<PartQuantity> partQuantities() {
+        return partItems.stream()
+                .map(item -> new PartQuantity(item.getPartId(), item.getQuantity()))
+                .toList();
     }
 
     private boolean hasPendingChanges() {

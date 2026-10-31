@@ -10,6 +10,7 @@ import br.com.arktech.workshop.serviceorder.domain.repository.InMemoryServiceOrd
 import br.com.arktech.workshop.shared.application.i18n.MessageResolver;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.money.Money;
+import br.com.arktech.workshop.shared.event.serviceorder.PartQuantity;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
 
 import java.math.BigDecimal;
@@ -59,7 +60,7 @@ class ApproveOriginalOnlyUseCaseTest {
                         serviceOrder.getPublicId(),
                         serviceOrder.getCustomerId(),
                         serviceOrder.getTotalPrice().amount(),
-                        List.of(new QuoteApprovedEvent.PartQuantity(PAD_ID, 2)),
+                        List.of(new PartQuantity(PAD_ID, 2)),
                         ATTENDANT_ID));
     }
 

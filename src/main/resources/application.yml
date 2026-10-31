@@ -60,6 +60,10 @@ security:
         capacity: 20
         period: PT1M
 
+inventory:
+  stock-reservation:
+    validity: P7D
+
 springdoc:
   api-docs:
     path: /docs/openapi.json

@@ -175,9 +175,11 @@ class MainFlowsIntegrationTest {
     @Test
     void shouldRollBackTheStatusAndTheStockWhenAPartIsShortOnApproval() {
         Long filter = createPart("Filtro de óleo", "32.00", 10);
-        Long oil = createPart("Óleo 5W30", "48.00", 4);
+        Long oil = createPart("Óleo 5W30", "48.00", 5);
         openServiceOrder();
         sendQuoteWithParts(Map.of(filter, 2, oil, 5));
+        releaseTheReservationAsIfItExpired();
+        jdbcTemplate.update("UPDATE part SET stock_quantity = 4 WHERE id = ?", oil);
 
         customer(HttpMethod.POST, "/customer/serviceOrders/{publicId}/approve", null)
                 .expect(422)
@@ -314,6 +316,17 @@ class MainFlowsIntegrationTest {
     private String statusOf() {
         return jdbcTemplate.queryForObject(
                 "SELECT status FROM service_order WHERE id = ?", String.class, serviceOrderId);
+    }
+
+    private void releaseTheReservationAsIfItExpired() {
+        jdbcTemplate.update(
+                """
+                UPDATE part SET reserved_quantity = part.reserved_quantity - r.quantity
+                FROM stock_reservation r
+                WHERE r.part_id = part.id AND r.service_order_id = ?
+                """,
+                serviceOrderId);
+        jdbcTemplate.update("DELETE FROM stock_reservation WHERE service_order_id = ?", serviceOrderId);
     }
 
     private int stockOf(Long partId) {

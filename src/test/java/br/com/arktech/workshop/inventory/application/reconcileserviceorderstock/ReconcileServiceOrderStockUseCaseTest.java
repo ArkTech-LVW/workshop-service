@@ -4,19 +4,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
+import br.com.arktech.workshop.inventory.application.serviceorderpart.ServiceOrderPart;
+import br.com.arktech.workshop.inventory.application.releaseserviceorderreservation.ReleaseServiceOrderReservationUseCase;
 import br.com.arktech.workshop.inventory.domain.model.MeasurementUnit;
 import br.com.arktech.workshop.inventory.domain.model.Part;
 import br.com.arktech.workshop.inventory.domain.model.PartType;
 import br.com.arktech.workshop.inventory.domain.model.Sku;
 import br.com.arktech.workshop.inventory.domain.model.StockMovement;
 import br.com.arktech.workshop.inventory.domain.model.StockMovementType;
+import br.com.arktech.workshop.inventory.domain.model.StockReservation;
 import br.com.arktech.workshop.inventory.domain.repository.InMemoryPartRepository;
 import br.com.arktech.workshop.inventory.domain.repository.InMemoryStockMovementRepository;
+import br.com.arktech.workshop.inventory.domain.repository.InMemoryStockReservationRepository;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.money.Money;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
 import org.jspecify.annotations.Nullable;
@@ -27,11 +32,18 @@ class ReconcileServiceOrderStockUseCaseTest {
     private static final Long USER_ID = 7L;
     private static final Long SERVICE_ORDER_ID = 42L;
     private static final Long OTHER_SERVICE_ORDER_ID = 43L;
+    private static final Instant EXPIRES_AT = Instant.parse("2026-11-07T12:00:00Z");
 
     private final InMemoryPartRepository partRepository = new InMemoryPartRepository();
     private final InMemoryStockMovementRepository stockMovementRepository = new InMemoryStockMovementRepository();
+    private final InMemoryStockReservationRepository stockReservationRepository =
+            new InMemoryStockReservationRepository();
     private final ReconcileServiceOrderStockUseCase reconcileServiceOrderStockUseCase =
-            new ReconcileServiceOrderStockUseCase(partRepository, stockMovementRepository);
+            new ReconcileServiceOrderStockUseCase(
+                    partRepository,
+                    stockMovementRepository,
+                    stockReservationRepository,
+                    new ReleaseServiceOrderReservationUseCase(partRepository, stockReservationRepository));
 
     @Test
     void shouldWithdrawEachPartAndMergeRepeatedItems() {
@@ -147,20 +159,83 @@ class ReconcileServiceOrderStockUseCaseTest {
     }
 
     @Test
+    void shouldTurnTheReservationIntoTheWithdrawal() {
+        Part filter = savePart("FILTRO-01", 5);
+        reserve(SERVICE_ORDER_ID, filter, 5);
+
+        reconcile(SERVICE_ORDER_ID, List.of(item(filter, 5)), USER_ID);
+
+        assertThat(filter.getStockQuantity()).isZero();
+        assertThat(filter.getReservedQuantity()).isZero();
+        assertThat(stockReservationRepository.findAll()).isEmpty();
+        assertThat(stockMovementRepository.findAll())
+                .extracting(StockMovement::getType, StockMovement::getQuantity)
+                .containsExactly(tuple(StockMovementType.OUT, 5));
+    }
+
+    @Test
+    void shouldReleaseTheReservationOfAPartThatLeftTheServiceOrderWithoutMovingIt() {
+        Part filter = savePart("FILTRO-01", 5);
+        Part oil = savePart("OLEO-5W30", 10);
+        reserve(SERVICE_ORDER_ID, filter, 2);
+        reserve(SERVICE_ORDER_ID, oil, 4);
+
+        reconcile(SERVICE_ORDER_ID, List.of(item(oil, 4)), USER_ID);
+
+        assertThat(filter.getStockQuantity()).isEqualTo(5);
+        assertThat(filter.getReservedQuantity()).isZero();
+        assertThat(oil.getStockQuantity()).isEqualTo(6);
+        assertThat(oil.getReservedQuantity()).isZero();
+        assertThat(stockReservationRepository.findAll()).isEmpty();
+        assertThat(stockMovementRepository.findAll()).extracting(StockMovement::getPart).containsExactly(oil);
+    }
+
+    @Test
+    void shouldReleaseTheReservationAndReturnWhatLeftWhenTheServiceOrderIsCanceled() {
+        Part filter = savePart("FILTRO-01", 5);
+        Part oil = savePart("OLEO-5W30", 10);
+        reconcile(SERVICE_ORDER_ID, List.of(item(filter, 2)), USER_ID);
+        reserve(SERVICE_ORDER_ID, oil, 4);
+
+        reconcile(SERVICE_ORDER_ID, List.of(), USER_ID);
+
+        assertThat(filter.getStockQuantity()).isEqualTo(5);
+        assertThat(oil.getStockQuantity()).isEqualTo(10);
+        assertThat(oil.getReservedQuantity()).isZero();
+        assertThat(stockReservationRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    void shouldNotTakeTheReservationOfAnotherServiceOrder() {
+        Part filter = savePart("FILTRO-01", 5);
+        reserve(OTHER_SERVICE_ORDER_ID, filter, 3);
+
+        assertThatThrownBy(() -> reconcile(SERVICE_ORDER_ID, List.of(item(filter, 3)), USER_ID))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("part.insufficientStock");
+        assertThat(filter.getStockQuantity()).isEqualTo(5);
+        assertThat(filter.getReservedQuantity()).isEqualTo(3);
+    }
+
+    @Test
     void shouldReportUnknownPart() {
         assertThatThrownBy(() -> reconcile(
-                        SERVICE_ORDER_ID, List.of(new ReconcileServiceOrderStockCommand.Item(1234L, 1)), USER_ID))
+                        SERVICE_ORDER_ID, List.of(new ServiceOrderPart(1234L, 1)), USER_ID))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("part.notFound");
     }
 
     private void reconcile(
-            Long serviceOrderId, List<ReconcileServiceOrderStockCommand.Item> items, @Nullable Long userId) {
+            Long serviceOrderId, List<ServiceOrderPart> items, @Nullable Long userId) {
         reconcileServiceOrderStockUseCase.execute(new ReconcileServiceOrderStockCommand(serviceOrderId, items, userId));
     }
 
-    private static ReconcileServiceOrderStockCommand.Item item(Part part, int quantity) {
-        return new ReconcileServiceOrderStockCommand.Item(part.getId(), quantity);
+    private void reserve(Long serviceOrderId, Part part, int quantity) {
+        stockReservationRepository.save(StockReservation.reserve(part, serviceOrderId, quantity, EXPIRES_AT));
+    }
+
+    private static ServiceOrderPart item(Part part, int quantity) {
+        return new ServiceOrderPart(part.getId(), quantity);
     }
 
     private Part savePart(String sku, int stockQuantity) {
