@@ -99,4 +99,17 @@ class StockMovementTest {
                 .hasMessage("part.insufficientStock");
         assertThat(part.getStockQuantity()).isEqualTo(5);
     }
+
+    @Test
+    void shouldNotTakeTheReservedStock() {
+        part.reserve(4);
+
+        assertThatThrownBy(() -> StockMovement.withdrawal(part, 2, 42L, USER_ID))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("part.insufficientStock");
+        assertThatThrownBy(() -> StockMovement.adjustment(part, 2, "Avaria no estoque", USER_ID))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("part.insufficientStock");
+        assertThat(part.getStockQuantity()).isEqualTo(5);
+    }
 }

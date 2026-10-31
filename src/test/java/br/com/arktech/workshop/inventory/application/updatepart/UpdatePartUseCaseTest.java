@@ -47,6 +47,8 @@ class UpdatePartUseCaseTest {
                         MeasurementUnit.LITER,
                         new BigDecimal("49.90"),
                         7,
+                        0,
+                        7,
                         4));
         assertThat(part.getSalePrice()).isEqualTo(new Money(new BigDecimal("49.90")));
     }

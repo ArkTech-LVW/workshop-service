@@ -109,13 +109,13 @@ class ServiceOrderItemIntegrationTest {
                 .andExpect(jsonPath("$.unitPrice").value(150.0))
                 .andExpect(jsonPath("$.subtotal").value(300.0))
                 .andExpect(jsonPath("$.serviceOrderTotalPrice").value(300.0)));
-        Long partItemId = idOf(as(Role.MECHANIC, addPart(serviceOrderId, savedPart(2), 3))
+        Long partItemId = idOf(as(Role.MECHANIC, addPart(serviceOrderId, savedPart(5), 3))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.unitPrice").value(35.9))
                 .andExpect(jsonPath("$.subtotal").value(107.7))
                 .andExpect(jsonPath("$.serviceOrderTotalPrice").value(407.7))
-                .andExpect(jsonPath("$.availableQuantity").value(2))
-                .andExpect(jsonPath("$.insufficientStock").value(true)));
+                .andExpect(jsonPath("$.availableQuantity").value(5))
+                .andExpect(jsonPath("$.insufficientStock").doesNotExist()));
         assertThat(totalPrice()).isEqualByComparingTo("407.70");
 
         as(Role.MECHANIC, delete("/admin/serviceOrders/{id}/services/{itemId}", serviceOrderId, serviceItemId))
@@ -169,6 +169,9 @@ class ServiceOrderItemIntegrationTest {
         as(Role.MECHANIC, addPart(serviceOrderId, savedPart(5), 1000))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.details[0].field").value("quantity"));
+        as(Role.MECHANIC, addPart(serviceOrderId, savedPart(2), 3))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.code").value("part.insufficientStock"));
 
         assertThat(itemCount()).isZero();
     }

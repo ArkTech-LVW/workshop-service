@@ -122,14 +122,15 @@ class QuoteDecisionIntegrationTest {
     @Test
     void shouldChangeNothingWhenAPartIsShort() throws Exception {
         Long filter = createPart(10);
-        Long oil = createPart(4);
+        Long oil = createPart(5);
         sendQuoteWith(Map.of(filter, 2, oil, 5));
+        jdbcTemplate.update("UPDATE part SET stock_quantity = 4 WHERE id = ?", oil);
 
         as(Role.ATTENDANT, approve())
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("part.insufficientStock"))
                 .andExpect(jsonPath("$.message")
-                        .value("Estoque insuficiente para %s: há 4 em estoque e foram pedidos 5."
+                        .value("Estoque insuficiente para %s: o disponível é 4 e foram pedidos 5."
                                 .formatted(skuOf(oil))));
 
         assertThat(statusOf()).isEqualTo("AWAITING_APPROVAL");

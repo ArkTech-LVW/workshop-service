@@ -36,6 +36,8 @@ class CreatePartUseCaseTest {
                         MeasurementUnit.LITER,
                         new BigDecimal("45.90"),
                         0,
+                        0,
+                        0,
                         10));
         Part part = partRepository.findRequiredById(result.id());
         assertThat(part.getSku()).isEqualTo(new Sku("OLEO-5W30-1L"));

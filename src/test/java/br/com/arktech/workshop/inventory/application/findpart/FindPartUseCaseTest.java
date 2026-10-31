@@ -42,6 +42,8 @@ class FindPartUseCaseTest {
                         MeasurementUnit.UNIT,
                         new BigDecimal("32.00"),
                         0,
+                        0,
+                        0,
                         5));
     }
 

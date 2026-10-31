@@ -487,7 +487,7 @@ class ServiceOrderControllerTest {
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(json("""
                         {"code": "part.insufficientStock",
-                         "message": "Estoque insuficiente para FILTRO-01: há 1 em estoque e foram pedidos 3."}
+                         "message": "Estoque insuficiente para FILTRO-01: o disponível é 1 e foram pedidos 3."}
                         """));
     }
 
