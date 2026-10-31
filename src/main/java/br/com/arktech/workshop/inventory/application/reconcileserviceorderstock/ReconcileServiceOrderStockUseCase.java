@@ -6,9 +6,11 @@ import br.com.arktech.workshop.inventory.domain.repository.PartRepository;
 import br.com.arktech.workshop.inventory.domain.repository.StockMovementRepository;
 import br.com.arktech.workshop.shared.application.VoidUseCase;
 
+import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,26 +27,46 @@ public class ReconcileServiceOrderStockUseCase implements VoidUseCase<ReconcileS
     @Override
     @Transactional
     public void execute(ReconcileServiceOrderStockCommand command) {
-        Map<Long, Integer> targetByPart = new TreeMap<>();
-        command.items().forEach(item -> targetByPart.merge(item.partId(), item.quantity(), Math::addExact));
+        Map<Long, Integer> requiredByPart = requiredQuantityByPart(command.items());
         Map<Long, Integer> withdrawnByPart =
                 stockMovementRepository.findNetWithdrawnByServiceOrderId(command.serviceOrderId());
 
-        TreeSet<Long> partIds = new TreeSet<>(targetByPart.keySet());
-        partIds.addAll(withdrawnByPart.keySet());
-        partIds.forEach(partId -> {
-            int difference = targetByPart.getOrDefault(partId, 0) - withdrawnByPart.getOrDefault(partId, 0);
-            if (difference != 0) {
-                move(partId, difference, command);
+        for (Long partId : partIdsInLockOrder(requiredByPart, withdrawnByPart)) {
+            int required = requiredByPart.getOrDefault(partId, 0);
+            int withdrawn = withdrawnByPart.getOrDefault(partId, 0);
+            if (required > withdrawn) {
+                withdraw(partId, required - withdrawn, command);
+            } else if (required < withdrawn) {
+                giveBack(partId, withdrawn - required, command);
             }
-        });
+        }
     }
 
-    private void move(Long partId, int difference, ReconcileServiceOrderStockCommand command) {
+    private Map<Long, Integer> requiredQuantityByPart(List<ReconcileServiceOrderStockCommand.Item> items) {
+        return items.stream().collect(Collectors.toMap(
+                ReconcileServiceOrderStockCommand.Item::partId,
+                ReconcileServiceOrderStockCommand.Item::quantity,
+                Math::addExact));
+    }
+
+    private SortedSet<Long> partIdsInLockOrder(
+            Map<Long, Integer> requiredByPart, Map<Long, Integer> withdrawnByPart) {
+        SortedSet<Long> partIds = new TreeSet<>(requiredByPart.keySet());
+        partIds.addAll(withdrawnByPart.keySet());
+        return partIds;
+    }
+
+    private void withdraw(Long partId, int quantity, ReconcileServiceOrderStockCommand command) {
         Part part = partRepository.findRequiredForUpdateById(partId);
-        StockMovement movement = difference > 0
-                ? StockMovement.withdrawal(part, difference, command.serviceOrderId(), command.userId())
-                : StockMovement.serviceOrderReturn(part, -difference, command.serviceOrderId(), command.userId());
+        save(part, StockMovement.withdrawal(part, quantity, command.serviceOrderId(), command.userId()));
+    }
+
+    private void giveBack(Long partId, int quantity, ReconcileServiceOrderStockCommand command) {
+        Part part = partRepository.findRequiredForUpdateById(partId);
+        save(part, StockMovement.serviceOrderReturn(part, quantity, command.serviceOrderId(), command.userId()));
+    }
+
+    private void save(Part part, StockMovement movement) {
         partRepository.save(part);
         stockMovementRepository.save(movement);
     }

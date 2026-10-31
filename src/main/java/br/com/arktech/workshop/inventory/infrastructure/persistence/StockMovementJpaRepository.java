@@ -9,9 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -21,6 +24,11 @@ interface StockMovementJpaRepository
         extends JpaRepository<StockMovement, Long>, JpaSpecificationExecutor<StockMovement>, StockMovementRepository {
 
     Sort PAGE_ORDER = Sort.by(Sort.Order.desc("dateCreated"), Sort.Order.desc("id"));
+
+    @Override
+    @EntityGraph(attributePaths = "stockAdjustmentRequest")
+    org.springframework.data.domain.Page<StockMovement> findAll(
+            @Nullable Specification<StockMovement> spec, Pageable pageable);
 
     @Override
     default Map<Long, Integer> findNetWithdrawnByServiceOrderId(Long serviceOrderId) {

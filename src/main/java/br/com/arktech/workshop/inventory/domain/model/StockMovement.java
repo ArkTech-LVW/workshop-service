@@ -38,6 +38,10 @@ public class StockMovement extends BaseEntity {
 
     private @Nullable Long createdByUserId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "stock_adjustment_request_id")
+    private @Nullable StockAdjustmentRequest stockAdjustmentRequest;
+
     private StockMovement(
             Part part,
             StockMovementType type,
@@ -66,6 +70,13 @@ public class StockMovement extends BaseEntity {
 
         part.decreaseStock(quantity);
         return new StockMovement(part, StockMovementType.ADJUSTMENT, quantity, normalized, null, userId);
+    }
+
+    static StockMovement adjustment(StockAdjustmentRequest request, Long approvedByUserId) {
+        StockMovement movement =
+                adjustment(request.getPart(), request.getQuantity(), request.getReason(), approvedByUserId);
+        movement.stockAdjustmentRequest = request;
+        return movement;
     }
 
     public static StockMovement withdrawal(Part part, int quantity, Long serviceOrderId, @Nullable Long userId) {

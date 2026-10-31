@@ -40,10 +40,11 @@ import org.springframework.test.web.servlet.ResultMatcher;
 class StockMovementControllerTest {
 
     private static final StockMovementResult ENTRY = new StockMovementResult(
-            5L, 1L, StockMovementType.IN, 10, "NF 1234", null, 7L, Instant.parse("2026-10-26T14:30:00Z"));
+            5L, 1L, StockMovementType.IN, 10, "NF 1234", null, 7L, null, null, Instant.parse("2026-10-26T14:30:00Z"));
     private static final String ENTRY_JSON = """
             {"id": 5, "partId": 1, "type": "IN", "quantity": 10, "reason": "NF 1234", "serviceOrderId": null,
-             "createdByUserId": 7, "dateCreated": "2026-10-26T14:30:00Z"}
+             "createdByUserId": 7, "stockAdjustmentRequestId": null, "requestedByUserId": null,
+             "dateCreated": "2026-10-26T14:30:00Z"}
             """;
 
     @Autowired
