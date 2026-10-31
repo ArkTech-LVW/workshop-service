@@ -1,4 +1,4 @@
-package br.com.arktech.workshop.notification.application.sendnotification;
+package br.com.arktech.workshop.serviceorder.application.notifycustomer;
 
 import static br.com.arktech.workshop.UniqueTestData.uniqueCPF;
 import static br.com.arktech.workshop.UniqueTestData.uniquePlate;
@@ -21,9 +21,8 @@ import br.com.arktech.workshop.auth.application.port.TokenIssuer;
 import br.com.arktech.workshop.auth.domain.model.User;
 import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
 import br.com.arktech.workshop.auth.domain.repository.UserRepository;
-import br.com.arktech.workshop.notification.application.port.Notifier;
-import br.com.arktech.workshop.notification.domain.model.Notification;
-import br.com.arktech.workshop.notification.domain.model.NotificationType;
+import br.com.arktech.workshop.shared.application.notification.Notification;
+import br.com.arktech.workshop.shared.application.notification.Notifier;
 import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
 import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.shared.domain.security.Role;
@@ -55,6 +54,10 @@ class ServiceOrderNotificationIntegrationTest {
 
     private static final Duration WAIT = Duration.ofSeconds(5);
 
+    private static final String QUOTE_SENT = "foi enviado para aprovação";
+
+    private static final String QUOTE_APPROVED = "foi aprovado";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -81,6 +84,8 @@ class ServiceOrderNotificationIntegrationTest {
 
     private UUID publicId;
 
+    private Long customerId;
+
     @BeforeEach
     void openAServiceOrder() throws Exception {
         long suffix = ThreadLocalRandom.current().nextLong(1_000_000_000L);
@@ -95,11 +100,13 @@ class ServiceOrderNotificationIntegrationTest {
         serviceOrderId = openServiceOrder();
         publicId = jdbcTemplate.queryForObject(
                 "SELECT public_id FROM service_order WHERE id = ?", UUID.class, serviceOrderId);
+        customerId = jdbcTemplate.queryForObject(
+                "SELECT customer_id FROM service_order WHERE id = ?", Long.class, serviceOrderId);
         doAnswer(invocation -> {
                     Notification notification = invocation.getArgument(0);
                     deliveries.add(new Delivery(
                             notification,
-                            statusOf(notification.serviceOrderPublicId()),
+                            statusOf(publicId),
                             Thread.currentThread().getName()));
                     return invocation.callRealMethod();
                 })
@@ -111,12 +118,11 @@ class ServiceOrderNotificationIntegrationTest {
     void shouldNotifyInTheBackgroundOnlyAfterTheQuoteIsCommitted() throws Exception {
         sendQuoteWith(createPart(10), 2);
 
-        Delivery delivery = awaitDelivery(NotificationType.QUOTE_SENT);
+        Delivery delivery = awaitDelivery(QUOTE_SENT);
 
         assertThat(delivery.serviceOrderStatus()).isEqualTo("AWAITING_APPROVAL");
         assertThat(delivery.threadName()).startsWith("async-");
-        assertThat(delivery.notification().customerId()).isEqualTo(customerIdOf());
-        assertThat(delivery.notification().totalPrice()).isEqualByComparingTo("64.00");
+        assertThat(delivery.notification().customerId()).isEqualTo(customerId);
         assertThat(delivery.notification().message()).contains(publicId.toString(), "R$ 64,00");
     }
 
@@ -130,41 +136,42 @@ class ServiceOrderNotificationIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("AWAITING_APPROVAL"));
 
-        verify(notifier, timeout(WAIT.toMillis())).send(argThat(notificationOf(NotificationType.QUOTE_SENT)));
+        verify(notifier, timeout(WAIT.toMillis())).send(argThat(notificationOf(QUOTE_SENT)));
         assertThat(statusOf(publicId)).isEqualTo("AWAITING_APPROVAL");
     }
 
     @Test
     void shouldNotNotifyWhenTheTransactionIsRolledBack() throws Exception {
         sendQuoteWith(createPart(1), 2);
-        awaitDelivery(NotificationType.QUOTE_SENT);
+        awaitDelivery(QUOTE_SENT);
 
         as(Role.ATTENDANT, post("/admin/serviceOrders/{id}/approve", serviceOrderId))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("part.insufficientStock"));
 
         verify(notifier, after(WAIT.toMillis()).never())
-                .send(argThat(notificationOf(NotificationType.QUOTE_APPROVED)));
+                .send(argThat(notificationOf(QUOTE_APPROVED)));
         assertThat(statusOf(publicId)).isEqualTo("AWAITING_APPROVAL");
     }
 
-    private Delivery awaitDelivery(NotificationType type) throws InterruptedException {
+    private Delivery awaitDelivery(String fragment) throws InterruptedException {
         long deadline = System.nanoTime() + WAIT.toNanos();
         while (true) {
             Delivery delivery = deliveries.poll(deadline - System.nanoTime(), TimeUnit.NANOSECONDS);
             if (delivery == null) {
-                return fail("No %s notification for service order %s".formatted(type, publicId));
+                return fail("No \"%s\" notification for service order %s".formatted(fragment, publicId));
             }
-            if (notificationOf(type).matches(delivery.notification())) {
+            if (notificationOf(fragment).matches(delivery.notification())) {
                 return delivery;
             }
         }
     }
 
-    private ArgumentMatcher<Notification> notificationOf(NotificationType type) {
+    private ArgumentMatcher<Notification> notificationOf(String fragment) {
         return notification -> notification != null
-                && notification.type() == type
-                && publicId.equals(notification.serviceOrderPublicId());
+                && customerId.equals(notification.customerId())
+                && notification.message().contains(publicId.toString())
+                && notification.message().contains(fragment);
     }
 
     private void sendQuoteWith(Long partId, int quantity) throws Exception {
@@ -229,11 +236,6 @@ class ServiceOrderNotificationIntegrationTest {
     private String statusOf(UUID serviceOrderPublicId) {
         return jdbcTemplate.queryForObject(
                 "SELECT status FROM service_order WHERE public_id = ?", String.class, serviceOrderPublicId);
-    }
-
-    private Long customerIdOf() {
-        return jdbcTemplate.queryForObject(
-                "SELECT customer_id FROM service_order WHERE id = ?", Long.class, serviceOrderId);
     }
 
     private ResultActions as(Role role, MockHttpServletRequestBuilder request) throws Exception {

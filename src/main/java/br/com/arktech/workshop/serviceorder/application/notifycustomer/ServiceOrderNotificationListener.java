@@ -1,10 +1,14 @@
-package br.com.arktech.workshop.notification.application.sendnotification;
+package br.com.arktech.workshop.serviceorder.application.notifycustomer;
 
-import br.com.arktech.workshop.notification.domain.model.NotificationType;
+import br.com.arktech.workshop.shared.application.i18n.MessageResolver;
+import br.com.arktech.workshop.shared.application.notification.Notification;
+import br.com.arktech.workshop.shared.application.notification.Notifier;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteRejectedEvent;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteSentEvent;
 import br.com.arktech.workshop.shared.event.serviceorder.ServiceOrderCompletedEvent;
+
+import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,52 +23,62 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @RequiredArgsConstructor
 class ServiceOrderNotificationListener {
 
-    private final SendNotificationUseCase sendNotificationUseCase;
+    private final MessageResolver messageResolver;
+    private final Notifier notifier;
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     void on(QuoteSentEvent event) {
-        send(new SendNotificationCommand(
-                NotificationType.QUOTE_SENT, event.publicId(), event.customerId(), event.totalPrice(), null));
+        notify(
+                event.publicId(),
+                event.customerId(),
+                "notification.serviceOrder.quoteSent",
+                event.publicId(),
+                event.totalPrice());
     }
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     void on(QuoteApprovedEvent event) {
-        send(new SendNotificationCommand(
-                NotificationType.QUOTE_APPROVED, event.publicId(), event.customerId(), event.totalPrice(), null));
+        notify(
+                event.publicId(),
+                event.customerId(),
+                "notification.serviceOrder.quoteApproved",
+                event.publicId(),
+                event.totalPrice());
     }
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     void on(QuoteRejectedEvent event) {
-        send(new SendNotificationCommand(
-                NotificationType.QUOTE_REJECTED,
+        notify(
                 event.publicId(),
                 event.customerId(),
+                "notification.serviceOrder.quoteRejected",
+                event.publicId(),
                 event.totalPrice(),
-                event.reason()));
+                event.reason());
     }
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     void on(ServiceOrderCompletedEvent event) {
-        send(new SendNotificationCommand(
-                NotificationType.SERVICE_ORDER_COMPLETED,
+        notify(
                 event.publicId(),
                 event.customerId(),
-                event.totalPrice(),
-                null));
+                "notification.serviceOrder.completed",
+                event.publicId(),
+                event.totalPrice());
     }
 
-    private void send(SendNotificationCommand command) {
+    private void notify(UUID serviceOrderPublicId, Long customerId, String messageKey, Object... messageArgs) {
         try {
-            sendNotificationUseCase.execute(command);
+            notifier.send(new Notification(customerId, messageResolver.get(messageKey, messageArgs)));
         } catch (RuntimeException ex) {
             log.error(
-                    "Notification failed [type={}, serviceOrderPublicId={}]",
-                    command.type(),
-                    command.serviceOrderPublicId(),
+                    "Notification failed [messageKey={}, serviceOrderPublicId={}]",
+                    messageKey,
+                    serviceOrderPublicId,
                     ex);
         }
     }
