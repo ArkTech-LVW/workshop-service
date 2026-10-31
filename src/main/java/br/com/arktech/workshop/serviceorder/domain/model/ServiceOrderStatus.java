@@ -1,5 +1,7 @@
 package br.com.arktech.workshop.serviceorder.domain.model;
 
+import java.util.Set;
+
 public enum ServiceOrderStatus {
     RECEIVED,
     IN_DIAGNOSIS,
@@ -36,14 +38,16 @@ public enum ServiceOrderStatus {
     }
 
     public boolean showsQuoteToCustomer() {
-        return this == AWAITING_APPROVAL
-                || this == QUOTE_APPROVED
-                || this == QUOTE_REJECTED
-                || this == IN_PROGRESS
-                || this == AWAITING_SUPPLEMENTARY_APPROVAL
-                || this == SUPPLEMENTARY_APPROVED
-                || this == SUPPLEMENTARY_REJECTED
-                || this == COMPLETED
-                || this == DELIVERED;
+        return Set.of(
+                        AWAITING_APPROVAL,
+                        QUOTE_APPROVED,
+                        QUOTE_REJECTED,
+                        IN_PROGRESS,
+                        AWAITING_SUPPLEMENTARY_APPROVAL,
+                        SUPPLEMENTARY_APPROVED,
+                        SUPPLEMENTARY_REJECTED,
+                        COMPLETED,
+                        DELIVERED)
+                .contains(this);
     }
 }
