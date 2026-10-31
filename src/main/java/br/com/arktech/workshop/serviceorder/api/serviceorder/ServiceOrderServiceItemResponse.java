@@ -17,6 +17,8 @@ record ServiceOrderServiceItemResponse(
         @Schema(description = "${openapi.serviceOrderItem.subtotal}", example = "150.00") BigDecimal subtotal,
         @Schema(description = "${openapi.serviceOrderItem.approvedAt}", example = "2026-10-28T10:15:00Z") @Nullable
                 Instant approvedAt,
+        @Schema(description = "${openapi.serviceOrderItem.startedAt}", example = "2026-10-28T14:30:00Z") @Nullable
+                Instant startedAt,
         @Schema(description = "${openapi.serviceOrderItem.completedAt}", example = "2026-10-28T16:45:00Z") @Nullable
                 Instant completedAt) {
 
@@ -28,6 +30,7 @@ record ServiceOrderServiceItemResponse(
                 result.unitPrice(),
                 result.subtotal(),
                 result.approvedAt(),
+                result.startedAt(),
                 result.completedAt());
     }
 }

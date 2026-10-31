@@ -14,6 +14,7 @@ public record ServiceItemResult(
         BigDecimal unitPrice,
         BigDecimal subtotal,
         @Nullable Instant approvedAt,
+        @Nullable Instant startedAt,
         @Nullable Instant completedAt) {
 
     static ServiceItemResult from(ServiceItem item) {
@@ -24,6 +25,7 @@ public record ServiceItemResult(
                 item.getUnitPrice().amount(),
                 item.getSubtotal().amount(),
                 item.getApprovedAt(),
+                item.getStartedAt(),
                 item.getCompletedAt());
     }
 }

@@ -154,6 +154,18 @@ interface IServiceOrderController {
             @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id);
 
     @Operation(
+            summary = "${openapi.serviceOrder.startService}",
+            description = "${openapi.serviceOrder.startServiceDescription}")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "422", ref = "BusinessRule")
+    @AllowedRoles({Role.ADMIN, Role.MECHANIC})
+    @PostMapping("/{id}/services/{itemId}/start")
+    ServiceOrderResponse startService(
+            @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id,
+            @Parameter(description = "${openapi.serviceOrderItem.itemId}", example = "1") @PathVariable Long itemId);
+
+    @Operation(
             summary = "${openapi.serviceOrder.completeService}",
             description = "${openapi.serviceOrder.completeServiceDescription}")
     @ApiResponse(responseCode = "200")

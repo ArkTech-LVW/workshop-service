@@ -72,32 +72,37 @@ class JdbcServiceOrderHistoryReader implements ServiceOrderHistoryReader {
             period AS (
                 SELECT history.service_order_id,
                        history.to_status AS status,
+                       history.date_created AS started_at,
                        LEAD(history.date_created) OVER (
                            PARTITION BY history.service_order_id
-                           ORDER BY history.date_created, history.id) - history.date_created AS duration
+                           ORDER BY history.date_created, history.id) AS ended_at
                 FROM status_change history
                 JOIN completed ON completed.service_order_id = history.service_order_id
             ),
-            execution AS (
-                SELECT service_order_id, sum(duration) AS duration
-                FROM period
-                WHERE status = 'IN_PROGRESS'
-                  AND duration IS NOT NULL
-                GROUP BY service_order_id
-            ),
-            service AS (
-                SELECT DISTINCT item.service_order_id, item.service_offering_id
+            item_execution AS (
+                SELECT item.id,
+                       item.service_order_id,
+                       item.service_offering_id,
+                       item.quantity,
+                       sum(greatest(INTERVAL '0',
+                                    least(period.ended_at, item.completed_at)
+                                        - greatest(period.started_at, item.started_at))) AS duration
                 FROM service_item item
                 JOIN completed ON completed.service_order_id = item.service_order_id
+                JOIN period ON period.service_order_id = item.service_order_id
+                WHERE period.status = 'IN_PROGRESS'
+                  AND period.ended_at IS NOT NULL
+                GROUP BY item.id, item.service_order_id, item.service_offering_id, item.quantity
             )
             SELECT offering.id AS service_offering_id,
                    offering.name,
                    offering.estimated_minutes,
-                   round(EXTRACT(EPOCH FROM avg(execution.duration)))::BIGINT AS average_seconds,
-                   count(*) AS service_order_count
-            FROM service
-            JOIN execution ON execution.service_order_id = service.service_order_id
-            JOIN service_offering offering ON offering.id = service.service_offering_id
+                   round(EXTRACT(EPOCH FROM sum(item_execution.duration))
+                         / sum(item_execution.quantity))::BIGINT AS average_seconds,
+                   count(DISTINCT item_execution.service_order_id) AS service_order_count,
+                   sum(item_execution.quantity) AS execution_count
+            FROM item_execution
+            JOIN service_offering offering ON offering.id = item_execution.service_offering_id
             GROUP BY offering.id, offering.name, offering.estimated_minutes
             ORDER BY offering.name, offering.id
             """;
@@ -135,7 +140,8 @@ class JdbcServiceOrderHistoryReader implements ServiceOrderHistoryReader {
                         resultSet.getString("name"),
                         resultSet.getInt("estimated_minutes"),
                         Duration.ofSeconds(resultSet.getLong("average_seconds")),
-                        resultSet.getLong("service_order_count")))
+                        resultSet.getLong("service_order_count"),
+                        resultSet.getLong("execution_count")))
                 .list();
     }
 
