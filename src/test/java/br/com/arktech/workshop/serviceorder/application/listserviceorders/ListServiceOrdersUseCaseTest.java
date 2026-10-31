@@ -43,13 +43,13 @@ class ListServiceOrdersUseCaseTest {
         }
 
         @Override
-        public VehicleDetails detailsOf(Long vehicleId) {
-            throw new UnsupportedOperationException();
+        public Optional<Long> findIdByLicensePlate(LicensePlate licensePlate) {
+            return Optional.ofNullable(vehicles.get(licensePlate));
         }
 
         @Override
-        public Optional<Long> findIdByLicensePlate(LicensePlate licensePlate) {
-            return Optional.ofNullable(vehicles.get(licensePlate));
+        public VehicleDetails detailsOf(Long vehicleId) {
+            throw new UnsupportedOperationException();
         }
     };
     private final ListServiceOrdersUseCase useCase =

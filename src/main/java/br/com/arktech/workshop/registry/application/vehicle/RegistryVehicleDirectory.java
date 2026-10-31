@@ -31,6 +31,11 @@ class RegistryVehicleDirectory implements VehicleDirectory {
     }
 
     @Override
+    public Optional<Long> findIdByLicensePlate(LicensePlate licensePlate) {
+        return vehicleRepository.findByLicensePlate(licensePlate).map(Vehicle::getId);
+    }
+
+    @Override
     public VehicleDetails detailsOf(Long vehicleId) {
         Vehicle vehicle = vehicleRepository.findRequiredById(vehicleId);
         return new VehicleDetails(
@@ -39,11 +44,6 @@ class RegistryVehicleDirectory implements VehicleDirectory {
                 vehicle.getModel(),
                 vehicle.getYear(),
                 vehicle.getColor());
-    }
-
-    @Override
-    public Optional<Long> findIdByLicensePlate(LicensePlate licensePlate) {
-        return vehicleRepository.findByLicensePlate(licensePlate).map(Vehicle::getId);
     }
 
     private Long register(Long customerId, VehicleDetails vehicle) {

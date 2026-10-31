@@ -8,7 +8,7 @@ public interface VehicleDirectory {
 
     Long findOrRegister(Long customerId, VehicleDetails vehicle);
 
-    VehicleDetails detailsOf(Long vehicleId);
-
     Optional<Long> findIdByLicensePlate(LicensePlate licensePlate);
+
+    VehicleDetails detailsOf(Long vehicleId);
 }

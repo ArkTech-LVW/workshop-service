@@ -52,14 +52,14 @@ class TrackServiceOrderUseCaseTest {
                 }
 
                 @Override
-                public VehicleDetails detailsOf(Long vehicleId) {
-                    assertThat(vehicleId).isEqualTo(GOL_ID);
-                    return GOL;
+                public Optional<Long> findIdByLicensePlate(LicensePlate licensePlate) {
+                    throw new UnsupportedOperationException();
                 }
 
                 @Override
-                public Optional<Long> findIdByLicensePlate(LicensePlate licensePlate) {
-                    throw new UnsupportedOperationException();
+                public VehicleDetails detailsOf(Long vehicleId) {
+                    assertThat(vehicleId).isEqualTo(GOL_ID);
+                    return GOL;
                 }
             },
             new ServiceOfferingDirectory() {
