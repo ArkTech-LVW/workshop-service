@@ -90,6 +90,14 @@ class RegistryVehicleDirectoryTest {
     }
 
     @Test
+    void shouldFindTheIdOfTheVehicleWithThePlate() {
+        Vehicle gol = vehicleRepository.save(new Vehicle(anaId, PLATE, null, "Volkswagen", "Gol", 2020, "Prata"));
+
+        assertThat(vehicleDirectory.findIdByLicensePlate(new LicensePlate("abc-1d23"))).contains(gol.getId());
+        assertThat(vehicleDirectory.findIdByLicensePlate(new LicensePlate("XYZ9Z99"))).isEmpty();
+    }
+
+    @Test
     void shouldGiveTheDetailsOfARegisteredVehicle() {
         Vehicle gol = vehicleRepository.save(new Vehicle(anaId, PLATE, null, "Volkswagen", "Gol", 2020, "Prata"));
 
