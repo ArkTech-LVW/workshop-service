@@ -58,6 +58,7 @@ class ServiceOrderTest {
     private static final Money LABOR_PRICE = new Money(new BigDecimal("150.00"));
     private static final Money PART_PRICE = new Money(new BigDecimal("35.90"));
     private static final String DESCRIPTION = "Cliente avisado por telefone";
+    private static final Instant STARTED_AT = Instant.parse("2026-10-28T14:30:00Z");
     private static final Instant COMPLETED_AT = Instant.parse("2026-10-28T16:45:00Z");
     private static final Instant APPROVED_AT = Instant.parse("2026-10-28T10:00:00Z");
     private static final Instant SUPPLEMENT_APPROVED_AT = Instant.parse("2026-10-29T09:30:00Z");
@@ -512,6 +513,7 @@ class ServiceOrderTest {
     @Test
     void shouldCompleteAServiceRecordingWhenAndWhoWithoutFinishingWhileOthersArePending() {
         ServiceOrder serviceOrder = serviceOrderInProgressWithServices(2);
+        serviceOrder.startServiceItem(1L, USER_ID, STARTED_AT);
         List<StatusChange> previousHistory = serviceOrder.getStatusHistory();
 
         serviceOrder.completeServiceItem(1L, USER_ID, COMPLETED_AT);
@@ -530,6 +532,8 @@ class ServiceOrderTest {
     @Test
     void shouldCompleteTheServiceOrderWhenTheLastServiceIsCompleted() {
         ServiceOrder serviceOrder = serviceOrderInProgressWithServices(2);
+        serviceOrder.startServiceItem(1L, USER_ID, STARTED_AT);
+        serviceOrder.startServiceItem(2L, ATTENDANT_ID, STARTED_AT);
         serviceOrder.completeServiceItem(2L, ATTENDANT_ID, COMPLETED_AT);
 
         serviceOrder.completeServiceItem(1L, USER_ID, COMPLETED_AT.plusSeconds(60));
@@ -550,6 +554,7 @@ class ServiceOrderTest {
     @Test
     void shouldRefuseToCompleteAServiceTwice() {
         ServiceOrder serviceOrder = serviceOrderInProgressWithServices(2);
+        serviceOrder.startServiceItem(1L, USER_ID, STARTED_AT);
         serviceOrder.completeServiceItem(1L, USER_ID, COMPLETED_AT);
 
         assertThatThrownBy(() -> serviceOrder.completeServiceItem(1L, ATTENDANT_ID, COMPLETED_AT.plusSeconds(60)))
@@ -559,6 +564,82 @@ class ServiceOrderTest {
             assertThat(item.getCompletedAt()).isEqualTo(COMPLETED_AT);
             assertThat(item.getCompletedByUserId()).isEqualTo(USER_ID);
         });
+    }
+
+    @Test
+    void shouldStartAServiceRecordingWhenAndWhoWithoutChangingTheStatus() {
+        ServiceOrder serviceOrder = serviceOrderInProgressWithServices(2);
+        List<StatusChange> previousHistory = serviceOrder.getStatusHistory();
+
+        serviceOrder.startServiceItem(1L, USER_ID, STARTED_AT);
+
+        assertThat(serviceOrder.getServiceItems().getFirst()).satisfies(item -> {
+            assertThat(item.isStarted()).isTrue();
+            assertThat(item.getStartedAt()).isEqualTo(STARTED_AT);
+            assertThat(item.getStartedByUserId()).isEqualTo(USER_ID);
+            assertThat(item.isCompleted()).isFalse();
+        });
+        assertThat(serviceOrder.getServiceItems().getLast().isStarted()).isFalse();
+        assertThat(serviceOrder.getStatus()).isEqualTo(IN_PROGRESS);
+        assertThat(serviceOrder.getStatusHistory()).containsExactlyElementsOf(previousHistory);
+        assertThat(serviceOrder.domainEvents()).isEmpty();
+    }
+
+    @Test
+    void shouldRefuseToStartAServiceTwice() {
+        ServiceOrder serviceOrder = serviceOrderInProgressWithServices(1);
+        serviceOrder.startServiceItem(1L, USER_ID, STARTED_AT);
+
+        assertThatThrownBy(() -> serviceOrder.startServiceItem(1L, ATTENDANT_ID, STARTED_AT.plusSeconds(60)))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("serviceOrder.serviceItemAlreadyStarted");
+        assertThat(serviceOrder.getServiceItems().getFirst()).satisfies(item -> {
+            assertThat(item.getStartedAt()).isEqualTo(STARTED_AT);
+            assertThat(item.getStartedByUserId()).isEqualTo(USER_ID);
+        });
+    }
+
+    @ParameterizedTest
+    @EnumSource(names = "IN_PROGRESS", mode = EnumSource.Mode.EXCLUDE)
+    void shouldRefuseToStartAServiceOutsideTheExecution(ServiceOrderStatus status) {
+        ServiceOrder serviceOrder = serviceOrderIn(status);
+
+        assertThatThrownBy(() -> serviceOrder.startServiceItem(1L, USER_ID, STARTED_AT))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("serviceOrder.serviceItemStartNotAllowed");
+        assertThat(serviceOrder.getStatus()).isEqualTo(status);
+    }
+
+    @Test
+    void shouldNotStartAServiceTheCustomerHasNotApproved() {
+        ServiceOrder serviceOrder = serviceOrderInProgressWithServices(1);
+        serviceOrder.addServiceItem(SERVICE_OFFERING_ID + 9, 1, LABOR_PRICE);
+        assignIds(serviceOrder.getServiceItems(), 1);
+
+        assertThatThrownBy(() -> serviceOrder.startServiceItem(2L, USER_ID, STARTED_AT))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("serviceOrder.pendingItemStartNotAllowed");
+    }
+
+    @Test
+    void shouldRefuseToCompleteAServiceThatWasNotStarted() {
+        ServiceOrder serviceOrder = serviceOrderInProgressWithServices(1);
+
+        assertThatThrownBy(() -> serviceOrder.completeServiceItem(1L, USER_ID, COMPLETED_AT))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("serviceOrder.serviceItemNotStarted");
+        assertThat(serviceOrder.getServiceItems().getFirst().isCompleted()).isFalse();
+        assertThat(serviceOrder.getStatus()).isEqualTo(IN_PROGRESS);
+    }
+
+    @Test
+    void shouldAllowRemovingAServiceStartedButNotCompleted() {
+        ServiceOrder serviceOrder = serviceOrderInProgressWithServices(2);
+        serviceOrder.startServiceItem(1L, USER_ID, STARTED_AT);
+
+        serviceOrder.removeServiceItem(1L);
+
+        assertThat(serviceOrder.getServiceItems()).hasSize(1);
     }
 
     @Test
@@ -585,6 +666,7 @@ class ServiceOrderTest {
     @Test
     void shouldRefuseToCompleteTheServiceOrderWithPendingServices() {
         ServiceOrder serviceOrder = serviceOrderInProgressWithServices(2);
+        serviceOrder.startServiceItem(1L, USER_ID, STARTED_AT);
         serviceOrder.completeServiceItem(1L, USER_ID, COMPLETED_AT);
         List<StatusChange> previousHistory = serviceOrder.getStatusHistory();
 
@@ -611,6 +693,7 @@ class ServiceOrderTest {
     @Test
     void shouldNotRemoveAServiceAlreadyCompleted() {
         ServiceOrder serviceOrder = serviceOrderInProgressWithServices(2);
+        serviceOrder.startServiceItem(1L, USER_ID, STARTED_AT);
         serviceOrder.completeServiceItem(1L, USER_ID, COMPLETED_AT);
 
         assertThatThrownBy(() -> serviceOrder.removeServiceItem(1L))
@@ -752,6 +835,7 @@ class ServiceOrderTest {
     void shouldNotFinishTheServiceOrderWithChangesWaitingForTheCustomer() {
         ServiceOrder serviceOrder = serviceOrderInProgressWithServices(1);
         serviceOrder.addPartItem(SUPPLEMENTARY_PART_ID, 1, PART_PRICE);
+        serviceOrder.startServiceItem(1L, USER_ID, STARTED_AT);
 
         serviceOrder.completeServiceItem(1L, USER_ID, COMPLETED_AT);
 

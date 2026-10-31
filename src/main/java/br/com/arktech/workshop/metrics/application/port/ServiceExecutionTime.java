@@ -7,5 +7,6 @@ public record ServiceExecutionTime(
         String name,
         int estimatedMinutes,
         Duration averageExecutionTime,
-        long serviceOrderCount) {
+        long serviceOrderCount,
+        long executionCount) {
 }

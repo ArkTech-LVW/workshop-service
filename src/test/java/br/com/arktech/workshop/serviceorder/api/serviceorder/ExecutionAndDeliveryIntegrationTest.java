@@ -103,7 +103,21 @@ class ExecutionAndDeliveryIntegrationTest {
         as(Role.MECHANIC, complete())
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("serviceOrder.pendingServiceItems"));
+        as(Role.ATTENDANT, startService(itemIds.getFirst())).andExpect(status().isForbidden());
         as(Role.ATTENDANT, completeService(itemIds.getFirst())).andExpect(status().isForbidden());
+        as(Role.MECHANIC, completeService(itemIds.getFirst()))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.code").value("serviceOrder.serviceItemNotStarted"));
+
+        as(Role.MECHANIC, startService(itemIds.getFirst()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("IN_PROGRESS"))
+                .andExpect(jsonPath("$.services[0].startedAt").isNotEmpty())
+                .andExpect(jsonPath("$.services[1].startedAt").isEmpty());
+        as(Role.MECHANIC, startService(itemIds.getFirst()))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.code").value("serviceOrder.serviceItemAlreadyStarted"));
+        as(Role.ADMIN, startService(itemIds.getLast())).andExpect(status().isOk());
 
         as(Role.MECHANIC, completeService(itemIds.getFirst()))
                 .andExpect(status().isOk())
@@ -135,6 +149,11 @@ class ExecutionAndDeliveryIntegrationTest {
                         serviceOrderId))
                 .hasSize(2)
                 .allSatisfy(completedAt -> assertThat(completedAt).isAfterOrEqualTo(executionStartedAt));
+        assertThat(jdbcTemplate.queryForList(
+                        "SELECT started_by_user_id FROM service_item WHERE service_order_id = ?",
+                        Long.class,
+                        serviceOrderId))
+                .containsOnly(userId);
 
         as(Role.MECHANIC, deliver()).andExpect(status().isForbidden());
         as(Role.ATTENDANT, deliver())
@@ -179,6 +198,17 @@ class ExecutionAndDeliveryIntegrationTest {
         as(Role.MECHANIC, completeService(itemIds.getFirst()))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("serviceOrder.serviceItemCompletionNotAllowed"));
+
+        assertThat(statusOf()).isEqualTo("QUOTE_APPROVED");
+    }
+
+    @Test
+    void shouldRefuseToStartAServiceBeforeTheExecutionStarts() throws Exception {
+        List<Long> itemIds = approveQuoteWithServices(1);
+
+        as(Role.MECHANIC, startService(itemIds.getFirst()))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.code").value("serviceOrder.serviceItemStartNotAllowed"));
 
         assertThat(statusOf()).isEqualTo("QUOTE_APPROVED");
     }
@@ -308,6 +338,10 @@ class ExecutionAndDeliveryIntegrationTest {
 
     private MockHttpServletRequestBuilder startExecution() {
         return post("/admin/serviceOrders/{id}/startExecution", serviceOrderId);
+    }
+
+    private MockHttpServletRequestBuilder startService(Long itemId) {
+        return post("/admin/serviceOrders/{id}/services/{itemId}/start", serviceOrderId, itemId);
     }
 
     private MockHttpServletRequestBuilder completeService(Long itemId) {

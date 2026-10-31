@@ -28,6 +28,8 @@ import br.com.arktech.workshop.serviceorder.application.startdiagnosis.StartDiag
 import br.com.arktech.workshop.serviceorder.application.startdiagnosis.StartDiagnosisUseCase;
 import br.com.arktech.workshop.serviceorder.application.startexecution.StartExecutionCommand;
 import br.com.arktech.workshop.serviceorder.application.startexecution.StartExecutionUseCase;
+import br.com.arktech.workshop.serviceorder.application.startserviceitem.StartServiceItemCommand;
+import br.com.arktech.workshop.serviceorder.application.startserviceitem.StartServiceItemUseCase;
 import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderStatus;
 import br.com.arktech.workshop.shared.api.pagination.PageResponse;
 import br.com.arktech.workshop.shared.application.registry.VehicleDetails;
@@ -53,6 +55,7 @@ class ServiceOrderController implements IServiceOrderController {
     private final RejectQuoteUseCase rejectQuoteUseCase;
     private final ReopenQuoteUseCase reopenQuoteUseCase;
     private final StartExecutionUseCase startExecutionUseCase;
+    private final StartServiceItemUseCase startServiceItemUseCase;
     private final CompleteServiceItemUseCase completeServiceItemUseCase;
     private final CompleteServiceOrderUseCase completeServiceOrderUseCase;
     private final DeliverServiceOrderUseCase deliverServiceOrderUseCase;
@@ -123,6 +126,11 @@ class ServiceOrderController implements IServiceOrderController {
     @Override
     public ServiceOrderResponse startExecution(Long id) {
         return ServiceOrderResponse.from(startExecutionUseCase.execute(new StartExecutionCommand(id)));
+    }
+
+    @Override
+    public ServiceOrderResponse startService(Long id, Long itemId) {
+        return ServiceOrderResponse.from(startServiceItemUseCase.execute(new StartServiceItemCommand(id, itemId)));
     }
 
     @Override

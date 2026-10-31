@@ -9,6 +9,7 @@ record ServiceExecutionTimeResponse(
         @Schema(description = "${openapi.metrics.serviceName}", example = "Troca de óleo") String name,
         @Schema(description = "${openapi.metrics.estimatedMinutes}", example = "60") int estimatedMinutes,
         @Schema(description = "${openapi.metrics.serviceOrderCountByService}", example = "12") long serviceOrderCount,
+        @Schema(description = "${openapi.metrics.executionCount}", example = "15") long executionCount,
         @Schema(description = "${openapi.metrics.averageExecutionTimeByService}")
                 DurationResponse averageExecutionTime) {
 
@@ -18,6 +19,7 @@ record ServiceExecutionTimeResponse(
                 service.name(),
                 service.estimatedMinutes(),
                 service.serviceOrderCount(),
+                service.executionCount(),
                 DurationResponse.from(service.averageExecutionTime()));
     }
 }

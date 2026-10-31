@@ -45,6 +45,8 @@ class CompleteServiceItemUseCaseTest {
         serviceOrder.clearDomainEvents();
         firstItemId = serviceOrder.getServiceItems().getFirst().getId();
         secondItemId = serviceOrder.getServiceItems().getLast().getId();
+        serviceOrder.startServiceItem(firstItemId, MECHANIC_ID, NOW.minusSeconds(3600));
+        serviceOrder.startServiceItem(secondItemId, MECHANIC_ID, NOW.minusSeconds(3600));
     }
 
     @Test

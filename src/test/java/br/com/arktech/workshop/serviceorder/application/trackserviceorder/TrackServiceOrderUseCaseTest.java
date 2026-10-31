@@ -158,6 +158,8 @@ class TrackServiceOrderUseCaseTest {
         serviceOrder.approveQuote(null, null, Instant.parse("2026-10-28T10:00:00Z"));
         serviceOrder.startExecution(MECHANIC_ID, null);
         serviceOrder.addPartItem(OIL_ID, 4, new Money(new BigDecimal("38.00")));
+        serviceOrder.startServiceItem(
+                serviceOrder.getServiceItems().getFirst().getId(), MECHANIC_ID, Instant.parse("2026-10-28T11:00:00Z"));
         serviceOrder.completeServiceItem(
                 serviceOrder.getServiceItems().getFirst().getId(), MECHANIC_ID, Instant.parse("2026-10-28T12:00:00Z"));
         serviceOrder.sendQuote(ATTENDANT_ID, true, null);
