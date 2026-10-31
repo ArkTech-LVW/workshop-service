@@ -126,7 +126,9 @@ class PartManagementIntegrationTest {
                 .andExpect(jsonPath("$.name").value("Filtro de ar"))
                 .andExpect(jsonPath("$.salePrice").value(58.50))
                 .andExpect(jsonPath("$.minimumStock").value(3))
-                .andExpect(jsonPath("$.stockQuantity").value(7));
+                .andExpect(jsonPath("$.stockQuantity").value(7))
+                .andExpect(jsonPath("$.reservedQuantity").value(0))
+                .andExpect(jsonPath("$.availableQuantity").value(7));
         asAdmin(get("/admin/parts/{id}", id)).andExpect(jsonPath("$.stockQuantity").value(7));
     }
 

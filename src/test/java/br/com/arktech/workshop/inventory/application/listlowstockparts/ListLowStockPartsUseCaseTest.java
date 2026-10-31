@@ -32,7 +32,18 @@ class ListLowStockPartsUseCaseTest {
         assertThat(page.content()).extracting(PartResult::name).containsExactly("Filtro", "Vela");
     }
 
-    private void savePart(String name, int stockQuantity, int minimumStock) {
+    @Test
+    void shouldCompareTheAvailableStockWithTheMinimum() {
+        savePart("Correia", 5, 2).reserve(3);
+        savePart("Bateria", 5, 2).reserve(2);
+
+        Page<PartResult> page = listLowStockPartsUseCase.execute(new ListLowStockPartsQuery(0, 20));
+
+        assertThat(page.content()).extracting(PartResult::name).containsExactly("Correia");
+        assertThat(page.content().getFirst().availableQuantity()).isEqualTo(2);
+    }
+
+    private Part savePart(String name, int stockQuantity, int minimumStock) {
         Part part = partRepository.save(new Part(
                 new Sku(name.toUpperCase().replace("Ó", "O")),
                 name,
@@ -41,5 +52,6 @@ class ListLowStockPartsUseCaseTest {
                 new Money(BigDecimal.TEN),
                 minimumStock));
         part.increaseStock(stockQuantity);
+        return part;
     }
 }

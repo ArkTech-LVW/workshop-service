@@ -14,9 +14,7 @@ record PartItemResponse(
         @Schema(description = "${openapi.serviceOrderItem.subtotal}", example = "107.70") BigDecimal subtotal,
         @Schema(description = "${openapi.serviceOrderItem.serviceOrderTotalPrice}", example = "257.70")
                 BigDecimal serviceOrderTotalPrice,
-        @Schema(description = "${openapi.serviceOrderItem.availableQuantity}", example = "2") int availableQuantity,
-        @Schema(description = "${openapi.serviceOrderItem.insufficientStock}", example = "true")
-                boolean insufficientStock) {
+        @Schema(description = "${openapi.serviceOrderItem.availableQuantity}", example = "5") int availableQuantity) {
 
     static PartItemResponse from(AddPartItemResult result) {
         return new PartItemResponse(
@@ -26,7 +24,6 @@ record PartItemResponse(
                 result.unitPrice(),
                 result.subtotal(),
                 result.serviceOrderTotalPrice(),
-                result.availableQuantity(),
-                result.insufficientStock());
+                result.availableQuantity());
     }
 }

@@ -142,8 +142,10 @@ class ServiceOrderNotificationIntegrationTest {
 
     @Test
     void shouldNotNotifyWhenTheTransactionIsRolledBack() throws Exception {
-        sendQuoteWith(createPart(1), 2);
+        Long partId = createPart(2);
+        sendQuoteWith(partId, 2);
         awaitDelivery(QUOTE_SENT);
+        jdbcTemplate.update("UPDATE part SET stock_quantity = 1 WHERE id = ?", partId);
 
         as(Role.ATTENDANT, post("/admin/serviceOrders/{id}/approve", serviceOrderId))
                 .andExpect(status().isUnprocessableContent())

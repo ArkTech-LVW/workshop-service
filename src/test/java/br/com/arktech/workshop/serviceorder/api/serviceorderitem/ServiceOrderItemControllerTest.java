@@ -80,7 +80,7 @@ class ServiceOrderItemControllerTest {
     }
 
     @Test
-    void shouldAddPartWarningAboutTheStock() throws Exception {
+    void shouldAddPartShowingTheAvailableStock() throws Exception {
         when(addPartItemUseCase.execute(any()))
                 .thenReturn(new AddPartItemResult(
                         9L,
@@ -89,8 +89,7 @@ class ServiceOrderItemControllerTest {
                         new BigDecimal("35.90"),
                         new BigDecimal("107.70"),
                         new BigDecimal("257.70"),
-                        2,
-                        true));
+                        5));
 
         mockMvc.perform(post1("/parts", """
                         {"partId": 4, "quantity": 3}
@@ -98,7 +97,7 @@ class ServiceOrderItemControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(json("""
                         {"id": 9, "partId": 4, "quantity": 3, "unitPrice": 35.90, "subtotal": 107.70,
-                         "serviceOrderTotalPrice": 257.70, "availableQuantity": 2, "insufficientStock": true}
+                         "serviceOrderTotalPrice": 257.70, "availableQuantity": 5}
                         """));
         verify(addPartItemUseCase).execute(new AddPartItemCommand(1L, 4L, 3));
     }

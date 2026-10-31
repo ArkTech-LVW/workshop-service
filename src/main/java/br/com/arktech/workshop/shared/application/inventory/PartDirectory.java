@@ -8,4 +8,6 @@ public interface PartDirectory {
     PartDetails detailsOf(Long partId);
 
     Map<Long, String> namesOf(Collection<Long> partIds);
+
+    void requireAvailableFor(Long serviceOrderId, Long partId, int quantity);
 }

@@ -96,6 +96,7 @@ As métricas saem do histórico de status de cada OS. A consulta e o índice est
 - [ADR 006: Orçamento complementar durante a execução](docs/adr/006-supplementary-quote.md)
 - [ADR 007: Versionamento de migrations por timestamp e execução fora de ordem](docs/adr/007-timestamp-migrations.md)
 - [ADR 008: Consultas de métricas sobre tabelas de outros módulos](docs/adr/008-metrics-queries.md)
+- [ADR 009: Reserva de estoque no orçamento](docs/adr/009-stock-reservation.md)
 
 ## Contribuindo
 

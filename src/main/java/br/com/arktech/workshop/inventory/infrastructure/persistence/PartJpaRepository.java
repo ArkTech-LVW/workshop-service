@@ -43,7 +43,9 @@ interface PartJpaRepository extends JpaRepository<Part, Long>, JpaSpecificationE
     @Override
     default Page<Part> findLowStockPage(Pagination pagination) {
         Specification<Part> lowStock = (root, query, builder) ->
-                builder.lessThanOrEqualTo(root.get("stockQuantity"), root.<Integer>get("minimumStock"));
+                builder.lessThanOrEqualTo(
+                        builder.diff(root.<Integer>get("stockQuantity"), root.<Integer>get("reservedQuantity")),
+                        root.<Integer>get("minimumStock"));
         var page = findAll(lowStock, PageRequest.of(pagination.page(), pagination.size(), PAGE_ORDER));
         return new Page<>(page.getContent(), pagination, page.getTotalElements());
     }

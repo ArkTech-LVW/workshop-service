@@ -16,6 +16,8 @@ record PartResponse(
         @Schema(description = "${openapi.part.unit}", example = "LITER") MeasurementUnit unit,
         @Schema(description = "${openapi.part.salePrice}", example = "45.90") BigDecimal salePrice,
         @Schema(description = "${openapi.part.stockQuantity}", example = "0") int stockQuantity,
+        @Schema(description = "${openapi.part.reservedQuantity}", example = "0") int reservedQuantity,
+        @Schema(description = "${openapi.part.availableQuantity}", example = "0") int availableQuantity,
         @Schema(description = "${openapi.part.minimumStock}", example = "10") int minimumStock) {
 
     static PartResponse from(PartResult result) {
@@ -27,6 +29,8 @@ record PartResponse(
                 result.unit(),
                 result.salePrice(),
                 result.stockQuantity(),
+                result.reservedQuantity(),
+                result.availableQuantity(),
                 result.minimumStock());
     }
 }
