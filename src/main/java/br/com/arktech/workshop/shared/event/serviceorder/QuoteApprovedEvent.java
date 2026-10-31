@@ -17,7 +17,4 @@ public record QuoteApprovedEvent(
     public QuoteApprovedEvent {
         parts = List.copyOf(parts);
     }
-
-    public record PartQuantity(Long partId, int quantity) {
-    }
 }

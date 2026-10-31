@@ -11,6 +11,7 @@ import br.com.arktech.workshop.serviceorder.domain.repository.InMemoryServiceOrd
 import br.com.arktech.workshop.shared.application.security.CurrentUser;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.money.Money;
+import br.com.arktech.workshop.shared.event.serviceorder.PartQuantity;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
 
 import java.math.BigDecimal;
@@ -73,8 +74,8 @@ class ApproveQuoteUseCaseTest {
                         10L,
                         new BigDecimal("337.70"),
                         List.of(
-                                new QuoteApprovedEvent.PartQuantity(40L, 3),
-                                new QuoteApprovedEvent.PartQuantity(41L, 1)),
+                                new PartQuantity(40L, 3),
+                                new PartQuantity(41L, 1)),
                         ATTENDANT_ID));
     }
 

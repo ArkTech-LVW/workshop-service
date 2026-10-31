@@ -4,6 +4,7 @@ import br.com.arktech.workshop.shared.domain.BaseEntity;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.money.Money;
+import br.com.arktech.workshop.shared.event.serviceorder.PartQuantity;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteRejectedEvent;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteSentEvent;
@@ -298,7 +299,7 @@ public class ServiceOrder extends BaseEntity {
                 customerId,
                 totalPrice.amount(),
                 partItems.stream()
-                        .map(item -> new QuoteApprovedEvent.PartQuantity(item.getPartId(), item.getQuantity()))
+                        .map(item -> new PartQuantity(item.getPartId(), item.getQuantity()))
                         .toList(),
                 changedByUserId));
     }
