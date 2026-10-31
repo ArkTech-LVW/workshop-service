@@ -304,7 +304,8 @@ A imagem do banco tem versão fixa (`postgres:18.6-alpine`) e aparece em dois lu
 ### Migrations
 
 - O esquema vem **só das migrations** (`ddl-auto=validate`): toda tabela, coluna ou índice novo entra por uma migration em `src/main/resources/db/migration`.
-- Nome no padrão `V<n>__<description>.sql`, com a descrição em inglês e snake_case (ex.: `V2__create_customer.sql`). Use o próximo número livre na `main`; se outro PR mergear a mesma versão antes do seu, renumere a sua.
+- Nome no padrão `V<yyyyMMddHHmmss>__<description>.sql`, com o horário em UTC e a descrição em inglês e snake_case (ex.: `V20261025193504__create_customer.sql`). Gere a versão com `date -u +%Y%m%d%H%M%S`. Os motivos estão no [ADR 007](docs/adr/007-timestamp-migrations.md).
+- O Flyway roda com `out-of-order`: uma migration de versão menor que chega à `main` depois de outra maior também é aplicada. Por isso, **uma migration não pode depender de outra que vem de um branch paralelo e ainda não está na `main`**, porque a ordem de execução pode variar entre ambientes.
 - **Nunca altere uma migration que já está na `main`.** Para corrigir, crie uma nova.
 - Tabelas no singular e colunas em inglês e snake_case (`service_order`, `created_at`).
 - Chave primária: `id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY` (mapeada na `BaseEntity`).

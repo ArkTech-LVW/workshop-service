@@ -85,6 +85,7 @@ Para chamar rotas protegidas pela própria UI, faça o login em `POST /auth/logi
 - [ADR 004: Eventos de domínio](docs/adr/004-domain-events.md)
 - [ADR 005: Acesso do cliente à ordem de serviço](docs/adr/005-customer-access.md)
 - [ADR 006: Orçamento complementar durante a execução](docs/adr/006-supplementary-quote.md)
+- [ADR 007: Versionamento de migrations por timestamp e execução fora de ordem](docs/adr/007-timestamp-migrations.md)
 
 ## Contribuindo
 
