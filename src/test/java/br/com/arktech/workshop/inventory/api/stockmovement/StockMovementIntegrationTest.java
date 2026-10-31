@@ -190,6 +190,32 @@ class StockMovementIntegrationTest {
         assertThat(withdrawals).isOne();
     }
 
+    @Test
+    void shouldMoveOnlyTheDifferenceFromWhatTheServiceOrderAlreadyTook() throws Exception {
+        Integer partId = createPart(0);
+        movement(partId, "IN", 5, null).andExpect(status().isCreated());
+        Long serviceOrderId = openServiceOrder();
+
+        reconcile(serviceOrderId, partId, 3, adminId);
+        reconcile(serviceOrderId, partId, 1, null);
+        reconcile(serviceOrderId, partId, 1, null);
+
+        asAdmin(get("/admin/parts/{id}", partId)).andExpect(jsonPath("$.stockQuantity").value(4));
+        asAdmin(get("/admin/parts/{id}/stockMovements", partId))
+                .andExpect(jsonPath("$.totalElements").value(3))
+                .andExpect(jsonPath("$.content[0].type").value("IN"))
+                .andExpect(jsonPath("$.content[0].quantity").value(2))
+                .andExpect(jsonPath("$.content[0].serviceOrderId").value(serviceOrderId))
+                .andExpect(jsonPath("$.content[0].createdByUserId").doesNotExist())
+                .andExpect(jsonPath("$.content[1].type").value("OUT"))
+                .andExpect(jsonPath("$.content[1].quantity").value(3));
+    }
+
+    private void reconcile(Long serviceOrderId, Integer partId, int quantity, Long userId) {
+        reconcileServiceOrderStockUseCase.execute(new ReconcileServiceOrderStockCommand(
+                serviceOrderId, List.of(new ReconcileServiceOrderStockCommand.Item(partId.longValue(), quantity)), userId));
+    }
+
     private Callable<Void> withdrawal(ReconcileServiceOrderStockCommand command, CountDownLatch start) {
         return () -> {
             start.await();
