@@ -11,6 +11,7 @@ import br.com.arktech.workshop.serviceorder.domain.repository.InMemoryServiceOrd
 import br.com.arktech.workshop.shared.application.registry.CustomerDirectory;
 import br.com.arktech.workshop.shared.application.security.CurrentUser;
 import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
+import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.money.Money;
 import br.com.arktech.workshop.shared.event.serviceorder.PartQuantity;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.junit.jupiter.api.Test;
 
@@ -83,6 +85,42 @@ class ApproveQuoteAsCustomerUseCaseTest {
                 .hasMessage("serviceOrder.notFound");
         assertThat(serviceOrder.getStatus()).isEqualTo(ServiceOrderStatus.AWAITING_APPROVAL);
         assertThat(publishedEvents).isEmpty();
+    }
+
+    @Test
+    void shouldTellTheCustomerThatThePartsAreNoLongerAvailableWithoutTheStockDetails() {
+        ApproveQuoteAsCustomerUseCase withoutStock = useCasePublishingTo(event -> {
+            throw new BusinessRuleException("part.insufficientStock", "PAST-01", 1, 3);
+        });
+        sendQuoteWithParts();
+
+        assertThatThrownBy(() -> withoutStock.execute(
+                        new ApproveQuoteAsCustomerCommand(serviceOrder.getPublicId(), ANA_DOCUMENT)))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("serviceOrder.partsUnavailable")
+                .extracting(error -> ((BusinessRuleException) error).getArgs())
+                .isEqualTo(new Object[0]);
+    }
+
+    @Test
+    void shouldKeepTheOtherBusinessRuleErrors() {
+        ApproveQuoteAsCustomerUseCase failing = useCasePublishingTo(event -> {
+            throw new BusinessRuleException("part.minimumStockNegative");
+        });
+        sendQuoteWithParts();
+
+        assertThatThrownBy(() -> failing.execute(
+                        new ApproveQuoteAsCustomerCommand(serviceOrder.getPublicId(), ANA_DOCUMENT)))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("part.minimumStockNegative");
+    }
+
+    private ApproveQuoteAsCustomerUseCase useCasePublishingTo(Consumer<Object> eventPublisher) {
+        InMemoryServiceOrderRepository repository = new InMemoryServiceOrderRepository(eventPublisher);
+        repository.save(serviceOrder);
+        return new ApproveQuoteAsCustomerUseCase(
+                new CustomerServiceOrderFinder(repository, customerDirectory),
+                new ApproveQuoteUseCase(repository, NO_USER, Clock.systemUTC()));
     }
 
     private void sendQuoteWithParts() {
