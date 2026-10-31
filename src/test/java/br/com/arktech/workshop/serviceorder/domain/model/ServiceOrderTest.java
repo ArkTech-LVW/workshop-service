@@ -16,6 +16,7 @@ import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.money.Money;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
+import br.com.arktech.workshop.shared.event.serviceorder.ServiceOrderCanceledEvent;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -689,7 +690,8 @@ class ServiceOrderTest {
                 Set.of(RECEIVED, IN_DIAGNOSIS, AWAITING_APPROVAL, QUOTE_REJECTED),
                 CANCELED,
                 serviceOrder -> serviceOrder.cancel(USER_ID, DESCRIPTION),
-                null);
+                serviceOrder ->
+                        new ServiceOrderCanceledEvent(serviceOrder.getId(), serviceOrder.getPublicId(), USER_ID));
 
         private final Set<ServiceOrderStatus> from;
         private final ServiceOrderStatus to;

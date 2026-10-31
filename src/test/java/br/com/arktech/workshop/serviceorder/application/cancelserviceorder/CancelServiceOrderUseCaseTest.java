@@ -10,6 +10,10 @@ import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderStatus;
 import br.com.arktech.workshop.serviceorder.domain.model.StatusChange;
 import br.com.arktech.workshop.serviceorder.domain.repository.InMemoryServiceOrderRepository;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
+import br.com.arktech.workshop.shared.event.serviceorder.ServiceOrderCanceledEvent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +23,9 @@ class CancelServiceOrderUseCaseTest {
     private static final Long ATTENDANT_ID = 7L;
     private static final String REASON = "Cliente desistiu do serviço";
 
-    private final InMemoryServiceOrderRepository serviceOrderRepository = new InMemoryServiceOrderRepository();
+    private final List<Object> publishedEvents = new ArrayList<>();
+    private final InMemoryServiceOrderRepository serviceOrderRepository =
+            new InMemoryServiceOrderRepository(publishedEvents::add);
     private final CancelServiceOrderUseCase useCase =
             new CancelServiceOrderUseCase(serviceOrderRepository, () -> ATTENDANT_ID);
 
@@ -44,6 +50,9 @@ class CancelServiceOrderUseCaseTest {
                     assertThat(change.getChangedByUserId()).isEqualTo(ATTENDANT_ID);
                     assertThat(change.getDescription()).isEqualTo(REASON);
                 });
+        assertThat(publishedEvents)
+                .containsExactly(
+                        new ServiceOrderCanceledEvent(serviceOrder.getId(), serviceOrder.getPublicId(), ATTENDANT_ID));
     }
 
     @Test

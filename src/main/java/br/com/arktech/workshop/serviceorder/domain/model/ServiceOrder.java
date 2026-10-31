@@ -5,6 +5,7 @@ import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.money.Money;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
+import br.com.arktech.workshop.shared.event.serviceorder.ServiceOrderCanceledEvent;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -222,6 +223,7 @@ public class ServiceOrder extends BaseEntity {
         }
         requireText(reason, "serviceOrder.reasonRequired");
         moveTo(ServiceOrderStatus.CANCELED, changedByUserId, reason);
+        events.add(new ServiceOrderCanceledEvent(getId(), publicId, changedByUserId));
     }
 
     private void requireStatus(ServiceOrderStatus expected, ServiceOrderStatus next) {

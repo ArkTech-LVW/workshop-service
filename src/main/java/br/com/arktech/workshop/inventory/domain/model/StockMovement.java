@@ -73,6 +73,12 @@ public class StockMovement extends BaseEntity {
         return new StockMovement(part, StockMovementType.OUT, quantity, null, serviceOrderId, userId);
     }
 
+    public static StockMovement serviceOrderReturn(
+            Part part, int quantity, Long serviceOrderId, @Nullable Long userId) {
+        part.increaseStock(quantity);
+        return new StockMovement(part, StockMovementType.IN, quantity, null, serviceOrderId, userId);
+    }
+
     private static @Nullable String normalize(@Nullable String reason) {
         return reason == null || reason.isBlank() ? null : reason.strip();
     }
