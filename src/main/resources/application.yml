@@ -63,6 +63,7 @@ security:
 inventory:
   stock-reservation:
     validity: P7D
+    release-interval: PT15M
 
 springdoc:
   api-docs:

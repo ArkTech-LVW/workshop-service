@@ -3,6 +3,7 @@ package br.com.arktech.workshop.inventory.infrastructure.persistence;
 import br.com.arktech.workshop.inventory.domain.model.StockReservation;
 import br.com.arktech.workshop.inventory.domain.repository.StockReservationRepository;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +15,8 @@ interface StockReservationJpaRepository extends JpaRepository<StockReservation, 
     @Override
     @Query("SELECT r.part.id FROM StockReservation r WHERE r.serviceOrderId = :serviceOrderId")
     List<Long> findPartIdsByServiceOrderId(@Param("serviceOrderId") Long serviceOrderId);
+
+    @Override
+    @Query("SELECT DISTINCT r.part.id FROM StockReservation r WHERE r.expiresAt < :instant ORDER BY r.part.id")
+    List<Long> findPartIdsWithReservationsExpiredBefore(@Param("instant") Instant instant);
 }
