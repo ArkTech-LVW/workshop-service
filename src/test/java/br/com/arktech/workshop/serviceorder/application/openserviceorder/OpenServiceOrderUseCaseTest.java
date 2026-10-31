@@ -14,6 +14,7 @@ import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
+import br.com.arktech.workshop.shared.domain.vehicle.LicensePlate;
 
 import java.math.BigDecimal;
 import java.time.Year;
@@ -122,6 +123,11 @@ class OpenServiceOrderUseCaseTest {
 
             @Override
             public VehicleDetails detailsOf(Long vehicleId) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public Optional<Long> findIdByLicensePlate(LicensePlate licensePlate) {
                 throw new UnsupportedOperationException();
             }
         };

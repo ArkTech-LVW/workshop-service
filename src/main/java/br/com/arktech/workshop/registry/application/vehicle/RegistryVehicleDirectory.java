@@ -9,6 +9,8 @@ import br.com.arktech.workshop.shared.application.registry.VehicleDirectory;
 import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.vehicle.LicensePlate;
 
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
@@ -37,6 +39,11 @@ class RegistryVehicleDirectory implements VehicleDirectory {
                 vehicle.getModel(),
                 vehicle.getYear(),
                 vehicle.getColor());
+    }
+
+    @Override
+    public Optional<Long> findIdByLicensePlate(LicensePlate licensePlate) {
+        return vehicleRepository.findByLicensePlate(licensePlate).map(Vehicle::getId);
     }
 
     private Long register(Long customerId, VehicleDetails vehicle) {

@@ -16,6 +16,7 @@ import br.com.arktech.workshop.shared.application.registry.VehicleDirectory;
 import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.money.Money;
+import br.com.arktech.workshop.shared.domain.vehicle.LicensePlate;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -53,6 +54,11 @@ class TrackServiceOrderUseCaseTest {
                 public VehicleDetails detailsOf(Long vehicleId) {
                     assertThat(vehicleId).isEqualTo(GOL_ID);
                     return GOL;
+                }
+
+                @Override
+                public Optional<Long> findIdByLicensePlate(LicensePlate licensePlate) {
+                    throw new UnsupportedOperationException();
                 }
             },
             new ServiceOfferingDirectory() {
