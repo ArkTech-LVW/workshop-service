@@ -31,6 +31,9 @@ Usuário e senha do banco vêm das variáveis `DB_USERNAME` e `DB_PASSWORD`, lid
 # Compila, roda todos os testes e gera o relatório de cobertura (build/reports/jacoco/test/html)
 ./gradlew build
 
+# Roda só os testes de integração (aceita --tests para filtrar uma classe)
+./gradlew integrationTest
+
 # Sobe só o PostgreSQL do docker-compose.yml e roda a aplicação localmente em http://localhost:8080
 ./gradlew bootRun
 
