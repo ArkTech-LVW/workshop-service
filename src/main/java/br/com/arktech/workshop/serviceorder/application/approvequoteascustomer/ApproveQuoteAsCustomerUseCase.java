@@ -5,6 +5,7 @@ import br.com.arktech.workshop.serviceorder.application.approvequote.ApproveQuot
 import br.com.arktech.workshop.serviceorder.application.customerserviceorder.CustomerServiceOrderFinder;
 import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrder;
 import br.com.arktech.workshop.shared.application.VoidUseCase;
+import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -15,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ApproveQuoteAsCustomerUseCase implements VoidUseCase<ApproveQuoteAsCustomerCommand> {
 
+    private static final String INSUFFICIENT_STOCK = "part.insufficientStock";
+
     private final CustomerServiceOrderFinder customerServiceOrderFinder;
     private final ApproveQuoteUseCase approveQuoteUseCase;
 
@@ -23,6 +26,13 @@ public class ApproveQuoteAsCustomerUseCase implements VoidUseCase<ApproveQuoteAs
     public void execute(ApproveQuoteAsCustomerCommand command) {
         ServiceOrder serviceOrder =
                 customerServiceOrderFinder.findRequired(command.publicId(), command.customerDocument());
-        approveQuoteUseCase.execute(new ApproveQuoteCommand(serviceOrder.getId()));
+        try {
+            approveQuoteUseCase.execute(new ApproveQuoteCommand(serviceOrder.getId()));
+        } catch (BusinessRuleException ex) {
+            if (INSUFFICIENT_STOCK.equals(ex.getCode())) {
+                throw new BusinessRuleException("serviceOrder.partsUnavailable");
+            }
+            throw ex;
+        }
     }
 }

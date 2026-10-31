@@ -2,6 +2,7 @@ package br.com.arktech.workshop.inventory.domain.repository;
 
 import br.com.arktech.workshop.inventory.domain.model.StockReservation;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,4 +15,8 @@ public interface StockReservationRepository {
     Optional<StockReservation> findByServiceOrderIdAndPartId(Long serviceOrderId, Long partId);
 
     List<Long> findPartIdsByServiceOrderId(Long serviceOrderId);
+
+    List<Long> findPartIdsWithReservationsExpiredBefore(Instant instant, int limit);
+
+    List<StockReservation> findByPartIdAndExpiresAtBefore(Long partId, Instant instant);
 }

@@ -2,6 +2,7 @@ package br.com.arktech.workshop.inventory.domain.repository;
 
 import br.com.arktech.workshop.inventory.domain.model.StockReservation;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +42,25 @@ public class InMemoryStockReservationRepository implements StockReservationRepos
         return reservations.stream()
                 .filter(reservation -> reservation.getServiceOrderId().equals(serviceOrderId))
                 .map(reservation -> reservation.getPart().getId())
+                .toList();
+    }
+
+    @Override
+    public List<Long> findPartIdsWithReservationsExpiredBefore(Instant instant, int limit) {
+        return reservations.stream()
+                .filter(reservation -> reservation.getExpiresAt().isBefore(instant))
+                .map(reservation -> reservation.getPart().getId())
+                .distinct()
+                .sorted()
+                .limit(limit)
+                .toList();
+    }
+
+    @Override
+    public List<StockReservation> findByPartIdAndExpiresAtBefore(Long partId, Instant instant) {
+        return reservations.stream()
+                .filter(reservation -> reservation.getPart().getId().equals(partId))
+                .filter(reservation -> reservation.getExpiresAt().isBefore(instant))
                 .toList();
     }
 
