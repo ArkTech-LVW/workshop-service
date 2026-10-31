@@ -8,6 +8,7 @@ import br.com.arktech.workshop.shared.event.serviceorder.PartQuantity;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteRejectedEvent;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteSentEvent;
+import br.com.arktech.workshop.shared.event.serviceorder.QuoteWithdrawnEvent;
 import br.com.arktech.workshop.shared.event.serviceorder.ServiceOrderCanceledEvent;
 import br.com.arktech.workshop.shared.event.serviceorder.ServiceOrderCompletedEvent;
 
@@ -221,8 +222,18 @@ public class ServiceOrder extends BaseEntity {
     }
 
     public void reopenQuote(Long changedByUserId, @Nullable String description) {
-        requireStatus(ServiceOrderStatus.QUOTE_REJECTED, ServiceOrderStatus.IN_DIAGNOSIS);
-        moveTo(ServiceOrderStatus.IN_DIAGNOSIS, changedByUserId, description);
+        if (status == ServiceOrderStatus.QUOTE_REJECTED) {
+            moveTo(ServiceOrderStatus.IN_DIAGNOSIS, changedByUserId, description);
+            return;
+        }
+        ServiceOrderStatus next = switch (status) {
+            case AWAITING_APPROVAL -> ServiceOrderStatus.IN_DIAGNOSIS;
+            case AWAITING_SUPPLEMENTARY_APPROVAL -> ServiceOrderStatus.IN_PROGRESS;
+            default -> throw new InvalidStatusTransitionException(status, ServiceOrderStatus.IN_DIAGNOSIS);
+        };
+        canProceedWithoutChanges = null;
+        moveTo(next, changedByUserId, description);
+        events.add(new QuoteWithdrawnEvent(getId()));
     }
 
     public void startExecution(Long changedByUserId, @Nullable String description) {
