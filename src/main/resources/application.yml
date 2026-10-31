@@ -21,6 +21,16 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: validate
+  task:
+    execution:
+      thread-name-prefix: async-
+      pool:
+        core-size: 2
+        max-size: 8
+        queue-capacity: 500
+      shutdown:
+        await-termination: true
+        await-termination-period: PT10S
 
 server:
   port: 8080

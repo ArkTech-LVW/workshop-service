@@ -20,7 +20,10 @@ import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.money.Money;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
+import br.com.arktech.workshop.shared.event.serviceorder.QuoteRejectedEvent;
+import br.com.arktech.workshop.shared.event.serviceorder.QuoteSentEvent;
 import br.com.arktech.workshop.shared.event.serviceorder.ServiceOrderCanceledEvent;
+import br.com.arktech.workshop.shared.event.serviceorder.ServiceOrderCompletedEvent;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -186,6 +189,8 @@ class ServiceOrderTest {
                 .containsExactly(new QuoteApprovedEvent(
                         99L,
                         serviceOrder.getPublicId(),
+                        CUSTOMER_ID,
+                        new BigDecimal("143.60"),
                         List.of(
                                 new QuoteApprovedEvent.PartQuantity(PART_ID, 3),
                                 new QuoteApprovedEvent.PartQuantity(PART_ID + 1, 1)),
@@ -537,6 +542,9 @@ class ServiceOrderTest {
             assertThat(change.getChangedByUserId()).isEqualTo(USER_ID);
             assertThat(change.getDescription()).isNull();
         });
+        assertThat(serviceOrder.domainEvents())
+                .containsExactly(new ServiceOrderCompletedEvent(
+                        serviceOrder.getId(), serviceOrder.getPublicId(), CUSTOMER_ID, new BigDecimal("300.00")));
     }
 
     @Test
@@ -712,6 +720,7 @@ class ServiceOrderTest {
         ServiceOrder serviceOrder = serviceOrderIn(IN_PROGRESS);
         serviceOrder.addPartItem(SUPPLEMENTARY_PART_ID, 1, PART_PRICE);
         serviceOrder.sendQuote(USER_ID, false, null);
+        serviceOrder.clearDomainEvents();
 
         assertThatThrownBy(() -> serviceOrder.approveOriginalOnly(null, null))
                 .isInstanceOf(BusinessRuleException.class)
@@ -851,7 +860,7 @@ class ServiceOrderTest {
                 Set.of(IN_DIAGNOSIS),
                 AWAITING_APPROVAL,
                 serviceOrder -> serviceOrder.sendQuote(USER_ID, null, DESCRIPTION),
-                null),
+                Transition::quoteSent),
         APPROVE_QUOTE(
                 Set.of(AWAITING_APPROVAL),
                 QUOTE_APPROVED,
@@ -861,7 +870,7 @@ class ServiceOrderTest {
                 Set.of(AWAITING_APPROVAL),
                 QUOTE_REJECTED,
                 serviceOrder -> serviceOrder.rejectQuote(USER_ID, DESCRIPTION),
-                null),
+                Transition::quoteRejected),
         REOPEN_QUOTE(
                 Set.of(QUOTE_REJECTED),
                 IN_DIAGNOSIS,
@@ -876,7 +885,11 @@ class ServiceOrderTest {
                 Set.of(IN_PROGRESS),
                 COMPLETED,
                 serviceOrder -> serviceOrder.complete(USER_ID, DESCRIPTION),
-                null),
+                serviceOrder -> new ServiceOrderCompletedEvent(
+                        serviceOrder.getId(),
+                        serviceOrder.getPublicId(),
+                        CUSTOMER_ID,
+                        serviceOrder.getTotalPrice().amount())),
         DELIVER(
                 Set.of(COMPLETED),
                 DELIVERED,
@@ -904,7 +917,7 @@ class ServiceOrderTest {
                     }
                     serviceOrder.sendQuote(USER_ID, true, DESCRIPTION);
                 },
-                null),
+                Transition::quoteSent),
         APPROVE_SUPPLEMENTARY_QUOTE(
                 "APPROVE_QUOTE",
                 Set.of(AWAITING_SUPPLEMENTARY_APPROVAL),
@@ -921,7 +934,7 @@ class ServiceOrderTest {
                 Set.of(AWAITING_SUPPLEMENTARY_APPROVAL),
                 SUPPLEMENTARY_REJECTED,
                 serviceOrder -> serviceOrder.rejectQuote(USER_ID, DESCRIPTION),
-                null),
+                Transition::quoteRejected),
         RESUME_EXECUTION(
                 "START_EXECUTION",
                 Set.of(SUPPLEMENTARY_APPROVED),
@@ -977,14 +990,33 @@ class ServiceOrderTest {
                     .collect(Collectors.toSet());
         }
 
+        private static Object quoteSent(ServiceOrder serviceOrder) {
+            return new QuoteSentEvent(
+                    serviceOrder.getId(),
+                    serviceOrder.getPublicId(),
+                    CUSTOMER_ID,
+                    serviceOrder.getTotalPrice().amount());
+        }
+
         private static Object quoteApproved(ServiceOrder serviceOrder) {
             return new QuoteApprovedEvent(
                     serviceOrder.getId(),
                     serviceOrder.getPublicId(),
+                    CUSTOMER_ID,
+                    serviceOrder.getTotalPrice().amount(),
                     serviceOrder.getPartItems().stream()
                             .map(item -> new QuoteApprovedEvent.PartQuantity(item.getPartId(), item.getQuantity()))
                             .toList(),
                     USER_ID);
+        }
+
+        private static Object quoteRejected(ServiceOrder serviceOrder) {
+            return new QuoteRejectedEvent(
+                    serviceOrder.getId(),
+                    serviceOrder.getPublicId(),
+                    CUSTOMER_ID,
+                    serviceOrder.getTotalPrice().amount(),
+                    DESCRIPTION);
         }
     }
 }

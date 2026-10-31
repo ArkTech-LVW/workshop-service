@@ -66,6 +66,8 @@ class ApproveQuoteAsCustomerUseCaseTest {
                 .containsExactly(new QuoteApprovedEvent(
                         serviceOrder.getId(),
                         serviceOrder.getPublicId(),
+                        serviceOrder.getCustomerId(),
+                        serviceOrder.getTotalPrice().amount(),
                         List.of(new QuoteApprovedEvent.PartQuantity(40L, 3)),
                         null));
     }
@@ -86,5 +88,6 @@ class ApproveQuoteAsCustomerUseCaseTest {
         serviceOrder.startDiagnosis(5L, null);
         serviceOrder.addPartItem(40L, 3, new Money(new BigDecimal("35.90")));
         serviceOrder.sendQuote(7L, null, null);
+        serviceOrder.clearDomainEvents();
     }
 }
