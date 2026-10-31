@@ -1,5 +1,7 @@
 package br.com.arktech.workshop.metrics.api.metrics;
 
+import br.com.arktech.workshop.shared.application.i18n.DurationFormatter;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.Duration;
@@ -12,7 +14,7 @@ record DurationResponse(
 
     static DurationResponse from(Duration duration) {
         long minutes = Math.round(duration.toSeconds() / 60.0);
-        return new DurationResponse(minutes, "%02d:%02d".formatted(minutes / 60, minutes % 60));
+        return new DurationResponse(minutes, DurationFormatter.formatMinutes(minutes));
     }
 
     static @Nullable DurationResponse fromNullable(@Nullable Duration duration) {
