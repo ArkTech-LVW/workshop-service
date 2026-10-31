@@ -1,5 +1,7 @@
 package br.com.arktech.workshop.inventory.application.reserveserviceorderstock;
 
+import br.com.arktech.workshop.inventory.application.serviceorderpart.PartLockOrder;
+import br.com.arktech.workshop.inventory.application.serviceorderpart.ServiceOrderPart;
 import br.com.arktech.workshop.inventory.domain.model.Part;
 import br.com.arktech.workshop.inventory.domain.model.StockReservation;
 import br.com.arktech.workshop.inventory.domain.repository.PartRepository;
@@ -10,13 +12,9 @@ import br.com.arktech.workshop.shared.application.VoidUseCase;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -47,31 +45,18 @@ public class ReserveServiceOrderStockUseCase implements VoidUseCase<ReserveServi
     @Override
     @Transactional
     public void execute(ReserveServiceOrderStockCommand command) {
-        Map<Long, Integer> requiredByPart = requiredQuantityByPart(command.items());
+        Map<Long, Integer> requiredByPart = ServiceOrderPart.quantityByPart(command.parts());
         Map<Long, Integer> withdrawnByPart =
                 stockMovementRepository.findNetWithdrawnByServiceOrderId(command.serviceOrderId());
         List<Long> reservedPartIds = stockReservationRepository.findPartIdsByServiceOrderId(command.serviceOrderId());
         Instant expiresAt = clock.instant().plus(validity);
 
-        for (Long partId : partIdsInLockOrder(requiredByPart.keySet(), reservedPartIds)) {
+        for (Long partId : PartLockOrder.of(requiredByPart.keySet(), reservedPartIds)) {
             int missing = Math.max(0, requiredByPart.getOrDefault(partId, 0) - withdrawnByPart.getOrDefault(partId, 0));
             if (missing > 0 || reservedPartIds.contains(partId)) {
                 reserve(partId, missing, command.serviceOrderId(), expiresAt);
             }
         }
-    }
-
-    private Map<Long, Integer> requiredQuantityByPart(List<ReserveServiceOrderStockCommand.Item> items) {
-        return items.stream().collect(Collectors.toMap(
-                ReserveServiceOrderStockCommand.Item::partId,
-                ReserveServiceOrderStockCommand.Item::quantity,
-                Math::addExact));
-    }
-
-    private SortedSet<Long> partIdsInLockOrder(Collection<Long> requiredPartIds, Collection<Long> reservedPartIds) {
-        SortedSet<Long> partIds = new TreeSet<>(requiredPartIds);
-        partIds.addAll(reservedPartIds);
-        return partIds;
     }
 
     private void reserve(Long partId, int quantity, Long serviceOrderId, Instant expiresAt) {

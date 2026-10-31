@@ -43,6 +43,9 @@ public class StockReservation extends BaseEntity {
     }
 
     public void change(int quantity, Instant expiresAt) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Reservation quantity must be positive, got " + quantity);
+        }
         if (quantity > this.quantity) {
             part.reserve(quantity - this.quantity);
         } else if (quantity < this.quantity) {

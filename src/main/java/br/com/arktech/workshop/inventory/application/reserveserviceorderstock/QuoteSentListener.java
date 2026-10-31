@@ -1,5 +1,6 @@
 package br.com.arktech.workshop.inventory.application.reserveserviceorderstock;
 
+import br.com.arktech.workshop.inventory.application.serviceorderpart.ServiceOrderPart;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteSentEvent;
 
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ class QuoteSentListener {
         reserveServiceOrderStockUseCase.execute(new ReserveServiceOrderStockCommand(
                 event.serviceOrderId(),
                 event.parts().stream()
-                        .map(part -> new ReserveServiceOrderStockCommand.Item(part.partId(), part.quantity()))
+                        .map(part -> new ServiceOrderPart(part.partId(), part.quantity()))
                         .toList()));
     }
 }
