@@ -77,6 +77,6 @@ class RejectQuoteAsCustomerUseCaseTest {
     private void sendQuote() {
         serviceOrder.startDiagnosis(5L, null);
         serviceOrder.addServiceItem(30L, 1, new Money(new BigDecimal("150.00")));
-        serviceOrder.sendQuote(7L, null);
+        serviceOrder.sendQuote(7L, null, null);
     }
 }

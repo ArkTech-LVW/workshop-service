@@ -295,7 +295,7 @@ class ServiceOrderQueryIntegrationTest {
                     .forEach(ignored -> serviceOrder.addServiceItem(serviceOfferingId, 1, LABOR_PRICE));
             IntStream.range(0, parts).forEach(ignored -> serviceOrder.addPartItem(partId, 1, PART_PRICE));
             serviceOrder.startDiagnosis(userId, "Pastilhas gastas");
-            serviceOrder.sendQuote(userId, null);
+            serviceOrder.sendQuote(userId, null, null);
             return serviceOrderRepository.save(serviceOrder).getId();
         });
     }

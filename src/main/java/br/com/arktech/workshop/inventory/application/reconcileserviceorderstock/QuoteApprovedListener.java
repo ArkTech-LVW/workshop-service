@@ -1,4 +1,4 @@
-package br.com.arktech.workshop.inventory.application.withdrawstock;
+package br.com.arktech.workshop.inventory.application.reconcileserviceorderstock;
 
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
 
@@ -11,14 +11,14 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 class QuoteApprovedListener {
 
-    private final WithdrawStockUseCase withdrawStockUseCase;
+    private final ReconcileServiceOrderStockUseCase reconcileServiceOrderStockUseCase;
 
     @EventListener
     void on(QuoteApprovedEvent event) {
-        withdrawStockUseCase.execute(new WithdrawStockCommand(
+        reconcileServiceOrderStockUseCase.execute(new ReconcileServiceOrderStockCommand(
                 event.serviceOrderId(),
                 event.parts().stream()
-                        .map(part -> new WithdrawStockCommand.Item(part.partId(), part.quantity()))
+                        .map(part -> new ReconcileServiceOrderStockCommand.Item(part.partId(), part.quantity()))
                         .toList(),
                 event.approvedByUserId()));
     }

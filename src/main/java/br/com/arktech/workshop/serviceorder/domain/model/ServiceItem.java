@@ -39,6 +39,9 @@ public class ServiceItem extends ServiceOrderItem {
         if (isCompleted()) {
             throw new BusinessRuleException("serviceOrder.serviceItemAlreadyCompleted");
         }
+        if (!isApproved()) {
+            throw new BusinessRuleException("serviceOrder.pendingItemCompletionNotAllowed");
+        }
         this.completedAt = completedAt;
         this.completedByUserId = completedByUserId;
     }

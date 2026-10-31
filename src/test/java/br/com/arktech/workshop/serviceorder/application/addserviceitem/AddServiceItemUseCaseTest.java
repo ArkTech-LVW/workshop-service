@@ -93,7 +93,7 @@ class AddServiceItemUseCaseTest {
     void shouldRefuseItemsOnceTheQuoteIsSent() {
         serviceOrder.startDiagnosis(2L, null);
         serviceOrder.addPartItem(40L, 1, new Money(new BigDecimal("35.90")));
-        serviceOrder.sendQuote(2L, null);
+        serviceOrder.sendQuote(2L, null, null);
 
         assertThatThrownBy(() ->
                         addServiceItemUseCase.execute(new AddServiceItemCommand(serviceOrder.getId(), BRAKES_ID, 1)))

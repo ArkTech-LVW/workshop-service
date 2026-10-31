@@ -33,7 +33,7 @@ class SendQuoteUseCaseTest {
     void shouldSendTheQuoteRecordingWhoSentIt() {
         diagnoseWithAService();
 
-        ServiceOrderResult result = sendQuoteUseCase.execute(new SendQuoteCommand(serviceOrder.getId()));
+        ServiceOrderResult result = sendQuoteUseCase.execute(new SendQuoteCommand(serviceOrder.getId(), null));
 
         assertThat(result.status()).isEqualTo(ServiceOrderStatus.AWAITING_APPROVAL);
         assertThat(result.totalPrice()).isEqualTo(new BigDecimal("300.00"));
@@ -50,7 +50,7 @@ class SendQuoteUseCaseTest {
     void shouldLockTheItemsAfterSending() {
         diagnoseWithAService();
 
-        sendQuoteUseCase.execute(new SendQuoteCommand(serviceOrder.getId()));
+        sendQuoteUseCase.execute(new SendQuoteCommand(serviceOrder.getId(), null));
 
         assertThatThrownBy(() -> serviceOrder.addPartItem(40L, 1, new Money(new BigDecimal("35.90"))))
                 .isInstanceOf(BusinessRuleException.class)
@@ -61,7 +61,7 @@ class SendQuoteUseCaseTest {
     void shouldRefuseAQuoteWithoutItems() {
         serviceOrder.startDiagnosis(MECHANIC_ID, null);
 
-        assertThatThrownBy(() -> sendQuoteUseCase.execute(new SendQuoteCommand(serviceOrder.getId())))
+        assertThatThrownBy(() -> sendQuoteUseCase.execute(new SendQuoteCommand(serviceOrder.getId(), null)))
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessage("serviceOrder.quoteWithoutItems");
         assertThat(serviceOrder.getStatus()).isEqualTo(ServiceOrderStatus.IN_DIAGNOSIS);
@@ -71,7 +71,7 @@ class SendQuoteUseCaseTest {
     void shouldRefuseAServiceOrderThatIsNotInDiagnosis() {
         serviceOrder.addServiceItem(30L, 1, new Money(new BigDecimal("150.00")));
 
-        assertThatThrownBy(() -> sendQuoteUseCase.execute(new SendQuoteCommand(serviceOrder.getId())))
+        assertThatThrownBy(() -> sendQuoteUseCase.execute(new SendQuoteCommand(serviceOrder.getId(), null)))
                 .isInstanceOf(InvalidStatusTransitionException.class)
                 .hasMessage("serviceOrder.invalidStatusTransition");
         assertThat(serviceOrder.getStatusHistory())
@@ -81,7 +81,7 @@ class SendQuoteUseCaseTest {
 
     @Test
     void shouldReportAnUnknownServiceOrder() {
-        assertThatThrownBy(() -> sendQuoteUseCase.execute(new SendQuoteCommand(99L)))
+        assertThatThrownBy(() -> sendQuoteUseCase.execute(new SendQuoteCommand(99L, null)))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("serviceOrder.notFound");
     }
