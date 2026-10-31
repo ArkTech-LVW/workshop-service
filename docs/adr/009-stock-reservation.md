@@ -1,4 +1,4 @@
-# ADR 008: Reserva de estoque no orçamento
+# ADR 009: Reserva de estoque no orçamento
 
 - **Status:** Proposto (passa a Aceito com a aprovação do grupo no PR)
 - **Data:** 2026-10-31
