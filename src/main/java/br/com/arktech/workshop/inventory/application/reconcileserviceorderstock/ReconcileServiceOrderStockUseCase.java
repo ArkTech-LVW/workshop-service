@@ -15,10 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Joins the caller's transaction (quote approval or cancellation), so a part without enough stock rolls back the
- * whole change. Parts are locked in id order so that concurrent reconciliations cannot deadlock.
- */
 @Service
 @RequiredArgsConstructor
 public class ReconcileServiceOrderStockUseCase implements VoidUseCase<ReconcileServiceOrderStockCommand> {
