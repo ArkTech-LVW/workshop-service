@@ -15,6 +15,10 @@ public enum ServiceOrderStatus {
         return this == RECEIVED || this == IN_DIAGNOSIS;
     }
 
+    public boolean isClosed() {
+        return this == DELIVERED || this == CANCELED;
+    }
+
     public boolean allowsCancellation() {
         return this == RECEIVED || this == IN_DIAGNOSIS || this == AWAITING_APPROVAL || this == QUOTE_REJECTED;
     }

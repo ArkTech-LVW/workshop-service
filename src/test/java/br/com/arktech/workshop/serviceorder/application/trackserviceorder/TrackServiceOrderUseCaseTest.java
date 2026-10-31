@@ -16,6 +16,7 @@ import br.com.arktech.workshop.shared.application.registry.VehicleDirectory;
 import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.money.Money;
+import br.com.arktech.workshop.shared.domain.vehicle.LicensePlate;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -46,6 +47,11 @@ class TrackServiceOrderUseCaseTest {
             new VehicleDirectory() {
                 @Override
                 public Long findOrRegister(Long customerId, VehicleDetails vehicle) {
+                    throw new UnsupportedOperationException();
+                }
+
+                @Override
+                public Optional<Long> findIdByLicensePlate(LicensePlate licensePlate) {
                     throw new UnsupportedOperationException();
                 }
 
