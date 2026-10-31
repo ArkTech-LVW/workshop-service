@@ -1,5 +1,6 @@
 package br.com.arktech.workshop.metrics.infrastructure.persistence;
 
+import br.com.arktech.workshop.metrics.application.port.ServiceExecutionTime;
 import br.com.arktech.workshop.metrics.application.port.ServiceOrderHistoryReader;
 import br.com.arktech.workshop.metrics.application.port.StatusTime;
 
@@ -60,6 +61,47 @@ class JdbcServiceOrderHistoryReader implements ServiceOrderHistoryReader {
                                           'DELIVERED', 'CANCELED']::VARCHAR[], status)
             """;
 
+    private static final String AVERAGE_EXECUTION_TIME_BY_SERVICE = """
+            WITH completed AS (
+                SELECT service_order_id
+                FROM status_change
+                WHERE to_status = 'COMPLETED'
+                  AND date_created >= :start
+                  AND date_created < :end
+            ),
+            period AS (
+                SELECT history.service_order_id,
+                       history.to_status AS status,
+                       LEAD(history.date_created) OVER (
+                           PARTITION BY history.service_order_id
+                           ORDER BY history.date_created, history.id) - history.date_created AS duration
+                FROM status_change history
+                JOIN completed ON completed.service_order_id = history.service_order_id
+            ),
+            execution AS (
+                SELECT service_order_id, sum(duration) AS duration
+                FROM period
+                WHERE status = 'IN_PROGRESS'
+                  AND duration IS NOT NULL
+                GROUP BY service_order_id
+            ),
+            service AS (
+                SELECT DISTINCT item.service_order_id, item.service_offering_id
+                FROM service_item item
+                JOIN completed ON completed.service_order_id = item.service_order_id
+            )
+            SELECT offering.id AS service_offering_id,
+                   offering.name,
+                   offering.estimated_minutes,
+                   round(EXTRACT(EPOCH FROM avg(execution.duration)))::BIGINT AS average_seconds,
+                   count(*) AS service_order_count
+            FROM service
+            JOIN execution ON execution.service_order_id = service.service_order_id
+            JOIN service_offering offering ON offering.id = service.service_offering_id
+            GROUP BY offering.id, offering.name, offering.estimated_minutes
+            ORDER BY offering.name, offering.id
+            """;
+
     private final JdbcClient jdbcClient;
 
     @Override
@@ -78,6 +120,20 @@ class JdbcServiceOrderHistoryReader implements ServiceOrderHistoryReader {
                 .param("end", atUtc(end))
                 .query((resultSet, rowNumber) -> new StatusTime(
                         resultSet.getString("status"),
+                        Duration.ofSeconds(resultSet.getLong("average_seconds")),
+                        resultSet.getLong("service_order_count")))
+                .list();
+    }
+
+    @Override
+    public List<ServiceExecutionTime> averageExecutionTimeByServiceOfCompletedBetween(Instant start, Instant end) {
+        return jdbcClient.sql(AVERAGE_EXECUTION_TIME_BY_SERVICE)
+                .param("start", atUtc(start))
+                .param("end", atUtc(end))
+                .query((resultSet, rowNumber) -> new ServiceExecutionTime(
+                        resultSet.getLong("service_offering_id"),
+                        resultSet.getString("name"),
+                        resultSet.getInt("estimated_minutes"),
                         Duration.ofSeconds(resultSet.getLong("average_seconds")),
                         resultSet.getLong("service_order_count")))
                 .list();

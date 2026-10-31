@@ -13,21 +13,34 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 
-final class ServiceOrderHistoryFixture {
+public final class ServiceOrderHistoryFixture {
 
     private final JdbcTemplate jdbcTemplate;
 
-    ServiceOrderHistoryFixture(JdbcTemplate jdbcTemplate) {
+    public ServiceOrderHistoryFixture(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    History openedAt(Instant openedAt) {
+    public Long serviceOffering(String name, int estimatedMinutes) {
+        return jdbcTemplate.queryForObject(
+                """
+                INSERT INTO service_offering (name, labor_price, estimated_minutes, date_created, last_updated, version)
+                VALUES (?, 100, ?, now(), now(), 0)
+                RETURNING id
+                """,
+                Long.class,
+                name,
+                estimatedMinutes);
+    }
+
+    public History openedAt(Instant openedAt) {
         return new History(openedAt);
     }
 
-    final class History {
+    public final class History {
 
         private final List<Entry> entries = new ArrayList<>();
+        private final List<ServiceItem> serviceItems = new ArrayList<>();
         private Instant current;
 
         private History(Instant openedAt) {
@@ -35,17 +48,22 @@ final class ServiceOrderHistoryFixture {
             entries.add(new Entry("RECEIVED", openedAt));
         }
 
-        History then(String status, Duration after) {
+        public History withService(Long serviceOfferingId, int quantity) {
+            serviceItems.add(new ServiceItem(serviceOfferingId, quantity));
+            return this;
+        }
+
+        public History then(String status, Duration after) {
             return thenAt(status, current.plus(after));
         }
 
-        History thenAt(String status, Instant at) {
+        public History thenAt(String status, Instant at) {
             current = at;
             entries.add(new Entry(status, at));
             return this;
         }
 
-        void save() {
+        public void save() {
             Long customerId = insertReturningId(
                     """
                     INSERT INTO customer (name, document, person_type, email, date_created, last_updated, version)
@@ -75,6 +93,17 @@ final class ServiceOrderHistoryFixture {
                     vehicleId,
                     entries.getLast().status(),
                     entries.getFirst().at().atOffset(ZoneOffset.UTC));
+            for (ServiceItem item : serviceItems) {
+                jdbcTemplate.update(
+                        """
+                        INSERT INTO service_item (service_order_id, service_offering_id, quantity, unit_price,
+                                                  date_created, last_updated, version)
+                        VALUES (?, ?, ?, 100, now(), now(), 0)
+                        """,
+                        serviceOrderId,
+                        item.serviceOfferingId(),
+                        item.quantity());
+            }
             String fromStatus = null;
             for (Entry entry : entries) {
                 jdbcTemplate.update(
@@ -97,4 +126,6 @@ final class ServiceOrderHistoryFixture {
     }
 
     private record Entry(String status, Instant at) {}
+
+    private record ServiceItem(Long serviceOfferingId, int quantity) {}
 }

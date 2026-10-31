@@ -8,4 +8,6 @@ public interface ServiceOrderHistoryReader {
     long countCompletedBetween(Instant start, Instant end);
 
     List<StatusTime> averageTimeByStatusOfCompletedBetween(Instant start, Instant end);
+
+    List<ServiceExecutionTime> averageExecutionTimeByServiceOfCompletedBetween(Instant start, Instant end);
 }
