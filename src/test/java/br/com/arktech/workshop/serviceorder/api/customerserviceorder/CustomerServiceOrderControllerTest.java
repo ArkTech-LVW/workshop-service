@@ -10,11 +10,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import br.com.arktech.workshop.serviceorder.application.approveoriginalonlyascustomer.ApproveOriginalOnlyAsCustomerCommand;
+import br.com.arktech.workshop.serviceorder.application.approveoriginalonlyascustomer.ApproveOriginalOnlyAsCustomerUseCase;
 import br.com.arktech.workshop.serviceorder.application.approvequoteascustomer.ApproveQuoteAsCustomerCommand;
 import br.com.arktech.workshop.serviceorder.application.approvequoteascustomer.ApproveQuoteAsCustomerUseCase;
 import br.com.arktech.workshop.serviceorder.application.rejectquoteascustomer.RejectQuoteAsCustomerCommand;
 import br.com.arktech.workshop.serviceorder.application.rejectquoteascustomer.RejectQuoteAsCustomerUseCase;
 import br.com.arktech.workshop.serviceorder.application.trackserviceorder.QuoteItemResult;
+import br.com.arktech.workshop.serviceorder.application.trackserviceorder.QuoteItemStage;
 import br.com.arktech.workshop.serviceorder.application.trackserviceorder.QuoteResult;
 import br.com.arktech.workshop.serviceorder.application.trackserviceorder.StatusChangeResult;
 import br.com.arktech.workshop.serviceorder.application.trackserviceorder.TrackServiceOrderQuery;
@@ -65,12 +68,23 @@ class CustomerServiceOrderControllerTest {
             HISTORY,
             new QuoteResult(
                     List.of(new QuoteItemResult(
-                            "Troca de pastilhas", 1, new BigDecimal("150.00"), new BigDecimal("150.00"))),
+                            "Troca de pastilhas",
+                            1,
+                            new BigDecimal("150.00"),
+                            new BigDecimal("150.00"),
+                            QuoteItemStage.PENDING)),
                     List.of(new QuoteItemResult(
-                            "Pastilha de freio", 2, new BigDecimal("45.90"), new BigDecimal("91.80"))),
+                            "Pastilha de freio",
+                            2,
+                            new BigDecimal("45.90"),
+                            new BigDecimal("91.80"),
+                            QuoteItemStage.PENDING)),
                     new BigDecimal("150.00"),
                     new BigDecimal("91.80"),
-                    new BigDecimal("241.80")),
+                    new BigDecimal("241.80"),
+                    new BigDecimal("0.00"),
+                    new BigDecimal("241.80"),
+                    null),
             Instant.parse("2026-10-27T14:30:00Z"));
     private static final TrackServiceOrderResult RECEIVED = new TrackServiceOrderResult(
             PUBLIC_ID,
@@ -96,6 +110,9 @@ class CustomerServiceOrderControllerTest {
     private ApproveQuoteAsCustomerUseCase approveQuoteAsCustomerUseCase;
 
     @MockitoBean
+    private ApproveOriginalOnlyAsCustomerUseCase approveOriginalOnlyAsCustomerUseCase;
+
+    @MockitoBean
     private RejectQuoteAsCustomerUseCase rejectQuoteAsCustomerUseCase;
 
     @Test
@@ -116,10 +133,11 @@ class CustomerServiceOrderControllerTest {
                            {"status": "AWAITING_APPROVAL", "description": null, "date": "2026-10-27T16:05:00Z"}],
                          "quote": {
                            "services": [{"name": "Troca de pastilhas", "quantity": 1, "unitPrice": 150.00,
-                                         "subtotal": 150.00}],
+                                         "subtotal": 150.00, "stage": "PENDING"}],
                            "parts": [{"name": "Pastilha de freio", "quantity": 2, "unitPrice": 45.90,
-                                      "subtotal": 91.80}],
-                           "servicesTotal": 150.00, "partsTotal": 91.80, "totalPrice": 241.80},
+                                      "subtotal": 91.80, "stage": "PENDING"}],
+                           "servicesTotal": 150.00, "partsTotal": 91.80, "totalPrice": 241.80,
+                           "approvedTotal": 0.00, "pendingTotal": 241.80, "canProceedWithoutChanges": null},
                          "dateCreated": "2026-10-27T14:30:00Z"}
                         """));
     }
@@ -190,6 +208,16 @@ class CustomerServiceOrderControllerTest {
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(""));
         verify(approveQuoteAsCustomerUseCase).execute(new ApproveQuoteAsCustomerCommand(PUBLIC_ID, DOCUMENT));
+    }
+
+    @Test
+    void shouldApproveOnlyTheOriginalQuote() throws Exception {
+        mockMvc.perform(post("/customer/serviceOrders/{publicId}/approveOriginalOnly", PUBLIC_ID)
+                        .header("X-Customer-Document", DOCUMENT))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+        verify(approveOriginalOnlyAsCustomerUseCase)
+                .execute(new ApproveOriginalOnlyAsCustomerCommand(PUBLIC_ID, DOCUMENT));
     }
 
     @Test

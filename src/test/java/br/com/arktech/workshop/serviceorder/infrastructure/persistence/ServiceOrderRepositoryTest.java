@@ -34,6 +34,7 @@ import br.com.arktech.workshop.shared.domain.vehicle.LicensePlate;
 import jakarta.persistence.EntityManager;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.Year;
 import java.time.ZoneId;
 import java.util.Set;
@@ -169,8 +170,8 @@ class ServiceOrderRepositoryTest {
 
         ServiceOrder found = serviceOrderRepository.findRequiredById(id);
         found.removePartItem(found.getPartItems().getFirst().getId());
-        found.sendQuote(attendantId, null);
-        found.approveQuote(null, null);
+        found.sendQuote(attendantId, null, null);
+        found.approveQuote(null, null, Instant.now());
         serviceOrderRepository.save(found);
         flushAndClear();
 

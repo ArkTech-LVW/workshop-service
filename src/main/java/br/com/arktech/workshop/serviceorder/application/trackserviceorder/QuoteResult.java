@@ -3,12 +3,17 @@ package br.com.arktech.workshop.serviceorder.application.trackserviceorder;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
+
 public record QuoteResult(
         List<QuoteItemResult> services,
         List<QuoteItemResult> parts,
         BigDecimal servicesTotal,
         BigDecimal partsTotal,
-        BigDecimal totalPrice) {
+        BigDecimal totalPrice,
+        BigDecimal approvedTotal,
+        BigDecimal pendingTotal,
+        @Nullable Boolean canProceedWithoutChanges) {
 
     public QuoteResult {
         services = List.copyOf(services);

@@ -94,7 +94,8 @@ interface IServiceOrderController {
     @AllowedRoles({Role.ADMIN, Role.ATTENDANT, Role.MECHANIC})
     @PostMapping("/{id}/sendQuote")
     ServiceOrderResponse sendQuote(
-            @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id);
+            @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id,
+            @RequestBody(required = false) @Nullable SendQuoteRequest request);
 
     @Operation(
             summary = "${openapi.serviceOrder.approveQuote}",
@@ -104,6 +105,16 @@ interface IServiceOrderController {
     @ApiResponse(responseCode = "422", ref = "BusinessRule")
     @PostMapping("/{id}/approve")
     ServiceOrderResponse approve(
+            @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id);
+
+    @Operation(
+            summary = "${openapi.serviceOrder.approveOriginalOnly}",
+            description = "${openapi.serviceOrder.approveOriginalOnlyDescription}")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "422", ref = "BusinessRule")
+    @PostMapping("/{id}/approveOriginalOnly")
+    ServiceOrderResponse approveOriginalOnly(
             @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id);
 
     @Operation(

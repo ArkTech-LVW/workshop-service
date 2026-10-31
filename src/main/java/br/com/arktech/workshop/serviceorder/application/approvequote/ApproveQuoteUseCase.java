@@ -6,6 +6,8 @@ import br.com.arktech.workshop.serviceorder.domain.repository.ServiceOrderReposi
 import br.com.arktech.workshop.shared.application.UseCase;
 import br.com.arktech.workshop.shared.application.security.CurrentUser;
 
+import java.time.Clock;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
@@ -17,12 +19,13 @@ public class ApproveQuoteUseCase implements UseCase<ApproveQuoteCommand, Service
 
     private final ServiceOrderRepository serviceOrderRepository;
     private final CurrentUser currentUser;
+    private final Clock clock;
 
     @Override
     @Transactional
     public ServiceOrderResult execute(ApproveQuoteCommand command) {
         ServiceOrder serviceOrder = serviceOrderRepository.findRequiredById(command.serviceOrderId());
-        serviceOrder.approveQuote(currentUser.findId().orElse(null), null);
+        serviceOrder.approveQuote(currentUser.findId().orElse(null), null, clock.instant());
 
         return ServiceOrderResult.from(serviceOrderRepository.save(serviceOrder));
     }

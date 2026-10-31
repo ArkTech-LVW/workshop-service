@@ -9,9 +9,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
 
+import java.time.Instant;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import org.jspecify.annotations.Nullable;
 
 @MappedSuperclass
 @Getter
@@ -27,6 +31,8 @@ public abstract class ServiceOrderItem extends BaseEntity {
 
     private Money unitPrice;
 
+    private @Nullable Instant approvedAt;
+
     protected ServiceOrderItem(ServiceOrder serviceOrder, int quantity, Money unitPrice) {
         requirePositive(quantity);
 
@@ -37,6 +43,14 @@ public abstract class ServiceOrderItem extends BaseEntity {
 
     public Money getSubtotal() {
         return unitPrice.times(quantity);
+    }
+
+    public boolean isApproved() {
+        return approvedAt != null;
+    }
+
+    void approve(Instant approvedAt) {
+        this.approvedAt = approvedAt;
     }
 
     private static void requirePositive(int quantity) {
