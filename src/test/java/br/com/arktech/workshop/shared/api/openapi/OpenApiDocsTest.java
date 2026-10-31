@@ -256,8 +256,10 @@ class OpenApiDocsTest {
     @Test
     void shouldDocumentCustomerServiceOrderRoutesAsPublicInTheirOwnTag() {
         String serviceOrder = "$.paths['/customer/serviceOrders/{publicId}']";
+        String approve = "$.paths['/customer/serviceOrders/{publicId}/approve']";
+        String reject = "$.paths['/customer/serviceOrders/{publicId}/reject']";
 
-        for (String operation : List.of(serviceOrder + ".get")) {
+        for (String operation : List.of(serviceOrder + ".get", approve + ".post", reject + ".post")) {
             assertThat(spec.read(operation + ".tags", List.class)).containsExactly("Acompanhamento da OS pelo cliente");
             assertThat(spec.read(operation + ".security", List.class)).isEmpty();
             assertThat(spec.read(operation + ".parameters[*].name", List.class))
@@ -267,6 +269,10 @@ class OpenApiDocsTest {
         }
         assertThat(spec.read(serviceOrder + ".get.responses", Map.class))
                 .containsOnlyKeys("200", "400", "404", "429", "500");
+        assertThat(spec.read(approve + ".post.responses", Map.class))
+                .containsOnlyKeys("204", "400", "404", "422", "429", "500");
+        assertThat(spec.read(reject + ".post.responses", Map.class))
+                .containsOnlyKeys("204", "400", "404", "422", "429", "500");
     }
 
     @Test
