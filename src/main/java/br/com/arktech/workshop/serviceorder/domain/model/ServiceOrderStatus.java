@@ -1,5 +1,8 @@
 package br.com.arktech.workshop.serviceorder.domain.model;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public enum ServiceOrderStatus {
     RECEIVED,
     IN_DIAGNOSIS,
@@ -10,6 +13,14 @@ public enum ServiceOrderStatus {
     COMPLETED,
     DELIVERED,
     CANCELED;
+
+    private static final Set<ServiceOrderStatus> QUOTE_VISIBLE_TO_CUSTOMER = EnumSet.of(
+            AWAITING_APPROVAL,
+            QUOTE_APPROVED,
+            QUOTE_REJECTED,
+            IN_PROGRESS,
+            COMPLETED,
+            DELIVERED);
 
     public boolean allowsItemChanges() {
         return this == RECEIVED || this == IN_DIAGNOSIS;
@@ -24,11 +35,6 @@ public enum ServiceOrderStatus {
     }
 
     public boolean showsQuoteToCustomer() {
-        return this == AWAITING_APPROVAL
-                || this == QUOTE_APPROVED
-                || this == QUOTE_REJECTED
-                || this == IN_PROGRESS
-                || this == COMPLETED
-                || this == DELIVERED;
+        return QUOTE_VISIBLE_TO_CUSTOMER.contains(this);
     }
 }
