@@ -28,6 +28,10 @@ record ServiceOrderResponse(
         @Schema(description = "${openapi.serviceOrder.servicesTotal}", example = "0.00") BigDecimal servicesTotal,
         @Schema(description = "${openapi.serviceOrder.partsTotal}", example = "0.00") BigDecimal partsTotal,
         @Schema(description = "${openapi.serviceOrder.totalPrice}", example = "0.00") BigDecimal totalPrice,
+        @Schema(description = "${openapi.serviceOrder.approvedTotal}", example = "0.00") BigDecimal approvedTotal,
+        @Schema(description = "${openapi.serviceOrder.pendingTotal}", example = "0.00") BigDecimal pendingTotal,
+        @Schema(description = "${openapi.serviceOrder.canProceedWithoutChanges}", example = "null") @Nullable
+                Boolean canProceedWithoutChanges,
         @Schema(description = "${openapi.serviceOrder.statusHistory}")
                 List<ServiceOrderStatusChangeResponse> statusHistory,
         @Schema(description = "${openapi.serviceOrder.dateCreated}", example = "2026-10-27T14:30:00Z") @Nullable
@@ -50,6 +54,9 @@ record ServiceOrderResponse(
                 result.servicesTotal(),
                 result.partsTotal(),
                 result.totalPrice(),
+                result.approvedTotal(),
+                result.pendingTotal(),
+                result.canProceedWithoutChanges(),
                 result.statusHistory().stream()
                         .map(ServiceOrderStatusChangeResponse::from)
                         .toList(),

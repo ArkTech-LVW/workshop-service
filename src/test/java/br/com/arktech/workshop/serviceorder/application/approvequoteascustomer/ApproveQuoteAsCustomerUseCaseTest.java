@@ -16,6 +16,7 @@ import br.com.arktech.workshop.shared.domain.money.Money;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,7 @@ class ApproveQuoteAsCustomerUseCaseTest {
     private final CustomerDirectory customerDirectory = document -> Optional.ofNullable(customers.get(document));
     private final ApproveQuoteAsCustomerUseCase approveQuoteAsCustomerUseCase = new ApproveQuoteAsCustomerUseCase(
             new CustomerServiceOrderFinder(serviceOrderRepository, customerDirectory),
-            new ApproveQuoteUseCase(serviceOrderRepository, NO_USER));
+            new ApproveQuoteUseCase(serviceOrderRepository, NO_USER, Clock.systemUTC()));
 
     private final ServiceOrder serviceOrder = serviceOrderRepository.save(
             new ServiceOrder(serviceOrderRepository.nextNumber(), ANA_ID, 20L, "Barulho ao frear", 1L));
@@ -84,6 +85,6 @@ class ApproveQuoteAsCustomerUseCaseTest {
     private void sendQuoteWithParts() {
         serviceOrder.startDiagnosis(5L, null);
         serviceOrder.addPartItem(40L, 3, new Money(new BigDecimal("35.90")));
-        serviceOrder.sendQuote(7L, null);
+        serviceOrder.sendQuote(7L, null, null);
     }
 }

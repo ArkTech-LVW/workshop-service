@@ -29,7 +29,7 @@ class ReopenQuoteUseCaseTest {
     void shouldReopenARejectedQuoteForANewOne() {
         serviceOrder.startDiagnosis(5L, null);
         serviceOrder.addServiceItem(30L, 1, new Money(new BigDecimal("150.00")));
-        serviceOrder.sendQuote(7L, null);
+        serviceOrder.sendQuote(7L, null, null);
         serviceOrder.rejectQuote(7L, "Cliente achou o valor alto");
 
         ServiceOrderResult result = reopenQuoteUseCase.execute(

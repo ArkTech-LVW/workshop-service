@@ -5,16 +5,47 @@ import br.com.arktech.workshop.inventory.domain.repository.StockMovementReposito
 import br.com.arktech.workshop.shared.domain.pagination.Page;
 import br.com.arktech.workshop.shared.domain.pagination.Pagination;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 interface StockMovementJpaRepository
         extends JpaRepository<StockMovement, Long>, JpaSpecificationExecutor<StockMovement>, StockMovementRepository {
 
     Sort PAGE_ORDER = Sort.by(Sort.Order.desc("dateCreated"), Sort.Order.desc("id"));
+
+    @Override
+    default Map<Long, Integer> findNetWithdrawnByServiceOrderId(Long serviceOrderId) {
+        return sumNetWithdrawnByServiceOrderId(serviceOrderId).stream()
+                .collect(Collectors.toMap(
+                        NetWithdrawn::getPartId, netWithdrawn -> Math.toIntExact(netWithdrawn.getQuantity())));
+    }
+
+    @Query("""
+            SELECT m.part.id AS partId,
+                   SUM(CASE WHEN m.type = br.com.arktech.workshop.inventory.domain.model.StockMovementType.OUT
+                            THEN m.quantity ELSE -m.quantity END) AS quantity
+            FROM StockMovement m
+            WHERE m.serviceOrderId = :serviceOrderId
+              AND m.type IN (br.com.arktech.workshop.inventory.domain.model.StockMovementType.IN,
+                             br.com.arktech.workshop.inventory.domain.model.StockMovementType.OUT)
+            GROUP BY m.part.id""")
+    List<NetWithdrawn> sumNetWithdrawnByServiceOrderId(@Param("serviceOrderId") Long serviceOrderId);
+
+    interface NetWithdrawn {
+
+        Long getPartId();
+
+        Long getQuantity();
+    }
 
     @Override
     default Page<StockMovement> findPageByPartId(Long partId, Pagination pagination) {

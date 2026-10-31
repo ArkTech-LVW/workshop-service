@@ -10,8 +10,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import br.com.arktech.workshop.IntegrationTest;
 import br.com.arktech.workshop.auth.application.port.TokenIssuer;
-import br.com.arktech.workshop.inventory.application.withdrawstock.WithdrawStockCommand;
-import br.com.arktech.workshop.inventory.application.withdrawstock.WithdrawStockUseCase;
+import br.com.arktech.workshop.inventory.application.reconcileserviceorderstock.ReconcileServiceOrderStockCommand;
+import br.com.arktech.workshop.inventory.application.reconcileserviceorderstock.ReconcileServiceOrderStockUseCase;
 import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.security.Role;
@@ -57,7 +57,7 @@ class StockMovementIntegrationTest {
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    private WithdrawStockUseCase withdrawStockUseCase;
+    private ReconcileServiceOrderStockUseCase reconcileServiceOrderStockUseCase;
 
     private Long adminId;
 
@@ -158,14 +158,16 @@ class StockMovementIntegrationTest {
     void shouldLetOnlyOneOfTwoConcurrentWithdrawalsPassWhenStockCoversOne() throws Exception {
         Integer partId = createPart(0);
         movement(partId, "IN", 5, null).andExpect(status().isCreated());
-        WithdrawStockCommand.Item threeUnits = new WithdrawStockCommand.Item(partId.longValue(), 3);
+        ReconcileServiceOrderStockCommand.Item threeUnits =
+                new ReconcileServiceOrderStockCommand.Item(partId.longValue(), 3);
         CountDownLatch start = new CountDownLatch(1);
 
         List<Throwable> failures = new ArrayList<>();
         try (ExecutorService executor = Executors.newFixedThreadPool(2)) {
             List<Future<Void>> results = new ArrayList<>();
             for (Long serviceOrderId : List.of(openServiceOrder(), openServiceOrder())) {
-                WithdrawStockCommand command = new WithdrawStockCommand(serviceOrderId, List.of(threeUnits), adminId);
+                ReconcileServiceOrderStockCommand command =
+                        new ReconcileServiceOrderStockCommand(serviceOrderId, List.of(threeUnits), adminId);
                 results.add(executor.submit(withdrawal(command, start)));
             }
             start.countDown();
@@ -188,10 +190,10 @@ class StockMovementIntegrationTest {
         assertThat(withdrawals).isOne();
     }
 
-    private Callable<Void> withdrawal(WithdrawStockCommand command, CountDownLatch start) {
+    private Callable<Void> withdrawal(ReconcileServiceOrderStockCommand command, CountDownLatch start) {
         return () -> {
             start.await();
-            withdrawStockUseCase.execute(command);
+            reconcileServiceOrderStockUseCase.execute(command);
             return null;
         };
     }

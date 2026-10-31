@@ -235,7 +235,7 @@ class ServiceOrderItemIntegrationTest {
         transactionTemplate.executeWithoutResult(transaction -> {
             ServiceOrder serviceOrder = serviceOrderRepository.findRequiredById(serviceOrderId);
             serviceOrder.startDiagnosis(userId, null);
-            serviceOrder.sendQuote(userId, null);
+            serviceOrder.sendQuote(userId, null, null);
             serviceOrderRepository.save(serviceOrder);
         });
     }

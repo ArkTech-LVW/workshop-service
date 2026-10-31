@@ -63,6 +63,6 @@ class RejectQuoteUseCaseTest {
     private void sendQuote() {
         serviceOrder.startDiagnosis(5L, null);
         serviceOrder.addServiceItem(30L, 1, new Money(new BigDecimal("150.00")));
-        serviceOrder.sendQuote(ATTENDANT_ID, null);
+        serviceOrder.sendQuote(ATTENDANT_ID, null, null);
     }
 }
