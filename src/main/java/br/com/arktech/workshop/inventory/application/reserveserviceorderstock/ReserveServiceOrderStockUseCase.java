@@ -12,10 +12,12 @@ import br.com.arktech.workshop.shared.application.VoidUseCase;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,24 +53,39 @@ public class ReserveServiceOrderStockUseCase implements VoidUseCase<ReserveServi
         List<Long> reservedPartIds = stockReservationRepository.findPartIdsByServiceOrderId(command.serviceOrderId());
         Instant expiresAt = clock.instant().plus(validity);
 
+        Map<Long, Integer> missingByPart = new HashMap<>();
         for (Long partId : PartLockOrder.of(requiredByPart.keySet(), reservedPartIds)) {
             int missing = Math.max(0, requiredByPart.getOrDefault(partId, 0) - withdrawnByPart.getOrDefault(partId, 0));
             if (missing > 0 || reservedPartIds.contains(partId)) {
-                reserve(partId, missing, command.serviceOrderId(), expiresAt);
+                missingByPart.put(partId, missing);
             }
+        }
+
+        List<Part> parts = PartLockOrder.lock(missingByPart.keySet(), partRepository);
+        Map<Long, StockReservation> reservationByPart = reservationByPart(command.serviceOrderId());
+        for (Part part : parts) {
+            reserve(
+                    part,
+                    reservationByPart.get(part.getId()),
+                    missingByPart.getOrDefault(part.getId(), 0),
+                    command.serviceOrderId(),
+                    expiresAt);
         }
     }
 
-    private void reserve(Long partId, int quantity, Long serviceOrderId, Instant expiresAt) {
-        Part part = partRepository.findRequiredForUpdateById(partId);
-        Optional<StockReservation> current =
-                stockReservationRepository.findByServiceOrderIdAndPartId(serviceOrderId, partId);
-        if (current.isPresent() && quantity == 0) {
-            current.get().release();
-            stockReservationRepository.delete(current.get());
-        } else if (current.isPresent()) {
-            current.get().change(quantity, expiresAt);
-            stockReservationRepository.save(current.get());
+    private Map<Long, StockReservation> reservationByPart(Long serviceOrderId) {
+        return stockReservationRepository.findByServiceOrderId(serviceOrderId).stream()
+                .collect(Collectors.toMap(reservation -> reservation.getPart().getId(), reservation -> reservation));
+    }
+
+    private void reserve(
+            Part part, @Nullable StockReservation current, int quantity, Long serviceOrderId, Instant expiresAt) {
+        if (current != null && quantity == 0) {
+            current.release();
+            stockReservationRepository.delete(current);
+        } else if (current != null) {
+            current.change(quantity, expiresAt);
+            stockReservationRepository.save(current);
         } else if (quantity > 0) {
             stockReservationRepository.save(StockReservation.reserve(part, serviceOrderId, quantity, expiresAt));
         }
