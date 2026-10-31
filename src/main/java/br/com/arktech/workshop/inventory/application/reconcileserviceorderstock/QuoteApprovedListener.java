@@ -1,5 +1,6 @@
 package br.com.arktech.workshop.inventory.application.reconcileserviceorderstock;
 
+import br.com.arktech.workshop.inventory.application.serviceorderpart.ServiceOrderPart;
 import br.com.arktech.workshop.shared.event.serviceorder.QuoteApprovedEvent;
 
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ class QuoteApprovedListener {
         reconcileServiceOrderStockUseCase.execute(new ReconcileServiceOrderStockCommand(
                 event.serviceOrderId(),
                 event.parts().stream()
-                        .map(part -> new ReconcileServiceOrderStockCommand.Item(part.partId(), part.quantity()))
+                        .map(part -> new ServiceOrderPart(part.partId(), part.quantity()))
                         .toList(),
                 event.approvedByUserId()));
     }

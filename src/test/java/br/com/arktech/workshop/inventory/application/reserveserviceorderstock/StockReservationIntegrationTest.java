@@ -13,6 +13,7 @@ import br.com.arktech.workshop.auth.application.port.TokenIssuer;
 import br.com.arktech.workshop.auth.domain.model.User;
 import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
 import br.com.arktech.workshop.auth.domain.repository.UserRepository;
+import br.com.arktech.workshop.inventory.application.serviceorderpart.ServiceOrderPart;
 import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
 import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
@@ -223,7 +224,7 @@ class StockReservationIntegrationTest {
     @Test
     void shouldLetOnlyOneOfTwoConcurrentReservationsPassWhenTheStockCoversOne() throws Exception {
         Long filter = createPart(5);
-        ReserveServiceOrderStockCommand.Item threeUnits = new ReserveServiceOrderStockCommand.Item(filter, 3);
+        ServiceOrderPart threeUnits = new ServiceOrderPart(filter, 3);
         CountDownLatch start = new CountDownLatch(1);
 
         List<Throwable> failures = new ArrayList<>();

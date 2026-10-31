@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
+import br.com.arktech.workshop.inventory.application.serviceorderpart.ServiceOrderPart;
 import br.com.arktech.workshop.inventory.domain.model.MeasurementUnit;
 import br.com.arktech.workshop.inventory.domain.model.Part;
 import br.com.arktech.workshop.inventory.domain.model.PartType;
@@ -142,12 +143,12 @@ class ReserveServiceOrderStockUseCaseTest {
 
     @Test
     void shouldReportUnknownPart() {
-        assertThatThrownBy(() -> reserve(NOW, SERVICE_ORDER_ID, new ReserveServiceOrderStockCommand.Item(1234L, 1)))
+        assertThatThrownBy(() -> reserve(NOW, SERVICE_ORDER_ID, new ServiceOrderPart(1234L, 1)))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("part.notFound");
     }
 
-    private void reserve(Instant now, Long serviceOrderId, ReserveServiceOrderStockCommand.Item... items) {
+    private void reserve(Instant now, Long serviceOrderId, ServiceOrderPart... items) {
         new ReserveServiceOrderStockUseCase(
                         partRepository,
                         stockMovementRepository,
@@ -157,8 +158,8 @@ class ReserveServiceOrderStockUseCaseTest {
                 .execute(new ReserveServiceOrderStockCommand(serviceOrderId, List.of(items)));
     }
 
-    private static ReserveServiceOrderStockCommand.Item item(Part part, int quantity) {
-        return new ReserveServiceOrderStockCommand.Item(part.getId(), quantity);
+    private static ServiceOrderPart item(Part part, int quantity) {
+        return new ServiceOrderPart(part.getId(), quantity);
     }
 
     private Part savePart(String sku, int stockQuantity) {

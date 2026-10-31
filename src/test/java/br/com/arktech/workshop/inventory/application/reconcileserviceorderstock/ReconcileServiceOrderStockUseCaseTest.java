@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
+import br.com.arktech.workshop.inventory.application.serviceorderpart.ServiceOrderPart;
 import br.com.arktech.workshop.inventory.domain.model.MeasurementUnit;
 import br.com.arktech.workshop.inventory.domain.model.Part;
 import br.com.arktech.workshop.inventory.domain.model.PartType;
@@ -214,13 +215,13 @@ class ReconcileServiceOrderStockUseCaseTest {
     @Test
     void shouldReportUnknownPart() {
         assertThatThrownBy(() -> reconcile(
-                        SERVICE_ORDER_ID, List.of(new ReconcileServiceOrderStockCommand.Item(1234L, 1)), USER_ID))
+                        SERVICE_ORDER_ID, List.of(new ServiceOrderPart(1234L, 1)), USER_ID))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("part.notFound");
     }
 
     private void reconcile(
-            Long serviceOrderId, List<ReconcileServiceOrderStockCommand.Item> items, @Nullable Long userId) {
+            Long serviceOrderId, List<ServiceOrderPart> items, @Nullable Long userId) {
         reconcileServiceOrderStockUseCase.execute(new ReconcileServiceOrderStockCommand(serviceOrderId, items, userId));
     }
 
@@ -228,8 +229,8 @@ class ReconcileServiceOrderStockUseCaseTest {
         stockReservationRepository.save(StockReservation.reserve(part, serviceOrderId, quantity, EXPIRES_AT));
     }
 
-    private static ReconcileServiceOrderStockCommand.Item item(Part part, int quantity) {
-        return new ReconcileServiceOrderStockCommand.Item(part.getId(), quantity);
+    private static ServiceOrderPart item(Part part, int quantity) {
+        return new ServiceOrderPart(part.getId(), quantity);
     }
 
     private Part savePart(String sku, int stockQuantity) {

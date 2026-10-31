@@ -1,5 +1,7 @@
 package br.com.arktech.workshop.inventory.application.reconcileserviceorderstock;
 
+import br.com.arktech.workshop.inventory.application.serviceorderpart.PartLockOrder;
+import br.com.arktech.workshop.inventory.application.serviceorderpart.ServiceOrderPart;
 import br.com.arktech.workshop.inventory.domain.model.Part;
 import br.com.arktech.workshop.inventory.domain.model.StockMovement;
 import br.com.arktech.workshop.inventory.domain.repository.PartRepository;
@@ -7,12 +9,8 @@ import br.com.arktech.workshop.inventory.domain.repository.StockMovementReposito
 import br.com.arktech.workshop.inventory.domain.repository.StockReservationRepository;
 import br.com.arktech.workshop.shared.application.VoidUseCase;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,33 +28,18 @@ public class ReconcileServiceOrderStockUseCase implements VoidUseCase<ReconcileS
     @Override
     @Transactional
     public void execute(ReconcileServiceOrderStockCommand command) {
-        Map<Long, Integer> requiredByPart = requiredQuantityByPart(command.items());
+        Map<Long, Integer> requiredByPart = ServiceOrderPart.quantityByPart(command.parts());
         Map<Long, Integer> withdrawnByPart =
                 stockMovementRepository.findNetWithdrawnByServiceOrderId(command.serviceOrderId());
         List<Long> reservedPartIds = stockReservationRepository.findPartIdsByServiceOrderId(command.serviceOrderId());
 
-        for (Long partId : partIdsInLockOrder(requiredByPart.keySet(), withdrawnByPart.keySet(), reservedPartIds)) {
+        for (Long partId : PartLockOrder.of(requiredByPart.keySet(), withdrawnByPart.keySet(), reservedPartIds)) {
             int required = requiredByPart.getOrDefault(partId, 0);
             int withdrawn = withdrawnByPart.getOrDefault(partId, 0);
             if (required != withdrawn || reservedPartIds.contains(partId)) {
                 reconcile(partId, required, withdrawn, command);
             }
         }
-    }
-
-    private Map<Long, Integer> requiredQuantityByPart(List<ReconcileServiceOrderStockCommand.Item> items) {
-        return items.stream().collect(Collectors.toMap(
-                ReconcileServiceOrderStockCommand.Item::partId,
-                ReconcileServiceOrderStockCommand.Item::quantity,
-                Math::addExact));
-    }
-
-    private SortedSet<Long> partIdsInLockOrder(
-            Collection<Long> requiredPartIds, Collection<Long> withdrawnPartIds, Collection<Long> reservedPartIds) {
-        SortedSet<Long> partIds = new TreeSet<>(requiredPartIds);
-        partIds.addAll(withdrawnPartIds);
-        partIds.addAll(reservedPartIds);
-        return partIds;
     }
 
     private void reconcile(Long partId, int required, int withdrawn, ReconcileServiceOrderStockCommand command) {

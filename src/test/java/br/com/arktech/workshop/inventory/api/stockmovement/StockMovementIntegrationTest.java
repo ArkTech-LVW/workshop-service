@@ -12,6 +12,7 @@ import br.com.arktech.workshop.IntegrationTest;
 import br.com.arktech.workshop.auth.application.port.TokenIssuer;
 import br.com.arktech.workshop.inventory.application.reconcileserviceorderstock.ReconcileServiceOrderStockCommand;
 import br.com.arktech.workshop.inventory.application.reconcileserviceorderstock.ReconcileServiceOrderStockUseCase;
+import br.com.arktech.workshop.inventory.application.serviceorderpart.ServiceOrderPart;
 import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
 import br.com.arktech.workshop.shared.domain.exception.BusinessRuleException;
 import br.com.arktech.workshop.shared.domain.security.Role;
@@ -158,8 +159,8 @@ class StockMovementIntegrationTest {
     void shouldLetOnlyOneOfTwoConcurrentWithdrawalsPassWhenStockCoversOne() throws Exception {
         Integer partId = createPart(0);
         movement(partId, "IN", 5, null).andExpect(status().isCreated());
-        ReconcileServiceOrderStockCommand.Item threeUnits =
-                new ReconcileServiceOrderStockCommand.Item(partId.longValue(), 3);
+        ServiceOrderPart threeUnits =
+                new ServiceOrderPart(partId.longValue(), 3);
         CountDownLatch start = new CountDownLatch(1);
 
         List<Throwable> failures = new ArrayList<>();
@@ -213,7 +214,7 @@ class StockMovementIntegrationTest {
 
     private void reconcile(Long serviceOrderId, Integer partId, int quantity, Long userId) {
         reconcileServiceOrderStockUseCase.execute(new ReconcileServiceOrderStockCommand(
-                serviceOrderId, List.of(new ReconcileServiceOrderStockCommand.Item(partId.longValue(), quantity)), userId));
+                serviceOrderId, List.of(new ServiceOrderPart(partId.longValue(), quantity)), userId));
     }
 
     private Callable<Void> withdrawal(ReconcileServiceOrderStockCommand command, CountDownLatch start) {
