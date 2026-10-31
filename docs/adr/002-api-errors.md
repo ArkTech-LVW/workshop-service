@@ -46,6 +46,7 @@ Sem tratamento próprio, a API devolve o erro padrão do Spring Boot (`timestamp
 3. **`GlobalExceptionHandler` em `shared/api/error`, estendendo `ResponseEntityExceptionHandler`:**
    - Erros de entrada (Bean Validation no corpo e nos parâmetros, tipo inválido, parâmetro ausente, valor JSON inválido) saem como 400 `request.invalidFields` com `details`. JSON sintaticamente quebrado ou corpo ausente sai como 400 `request.malformedBody`.
    - As demais exceções do Spring MVC recebem um código pelo status (`request.routeNotFound`, `request.methodNotSupported` etc.), preservando os headers (ex.: `Allow` no 405).
+   - Falha de lock otimista (`OptimisticLockingFailureException` do Spring ou `OptimisticLockException` do JPA), lançada quando duas ações alteram ao mesmo tempo o mesmo agregado com `@Version`, sai como 409 `request.concurrentUpdate`. A transação perdedora já foi desfeita, e o cliente deve consultar o recurso de novo antes de repetir a ação. A mensagem é genérica e vale para qualquer agregado (KAN-92).
    - Qualquer outra exceção, e todo 5xx, sai como 500 `server.unexpectedError`, com um código de referência de 8 caracteres na mensagem. O mesmo código vai para o log `ERROR`, junto com o stack trace. Erros 4xx não são logados.
 4. **`ApiErrorController` no lugar do `BasicErrorController`:** atende o `/error`, para onde o Tomcat encaminha o que escapa do `DispatcherServlet` (exceção em filtro, exceção dentro do próprio advice).
    - Com exceção: sempre 500 `server.unexpectedError`, com código de referência e log, como no advice.
