@@ -9,6 +9,9 @@ import br.com.arktech.workshop.shared.domain.security.Role;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -23,6 +26,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -90,6 +94,7 @@ interface IServiceOrderController {
             summary = "${openapi.serviceOrder.sendQuote}",
             description = "${openapi.serviceOrder.sendQuoteDescription}")
     @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "400", ref = "BadRequest")
     @ApiResponse(responseCode = "404", ref = "NotFound")
     @ApiResponse(responseCode = "409", ref = "Conflict")
     @ApiResponse(responseCode = "422", ref = "BusinessRule")
@@ -97,7 +102,22 @@ interface IServiceOrderController {
     @PostMapping("/{id}/sendQuote")
     ServiceOrderResponse sendQuote(
             @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id,
-            @RequestBody(required = false) @Nullable SendQuoteRequest request);
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = SendQuoteRequest.class),
+                                    examples = {
+                                        @ExampleObject(
+                                                name = "initial",
+                                                summary = "${openapi.serviceOrder.sendQuoteInitialExample}",
+                                                value = "{}"),
+                                        @ExampleObject(
+                                                name = "supplementary",
+                                                summary = "${openapi.serviceOrder.sendQuoteSupplementaryExample}",
+                                                value = "{\"canProceedWithoutChanges\": true}")
+                                    }))
+                    @RequestBody(required = false)
+                    @Nullable SendQuoteRequest request);
 
     @Operation(
             summary = "${openapi.serviceOrder.approveQuote}",

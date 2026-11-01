@@ -7,9 +7,15 @@ import br.com.arktech.workshop.shared.application.i18n.MessageResolver;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -61,6 +67,23 @@ class OpenApiDocsTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(MediaType.TEXT_HTML.isCompatibleWith(response.getHeaders().getContentType())).isTrue();
         assertThat(response.getBody()).contains("swagger-ui");
+    }
+
+    @Test
+    void shouldAuthorizeSwaggerUiWithTokenFromLogin() {
+        ResponseEntity<String> response = restClient
+                .get()
+                .uri("/swagger-ui/swagger-initializer.js")
+                .retrieve()
+                .toEntity(String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody())
+                .contains("window.ui = SwaggerUIBundle({")
+                .contains("responseInterceptor: (response) => {")
+                .contains("path.endsWith('/auth/login')")
+                .contains("window.ui.preauthorizeApiKey('bearerAuth', response.body.accessToken)")
+                .contains("\"persistAuthorization\" : true");
     }
 
     @Test
@@ -276,9 +299,171 @@ class OpenApiDocsTest {
     }
 
     @Test
+    void shouldDescribeCompleteFlow() {
+        assertThat(spec.read("$.info.description", String.class))
+                .contains("## Fluxo completo")
+                .contains("POST /auth/login")
+                .contains("stockMovements")
+                .contains("X-Customer-Document")
+                .contains("/services/{itemId}/start")
+                .contains("/deliver");
+    }
+
+    @Test
+    void shouldListTagsInFlowOrderWithDescriptions() {
+        List<String> flowOrder = List.of(
+                "Autenticação",
+                "Usuários",
+                "Clientes",
+                "Veículos",
+                "Serviços",
+                "Peças e insumos",
+                "Movimentações de estoque",
+                "Pedidos de ajuste de estoque",
+                "Ordens de serviço",
+                "Acompanhamento da OS pelo cliente",
+                "Métricas");
+        List<String> tagNames = spec.read("$.tags[*].name");
+
+        assertThat(tagNames.subList(0, flowOrder.size())).containsExactlyElementsOf(flowOrder);
+        assertThat(spec.read("$.tags[0:" + flowOrder.size() + "].description", List.class))
+                .hasSize(flowOrder.size())
+                .doesNotContainNull();
+        assertThat(businessOperations().stream()
+                        .flatMap(operation -> this.<String>listOf(operation.body().get("tags")).stream())
+                        .distinct())
+                .allMatch(flowOrder::contains);
+    }
+
+    @Test
+    void shouldAppendAllowedRolesToDescription() {
+        assertThat(spec.read("$.paths['/test/docs/admin'].get.description", String.class))
+                .isEqualTo("**Papéis:** ADMIN");
+        assertThat(spec.read(TEST_OPERATION + ".description", String.class))
+                .isEqualTo("**Papéis:** qualquer usuário logado");
+        assertThat(spec.read("$.paths['/test/docs/public'].get", Map.class)).doesNotContainKey("description");
+        assertThat(spec.read("$.paths['/admin/serviceOrders/{id}/sendQuote'].post.description", String.class))
+                .startsWith("De IN_DIAGNOSIS")
+                .endsWith("\n\n**Papéis:** ADMIN, ATTENDANT, MECHANIC");
+    }
+
+    @Test
+    void shouldOfferInitialAndSupplementaryExamplesToSendQuote() {
+        String examples =
+                "$.paths['/admin/serviceOrders/{id}/sendQuote'].post.requestBody.content['application/json'].examples";
+
+        assertThat(spec.read(examples, Map.class)).containsOnlyKeys("initial", "supplementary");
+        assertThat(spec.read(examples + ".initial.value", Map.class)).isEmpty();
+        assertThat(spec.read(examples + ".supplementary.value.canProceedWithoutChanges", Boolean.class))
+                .isTrue();
+    }
+
+    @Test
+    void shouldGiveExampleToEveryParameterAndBodyField() {
+        List<String> missing = new ArrayList<>();
+
+        for (NamedOperation operation : businessOperations()) {
+            for (Map<String, Object> parameter : this.<Map<String, Object>>listOf(operation.body().get("parameters"))) {
+                Map<String, Object> schema = mapOf(parameter.get("schema"));
+                if (!parameter.containsKey("example") && !hasExample(schema)) {
+                    missing.add(operation.name() + " parameter " + parameter.get("name"));
+                }
+            }
+            Map<String, Object> requestBody = mapOf(operation.body().get("requestBody"));
+            schemasOf(requestBody)
+                    .forEach(schema -> collectMissingExamples(schema, operation.name() + " body", new HashSet<>(), missing));
+            mapOf(operation.body().get("responses")).forEach((status, response) -> {
+                if (status.startsWith("2")) {
+                    schemasOf(mapOf(response)).forEach(schema -> collectMissingExamples(
+                            schema, operation.name() + " response " + status, new HashSet<>(), missing));
+                }
+            });
+        }
+
+        assertThat(missing).as("fields without example").isEmpty();
+    }
+
+    @Test
     void shouldHideErrorController() {
         Map<String, Object> paths = spec.read("$.paths");
 
         assertThat(paths).doesNotContainKey("/error");
     }
+
+    private List<NamedOperation> businessOperations() {
+        Map<String, Object> paths = spec.read("$.paths");
+        List<NamedOperation> operations = new ArrayList<>();
+        paths.forEach((path, item) -> {
+            if (!path.startsWith("/test/")) {
+                mapOf(item).forEach((method, operation) -> operations.add(
+                        new NamedOperation(method.toUpperCase(Locale.ROOT) + " " + path, mapOf(operation))));
+            }
+        });
+        return operations;
+    }
+
+    private static List<Map<String, Object>> schemasOf(Map<String, Object> bodyOrResponse) {
+        return mapOf(bodyOrResponse.get("content")).values().stream()
+                .map(mediaType -> mapOf(mapOf(mediaType).get("schema")))
+                .toList();
+    }
+
+    private void collectMissingExamples(
+            Map<String, Object> schema, String location, Set<String> visited, List<String> missing) {
+        if (schema.get("$ref") instanceof String ref && !visited.add(ref)) {
+            return;
+        }
+        Map<String, Object> resolved = resolve(schema);
+        if (isArray(resolved)) {
+            collectMissingExamples(mapOf(resolved.get("items")), location + "[]", new HashSet<>(visited), missing);
+            return;
+        }
+        mapOf(resolved.get("properties")).forEach((name, value) -> {
+            Map<String, Object> property = mapOf(value);
+            Map<String, Object> target = resolve(property);
+            String field = location + "." + name;
+            if (target.containsKey("properties")) {
+                collectMissingExamples(property, field, new HashSet<>(visited), missing);
+            } else if (isArray(target)) {
+                Map<String, Object> items = mapOf(target.get("items"));
+                if (resolve(items).containsKey("properties")) {
+                    collectMissingExamples(items, field + "[]", new HashSet<>(visited), missing);
+                } else if (!hasExample(property) && !hasExample(target) && !hasExample(resolve(items))) {
+                    missing.add(field);
+                }
+            } else if (!hasExample(property) && !hasExample(target)) {
+                missing.add(field);
+            }
+        });
+    }
+
+    private Map<String, Object> resolve(Map<String, Object> schema) {
+        Map<String, Object> resolved = schema;
+        while (resolved.get("$ref") instanceof String ref) {
+            String name = ref.substring(ref.lastIndexOf('/') + 1);
+            resolved = mapOf(spec.read("$.components.schemas['" + name + "']"));
+        }
+        return resolved;
+    }
+
+    private static boolean isArray(Map<String, Object> schema) {
+        Object type = schema.get("type");
+        return "array".equals(type) || (type instanceof List<?> types && types.contains("array"));
+    }
+
+    private static boolean hasExample(Map<String, Object> schema) {
+        return Stream.of("example", "examples", "enum", "default", "const").anyMatch(schema::containsKey);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> mapOf(@Nullable Object value) {
+        return value instanceof Map<?, ?> map ? (Map<String, Object>) map : Map.of();
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> List<T> listOf(@Nullable Object value) {
+        return value instanceof List<?> list ? (List<T>) list : List.of();
+    }
+
+    private record NamedOperation(String name, Map<String, Object> body) {}
 }

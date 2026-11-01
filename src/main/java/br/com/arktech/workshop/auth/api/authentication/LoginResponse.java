@@ -5,7 +5,10 @@ import br.com.arktech.workshop.auth.application.login.LoginResult;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 record LoginResponse(
-        @Schema(description = "${openapi.auth.accessToken}") String accessToken,
+        @Schema(
+                        description = "${openapi.auth.accessToken}",
+                        example = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZXMiOlsiQURNSU4iXX0.c2lnbmF0dXJl")
+                String accessToken,
         @Schema(description = "${openapi.auth.tokenType}", example = "Bearer") String tokenType,
         @Schema(description = "${openapi.auth.expiresIn}", example = "3600") long expiresIn) {
 

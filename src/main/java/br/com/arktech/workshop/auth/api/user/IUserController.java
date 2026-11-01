@@ -51,7 +51,7 @@ interface IUserController {
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "404", ref = "NotFound")
     @GetMapping("/{id}")
-    UserResponse findById(@PathVariable Long id);
+    UserResponse findById(@Parameter(description = "${openapi.user.id}", example = "1") @PathVariable Long id);
 
     @Operation(summary = "${openapi.user.update}")
     @ApiResponse(responseCode = "200")
@@ -59,18 +59,20 @@ interface IUserController {
     @ApiResponse(responseCode = "404", ref = "NotFound")
     @ApiResponse(responseCode = "422", ref = "BusinessRule")
     @PutMapping("/{id}")
-    UserResponse update(@PathVariable Long id, @Valid @RequestBody UpdateUserRequest request);
+    UserResponse update(
+            @Parameter(description = "${openapi.user.id}", example = "1") @PathVariable Long id,
+            @Valid @RequestBody UpdateUserRequest request);
 
     @Operation(summary = "${openapi.user.activate}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "404", ref = "NotFound")
     @PostMapping("/{id}/activate")
-    UserResponse activate(@PathVariable Long id);
+    UserResponse activate(@Parameter(description = "${openapi.user.id}", example = "1") @PathVariable Long id);
 
     @Operation(summary = "${openapi.user.deactivate}", description = "${openapi.user.deactivateDescription}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "404", ref = "NotFound")
     @ApiResponse(responseCode = "422", ref = "BusinessRule")
     @PostMapping("/{id}/deactivate")
-    UserResponse deactivate(@PathVariable Long id);
+    UserResponse deactivate(@Parameter(description = "${openapi.user.id}", example = "1") @PathVariable Long id);
 }
