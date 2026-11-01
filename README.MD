@@ -102,7 +102,7 @@ Onde ver a cobertura:
 
 - **Local:** o relatório completo fica em `build/reports/jacoco/test/html`, gerado a cada build e fora do git.
 - **CI:** cada run publica o relatório no artefato `coverage-report`, que expira junto com os artefatos do GitHub Actions. Cada PR recebe um comentário com a cobertura por módulo, atualizado a cada push. Nada disso fica no repositório.
-- **Entrega:** a evidência versionada está em [docs/evidencias/cobertura](docs/evidencias/cobertura). É uma foto tirada à mão no fechamento da entrega e não se atualiza sozinha.
+- **Entrega:** a evidência versionada está em [docs/evidencias/cobertura](docs/evidencias/cobertura): a tabela por módulo, com data, commit de origem e link da run, e o CSV do JaCoCo com a cobertura por classe. Ela não se atualiza sozinha. Para gerar uma nova, rode o workflow **Coverage evidence** na aba Actions e escolha a branch. Ele roda a suíte, commita a evidência assinada pelo GitHub numa branch nova e deixa no resumo da run o link para abrir o PR. O motivo está no [ADR 010](docs/adr/010-coverage-evidence.md).
 
 ## Decisões de arquitetura
 
@@ -115,6 +115,7 @@ Onde ver a cobertura:
 - [ADR 007: Versionamento de migrations por timestamp e execução fora de ordem](docs/adr/007-timestamp-migrations.md)
 - [ADR 008: Consultas de métricas sobre tabelas de outros módulos](docs/adr/008-metrics-queries.md)
 - [ADR 009: Reserva de estoque no orçamento](docs/adr/009-stock-reservation.md)
+- [ADR 010: Regra de cobertura e evidência versionada](docs/adr/010-coverage-evidence.md)
 
 ## Contribuindo
 

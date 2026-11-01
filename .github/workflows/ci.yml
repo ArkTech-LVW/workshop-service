@@ -50,46 +50,16 @@ jobs:
           COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          csv=build/reports/jacoco/test/jacocoTestReport.csv
-          [ -f "$csv" ] || exit 0
-          minimum=$(sed -n 's/^coverageLineMinimum=//p' gradle.properties | tr -d '\r')
+          summary=build/reports/jacoco/test/coverage-summary.md
+          [ -f "$summary" ] || exit 0
           marker='<!-- coverage-report -->'
           body="$RUNNER_TEMP/coverage.md"
-
-          rows=$(awk -F, 'NR > 1 {
-              split($2, pkg, ".")
-              if (pkg[6] == "domain" || pkg[6] == "application") { missed[pkg[5]] += $8; covered[pkg[5]] += $9 }
-            }
-            END {
-              for (module in covered) {
-                lines = missed[module] + covered[module]
-                if (lines > 0) printf "| %s | %d | %.1f%% |\n", module, lines, 100 * covered[module] / lines
-              }
-            }' "$csv" | sort)
-
-          read -r scope_pct scope_lines project_pct status < <(awk -F, -v minimum="$minimum" 'NR > 1 {
-              split($2, pkg, ".")
-              all_missed += $8; all_covered += $9
-              if (pkg[6] == "domain" || pkg[6] == "application") { scope_missed += $8; scope_covered += $9 }
-            }
-            END {
-              scope = scope_missed + scope_covered
-              ratio = scope ? scope_covered / scope : 1
-              printf "%.1f %d %.1f %s\n", 100 * ratio, scope, 100 * all_covered / (all_missed + all_covered), (ratio >= minimum ? "✅" : "❌")
-            }' "$csv")
 
           {
             echo "$marker"
             echo "### Cobertura de testes no commit ${COMMIT_SHA:0:7}"
             echo
-            echo "Regra: linhas de \`domain\` e \`application\` de todos os módulos, mínimo $(awk -v m="$minimum" 'BEGIN { printf "%d", m * 100 }')%."
-            echo
-            echo "| Módulo | Linhas | Cobertura |"
-            echo "|---|---|---|"
-            echo "$rows"
-            echo "| **Escopo da regra** | **$scope_lines** | **$scope_pct%** $status |"
-            echo
-            echo "Projeto inteiro: $project_pct% das linhas."
+            cat "$summary"
             echo
             echo "[Relatório completo no artefato \`coverage-report\`]($RUN_URL)"
           } > "$body"
