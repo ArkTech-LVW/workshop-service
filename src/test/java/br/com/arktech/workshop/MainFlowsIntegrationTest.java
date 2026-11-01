@@ -264,7 +264,7 @@ class MainFlowsIntegrationTest {
 
         staff(attendantToken, HttpMethod.POST, "/admin/serviceOrders/{id}/startExecution", null).expect(403);
         staff(mechanicToken, HttpMethod.POST, "/admin/serviceOrders/{id}/deliver", null).expect(403);
-        staff(attendantToken, HttpMethod.POST, "/admin/serviceOrders/{id}/reopenQuote", null).expect(403);
+        staff(mechanicToken, HttpMethod.POST, "/admin/serviceOrders/{id}/reopenQuote", null).expect(403);
 
         assertThat(statusOf()).isEqualTo("RECEIVED");
     }

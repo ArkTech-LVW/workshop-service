@@ -355,6 +355,7 @@ class OpenApiDocsTest {
             /admin/serviceOrders       | get    | ADMIN, ATTENDANT, MECHANIC
             /admin/serviceOrders/{id}  | get    | ADMIN, ATTENDANT, MECHANIC
             /admin/serviceOrders       | post   | ADMIN, ATTENDANT
+            /admin/serviceOrders/{id}/reopenQuote | post | ADMIN, ATTENDANT
             /admin/services            | get    | ADMIN, ATTENDANT, MECHANIC
             /admin/services/{id}       | get    | ADMIN, ATTENDANT, MECHANIC
             /admin/services            | post   | ADMIN

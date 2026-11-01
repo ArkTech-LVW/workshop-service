@@ -164,7 +164,6 @@ interface IServiceOrderController {
     @ApiResponse(responseCode = "404", ref = "NotFound")
     @ApiResponse(responseCode = "409", ref = "Conflict")
     @ApiResponse(responseCode = "422", ref = "BusinessRule")
-    @AllowedRoles(Role.ADMIN)
     @PostMapping("/{id}/reopenQuote")
     ServiceOrderResponse reopenQuote(
             @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id,
