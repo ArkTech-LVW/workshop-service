@@ -123,6 +123,10 @@ MAIL_FROM=sua.conta@gmail.com
 
 O Gmail limita o envio a cerca de 500 e-mails por dia por conta e reescreve o remetente para a conta autenticada. Nunca faça commit da senha de app.
 
+## Análise de vulnerabilidades
+
+O código passa por análise estática no SonarQube, rodando localmente. O resultado da última análise, a justificativa de cada achado e o passo a passo para rodar a análise estão em [docs/security/vulnerability-report.md](docs/security/vulnerability-report.md).
+
 ## Cobertura de testes
 
 O `./gradlew build` falha se a cobertura de linhas das camadas `domain` e `application` ficar abaixo de 90%. A conta junta essas camadas de todos os módulos num número só, e o mínimo fica em `coverageLineMinimum` no `gradle.properties`.
