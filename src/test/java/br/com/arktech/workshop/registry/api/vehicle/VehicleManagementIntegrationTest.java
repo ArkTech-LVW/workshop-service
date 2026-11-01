@@ -53,6 +53,14 @@ class VehicleManagementIntegrationTest {
                 Arguments.of(get("/admin/customers/1/vehicles")));
     }
 
+    static Stream<Arguments> vehicleEndpointsClosedToMechanics() {
+        return Stream.of(
+                Arguments.of(post("/admin/vehicles").contentType(MediaType.APPLICATION_JSON).content("{}")),
+                Arguments.of(put("/admin/vehicles/1").contentType(MediaType.APPLICATION_JSON).content("{}")),
+                Arguments.of(delete("/admin/vehicles/1")),
+                Arguments.of(get("/admin/customers/1/vehicles")));
+    }
+
     @ParameterizedTest
     @MethodSource("vehicleEndpoints")
     void shouldRequireToken(MockHttpServletRequestBuilder request) throws Exception {
@@ -60,13 +68,25 @@ class VehicleManagementIntegrationTest {
     }
 
     @ParameterizedTest
-    @MethodSource("vehicleEndpoints")
+    @MethodSource("vehicleEndpointsClosedToMechanics")
     void shouldDenyMechanics(MockHttpServletRequestBuilder request) throws Exception {
         String token = tokenFor(Role.MECHANIC);
 
         mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("auth.accessDenied"));
+    }
+
+    @Test
+    void shouldLetMechanicsConsultVehicles() throws Exception {
+        Integer id = createVehicle(createCustomer(), uniquePlate(), null);
+        String token = tokenFor(Role.MECHANIC);
+
+        mockMvc.perform(get("/admin/vehicles").header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/admin/vehicles/{id}", id).header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id));
     }
 
     @Test
