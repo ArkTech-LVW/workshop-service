@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -45,7 +46,15 @@ class PartManagementIntegrationTest {
         return Stream.of(
                 Arguments.of(post("/admin/parts").contentType(MediaType.APPLICATION_JSON).content("{}")),
                 Arguments.of(get("/admin/parts")),
+                Arguments.of(get("/admin/parts/lowStock")),
                 Arguments.of(get("/admin/parts/1")),
+                Arguments.of(put("/admin/parts/1").contentType(MediaType.APPLICATION_JSON).content("{}")),
+                Arguments.of(delete("/admin/parts/1")));
+    }
+
+    static Stream<Arguments> partWriteEndpoints() {
+        return Stream.of(
+                Arguments.of(post("/admin/parts").contentType(MediaType.APPLICATION_JSON).content("{}")),
                 Arguments.of(put("/admin/parts/1").contentType(MediaType.APPLICATION_JSON).content("{}")),
                 Arguments.of(delete("/admin/parts/1")));
     }
@@ -57,13 +66,28 @@ class PartManagementIntegrationTest {
     }
 
     @ParameterizedTest
-    @MethodSource("partEndpoints")
-    void shouldDenyUsersWithoutAdminRole(MockHttpServletRequestBuilder request) throws Exception {
+    @MethodSource("partWriteEndpoints")
+    void shouldDenyWritesToUsersWithoutAdminRole(MockHttpServletRequestBuilder request) throws Exception {
         String token = tokenFor(Role.ATTENDANT, Role.MECHANIC);
 
         mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("auth.accessDenied"));
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = Role.class, names = {"ATTENDANT", "MECHANIC"})
+    void shouldLetAttendantsAndMechanicsConsultParts(Role role) throws Exception {
+        Integer id = createPart(uniqueSku());
+        String token = tokenFor(role);
+
+        mockMvc.perform(get("/admin/parts").header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/admin/parts/lowStock").header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/admin/parts/{id}", id).header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id));
     }
 
     @Test

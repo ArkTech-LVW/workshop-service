@@ -205,9 +205,9 @@ class QuoteDecisionIntegrationTest {
         as(Role.ATTENDANT, reject("De novo"))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("serviceOrder.invalidStatusTransition"));
-        as(Role.ATTENDANT, reopenQuote()).andExpect(status().isForbidden());
+        as(Role.MECHANIC, reopenQuote()).andExpect(status().isForbidden());
 
-        as(Role.ADMIN, reopenQuote()
+        as(Role.ATTENDANT, reopenQuote()
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"description": "Cliente pediu peça mais barata"}

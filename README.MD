@@ -255,16 +255,22 @@ Um usuário pode ter mais de um papel. O que cada papel pode fazer:
 
 | Ação | ADMIN | ATTENDANT | MECHANIC |
 |---|:-:|:-:|:-:|
-| Usuários, clientes, catálogo de serviços, peças e movimentações de estoque | ✓ | | |
+| Usuários e movimentações de estoque | ✓ | | |
+| Cadastrar, alterar, ativar, desativar ou excluir itens do catálogo de serviços e peças | ✓ | | |
+| Consultar o catálogo de serviços e as peças | ✓ | ✓ | ✓ |
 | Aprovar ou rejeitar pedidos de ajuste de estoque | ✓ | | |
 | Pedir ajuste de estoque | ✓ | ✓ | |
-| Veículos (cadastrar, consultar, alterar) | ✓ | ✓ | |
+| Clientes (cadastrar, consultar, alterar) | ✓ | ✓ | |
+| Excluir cliente | ✓ | | |
+| Veículos (cadastrar, alterar, listar por cliente) | ✓ | ✓ | |
+| Listar e detalhar veículos | ✓ | ✓ | ✓ |
 | Excluir veículo | ✓ | | |
-| Abrir, listar e consultar OS | ✓ | ✓ | |
+| Abrir OS | ✓ | ✓ | |
+| Listar e detalhar OS | ✓ | ✓ | ✓ |
 | Aprovar ou rejeitar orçamento no balcão, entregar e cancelar OS | ✓ | ✓ | |
+| Reabrir orçamento rejeitado ou retirar orçamento enviado | ✓ | ✓ | |
 | Incluir e remover itens da OS e enviar o orçamento | ✓ | ✓ | ✓ |
 | Iniciar diagnóstico e execução, iniciar e concluir serviços, finalizar OS | ✓ | | ✓ |
-| Reabrir orçamento rejeitado ou retirar orçamento enviado | ✓ | | |
 | Métricas | ✓ | | |
 
 Um papel fora da lista recebe 403. No Swagger, cada rota protegida diz no fim da descrição quais papéis podem chamá-la. O cliente da oficina não tem usuário: ele acessa a própria OS pelas rotas `/customer/...`, como explica a [autenticação](#autenticação).

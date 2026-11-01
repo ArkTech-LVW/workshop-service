@@ -44,6 +44,7 @@ interface IPartController {
     @Operation(summary = "${openapi.part.list}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "400", ref = "BadRequest")
+    @AllowedRoles({Role.ADMIN, Role.ATTENDANT, Role.MECHANIC})
     @GetMapping
     PageResponse<PartResponse> list(
             @Parameter(description = "${openapi.part.nameFilter}", example = "óleo")
@@ -62,6 +63,7 @@ interface IPartController {
     @Operation(summary = "${openapi.part.lowStock}", description = "${openapi.part.lowStockDescription}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "400", ref = "BadRequest")
+    @AllowedRoles({Role.ADMIN, Role.ATTENDANT, Role.MECHANIC})
     @GetMapping("/lowStock")
     PageResponse<PartResponse> listLowStock(
             @Parameter(description = "${openapi.page.page}") @RequestParam(defaultValue = "0") @PositiveOrZero
@@ -72,6 +74,7 @@ interface IPartController {
     @Operation(summary = "${openapi.part.findById}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "404", ref = "NotFound")
+    @AllowedRoles({Role.ADMIN, Role.ATTENDANT, Role.MECHANIC})
     @GetMapping("/{id}")
     PartResponse findById(@Parameter(description = "${openapi.part.id}", example = "1") @PathVariable Long id);
 

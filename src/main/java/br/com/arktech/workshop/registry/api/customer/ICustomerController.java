@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Tag(name = "${openapi.customer.tag}")
-@AllowedRoles(Role.ADMIN)
+@AllowedRoles({Role.ADMIN, Role.ATTENDANT})
 @RequestMapping("/admin/customers")
 interface ICustomerController {
 
@@ -73,6 +73,7 @@ interface ICustomerController {
     @ApiResponse(responseCode = "204")
     @ApiResponse(responseCode = "404", ref = "NotFound")
     @ApiResponse(responseCode = "409", ref = "Conflict")
+    @AllowedRoles(Role.ADMIN)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     void delete(@Parameter(description = "${openapi.customer.id}", example = "1") @PathVariable Long id);
