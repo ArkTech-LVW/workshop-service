@@ -14,6 +14,6 @@ record StockMovementRequest(
         @Schema(description = "${openapi.stockMovement.requestType}", example = "IN") @NotNull StockMovementType type,
         @Schema(description = "${openapi.stockMovement.quantity}", example = "10") @NotNull @Positive
                 Integer quantity,
-        @Schema(description = "${openapi.stockMovement.reason}", example = "NF 1234 ou avaria no transporte")
+        @Schema(description = "${openapi.stockMovement.reason}", example = "NF 1234")
                 @Size(max = 255, message = "{validation.maxLength}") @Nullable String reason) {
 }
