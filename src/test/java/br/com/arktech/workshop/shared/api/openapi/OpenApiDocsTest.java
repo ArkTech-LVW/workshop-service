@@ -19,6 +19,7 @@ import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -235,7 +236,7 @@ class OpenApiDocsTest {
     }
 
     @Test
-    void shouldDocumentCustomerManagementAsAdminOnly() {
+    void shouldDocumentCustomerManagement() {
         String customers = "$.paths['/admin/customers']";
         String customer = "$.paths['/admin/customers/{id}']";
 
@@ -253,7 +254,7 @@ class OpenApiDocsTest {
     }
 
     @Test
-    void shouldDocumentVehicleManagementAsAdminOnly() {
+    void shouldDocumentVehicleManagement() {
         String vehicles = "$.paths['/admin/vehicles']";
         String vehicle = "$.paths['/admin/vehicles/{id}']";
         String customerVehicles = "$.paths['/admin/customers/{customerId}/vehicles']";
@@ -345,6 +346,29 @@ class OpenApiDocsTest {
         assertThat(spec.read("$.paths['/admin/serviceOrders/{id}/sendQuote'].post.description", String.class))
                 .startsWith("De IN_DIAGNOSIS")
                 .endsWith("\n\n**Papéis:** ADMIN, ATTENDANT, MECHANIC");
+    }
+
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', textBlock = """
+            /admin/customers           | post   | ADMIN, ATTENDANT
+            /admin/customers/{id}      | delete | ADMIN
+            /admin/serviceOrders       | get    | ADMIN, ATTENDANT, MECHANIC
+            /admin/serviceOrders/{id}  | get    | ADMIN, ATTENDANT, MECHANIC
+            /admin/serviceOrders       | post   | ADMIN, ATTENDANT
+            /admin/services            | get    | ADMIN, ATTENDANT, MECHANIC
+            /admin/services/{id}       | get    | ADMIN, ATTENDANT, MECHANIC
+            /admin/services            | post   | ADMIN
+            /admin/parts               | get    | ADMIN, ATTENDANT, MECHANIC
+            /admin/parts/lowStock      | get    | ADMIN, ATTENDANT, MECHANIC
+            /admin/parts/{id}          | get    | ADMIN, ATTENDANT, MECHANIC
+            /admin/parts               | post   | ADMIN
+            /admin/vehicles            | get    | ADMIN, ATTENDANT, MECHANIC
+            /admin/vehicles/{id}       | get    | ADMIN, ATTENDANT, MECHANIC
+            /admin/vehicles            | post   | ADMIN, ATTENDANT
+            """)
+    void shouldDocumentTheRolesOfEachReviewedRoute(String path, String method, String roles) {
+        assertThat(spec.read("$.paths['%s'].%s.description".formatted(path, method), String.class))
+                .endsWith("**Papéis:** " + roles);
     }
 
     @Test
