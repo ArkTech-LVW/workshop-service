@@ -1,10 +1,10 @@
 package br.com.arktech.workshop.notification.application.email;
 
+import br.com.arktech.workshop.notification.application.NotificationChannel;
 import br.com.arktech.workshop.notification.application.email.EmailTemplate.RenderedEmail;
 import br.com.arktech.workshop.notification.domain.model.EmailNotification;
 import br.com.arktech.workshop.notification.domain.repository.EmailNotificationRepository;
 import br.com.arktech.workshop.shared.application.notification.Notification;
-import br.com.arktech.workshop.shared.application.notification.Notifier;
 import br.com.arktech.workshop.shared.application.registry.CustomerContacts;
 
 import java.time.Clock;
@@ -13,13 +13,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-class EmailNotifier implements Notifier {
+class EmailChannel implements NotificationChannel {
 
     static final String RECIPIENT_NOT_FOUND = "Customer email not found";
 
@@ -29,8 +27,7 @@ class EmailNotifier implements Notifier {
     private final Clock clock;
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
-    public void send(Notification notification) {
+    public void record(Notification notification) {
         RenderedEmail email = emailTemplate.render(notification);
         String type = notification.type().name();
 

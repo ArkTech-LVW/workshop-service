@@ -19,7 +19,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
-class EmailNotifierTest {
+class EmailChannelTest {
 
     private static final Instant NOW = Instant.parse("2026-11-01T12:00:00Z");
     private static final Long CUSTOMER_ID = 10L;
@@ -27,7 +27,7 @@ class EmailNotifierTest {
 
     private final InMemoryEmailNotificationRepository repository = new InMemoryEmailNotificationRepository();
     private final Map<Long, Email> emails = Map.of(CUSTOMER_ID, ANA);
-    private final EmailNotifier notifier = new EmailNotifier(
+    private final EmailChannel channel = new EmailChannel(
             new EmailTemplate(TestMessageResolver.withApplicationMessages()),
             customerId -> Optional.ofNullable(emails.get(customerId)),
             repository,
@@ -35,7 +35,7 @@ class EmailNotifierTest {
 
     @Test
     void shouldRecordAPendingEmailWithTheTemplateOfTheType() {
-        notifier.send(new Notification(
+        channel.record(new Notification(
                 CUSTOMER_ID,
                 NotificationType.SERVICE_ORDER_QUOTE_REJECTED,
                 List.of("OS-1", "R$ 64,00", "Achou caro")));
@@ -56,14 +56,14 @@ class EmailNotifierTest {
 
     @Test
     void shouldRecordAFailedEmailWhenTheCustomerHasNoEmail() {
-        notifier.send(new Notification(
+        channel.record(new Notification(
                 99L, NotificationType.SERVICE_ORDER_COMPLETED, List.of("OS-1", "R$ 64,00")));
 
         assertThat(repository.findAll()).singleElement().satisfies(email -> {
             assertThat(email.getStatus()).isEqualTo(EmailNotificationStatus.FAILED);
             assertThat(email.getRecipient()).isNull();
             assertThat(email.getNextAttemptAt()).isNull();
-            assertThat(email.getLastError()).isEqualTo(EmailNotifier.RECIPIENT_NOT_FOUND);
+            assertThat(email.getLastError()).isEqualTo(EmailChannel.RECIPIENT_NOT_FOUND);
             assertThat(email.getSubject()).isEqualTo("Ordem de serviço OS-1 finalizada");
         });
     }
@@ -71,7 +71,7 @@ class EmailNotifierTest {
     @Test
     void shouldHaveATemplateForEveryNotificationType() {
         for (NotificationType type : NotificationType.values()) {
-            notifier.send(new Notification(CUSTOMER_ID, type, List.of("OS-1", "R$ 64,00", "Motivo")));
+            channel.record(new Notification(CUSTOMER_ID, type, List.of("OS-1", "R$ 64,00", "Motivo")));
         }
 
         assertThat(repository.findAll())
