@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.errorprone)
+    alias(libs.plugins.sonarqube)
 }
 
 group = "br.com.arktech"
@@ -101,4 +102,17 @@ tasks.register<Test>("integrationTest") {
     testClassesDirs = sourceSets.test.get().output.classesDirs
     classpath = sourceSets.test.get().runtimeClasspath
     useJUnitPlatform { includeTags("integration") }
+}
+
+tasks.jacocoTestReport {
+    reports {
+        xml.required = true
+    }
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "workshop-service")
+        property("sonar.host.url", providers.environmentVariable("SONAR_HOST_URL").getOrElse("http://localhost:9000"))
+    }
 }
