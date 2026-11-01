@@ -52,7 +52,7 @@ class GetServiceOrderTimeMetricsIntegrationTest {
     }
 
     @Test
-    void shouldAverageTheExecutionTimeOfTheServiceOrdersThatIncludedEachService() {
+    void shouldAverageTheExecutionTimeOfEachServicePerUnit() {
         LocalDate day = LocalDate.of(2001, 3, 8);
         Long oilChange = fixture.serviceOffering("Troca de óleo", 60);
         Long alignment = fixture.serviceOffering("Alinhamento", 45);
@@ -69,8 +69,30 @@ class GetServiceOrderTimeMetricsIntegrationTest {
         assertThat(result.averageExecutionTime()).isEqualTo(ofMinutes(195));
         assertThat(result.byService())
                 .containsExactly(
-                        new ServiceExecutionTime(alignment, "Alinhamento", 45, ofHours(5), 2),
-                        new ServiceExecutionTime(oilChange, "Troca de óleo", 60, ofHours(3), 2));
+                        new ServiceExecutionTime(alignment, "Alinhamento", 45, ofHours(5), 2, 2),
+                        new ServiceExecutionTime(oilChange, "Troca de óleo", 60, ofHours(2), 2, 3));
+    }
+
+    @Test
+    void shouldMeasureEachServiceFromItsStartToItsCompletion() {
+        LocalDate day = LocalDate.of(2001, 3, 9);
+        Long oilChange = fixture.serviceOffering("Troca de óleo", 60);
+        Long alignment = fixture.serviceOffering("Alinhamento", 45);
+        fixture.openedAt(at(day, 7))
+                .withService(oilChange, 1, at(day, 8, 30), at(day, 9, 0))
+                .withService(alignment, 2, at(day, 8, 45), at(day, 10, 45))
+                .withService(oilChange, 1, at(day, 9, 0), at(day, 10, 0))
+                .then("IN_PROGRESS", ofHours(1))
+                .then("COMPLETED", ofHours(3))
+                .save();
+
+        ServiceOrderTimeMetricsResult result = metricsOf(day, day);
+
+        assertThat(result.averageExecutionTime()).isEqualTo(ofHours(3));
+        assertThat(result.byService())
+                .containsExactly(
+                        new ServiceExecutionTime(alignment, "Alinhamento", 45, ofHours(1), 1, 2),
+                        new ServiceExecutionTime(oilChange, "Troca de óleo", 60, ofMinutes(45), 1, 2));
     }
 
     @Test
@@ -78,7 +100,7 @@ class GetServiceOrderTimeMetricsIntegrationTest {
         LocalDate day = LocalDate.of(2001, 3, 2);
         Long brakes = fixture.serviceOffering("Revisão de freios", 90);
         fixture.openedAt(at(day, 7))
-                .withService(brakes, 1)
+                .withService(brakes, 1, at(day, 9, 15), at(day, 16, 30))
                 .then("IN_DIAGNOSIS", ofMinutes(10))
                 .then("AWAITING_APPROVAL", ofMinutes(20))
                 .then("QUOTE_APPROVED", ofMinutes(30))
@@ -94,7 +116,7 @@ class GetServiceOrderTimeMetricsIntegrationTest {
         assertThat(result.serviceOrderCount()).isEqualTo(1);
         assertThat(result.averageExecutionTime()).isEqualTo(ofHours(3));
         assertThat(result.byService())
-                .containsExactly(new ServiceExecutionTime(brakes, "Revisão de freios", 90, ofHours(3), 1));
+                .containsExactly(new ServiceExecutionTime(brakes, "Revisão de freios", 90, ofMinutes(90), 1, 1));
         assertThat(result.timeByStatus())
                 .containsExactly(
                         new StatusTime("RECEIVED", ofMinutes(10), 1),
@@ -229,6 +251,10 @@ class GetServiceOrderTimeMetricsIntegrationTest {
     }
 
     private static Instant at(LocalDate day, int hour) {
-        return day.atTime(hour, 0).atZone(ZoneId.of("America/Sao_Paulo")).toInstant();
+        return at(day, hour, 0);
+    }
+
+    private static Instant at(LocalDate day, int hour, int minute) {
+        return day.atTime(hour, minute).atZone(ZoneId.of("America/Sao_Paulo")).toInstant();
     }
 }

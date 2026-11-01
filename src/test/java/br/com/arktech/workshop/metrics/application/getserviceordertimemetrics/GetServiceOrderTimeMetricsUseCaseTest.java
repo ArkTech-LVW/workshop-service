@@ -75,7 +75,7 @@ class GetServiceOrderTimeMetricsUseCaseTest {
                 new StatusTime("IN_DIAGNOSIS", Duration.ofHours(1), 2),
                 new StatusTime("IN_PROGRESS", Duration.ofHours(3), 2),
                 new StatusTime("COMPLETED", Duration.ofHours(5), 1));
-        reader.byService = List.of(new ServiceExecutionTime(3L, "Troca de óleo", 60, Duration.ofHours(3), 2));
+        reader.byService = List.of(new ServiceExecutionTime(3L, "Troca de óleo", 60, Duration.ofHours(3), 2, 2));
 
         ServiceOrderTimeMetricsResult result =
                 useCase.execute(new GetServiceOrderTimeMetricsQuery(OCTOBER_1, OCTOBER_31));

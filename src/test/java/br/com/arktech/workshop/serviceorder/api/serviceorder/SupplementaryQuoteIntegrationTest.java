@@ -223,6 +223,13 @@ class SupplementaryQuoteIntegrationTest {
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("serviceOrder.pendingItemCompletionNotAllowed"));
         as(Role.MECHANIC, post(
+                        "/admin/serviceOrders/{id}/services/{itemId}/start", serviceOrderId, newServiceItemId))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.code").value("serviceOrder.pendingItemStartNotAllowed"));
+        as(Role.MECHANIC, post(
+                        "/admin/serviceOrders/{id}/services/{itemId}/start", serviceOrderId, serviceItemId))
+                .andExpect(status().isOk());
+        as(Role.MECHANIC, post(
                         "/admin/serviceOrders/{id}/services/{itemId}/complete", serviceOrderId, serviceItemId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("IN_PROGRESS"));

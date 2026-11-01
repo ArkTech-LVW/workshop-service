@@ -48,7 +48,7 @@ class MetricsControllerTest {
         when(getServiceOrderTimeMetricsUseCase.execute(any())).thenReturn(new ServiceOrderTimeMetricsResult(
                 2,
                 Duration.ofMinutes(150),
-                List.of(new ServiceExecutionTime(3L, "Troca de óleo", 60, Duration.ofSeconds(90), 2)),
+                List.of(new ServiceExecutionTime(3L, "Troca de óleo", 60, Duration.ofSeconds(90), 2, 3)),
                 List.of(new StatusTime("AWAITING_APPROVAL", Duration.ofHours(27).plusMinutes(5), 1))));
 
         mockMvc.perform(get(ROUTE).param("from", "2026-10-01").param("to", "2026-10-31"))
@@ -58,7 +58,7 @@ class MetricsControllerTest {
                         {"serviceOrderCount": 2,
                          "averageExecutionTime": {"minutes": 150, "formatted": "02:30"},
                          "byService": [{"serviceOfferingId": 3, "name": "Troca de óleo", "estimatedMinutes": 60,
-                                        "serviceOrderCount": 2,
+                                        "serviceOrderCount": 2, "executionCount": 3,
                                         "averageExecutionTime": {"minutes": 2, "formatted": "00:02"}}],
                          "timeByStatus": [{"status": "AWAITING_APPROVAL", "serviceOrderCount": 1,
                                            "averageTime": {"minutes": 1625, "formatted": "27:05"}}]}
