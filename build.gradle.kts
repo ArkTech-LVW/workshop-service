@@ -95,6 +95,34 @@ tasks.test {
     })
 }
 
+val coverageScope = listOf(
+    "br/com/arktech/workshop/*/domain/**",
+    "br/com/arktech/workshop/*/application/**",
+)
+
+tasks.jacocoTestReport {
+    reports {
+        csv.required = true
+    }
+}
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.test)
+    classDirectories.setFrom(sourceSets.main.get().output.classesDirs.asFileTree.matching { include(coverageScope) })
+    violationRules {
+        rule {
+            limit {
+                counter = "LINE"
+                minimum = providers.gradleProperty("coverageLineMinimum").get().toBigDecimal()
+            }
+        }
+    }
+}
+
+tasks.check {
+    dependsOn(tasks.jacocoTestCoverageVerification)
+}
+
 tasks.register<Test>("integrationTest") {
     description = "Runs only the integration tests."
     group = LifecycleBasePlugin.VERIFICATION_GROUP

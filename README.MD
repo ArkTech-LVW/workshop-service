@@ -28,7 +28,7 @@ Usuário e senha do banco vêm das variáveis `DB_USERNAME` e `DB_PASSWORD`, lid
 ### Para desenvolvimento
 
 ```bash
-# Compila, roda todos os testes e gera o relatório de cobertura (build/reports/jacoco/test/html)
+# Compila, roda todos os testes, gera o relatório de cobertura (build/reports/jacoco/test/html) e verifica o mínimo de cobertura
 ./gradlew build
 
 # Roda só os testes de integração (aceita --tests para filtrar uma classe)
@@ -90,6 +90,19 @@ As métricas saem do histórico de status de cada OS. A consulta e o índice est
 - **Média:** por status, entre as OS que passaram por ele, junto com a quantidade dessas OS. Sem OS no período, a média é nula.
 - **Por serviço do catálogo:** tempo médio de execução das OS do período que incluíram o serviço, sem peso pela quantidade. Uma OS com vários serviços conta em cada um, com o tempo de execução da OS inteira, porque o item não registra quando começou. Nome e tempo estimado são os atuais do catálogo.
 - **Rota:** `GET /admin/metrics/averageExecutionTime?from=2026-10-01&to=2026-10-31`, só para ADMIN, com no máximo 366 dias. Cada duração sai em minutos inteiros e em `HH:mm`, com as horas sem limite (`27:05`).
+
+## Cobertura de testes
+
+O `./gradlew build` falha se a cobertura de linhas das camadas `domain` e `application` ficar abaixo de 90%. A conta junta essas camadas de todos os módulos num número só, e o mínimo fica em `coverageLineMinimum` no `gradle.properties`.
+
+- **O que entra:** tudo que está em `domain` e `application`: entidades e value objects, use cases, listeners, commands, queries e results.
+- **O que fica fora:** `api` (controllers e DTOs HTTP), `infrastructure` (adapters, repositórios JPA, configurações) e a classe `main`. Não têm regra de negócio e já são exercitados pelos testes de integração.
+
+Onde ver a cobertura:
+
+- **Local:** o relatório completo fica em `build/reports/jacoco/test/html`, gerado a cada build e fora do git.
+- **CI:** cada run publica o relatório no artefato `coverage-report`, que expira junto com os artefatos do GitHub Actions. Cada PR recebe um comentário com a cobertura por módulo, atualizado a cada push. Nada disso fica no repositório.
+- **Entrega:** a evidência versionada está em [docs/evidencias/cobertura](docs/evidencias/cobertura). É uma foto tirada à mão no fechamento da entrega e não se atualiza sozinha.
 
 ## Decisões de arquitetura
 
