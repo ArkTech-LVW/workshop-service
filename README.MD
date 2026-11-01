@@ -395,11 +395,10 @@ O código passa por análise estática no SonarQube, rodando localmente. O resul
 
 ### Domain-Driven Design
 
-> A definir: link da documentação DDD (Event Storming, contextos delimitados e linguagem ubíqua).
+A documentação DDD fica em [`docs/ddd/workshop-ddd.drawio`](docs/ddd/workshop-ddd.drawio), com uma aba por entregável. Para ver sem instalar nada e sem login, [abra no draw.io](https://app.diagrams.net/#Uhttps%3A%2F%2Fraw.githubusercontent.com%2FArkTech-LVW%2Fworkshop-service%2Fmain%2Fdocs%2Fddd%2Fworkshop-ddd.drawio).
 
-### Vídeo de apresentação
-
-> A definir: link do vídeo de demonstração.
+- **Mapa de contextos:** os contextos delimitados, as relações entre eles e os subdomínios.
+- **Legenda:** a notação usada nos diagramas.
 
 ## Contribuindo
 
