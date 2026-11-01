@@ -1,6 +1,7 @@
 package br.com.arktech.workshop.auth.infrastructure.ratelimit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import br.com.arktech.workshop.auth.infrastructure.config.RateLimitProperties;
@@ -28,7 +29,7 @@ class RateLimitTest {
     void shouldCountEachKeyOnItsOwn() {
         consume("10.0.0.1", 3);
 
-        consume("10.0.0.2", 3);
+        assertThatCode(() -> consume("10.0.0.2", 3)).doesNotThrowAnyException();
     }
 
     private void consume(String key, int times) {
