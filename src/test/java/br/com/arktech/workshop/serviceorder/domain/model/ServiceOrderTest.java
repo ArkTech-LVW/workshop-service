@@ -297,6 +297,7 @@ class ServiceOrderTest {
         serviceOrder.sendQuote(USER_ID, true, null);
 
         serviceOrder.reopenQuote(USER_ID, "Peça nova em falta");
+        serviceOrder.startServiceItem(1L, USER_ID, STARTED_AT);
         serviceOrder.completeServiceItem(1L, USER_ID, COMPLETED_AT);
 
         assertThat(serviceOrder.getStatus()).isEqualTo(IN_PROGRESS);

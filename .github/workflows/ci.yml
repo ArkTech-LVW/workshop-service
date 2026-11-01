@@ -40,6 +40,41 @@ jobs:
           name: coverage-report
           path: build/reports/jacoco/test/html
 
+      - name: Publish coverage summary
+        if: ${{ always() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          summary=build/reports/jacoco/test/coverage-summary.md
+          [ -f "$summary" ] || exit 0
+          marker='<!-- coverage-report -->'
+          body="$RUNNER_TEMP/coverage.md"
+
+          {
+            echo "$marker"
+            echo "### Cobertura de testes no commit ${COMMIT_SHA:0:7}"
+            echo
+            cat "$summary"
+            echo
+            echo "[Relatório completo no artefato \`coverage-report\`]($RUN_URL)"
+          } > "$body"
+
+          cat "$body" >> "$GITHUB_STEP_SUMMARY"
+
+          [ "$EVENT_NAME" = "pull_request" ] || exit 0
+          comment_id=$(gh api "repos/$GH_REPO/issues/$PR_NUMBER/comments" --paginate \
+            --jq ".[] | select(.user.login == \"github-actions[bot]\" and (.body | startswith(\"$marker\"))) | .id" | tail -n 1)
+          if [ -n "$comment_id" ]; then
+            gh api -X PATCH "repos/$GH_REPO/issues/comments/$comment_id" -F body=@"$body" > /dev/null
+          else
+            gh pr comment "$PR_NUMBER" --body-file "$body"
+          fi
+
       - name: Comment failed tests on PR
         if: ${{ failure() && github.event_name == 'pull_request' }}
         env:
