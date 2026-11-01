@@ -122,6 +122,8 @@ class QuoteWithdrawalIntegrationTest {
         sendQuote().andExpect(status().isOk());
         as(post("/admin/serviceOrders/{id}/approve", serviceOrderId)).andExpect(status().isOk());
         as(post("/admin/serviceOrders/{id}/startExecution", serviceOrderId)).andExpect(status().isOk());
+        as(post("/admin/serviceOrders/{id}/services/{itemId}/start", serviceOrderId, serviceItemId))
+                .andExpect(status().isOk());
         addPart(filter, 1);
         as(post("/admin/serviceOrders/{id}/sendQuote", serviceOrderId)
                         .contentType(MediaType.APPLICATION_JSON)

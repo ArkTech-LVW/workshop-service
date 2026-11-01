@@ -293,6 +293,7 @@ class ServiceOrderTest {
     @Test
     void shouldGoOnWithTheApprovedServicesAfterWithdrawingTheSupplementaryQuote() {
         ServiceOrder serviceOrder = serviceOrderInProgressWithServices(1);
+        serviceOrder.startServiceItem(1L, USER_ID, STARTED_AT);
         serviceOrder.addPartItem(SUPPLEMENTARY_PART_ID, 1, PART_PRICE);
         serviceOrder.sendQuote(USER_ID, true, null);
 
