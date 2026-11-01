@@ -50,20 +50,20 @@ Subdomínio principal. Vai da abertura da OS até a entrega do veículo.
 
 ### Status da OS
 
-| Status no código | Termo | Quando |
+| Termo | Nome no código | Quando |
 |---|---|---|
-| `RECEIVED` | Recebida | OS aberta. |
-| `IN_DIAGNOSIS` | Em diagnóstico | Mecânico avaliando; itens sendo montados. Também é para onde volta um orçamento retirado ou um rejeitado que foi reaberto. |
-| `AWAITING_APPROVAL` | Aguardando aprovação | Orçamento enviado ao cliente. |
-| `QUOTE_APPROVED` | Orçamento aprovado | Aprovado, na fila para começar. |
-| `QUOTE_REJECTED` | Orçamento rejeitado | O cliente recusou; a oficina reabre o orçamento ou cancela a OS. |
-| `IN_PROGRESS` | Em execução | Serviços sendo feitos. |
-| `AWAITING_SUPPLEMENTARY_APPROVAL` | Aguardando aprovação do complementar | Orçamento complementar enviado durante a execução. |
-| `SUPPLEMENTARY_APPROVED` | Complementar aprovado | Complementar (ou só o original) aprovado; a execução retoma. |
-| `SUPPLEMENTARY_REJECTED` | Complementar rejeitado | O cliente recusou o complementar; a oficina refaz e reenvia, ou cancela. |
-| `COMPLETED` | Finalizada | Todos os serviços concluídos. |
-| `DELIVERED` | Entregue | Veículo retirado. |
-| `CANCELED` | Cancelada | Encerrada antes da execução ou durante a espera do complementar. |
+| Recebida | `RECEIVED` | OS aberta. |
+| Em diagnóstico | `IN_DIAGNOSIS` | Mecânico avaliando; itens sendo montados. Também é para onde volta um orçamento retirado ou um rejeitado que foi reaberto. |
+| Aguardando aprovação | `AWAITING_APPROVAL` | Orçamento enviado ao cliente. |
+| Orçamento aprovado | `QUOTE_APPROVED` | Aprovado, na fila para começar. |
+| Orçamento rejeitado | `QUOTE_REJECTED` | O cliente recusou; a oficina reabre o orçamento ou cancela a OS. |
+| Em execução | `IN_PROGRESS` | Serviços sendo feitos. |
+| Aguardando aprovação do complementar | `AWAITING_SUPPLEMENTARY_APPROVAL` | Orçamento complementar enviado durante a execução. |
+| Complementar aprovado | `SUPPLEMENTARY_APPROVED` | Complementar (ou só o original) aprovado; a execução retoma. |
+| Complementar rejeitado | `SUPPLEMENTARY_REJECTED` | O cliente recusou o complementar; a oficina refaz e reenvia, ou cancela. |
+| Finalizada | `COMPLETED` | Todos os serviços concluídos. |
+| Entregue | `DELIVERED` | Veículo retirado. |
+| Cancelada | `CANCELED` | Encerrada antes da execução ou durante a espera do complementar. |
 
 ## Cadastro
 
@@ -167,7 +167,7 @@ Objetos de valor usados por mais de um contexto.
 
 Só os eventos da OS viraram classe ([ADR 004](../adr/004-domain-events.md)). Os demais fatos do Event Storming ficam registrados no próprio agregado, sem classe de evento.
 
-| Evento | Nome no código | O que acontece depois |
+| Termo | Nome no código | O que acontece depois |
 |---|---|---|
 | Orçamento enviado | `QuoteSentEvent` | O estoque reserva as peças e o cliente é avisado. |
 | Orçamento aprovado | `QuoteApprovedEvent` | O estoque baixa as peças pela diferença e o cliente é avisado. |
@@ -192,17 +192,28 @@ Só os eventos da OS viraram classe ([ADR 004](../adr/004-domain-events.md)). Os
 
 ## Termos que mudam de significado entre contextos
 
-| Termo | Em um contexto | Em outro |
-|---|---|---|
-| Serviço | **Catálogo:** o serviço oferecido, com preço de mão de obra e tempo estimado (`ServiceOffering`). | **OS:** a linha da OS, com quantidade, preço copiado, aprovação, início e conclusão (`ServiceItem`). |
-| Peça | **Estoque:** o item controlado, com SKU, quantidades e reservas (`Part`). Pode ser peça ou insumo. | **OS:** a linha da OS, com quantidade e preço copiado (`PartItem`). |
-| Preço | **Catálogo:** preço de mão de obra. **Estoque:** preço de venda. | **OS:** preço unitário copiado na inclusão, que não acompanha mudanças posteriores. |
-| Cliente | **Cadastro:** o registro com documento e contatos (`Customer`). | **OS:** o ator sem login que acompanha e decide pelo código e pelo documento. **Notificações:** o destinatário do aviso. |
-| Usuário | **Identidade e Acesso:** a conta com perfis e senha (`User`). | **OS:** só quem fez a ação. Sem usuário no histórico significa decisão do cliente. |
-| Aprovação | **OS:** o cliente (ou a oficina) aceita o orçamento. | **Estoque:** o administrador aceita um pedido de ajuste. |
-| Status | **OS:** os 12 status do atendimento (`ServiceOrderStatus`). | **Estoque:** a situação do pedido de ajuste. **Notificações:** a situação do e-mail. |
-| Concluído / finalizado | **Item de serviço:** o mecânico terminou aquele serviço. | **OS:** todos os serviços concluídos e nada pendente. **Orçamento visto pelo cliente:** item já feito, que não pode ser recusado. |
-| Ativo / desativado | **Catálogo:** serviço que pode entrar em OS nova. | **Identidade e Acesso:** usuário que pode fazer login. |
-| Saída de estoque | **Baixa:** peças para uma OS. | **Ajuste:** perda ou correção, com motivo; o administrador lança direto, o atendente passa por pedido de ajuste. |
-| Entrada de estoque | **Entrada:** compra ou recebimento. | **Devolução:** peças voltando de uma OS. |
-| Tempo | **Catálogo:** tempo estimado de uma unidade do serviço. | **Indicadores:** tempo real, medido pelo histórico e pelos itens. |
+| Termo | Nome no código | Contexto | Significado |
+|---|---|---|---|
+| Serviço | `ServiceOffering` | Catálogo de Serviços | O serviço oferecido, com preço de mão de obra e tempo estimado. |
+| Serviço | `ServiceItem` | Ordem de Serviço | A linha da OS, com quantidade, preço copiado, aprovação, início e conclusão. |
+| Peça | `Part` | Estoque | O item controlado, com SKU, quantidades e reservas. Pode ser peça ou insumo. |
+| Peça | `PartItem` | Ordem de Serviço | A linha da OS, com quantidade e preço copiado. |
+| Preço | `laborPrice` | Catálogo de Serviços | Preço de mão de obra. |
+| Preço | `salePrice` | Estoque | Preço de venda. |
+| Preço | `unitPrice` | Ordem de Serviço | Preço copiado na inclusão do item, que não acompanha mudanças posteriores. |
+| Cliente | `Customer` | Cadastro | O registro com documento e contatos. |
+| Cliente | `customer` | Ordem de Serviço | O ator sem login que acompanha e decide a OS pelo código e pelo documento. |
+| Cliente | `customer` | Notificações | O destinatário do aviso. |
+| Usuário | `User` | Identidade e Acesso | A conta com perfis e senha. |
+| Usuário | `changedBy` | Ordem de Serviço | Só quem fez a ação. Sem usuário no histórico significa decisão do cliente. |
+| Aprovação | `QUOTE_APPROVED` | Ordem de Serviço | O cliente (ou a oficina) aceita o orçamento. |
+| Aprovação | `APPROVED` | Estoque | O administrador aceita um pedido de ajuste. |
+| Status | `ServiceOrderStatus` | Ordem de Serviço | Os 12 status do atendimento. |
+| Status | `StockAdjustmentRequestStatus` | Estoque | A situação do pedido de ajuste. |
+| Status | `EmailNotificationStatus` | Notificações | A situação do e-mail. |
+| Concluído | `completed` | Ordem de Serviço (item de serviço) | O mecânico terminou aquele serviço. |
+| Concluído | `COMPLETED` | Ordem de Serviço (OS) | Todos os serviços concluídos e nada pendente. |
+| Ativo | `active` | Catálogo de Serviços | Serviço que pode entrar em OS nova. |
+| Ativo | `active` | Identidade e Acesso | Usuário que pode fazer login. |
+| Tempo | `estimatedMinutes` | Catálogo de Serviços | Tempo estimado de uma unidade do serviço. |
+| Tempo | `averageExecutionTime` | Indicadores Operacionais | Tempo real, medido pelo histórico e pelos itens. |
