@@ -26,7 +26,11 @@ public class SendPendingEmailsUseCase implements VoidUseCase<SendPendingEmailsCo
     public void execute(SendPendingEmailsCommand command) {
         for (EmailNotification email : emailNotificationRepository.lockPendingDueAt(command.now(), command.limit())) {
             try {
-                emailSender.send(Objects.requireNonNull(email.getRecipient()), email.getSubject(), email.getBody());
+                emailSender.send(
+                        Objects.requireNonNull(email.getRecipient()),
+                        email.getSubject(),
+                        email.getBody(),
+                        email.getHtmlBody());
                 email.markSent(command.now());
             } catch (RuntimeException ex) {
                 log.warn("Email notification failed [id={}, attempt={}]", email.getId(), email.getAttempts() + 1, ex);

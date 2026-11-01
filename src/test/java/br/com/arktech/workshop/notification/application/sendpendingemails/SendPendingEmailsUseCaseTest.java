@@ -23,7 +23,7 @@ class SendPendingEmailsUseCaseTest {
     private final InMemoryEmailNotificationRepository repository = new InMemoryEmailNotificationRepository();
     private final List<Email> sentTo = new ArrayList<>();
     private final SendPendingEmailsUseCase useCase =
-            new SendPendingEmailsUseCase(repository, (to, subject, body) -> {
+            new SendPendingEmailsUseCase(repository, (to, subject, textBody, htmlBody) -> {
                 if (to.equals(BRUNO)) {
                     throw new IllegalStateException("Mailbox unavailable");
                 }

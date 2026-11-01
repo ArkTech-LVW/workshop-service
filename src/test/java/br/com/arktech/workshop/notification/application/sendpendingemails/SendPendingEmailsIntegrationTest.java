@@ -61,7 +61,8 @@ class SendPendingEmailsIntegrationTest {
 
         useCase.execute(new SendPendingEmailsCommand(NOW, 500, 5, Duration.ofMinutes(1)));
 
-        verify(emailSender).send(eq(ANA), eq("Ordem de serviço finalizada"), anyString());
+        verify(emailSender)
+                .send(eq(ANA), eq("Ordem de serviço finalizada"), anyString(), eq("<p>Pronto para retirada</p>"));
         assertThat(jdbcTemplate.queryForMap(
                         "SELECT status, attempts, sent_at FROM email_notification WHERE id = ?", id))
                 .containsEntry("status", "SENT")
