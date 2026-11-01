@@ -10,6 +10,7 @@ import br.com.arktech.workshop.shared.domain.exception.ConflictException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.exception.TooManyRequestsException;
 import br.com.arktech.workshop.shared.domain.exception.UnauthorizedException;
+import jakarta.persistence.OptimisticLockException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -18,6 +19,7 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.List;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +44,16 @@ class ErrorTestController {
     @GetMapping("/conflict")
     void conflict() {
         throw new ConflictException("test.conflict");
+    }
+
+    @GetMapping("/optimisticLock")
+    void optimisticLock() {
+        throw new ObjectOptimisticLockingFailureException("TestAggregate", 42L);
+    }
+
+    @GetMapping("/jpaOptimisticLock")
+    void jpaOptimisticLock() {
+        throw new OptimisticLockException();
     }
 
     @GetMapping("/businessRule")

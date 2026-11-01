@@ -59,6 +59,17 @@ class GlobalExceptionHandlerTest {
                         """));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"/test/errors/optimisticLock", "/test/errors/jpaOptimisticLock"})
+    void shouldMapOptimisticLockFailureTo409(String path) throws Exception {
+        perform(get(path))
+                .andExpect(status().isConflict())
+                .andExpect(json("""
+                        {"code": "request.concurrentUpdate",
+                         "message": "O registro foi alterado por outra ação. Consulte de novo e tente outra vez."}
+                        """));
+    }
+
     @Test
     void shouldMapBusinessRuleTo422() throws Exception {
         perform(get("/test/errors/businessRule"))

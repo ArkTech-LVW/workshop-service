@@ -6,6 +6,7 @@ import br.com.arktech.workshop.shared.domain.exception.DomainException;
 import br.com.arktech.workshop.shared.domain.exception.NotFoundException;
 import br.com.arktech.workshop.shared.domain.exception.TooManyRequestsException;
 import br.com.arktech.workshop.shared.domain.exception.UnauthorizedException;
+import jakarta.persistence.OptimisticLockException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -14,6 +15,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.core.MethodParameter;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -74,6 +76,11 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     ResponseEntity<ApiError> handleAccessDenied() {
         return ApiErrors.response(HttpStatus.FORBIDDEN, apiErrors.of("auth.accessDenied"));
+    }
+
+    @ExceptionHandler({OptimisticLockingFailureException.class, OptimisticLockException.class})
+    ResponseEntity<ApiError> handleConcurrentUpdate() {
+        return ApiErrors.response(HttpStatus.CONFLICT, apiErrors.of("request.concurrentUpdate"));
     }
 
     @ExceptionHandler(Exception.class)

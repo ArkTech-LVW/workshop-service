@@ -22,10 +22,17 @@ import br.com.arktech.workshop.shared.domain.security.Role;
 
 import com.jayway.jsonpath.JsonPath;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -187,6 +195,43 @@ class CustomerServiceOrderIntegrationTest {
         mockMvc.perform(approve(document.value()))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("serviceOrder.invalidStatusTransition"));
+    }
+
+    @Test
+    void shouldApproveOnlyOnceWhenTheCustomerApprovesTwiceAtTheSameTime() throws Exception {
+        Long pad = createPart("Pastilha de freio", "45.90", 10);
+        sendQuoteWithPart(pad, 3);
+        CountDownLatch start = new CountDownLatch(1);
+
+        List<MockHttpServletResponse> responses = new ArrayList<>();
+        try (ExecutorService executor = Executors.newFixedThreadPool(2)) {
+            List<Future<MockHttpServletResponse>> results = new ArrayList<>();
+            for (int i = 0; i < 2; i++) {
+                results.add(executor.submit(() -> {
+                    start.await();
+                    return mockMvc.perform(approve(document.value())).andReturn().getResponse();
+                }));
+            }
+            start.countDown();
+            for (Future<MockHttpServletResponse> result : results) {
+                responses.add(result.get(30, TimeUnit.SECONDS));
+            }
+        }
+
+        assertThat(responses).extracting(MockHttpServletResponse::getStatus).containsOnlyOnce(204);
+        MockHttpServletResponse loser = responses.stream()
+                .filter(response -> response.getStatus() != 204)
+                .findFirst()
+                .orElseThrow();
+        assertThat(loser.getStatus()).isIn(409, 422);
+        assertThat(JsonPath.<String>read(loser.getContentAsString(), "$.code"))
+                .isIn("request.concurrentUpdate", "serviceOrder.invalidStatusTransition");
+        assertThat(statusOf()).isEqualTo("QUOTE_APPROVED");
+        assertThat(jdbcTemplate.queryForObject("SELECT stock_quantity FROM part WHERE id = ?", Integer.class, pad))
+                .isEqualTo(7);
+        assertThat(jdbcTemplate.queryForObject(
+                        "SELECT count(*) FROM stock_movement WHERE service_order_id = ?", Integer.class, serviceOrderId))
+                .isOne();
     }
 
     @Test
