@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR"
+      th:replace="~{email/layout :: layout('#2f855a', #{notification.email.serviceOrderQuoteApproved.badge}, ~{::content})}">
+<body>
+<th:block th:fragment="content">
+    <h1 th:replace="~{email/components :: heading(#{notification.email.serviceOrderQuoteApproved.heading})}"></h1>
+    <p th:replace="~{email/components :: paragraph(#{notification.email.serviceOrderQuoteApproved.intro})}"></p>
+    <table th:replace="~{email/components :: details(${ {{#messages.msg('notification.email.label.serviceOrder'), parameters[0]}, {#messages.msg('notification.email.label.totalPrice'), parameters[1]}} })}"></table>
+    <p th:replace="~{email/components :: nextStep(#{notification.email.serviceOrderQuoteApproved.nextStep})}"></p>
+</th:block>
+</body>
+</html>

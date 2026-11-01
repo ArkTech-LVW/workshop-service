@@ -39,7 +39,7 @@ class EmailChannel implements NotificationChannel {
                         recipient,
                         email.subject(),
                         email.body(),
-                        null,
+                        email.htmlBody(),
                         clock.instant()))
                 .orElseGet(() -> {
                     log.warn("Email notification without recipient [customerId={}, type={}]",
@@ -49,7 +49,7 @@ class EmailChannel implements NotificationChannel {
                             type,
                             email.subject(),
                             email.body(),
-                            null,
+                            email.htmlBody(),
                             RECIPIENT_NOT_FOUND);
                 });
         emailNotificationRepository.save(emailNotification);

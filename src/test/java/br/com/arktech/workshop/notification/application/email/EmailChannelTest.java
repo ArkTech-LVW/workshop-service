@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import br.com.arktech.workshop.notification.domain.model.EmailNotification;
 import br.com.arktech.workshop.notification.domain.model.EmailNotificationStatus;
 import br.com.arktech.workshop.notification.domain.repository.InMemoryEmailNotificationRepository;
-import br.com.arktech.workshop.shared.application.i18n.TestMessageResolver;
 import br.com.arktech.workshop.shared.application.notification.Notification;
 import br.com.arktech.workshop.shared.application.notification.NotificationType;
 import br.com.arktech.workshop.shared.domain.email.Email;
@@ -28,7 +27,7 @@ class EmailChannelTest {
     private final InMemoryEmailNotificationRepository repository = new InMemoryEmailNotificationRepository();
     private final Map<Long, Email> emails = Map.of(CUSTOMER_ID, ANA);
     private final EmailChannel channel = new EmailChannel(
-            new EmailTemplate(TestMessageResolver.withApplicationMessages()),
+            TestEmailTemplates.create(),
             customerId -> Optional.ofNullable(emails.get(customerId)),
             repository,
             Clock.fixed(NOW, ZoneOffset.UTC));
@@ -49,6 +48,7 @@ class EmailChannelTest {
             assertThat(email.getBody())
                     .isEqualTo("O orçamento da ordem de serviço OS-1 foi rejeitado. Valor total: R$ 64,00. "
                             + "Motivo: Achou caro");
+            assertThat(email.getHtmlBody()).contains("Orçamento rejeitado", "OS-1", "R$ 64,00", "Achou caro");
             assertThat(email.getAttempts()).isZero();
             assertThat(email.getNextAttemptAt()).isEqualTo(NOW);
         });
