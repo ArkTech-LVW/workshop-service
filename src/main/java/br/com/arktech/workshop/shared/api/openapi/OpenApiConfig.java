@@ -31,6 +31,11 @@ import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.customizers.OperationCustomizer;
+import org.springdoc.core.properties.SwaggerUiConfigProperties;
+import org.springdoc.core.properties.SwaggerUiOAuthProperties;
+import org.springdoc.core.providers.ObjectMapperProvider;
+import org.springdoc.webmvc.ui.SwaggerIndexTransformer;
+import org.springdoc.webmvc.ui.SwaggerWelcomeCommon;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
@@ -47,7 +52,8 @@ class OpenApiConfig {
 
     private static final String TITLE = "Workshop Service API";
     private static final String DEFAULT_VERSION = "dev";
-    private static final String BEARER_AUTH = "bearerAuth";
+    static final String BEARER_AUTH = "bearerAuth";
+    private static final String LOGIN_PATH = "/auth/login";
     private static final String JSON = org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
     private static final String API_ERROR_REF = "#/components/schemas/ApiError";
     private static final String INTERNAL_ERROR_REF = "#/components/responses/InternalError";
@@ -91,6 +97,16 @@ class OpenApiConfig {
                         .description(description.getContentAsString(StandardCharsets.UTF_8)))
                 .components(components)
                 .addSecurityItem(new SecurityRequirement().addList(BEARER_AUTH));
+    }
+
+    @Bean
+    SwaggerIndexTransformer loginAuthorizingIndexPageTransformer(
+            SwaggerUiConfigProperties swaggerUiConfig,
+            SwaggerUiOAuthProperties swaggerUiOAuthProperties,
+            SwaggerWelcomeCommon swaggerWelcomeCommon,
+            ObjectMapperProvider objectMapperProvider) {
+        return new LoginAuthorizingIndexPageTransformer(
+                swaggerUiConfig, swaggerUiOAuthProperties, swaggerWelcomeCommon, objectMapperProvider, LOGIN_PATH);
     }
 
     @Bean

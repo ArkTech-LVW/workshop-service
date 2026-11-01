@@ -70,6 +70,23 @@ class OpenApiDocsTest {
     }
 
     @Test
+    void shouldAuthorizeSwaggerUiWithTokenFromLogin() {
+        ResponseEntity<String> response = restClient
+                .get()
+                .uri("/swagger-ui/swagger-initializer.js")
+                .retrieve()
+                .toEntity(String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody())
+                .contains("window.ui = SwaggerUIBundle({")
+                .contains("responseInterceptor: (response) => {")
+                .contains("path.endsWith('/auth/login')")
+                .contains("window.ui.preauthorizeApiKey('bearerAuth', response.body.accessToken)")
+                .contains("\"persistAuthorization\" : true");
+    }
+
+    @Test
     void shouldDescribeApiWithErrorsSection() {
         assertThat(spec.read("$.info.title", String.class)).isEqualTo("Workshop Service API");
         assertThat(spec.read("$.info.version", String.class)).isNotBlank();

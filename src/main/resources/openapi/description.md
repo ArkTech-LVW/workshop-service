@@ -2,7 +2,7 @@ API de gestão de oficina mecânica: clientes, veículos, ordens de serviço e e
 
 ## Autenticação
 
-As rotas protegidas exigem um token JWT no header `Authorization: Bearer <token>`. O token é obtido em `POST /auth/login` e vale 1h. Para testar por aqui, faça o login, clique em **Authorize** e cole o `accessToken`. Rotas públicas aparecem sem o cadeado.
+As rotas protegidas exigem um token JWT no header `Authorization: Bearer <token>`. O token é obtido em `POST /auth/login` e vale 1h. Para testar por aqui, execute o `POST /auth/login`: o token da resposta é aplicado sozinho no **Authorize** e continua lá depois de recarregar a página. Quando ele vencer, as rotas respondem 401: é só fazer o login de novo. Rotas públicas aparecem sem o cadeado.
 
 As rotas do cliente (`/customer/...`) não usam token: o cliente informa o `publicId` da OS na URL e o próprio CPF/CNPJ no header `X-Customer-Document`.
 
@@ -14,7 +14,7 @@ Cada rota protegida diz, no fim da descrição, quais **papéis** podem chamá-l
 
 O roteiro abaixo leva uma OS da abertura à entrega usando só esta página. Os exemplos de cada rota já se encaixam (mesmo CPF, mesma placa, ids `1`): em banco limpo, basta clicar em **Try it out** e **Execute**. Em banco com dados, troque o CPF, a placa e o SKU e use os ids devolvidos pelas respostas.
 
-1. **Login.** `POST /auth/login` com o corpo de exemplo (o ADMIN `admin@workshop.local` / `admin123`, que só existe no perfil `development`). Clique em **Authorize** e cole o `accessToken`.
+1. **Login.** `POST /auth/login` com o corpo de exemplo (o ADMIN `admin@workshop.local` / `admin123`, que só existe no perfil `development`). O token já fica aplicado no **Authorize**.
 2. **Cliente.** `POST /admin/customers`. Guarde o `id`.
 3. **Veículo.** `POST /admin/vehicles` com o `customerId` do passo 2. Opcional: a abertura da OS cadastra o veículo se a placa ainda não existir.
 4. **Serviço do catálogo.** `POST /admin/services`. Guarde o `id`.
