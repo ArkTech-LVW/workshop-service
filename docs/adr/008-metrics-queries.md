@@ -25,6 +25,8 @@
 - O período tem no máximo 366 dias. O custo da consulta cresce com o número de OS do período (ver [Índice](#índice)), e um ano cobre a comparação que a métrica precisa.
 - Os status entram na SQL e no caso de uso como literais (`'COMPLETED'`, `'IN_PROGRESS'`), porque o enum é do `serviceorder`.
 - O tempo em cada status sai de `LEAD(date_created)` sobre o histórico de cada OS, ordenado por `date_created, id`. A média é convertida em segundos no banco (`round(EXTRACT(EPOCH FROM avg(...)))`) e vira `Duration` no Java. O `interval` do PostgreSQL não chega ao JDBC, porque o driver o entrega como `PGInterval`, separado em meses, dias e horas.
+- O tempo de cada serviço sai do próprio item da OS: o intervalo de `started_at` a `completed_at` do `service_item`, cruzado com os períodos em `IN_PROGRESS` do histórico. Um serviço iniciado antes de um orçamento complementar e concluído depois não conta a espera pelo cliente. A média é por unidade: a soma dos tempos dos itens de cada serviço dividida pela soma das quantidades, na mesma unidade do `estimated_minutes` do catálogo. Cada serviço traz duas contagens: as OS que o incluíram (`serviceOrderCount`) e as execuções somadas (`executionCount`), que é a amostra da média.
+- Os itens entram pelas OS finalizadas no período, as mesmas do total e do tempo por status. Toda OS finalizada só tem itens concluídos, e o banco garante que todo item concluído tem início (`CHECK (completed_at IS NULL OR started_at IS NOT NULL)`), então a consulta não precisa de regra para item sem início.
 
 ### Custo aceito
 
@@ -52,5 +54,5 @@ O índice foi escolhido por um estudo com dados sintéticos realistas: cerca de 
 ## Consequências
 
 - A rota `GET /admin/metrics/averageExecutionTime` só converte o resultado do `GetServiceOrderTimeMetricsUseCase` em resposta. Agregações novas sobre o mesmo histórico estendem a mesma porta.
-- A média por serviço não isola o tempo do serviço: o item não registra quando começou, então cada serviço recebe o tempo de execução da OS inteira. Medir o serviço em si depende de registrar o início de cada item na OS.
+- O mecânico precisa iniciar cada serviço antes de concluí-lo. Sem isso, a média por serviço voltaria a depender do tempo da OS inteira. Um serviço iniciado e removido no complementar sai da média por serviço, mas o tempo dele continua no tempo de execução da OS.
 - Métricas novas sobre tabelas de outros módulos seguem o mesmo padrão: porta no `metrics/application`, `JdbcClient` no `metrics/infrastructure`, teste de integração com dados montados por SQL.

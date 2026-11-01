@@ -28,7 +28,7 @@ Usuário e senha do banco vêm das variáveis `DB_USERNAME` e `DB_PASSWORD`, lid
 ### Para desenvolvimento
 
 ```bash
-# Compila, roda todos os testes e gera o relatório de cobertura (build/reports/jacoco/test/html)
+# Compila, roda todos os testes, gera o relatório de cobertura (build/reports/jacoco/test/html) e verifica o mínimo de cobertura
 ./gradlew build
 
 # Roda só os testes de integração (aceita --tests para filtrar uma classe)
@@ -88,12 +88,25 @@ As métricas saem do histórico de status de cada OS. A consulta e o índice est
 - **Tempo em um status:** soma de todos os períodos que a OS passou nele. Cada entrada no status conta até a mudança de status seguinte. O status atual da OS não conta, porque o período dele ainda não terminou: o tempo em Finalizada só aparece para as OS já entregues.
 - **Tempo de execução:** tempo em Em execução (`IN_PROGRESS`). Com o orçamento complementar, a OS entra em execução mais de uma vez, e os períodos se somam. A espera pela aprovação do cliente e a fila até o mecânico iniciar (Orçamento aprovado e Complementar aprovado) ficam de fora.
 - **Média:** por status, entre as OS que passaram por ele, junto com a quantidade dessas OS. Sem OS no período, a média é nula.
-- **Por serviço do catálogo:** tempo médio de execução das OS do período que incluíram o serviço, sem peso pela quantidade. Uma OS com vários serviços conta em cada um, com o tempo de execução da OS inteira, porque o item não registra quando começou. Nome e tempo estimado são os atuais do catálogo.
+- **Por serviço do catálogo:** o tempo de cada serviço vai do início à conclusão dele na OS (`POST /admin/serviceOrders/{id}/services/{itemId}/start` e `/complete`), contando só os períodos em Em execução. A média é por unidade, dividida pela soma das quantidades, e fica comparável com o tempo estimado. Junto vêm a quantidade de OS que incluíram o serviço e a de execuções. Nome e tempo estimado são os atuais do catálogo.
 - **Rota:** `GET /admin/metrics/averageExecutionTime?from=2026-10-01&to=2026-10-31`, só para ADMIN, com no máximo 366 dias. Cada duração sai em minutos inteiros e em `HH:mm`, com as horas sem limite (`27:05`).
 
 ## Análise de vulnerabilidades
 
 O código passa por análise estática no SonarQube, rodando localmente. O resultado da última análise, a justificativa de cada achado e o passo a passo para rodar a análise estão em [docs/security/vulnerability-report.md](docs/security/vulnerability-report.md).
+
+## Cobertura de testes
+
+O `./gradlew build` falha se a cobertura de linhas das camadas `domain` e `application` ficar abaixo de 90%. A conta junta essas camadas de todos os módulos num número só, e o mínimo fica em `coverageLineMinimum` no `gradle.properties`.
+
+- **O que entra:** tudo que está em `domain` e `application`: entidades e value objects, use cases, listeners, commands, queries e results.
+- **O que fica fora:** `api` (controllers e DTOs HTTP), `infrastructure` (adapters, repositórios JPA, configurações) e a classe `main`. Não têm regra de negócio e já são exercitados pelos testes de integração.
+
+Onde ver a cobertura:
+
+- **Local:** o relatório completo fica em `build/reports/jacoco/test/html`, gerado a cada build e fora do git.
+- **CI:** cada run publica o relatório no artefato `coverage-report`, que expira junto com os artefatos do GitHub Actions. Cada PR recebe um comentário com a cobertura por módulo, atualizado a cada push. Nada disso fica no repositório.
+- **Entrega:** a evidência versionada está em [docs/evidencias/cobertura](docs/evidencias/cobertura): a tabela por módulo, com data, commit de origem e link da run, e o CSV do JaCoCo com a cobertura por classe. Ela não se atualiza sozinha. Para gerar uma nova, rode o workflow **Coverage evidence** na aba Actions e escolha a branch. Ele roda a suíte, commita a evidência assinada pelo GitHub numa branch nova e deixa no resumo da run o link para abrir o PR. O motivo está no [ADR 010](docs/adr/010-coverage-evidence.md).
 
 ## Decisões de arquitetura
 
@@ -106,6 +119,7 @@ O código passa por análise estática no SonarQube, rodando localmente. O resul
 - [ADR 007: Versionamento de migrations por timestamp e execução fora de ordem](docs/adr/007-timestamp-migrations.md)
 - [ADR 008: Consultas de métricas sobre tabelas de outros módulos](docs/adr/008-metrics-queries.md)
 - [ADR 009: Reserva de estoque no orçamento](docs/adr/009-stock-reservation.md)
+- [ADR 010: Regra de cobertura e evidência versionada](docs/adr/010-coverage-evidence.md)
 
 ## Contribuindo
 

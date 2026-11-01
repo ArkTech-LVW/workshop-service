@@ -79,6 +79,7 @@ interface IServiceOrderController {
             description = "${openapi.serviceOrder.startDiagnosisDescription}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "409", ref = "Conflict")
     @ApiResponse(responseCode = "422", ref = "BusinessRule")
     @AllowedRoles({Role.ADMIN, Role.MECHANIC})
     @PostMapping("/{id}/startDiagnosis")
@@ -90,6 +91,7 @@ interface IServiceOrderController {
             description = "${openapi.serviceOrder.sendQuoteDescription}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "409", ref = "Conflict")
     @ApiResponse(responseCode = "422", ref = "BusinessRule")
     @AllowedRoles({Role.ADMIN, Role.ATTENDANT, Role.MECHANIC})
     @PostMapping("/{id}/sendQuote")
@@ -102,6 +104,7 @@ interface IServiceOrderController {
             description = "${openapi.serviceOrder.approveQuoteDescription}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "409", ref = "Conflict")
     @ApiResponse(responseCode = "422", ref = "BusinessRule")
     @PostMapping("/{id}/approve")
     ServiceOrderResponse approve(
@@ -112,6 +115,7 @@ interface IServiceOrderController {
             description = "${openapi.serviceOrder.approveOriginalOnlyDescription}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "409", ref = "Conflict")
     @ApiResponse(responseCode = "422", ref = "BusinessRule")
     @PostMapping("/{id}/approveOriginalOnly")
     ServiceOrderResponse approveOriginalOnly(
@@ -123,6 +127,7 @@ interface IServiceOrderController {
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "400", ref = "BadRequest")
     @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "409", ref = "Conflict")
     @ApiResponse(responseCode = "422", ref = "BusinessRule")
     @PostMapping("/{id}/reject")
     ServiceOrderResponse reject(
@@ -135,6 +140,7 @@ interface IServiceOrderController {
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "400", ref = "BadRequest")
     @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "409", ref = "Conflict")
     @ApiResponse(responseCode = "422", ref = "BusinessRule")
     @AllowedRoles(Role.ADMIN)
     @PostMapping("/{id}/reopenQuote")
@@ -147,6 +153,7 @@ interface IServiceOrderController {
             description = "${openapi.serviceOrder.startExecutionDescription}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "409", ref = "Conflict")
     @ApiResponse(responseCode = "422", ref = "BusinessRule")
     @AllowedRoles({Role.ADMIN, Role.MECHANIC})
     @PostMapping("/{id}/startExecution")
@@ -154,10 +161,23 @@ interface IServiceOrderController {
             @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id);
 
     @Operation(
+            summary = "${openapi.serviceOrder.startService}",
+            description = "${openapi.serviceOrder.startServiceDescription}")
+    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "422", ref = "BusinessRule")
+    @AllowedRoles({Role.ADMIN, Role.MECHANIC})
+    @PostMapping("/{id}/services/{itemId}/start")
+    ServiceOrderResponse startService(
+            @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id,
+            @Parameter(description = "${openapi.serviceOrderItem.itemId}", example = "1") @PathVariable Long itemId);
+
+    @Operation(
             summary = "${openapi.serviceOrder.completeService}",
             description = "${openapi.serviceOrder.completeServiceDescription}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "409", ref = "Conflict")
     @ApiResponse(responseCode = "422", ref = "BusinessRule")
     @AllowedRoles({Role.ADMIN, Role.MECHANIC})
     @PostMapping("/{id}/services/{itemId}/complete")
@@ -170,6 +190,7 @@ interface IServiceOrderController {
             description = "${openapi.serviceOrder.completeDescription}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "409", ref = "Conflict")
     @ApiResponse(responseCode = "422", ref = "BusinessRule")
     @AllowedRoles({Role.ADMIN, Role.MECHANIC})
     @PostMapping("/{id}/complete")
@@ -179,6 +200,7 @@ interface IServiceOrderController {
     @Operation(summary = "${openapi.serviceOrder.deliver}", description = "${openapi.serviceOrder.deliverDescription}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "409", ref = "Conflict")
     @ApiResponse(responseCode = "422", ref = "BusinessRule")
     @PostMapping("/{id}/deliver")
     ServiceOrderResponse deliver(
@@ -188,6 +210,7 @@ interface IServiceOrderController {
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "400", ref = "BadRequest")
     @ApiResponse(responseCode = "404", ref = "NotFound")
+    @ApiResponse(responseCode = "409", ref = "Conflict")
     @ApiResponse(responseCode = "422", ref = "BusinessRule")
     @PostMapping("/{id}/cancel")
     ServiceOrderResponse cancel(

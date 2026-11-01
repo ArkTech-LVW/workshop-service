@@ -243,15 +243,18 @@ public class ServiceOrder extends BaseEntity {
         moveTo(ServiceOrderStatus.IN_PROGRESS, changedByUserId, description);
     }
 
+    public void startServiceItem(Long itemId, Long startedByUserId, Instant startedAt) {
+        if (status != ServiceOrderStatus.IN_PROGRESS) {
+            throw new BusinessRuleException("serviceOrder.serviceItemStartNotAllowed");
+        }
+        findServiceItem(itemId).start(startedByUserId, startedAt);
+    }
+
     public void completeServiceItem(Long itemId, Long completedByUserId, Instant completedAt) {
         if (status != ServiceOrderStatus.IN_PROGRESS) {
             throw new BusinessRuleException("serviceOrder.serviceItemCompletionNotAllowed");
         }
-        ServiceItem item = serviceItems.stream()
-                .filter(serviceItem -> itemId.equals(serviceItem.getId()))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("serviceOrder.itemNotFound", itemId.toString()));
-        item.complete(completedByUserId, completedAt);
+        findServiceItem(itemId).complete(completedByUserId, completedAt);
         if (serviceItems.stream().allMatch(ServiceItem::isCompleted) && !hasPendingChanges()) {
             moveToCompleted(completedByUserId, null);
         }
@@ -325,6 +328,13 @@ public class ServiceOrder extends BaseEntity {
 
     private Stream<ServiceOrderItem> items() {
         return Stream.concat(serviceItems.stream(), partItems.stream());
+    }
+
+    private ServiceItem findServiceItem(Long itemId) {
+        return serviceItems.stream()
+                .filter(serviceItem -> itemId.equals(serviceItem.getId()))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("serviceOrder.itemNotFound", itemId.toString()));
     }
 
     private void requireItems() {

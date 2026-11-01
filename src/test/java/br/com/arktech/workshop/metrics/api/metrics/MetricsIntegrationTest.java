@@ -97,9 +97,10 @@ class MetricsIntegrationTest {
                          "averageExecutionTime": {"minutes": 928, "formatted": "15:28"},
                          "byService": [
                            {"serviceOfferingId": %d, "name": "Alinhamento", "estimatedMinutes": 45,
-                            "serviceOrderCount": 1, "averageExecutionTime": {"minutes": 1735, "formatted": "28:55"}},
+                            "serviceOrderCount": 1, "executionCount": 1,
+                            "averageExecutionTime": {"minutes": 1735, "formatted": "28:55"}},
                            {"serviceOfferingId": %d, "name": "Troca de óleo", "estimatedMinutes": 60,
-                            "serviceOrderCount": 2, "averageExecutionTime": {"minutes": 928, "formatted": "15:28"}}],
+                            "serviceOrderCount": 2, "executionCount": 2, "averageExecutionTime": {"minutes": 928, "formatted": "15:28"}}],
                          "timeByStatus": [
                            {"status": "RECEIVED", "serviceOrderCount": 2,
                             "averageTime": {"minutes": 30, "formatted": "00:30"}},

@@ -22,6 +22,10 @@ public class ServiceItem extends ServiceOrderItem {
 
     private Long serviceOfferingId;
 
+    private @Nullable Instant startedAt;
+
+    private @Nullable Long startedByUserId;
+
     private @Nullable Instant completedAt;
 
     private @Nullable Long completedByUserId;
@@ -31,8 +35,23 @@ public class ServiceItem extends ServiceOrderItem {
         this.serviceOfferingId = serviceOfferingId;
     }
 
+    public boolean isStarted() {
+        return startedAt != null;
+    }
+
     public boolean isCompleted() {
         return completedAt != null;
+    }
+
+    void start(Long startedByUserId, Instant startedAt) {
+        if (isStarted()) {
+            throw new BusinessRuleException("serviceOrder.serviceItemAlreadyStarted");
+        }
+        if (!isApproved()) {
+            throw new BusinessRuleException("serviceOrder.pendingItemStartNotAllowed");
+        }
+        this.startedAt = startedAt;
+        this.startedByUserId = startedByUserId;
     }
 
     void complete(Long completedByUserId, Instant completedAt) {
@@ -41,6 +60,9 @@ public class ServiceItem extends ServiceOrderItem {
         }
         if (!isApproved()) {
             throw new BusinessRuleException("serviceOrder.pendingItemCompletionNotAllowed");
+        }
+        if (!isStarted()) {
+            throw new BusinessRuleException("serviceOrder.serviceItemNotStarted");
         }
         this.completedAt = completedAt;
         this.completedByUserId = completedByUserId;

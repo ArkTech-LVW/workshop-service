@@ -1,5 +1,6 @@
 import net.ltgt.gradle.errorprone.CheckSeverity
 import net.ltgt.gradle.errorprone.errorprone
+import java.util.Locale
 
 plugins {
     java
@@ -94,6 +95,87 @@ tasks.test {
             )
         }
     })
+}
+
+val coverageScope = listOf(
+    "br/com/arktech/workshop/*/domain/**",
+    "br/com/arktech/workshop/*/application/**",
+)
+
+val coverageSummary = tasks.register("coverageSummary") {
+    description = "Writes the line coverage of the domain and application layers as a Markdown table."
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    val csv = layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.csv")
+    val summary = layout.buildDirectory.file("reports/jacoco/test/coverage-summary.md")
+    val minimum = providers.gradleProperty("coverageLineMinimum").map { it.toBigDecimal() }
+    inputs.files(csv)
+    inputs.property("minimum", minimum)
+    outputs.file(summary)
+    onlyIf { csv.get().asFile.exists() }
+
+    doLast {
+        val locale = Locale.of("pt", "BR")
+        val modules = sortedMapOf<String, LongArray>()
+        val scope = LongArray(2)
+        val project = LongArray(2)
+        csv.get().asFile.readLines().drop(1).filter { it.isNotBlank() }.forEach { line ->
+            val columns = line.split(",")
+            val missed = columns[7].toLong()
+            val covered = columns[8].toLong()
+            val packageName = columns[1].split(".")
+            project[0] += missed
+            project[1] += covered
+            if (packageName.getOrNull(5) in setOf("domain", "application")) {
+                val module = modules.getOrPut(packageName[4]) { LongArray(2) }
+                module[0] += missed
+                module[1] += covered
+                scope[0] += missed
+                scope[1] += covered
+            }
+        }
+
+        fun lines(counts: LongArray) = String.format(locale, "%,d", counts[0] + counts[1])
+        fun ratio(counts: LongArray) =
+            if (counts[0] + counts[1] == 0L) 1.0 else counts[1].toDouble() / (counts[0] + counts[1])
+        fun percent(counts: LongArray) = String.format(locale, "%.1f%%", 100 * ratio(counts))
+
+        val passed = ratio(scope).toBigDecimal() >= minimum.get()
+        val markdown = buildString {
+            appendLine("Regra: linhas de `domain` e `application` de todos os módulos, mínimo ${minimum.get().movePointRight(2).stripTrailingZeros().toPlainString()}%.")
+            appendLine()
+            appendLine("| Módulo | Linhas | Cobertura |")
+            appendLine("|---|---:|---:|")
+            modules.forEach { (name, counts) -> appendLine("| $name | ${lines(counts)} | ${percent(counts)} |") }
+            appendLine("| **Escopo da regra** | **${lines(scope)}** | **${percent(scope)}** ${if (passed) "✅" else "❌"} |")
+            appendLine()
+            appendLine("Projeto inteiro: ${percent(project)} das linhas (${lines(project)}).")
+        }
+        summary.get().asFile.writeText(markdown)
+    }
+}
+
+tasks.jacocoTestReport {
+    reports {
+        csv.required = true
+    }
+    finalizedBy(coverageSummary)
+}
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.test)
+    classDirectories.setFrom(sourceSets.main.get().output.classesDirs.asFileTree.matching { include(coverageScope) })
+    violationRules {
+        rule {
+            limit {
+                counter = "LINE"
+                minimum = providers.gradleProperty("coverageLineMinimum").get().toBigDecimal()
+            }
+        }
+    }
+}
+
+tasks.check {
+    dependsOn(tasks.jacocoTestCoverageVerification)
 }
 
 tasks.register<Test>("integrationTest") {

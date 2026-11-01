@@ -45,6 +45,8 @@ import br.com.arktech.workshop.serviceorder.application.startdiagnosis.StartDiag
 import br.com.arktech.workshop.serviceorder.application.startdiagnosis.StartDiagnosisUseCase;
 import br.com.arktech.workshop.serviceorder.application.startexecution.StartExecutionCommand;
 import br.com.arktech.workshop.serviceorder.application.startexecution.StartExecutionUseCase;
+import br.com.arktech.workshop.serviceorder.application.startserviceitem.StartServiceItemCommand;
+import br.com.arktech.workshop.serviceorder.application.startserviceitem.StartServiceItemUseCase;
 import br.com.arktech.workshop.serviceorder.domain.model.InvalidStatusTransitionException;
 import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderStatus;
 import br.com.arktech.workshop.shared.api.error.ApiErrorTestConfig;
@@ -116,7 +118,8 @@ class ServiceOrderControllerTest {
             5L,
             "Barulho ao frear",
             ServiceOrderStatus.IN_DIAGNOSIS,
-            List.of(new ServiceItemResult(1L, 30L, 2, new BigDecimal("150.00"), new BigDecimal("300.00"), null, null)),
+            List.of(new ServiceItemResult(
+                    1L, 30L, 2, new BigDecimal("150.00"), new BigDecimal("300.00"), null, null, null)),
             List.of(new PartItemResult(2L, 40L, 3, new BigDecimal("35.90"), new BigDecimal("107.70"), null)),
             new BigDecimal("300.00"),
             new BigDecimal("107.70"),
@@ -135,7 +138,8 @@ class ServiceOrderControllerTest {
             5L,
             "Barulho ao frear",
             ServiceOrderStatus.AWAITING_APPROVAL,
-            List.of(new ServiceItemResult(1L, 30L, 2, new BigDecimal("150.00"), new BigDecimal("300.00"), null, null)),
+            List.of(new ServiceItemResult(
+                    1L, 30L, 2, new BigDecimal("150.00"), new BigDecimal("300.00"), null, null, null)),
             List.of(new PartItemResult(2L, 40L, 3, new BigDecimal("35.90"), new BigDecimal("107.70"), null)),
             new BigDecimal("300.00"),
             new BigDecimal("107.70"),
@@ -161,6 +165,7 @@ class ServiceOrderControllerTest {
                     new BigDecimal("150.00"),
                     new BigDecimal("300.00"),
                     Instant.parse("2026-10-28T10:15:00Z"),
+                    Instant.parse("2026-10-28T14:30:00Z"),
                     Instant.parse("2026-10-28T16:45:00Z"))),
             List.of(),
             new BigDecimal("300.00"),
@@ -231,6 +236,9 @@ class ServiceOrderControllerTest {
 
     @MockitoBean
     private StartExecutionUseCase startExecutionUseCase;
+
+    @MockitoBean
+    private StartServiceItemUseCase startServiceItemUseCase;
 
     @MockitoBean
     private CompleteServiceItemUseCase completeServiceItemUseCase;
@@ -350,7 +358,8 @@ class ServiceOrderControllerTest {
                          "customerId": 10, "vehicleId": 20, "mechanicId": 5,
                          "problemDescription": "Barulho ao frear", "status": "IN_DIAGNOSIS",
                          "services": [{"id": 1, "serviceOfferingId": 30, "quantity": 2, "unitPrice": 150.00,
-                                       "subtotal": 300.00, "approvedAt": null, "completedAt": null}],
+                                       "subtotal": 300.00, "approvedAt": null, "startedAt": null,
+                                       "completedAt": null}],
                          "parts": [{"id": 2, "partId": 40, "quantity": 3, "unitPrice": 35.90, "subtotal": 107.70,
                                     "approvedAt": null}],
                          "servicesTotal": 300.00, "partsTotal": 107.70, "totalPrice": 407.70,
@@ -545,6 +554,46 @@ class ServiceOrderControllerTest {
         mockMvc.perform(post("/admin/serviceOrders/{id}/startExecution", 1L)).andExpect(status().isOk());
 
         verify(startExecutionUseCase).execute(new StartExecutionCommand(1L));
+    }
+
+    @Test
+    void shouldStartAServiceShowingWhenItWasStarted() throws Exception {
+        when(startServiceItemUseCase.execute(any())).thenReturn(COMPLETED);
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/services/{itemId}/start", 1L, 3L))
+                .andExpect(status().isOk())
+                .andExpect(json(
+                        """
+                        {"services": [{"id": 1, "startedAt": "2026-10-28T14:30:00Z"}]}
+                        """,
+                        JsonCompareMode.LENIENT));
+        verify(startServiceItemUseCase).execute(new StartServiceItemCommand(1L, 3L));
+    }
+
+    @Test
+    void shouldAnswer422WhenTheServiceWasAlreadyStarted() throws Exception {
+        when(startServiceItemUseCase.execute(any()))
+                .thenThrow(new BusinessRuleException("serviceOrder.serviceItemAlreadyStarted"));
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/services/{itemId}/start", 1L, 3L))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(json("""
+                        {"code": "serviceOrder.serviceItemAlreadyStarted",
+                         "message": "Este serviço já foi iniciado."}
+                        """));
+    }
+
+    @Test
+    void shouldAnswer422WhenCompletingAServiceThatWasNotStarted() throws Exception {
+        when(completeServiceItemUseCase.execute(any()))
+                .thenThrow(new BusinessRuleException("serviceOrder.serviceItemNotStarted"));
+
+        mockMvc.perform(post("/admin/serviceOrders/{id}/services/{itemId}/complete", 1L, 3L))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(json("""
+                        {"code": "serviceOrder.serviceItemNotStarted",
+                         "message": "Inicie o serviço antes de concluí-lo."}
+                        """));
     }
 
     @Test

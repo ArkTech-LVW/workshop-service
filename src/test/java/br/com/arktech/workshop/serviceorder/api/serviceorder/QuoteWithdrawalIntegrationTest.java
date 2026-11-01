@@ -137,6 +137,9 @@ class QuoteWithdrawalIntegrationTest {
 
         assertThat(reservedOf(filter)).isZero();
         assertThat(stockOf(pad)).isEqualTo(8);
+        as(post("/admin/serviceOrders/{id}/services/{itemId}/start", serviceOrderId, serviceItemId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("IN_PROGRESS"));
         as(post("/admin/serviceOrders/{id}/services/{itemId}/complete", serviceOrderId, serviceItemId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("IN_PROGRESS"));

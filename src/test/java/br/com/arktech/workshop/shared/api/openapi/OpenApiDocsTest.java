@@ -270,9 +270,9 @@ class OpenApiDocsTest {
         assertThat(spec.read(serviceOrder + ".get.responses", Map.class))
                 .containsOnlyKeys("200", "400", "404", "429", "500");
         assertThat(spec.read(approve + ".post.responses", Map.class))
-                .containsOnlyKeys("204", "400", "404", "422", "429", "500");
+                .containsOnlyKeys("204", "400", "404", "409", "422", "429", "500");
         assertThat(spec.read(reject + ".post.responses", Map.class))
-                .containsOnlyKeys("204", "400", "404", "422", "429", "500");
+                .containsOnlyKeys("204", "400", "404", "409", "422", "429", "500");
     }
 
     @Test
