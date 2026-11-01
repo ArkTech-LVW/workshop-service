@@ -104,6 +104,9 @@ class MainFlowsIntegrationTest {
         staff(mechanicToken, HttpMethod.POST, "/admin/serviceOrders/{id}/startExecution", null)
                 .expect(200)
                 .expectStatus("IN_PROGRESS");
+        staff(mechanicToken, HttpMethod.POST, "/admin/serviceOrders/{id}/services/{itemId}/start", null, brakesItem)
+                .expect(200)
+                .expectStatus("IN_PROGRESS");
         staff(mechanicToken, HttpMethod.POST, "/admin/serviceOrders/{id}/services/{itemId}/complete", null, brakesItem)
                 .expect(200)
                 .expectStatus("COMPLETED");
