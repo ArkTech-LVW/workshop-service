@@ -26,4 +26,17 @@ class RegistryCustomerDirectoryTest {
     void shouldFindNothingForAnUnknownDocument() {
         assertThat(customerDirectory.findIdByDocument(CPFCNPJ.of("52998224725"))).isEmpty();
     }
+
+    @Test
+    void shouldFindTheEmailOfTheCustomer() {
+        Customer ana = customerRepository.save(
+                new Customer("Ana", CPFCNPJ.of("52998224725"), new Email("ana@email.com"), null));
+
+        assertThat(customerDirectory.findEmailById(ana.getId())).contains(new Email("ana@email.com"));
+    }
+
+    @Test
+    void shouldFindNoEmailForAnUnknownCustomer() {
+        assertThat(customerDirectory.findEmailById(99L)).isEmpty();
+    }
 }

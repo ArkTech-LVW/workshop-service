@@ -41,6 +41,8 @@ dependencies {
     implementation(libs.jspecify)
     implementation(libs.spring.boot.starter.data.jpa)
     implementation(libs.spring.boot.starter.flyway)
+    implementation(libs.spring.boot.starter.mail)
+    implementation(libs.spring.boot.starter.thymeleaf)
     implementation(libs.flyway.database.postgresql)
     runtimeOnly(libs.postgresql)
     developmentOnly(libs.spring.boot.docker.compose)

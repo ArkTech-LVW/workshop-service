@@ -15,6 +15,12 @@ services:
       timeout: 5s
       retries: 10
 
+  mailpit:
+    image: axllent/mailpit:v1.33.0
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
   app:
     build: .
     environment:
@@ -22,11 +28,20 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/workshop
       DB_USERNAME: ${DB_USERNAME:-workshop}
       DB_PASSWORD: ${DB_PASSWORD:-workshop}
+      MAIL_HOST: ${MAIL_HOST:-mailpit}
+      MAIL_PORT: ${MAIL_PORT:-1025}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_SMTP_AUTH: ${MAIL_SMTP_AUTH:-false}
+      MAIL_SMTP_STARTTLS: ${MAIL_SMTP_STARTTLS:-false}
+      MAIL_FROM: ${MAIL_FROM:-oficina@arktech.local}
     ports:
       - "8080:8080"
     depends_on:
       postgres:
         condition: service_healthy
+      mailpit:
+        condition: service_started
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
       interval: 10s

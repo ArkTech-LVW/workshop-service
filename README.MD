@@ -17,7 +17,7 @@ Não é preciso instalar o Gradle: use o wrapper (`./gradlew`, ou `gradlew.bat` 
 
 ### Com Docker (ambiente completo)
 
-Só precisa do Docker. Sobe o PostgreSQL e a aplicação em http://localhost:8080:
+Só precisa do Docker. Sobe o PostgreSQL, o Mailpit (servidor de e-mail local) e a aplicação em http://localhost:8080:
 
 ```bash
 docker compose up --build
@@ -34,7 +34,7 @@ Usuário e senha do banco vêm das variáveis `DB_USERNAME` e `DB_PASSWORD`, lid
 # Roda só os testes de integração (aceita --tests para filtrar uma classe)
 ./gradlew integrationTest
 
-# Sobe só o PostgreSQL do docker-compose.yml e roda a aplicação localmente em http://localhost:8080
+# Sobe o PostgreSQL e o Mailpit do docker-compose.yml e roda a aplicação localmente em http://localhost:8080
 ./gradlew bootRun
 
 # Verifica se está no ar
@@ -90,6 +90,38 @@ As métricas saem do histórico de status de cada OS. A consulta e o índice est
 - **Média:** por status, entre as OS que passaram por ele, junto com a quantidade dessas OS. Sem OS no período, a média é nula.
 - **Por serviço do catálogo:** o tempo de cada serviço vai do início à conclusão dele na OS (`POST /admin/serviceOrders/{id}/services/{itemId}/start` e `/complete`), contando só os períodos em Em execução. A média é por unidade, dividida pela soma das quantidades, e fica comparável com o tempo estimado. Junto vêm a quantidade de OS que incluíram o serviço e a de execuções. Nome e tempo estimado são os atuais do catálogo.
 - **Rota:** `GET /admin/metrics/averageExecutionTime?from=2026-10-01&to=2026-10-31`, só para ADMIN, com no máximo 366 dias. Cada duração sai em minutos inteiros e em `HH:mm`, com as horas sem limite (`27:05`).
+
+## Notificações por e-mail
+
+O cliente recebe um e-mail quando o orçamento é enviado, aprovado ou rejeitado e quando a OS é finalizada.
+
+- **Nada se perde:** a notificação é gravada na tabela `email_notification` na mesma transação da ação. Se a gravação falhar, a ação também é desfeita.
+- **Envio:** um job envia os pendentes a cada 30 s. Se o envio falhar, ele tenta de novo, cada vez mais espaçado (1 min, 2 min, …), até 5 tentativas; depois disso o e-mail fica como `FAILED`, com o último erro. Cliente sem e-mail também fica como `FAILED`.
+- **Textos:** assunto e corpo de cada tipo ficam em `src/main/resources/notifications_pt_BR.properties`.
+
+### Mailpit (padrão local)
+
+O `bootRun` e o `docker compose up` sobem o [Mailpit](https://mailpit.axllent.org/), um servidor SMTP de teste que **não entrega nada de verdade**: ele guarda os e-mails e mostra numa caixa de entrada em <http://localhost:8025>. Não precisa de nenhuma configuração.
+
+### Gmail (envio real)
+
+Para enviar de verdade pelo Gmail:
+
+1. Ative a [verificação em duas etapas](https://myaccount.google.com/signinoptions/twosv) na conta Google.
+2. Gere uma [senha de app](https://myaccount.google.com/apppasswords). São 16 letras; use-a no lugar da senha da conta.
+3. Defina as variáveis abaixo, no `.env` da raiz (fora do git) para o `docker compose up`, ou nas variáveis de ambiente da IDE ou do terminal para o `bootRun`:
+
+```properties
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=sua.conta@gmail.com
+MAIL_PASSWORD=senha-de-app-sem-espacos
+MAIL_SMTP_AUTH=true
+MAIL_SMTP_STARTTLS=true
+MAIL_FROM=sua.conta@gmail.com
+```
+
+O Gmail limita o envio a cerca de 500 e-mails por dia por conta e reescreve o remetente para a conta autenticada. Nunca faça commit da senha de app.
 
 ## Análise de vulnerabilidades
 

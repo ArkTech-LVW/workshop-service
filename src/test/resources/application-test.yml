@@ -19,3 +19,7 @@ security:
         capacity: 10000
       customer-service-orders:
         capacity: 10000
+
+notification:
+  email:
+    send-interval: PT1H
