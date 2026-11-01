@@ -13,6 +13,10 @@ class LogNotifier implements Notifier {
 
     @Override
     public void send(Notification notification) {
-        log.info("Notification [customerId={}] {}", notification.customerId(), notification.message());
+        log.info(
+                "Notification [customerId={}, type={}] {}",
+                notification.customerId(),
+                notification.type(),
+                notification.parameters());
     }
 }

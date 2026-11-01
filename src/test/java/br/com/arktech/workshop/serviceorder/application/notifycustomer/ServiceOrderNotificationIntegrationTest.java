@@ -3,15 +3,9 @@ package br.com.arktech.workshop.serviceorder.application.notifycustomer;
 import static br.com.arktech.workshop.UniqueTestData.uniqueCPF;
 import static br.com.arktech.workshop.UniqueTestData.uniquePlate;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.after;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.timeout;
-import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -22,6 +16,7 @@ import br.com.arktech.workshop.auth.domain.model.User;
 import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
 import br.com.arktech.workshop.auth.domain.repository.UserRepository;
 import br.com.arktech.workshop.shared.application.notification.Notification;
+import br.com.arktech.workshop.shared.application.notification.NotificationType;
 import br.com.arktech.workshop.shared.application.notification.Notifier;
 import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
 import br.com.arktech.workshop.shared.domain.email.Email;
@@ -29,17 +24,14 @@ import br.com.arktech.workshop.shared.domain.security.Role;
 
 import com.jayway.jsonpath.JsonPath;
 
-import java.time.Duration;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -48,15 +40,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @IntegrationTest
 class ServiceOrderNotificationIntegrationTest {
-
-    private static final Duration WAIT = Duration.ofSeconds(5);
-
-    private static final String QUOTE_SENT = "foi enviado para aprovação";
-
-    private static final String QUOTE_APPROVED = "foi aprovado";
 
     @Autowired
     private MockMvc mockMvc;
@@ -76,7 +63,7 @@ class ServiceOrderNotificationIntegrationTest {
     @MockitoSpyBean
     private Notifier notifier;
 
-    private final BlockingQueue<Delivery> deliveries = new LinkedBlockingQueue<>();
+    private final List<Delivery> deliveries = new CopyOnWriteArrayList<>();
 
     private Long userId;
 
@@ -103,11 +90,9 @@ class ServiceOrderNotificationIntegrationTest {
         customerId = jdbcTemplate.queryForObject(
                 "SELECT customer_id FROM service_order WHERE id = ?", Long.class, serviceOrderId);
         doAnswer(invocation -> {
-                    Notification notification = invocation.getArgument(0);
                     deliveries.add(new Delivery(
-                            notification,
-                            statusOf(publicId),
-                            Thread.currentThread().getName()));
+                            invocation.getArgument(0),
+                            TransactionSynchronizationManager.isActualTransactionActive()));
                     return invocation.callRealMethod();
                 })
                 .when(notifier)
@@ -115,36 +100,33 @@ class ServiceOrderNotificationIntegrationTest {
     }
 
     @Test
-    void shouldNotifyInTheBackgroundOnlyAfterTheQuoteIsCommitted() throws Exception {
+    void shouldNotifyWithinTheTransactionOfTheQuote() throws Exception {
         sendQuoteWith(createPart(10), 2);
 
-        Delivery delivery = awaitDelivery(QUOTE_SENT);
-
-        assertThat(delivery.serviceOrderStatus()).isEqualTo("AWAITING_APPROVAL");
-        assertThat(delivery.threadName()).startsWith("async-");
-        assertThat(delivery.notification().customerId()).isEqualTo(customerId);
-        assertThat(delivery.notification().message()).contains(publicId.toString(), "R$ 64,00");
+        assertThat(deliveriesOf(NotificationType.SERVICE_ORDER_QUOTE_SENT))
+                .singleElement()
+                .satisfies(delivery -> {
+                    assertThat(delivery.withinTransaction()).isTrue();
+                    assertThat(delivery.notification().customerId()).isEqualTo(customerId);
+                    assertThat(delivery.notification().parameters()).containsExactly(publicId.toString(), "R$ 64,00");
+                });
     }
 
     @Test
-    void shouldKeepTheResultOfTheRequestWhenTheNotificationFails() throws Exception {
+    void shouldRollBackTheActionWhenTheNotificationCannotBeRecorded() throws Exception {
         doThrow(new IllegalStateException("Notifier unavailable")).when(notifier).send(any());
         Long partId = createPart(10);
         startDiagnosisWith(partId, 2);
 
-        as(Role.ATTENDANT, sendQuote())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("AWAITING_APPROVAL"));
+        as(Role.ATTENDANT, sendQuote()).andExpect(status().isInternalServerError());
 
-        verify(notifier, timeout(WAIT.toMillis())).send(argThat(notificationOf(QUOTE_SENT)));
-        assertThat(statusOf(publicId)).isEqualTo("AWAITING_APPROVAL");
+        assertThat(statusOf(publicId)).isEqualTo("IN_DIAGNOSIS");
     }
 
     @Test
     void shouldNotNotifyWhenTheTransactionIsRolledBack() throws Exception {
         Long partId = createPart(2);
         sendQuoteWith(partId, 2);
-        awaitDelivery(QUOTE_SENT);
         releaseTheReservationAsIfItExpired();
         jdbcTemplate.update("UPDATE part SET stock_quantity = 1 WHERE id = ?", partId);
 
@@ -152,40 +134,26 @@ class ServiceOrderNotificationIntegrationTest {
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("part.insufficientStock"));
 
-        verify(notifier, after(WAIT.toMillis()).never())
-                .send(argThat(notificationOf(QUOTE_APPROVED)));
+        assertThat(deliveriesOf(NotificationType.SERVICE_ORDER_QUOTE_APPROVED)).isEmpty();
         assertThat(statusOf(publicId)).isEqualTo("AWAITING_APPROVAL");
     }
 
     @Test
     void shouldNotNotifyWhenTheWorkshopWithdrawsTheQuote() throws Exception {
         sendQuoteWith(createPart(10), 2);
-        awaitDelivery(QUOTE_SENT);
+        deliveries.clear();
 
         as(Role.ADMIN, post("/admin/serviceOrders/{id}/reopenQuote", serviceOrderId)).andExpect(status().isOk());
 
-        assertThat(deliveries.poll(WAIT.toMillis(), TimeUnit.MILLISECONDS)).isNull();
+        assertThat(deliveries).isEmpty();
         assertThat(statusOf(publicId)).isEqualTo("IN_DIAGNOSIS");
     }
 
-    private Delivery awaitDelivery(String fragment) throws InterruptedException {
-        long deadline = System.nanoTime() + WAIT.toNanos();
-        while (true) {
-            Delivery delivery = deliveries.poll(deadline - System.nanoTime(), TimeUnit.NANOSECONDS);
-            if (delivery == null) {
-                return fail("No \"%s\" notification for service order %s".formatted(fragment, publicId));
-            }
-            if (notificationOf(fragment).matches(delivery.notification())) {
-                return delivery;
-            }
-        }
-    }
-
-    private ArgumentMatcher<Notification> notificationOf(String fragment) {
-        return notification -> notification != null
-                && customerId.equals(notification.customerId())
-                && notification.message().contains(publicId.toString())
-                && notification.message().contains(fragment);
+    private List<Delivery> deliveriesOf(NotificationType type) {
+        return deliveries.stream()
+                .filter(delivery -> delivery.notification().type() == type)
+                .filter(delivery -> delivery.notification().parameters().contains(publicId.toString()))
+                .toList();
     }
 
     private void sendQuoteWith(Long partId, int quantity) throws Exception {
@@ -268,6 +236,6 @@ class ServiceOrderNotificationIntegrationTest {
         return mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + token));
     }
 
-    private record Delivery(Notification notification, String serviceOrderStatus, String threadName) {
+    private record Delivery(Notification notification, boolean withinTransaction) {
     }
 }
