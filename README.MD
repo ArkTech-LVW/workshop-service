@@ -28,7 +28,7 @@ Usuário e senha do banco vêm das variáveis `DB_USERNAME` e `DB_PASSWORD`, lid
 ### Para desenvolvimento
 
 ```bash
-# Compila, roda todos os testes e gera o relatório de cobertura (build/reports/jacoco/test/html)
+# Compila, roda todos os testes, gera o relatório de cobertura (build/reports/jacoco/test/html) e verifica o mínimo de cobertura
 ./gradlew build
 
 # Roda só os testes de integração (aceita --tests para filtrar uma classe)
@@ -91,6 +91,19 @@ As métricas saem do histórico de status de cada OS. A consulta e o índice est
 - **Por serviço do catálogo:** o tempo de cada serviço vai do início à conclusão dele na OS (`POST /admin/serviceOrders/{id}/services/{itemId}/start` e `/complete`), contando só os períodos em Em execução. A média é por unidade, dividida pela soma das quantidades, e fica comparável com o tempo estimado. Junto vêm a quantidade de OS que incluíram o serviço e a de execuções. Nome e tempo estimado são os atuais do catálogo.
 - **Rota:** `GET /admin/metrics/averageExecutionTime?from=2026-10-01&to=2026-10-31`, só para ADMIN, com no máximo 366 dias. Cada duração sai em minutos inteiros e em `HH:mm`, com as horas sem limite (`27:05`).
 
+## Cobertura de testes
+
+O `./gradlew build` falha se a cobertura de linhas das camadas `domain` e `application` ficar abaixo de 90%. A conta junta essas camadas de todos os módulos num número só, e o mínimo fica em `coverageLineMinimum` no `gradle.properties`.
+
+- **O que entra:** tudo que está em `domain` e `application`: entidades e value objects, use cases, listeners, commands, queries e results.
+- **O que fica fora:** `api` (controllers e DTOs HTTP), `infrastructure` (adapters, repositórios JPA, configurações) e a classe `main`. Não têm regra de negócio e já são exercitados pelos testes de integração.
+
+Onde ver a cobertura:
+
+- **Local:** o relatório completo fica em `build/reports/jacoco/test/html`, gerado a cada build e fora do git.
+- **CI:** cada run publica o relatório no artefato `coverage-report`, que expira junto com os artefatos do GitHub Actions. Cada PR recebe um comentário com a cobertura por módulo, atualizado a cada push. Nada disso fica no repositório.
+- **Entrega:** a evidência versionada está em [docs/evidencias/cobertura](docs/evidencias/cobertura): a tabela por módulo, com data, commit de origem e link da run, e o CSV do JaCoCo com a cobertura por classe. Ela não se atualiza sozinha. Para gerar uma nova, rode o workflow **Coverage evidence** na aba Actions e escolha a branch. Ele roda a suíte, commita a evidência assinada pelo GitHub numa branch nova e deixa no resumo da run o link para abrir o PR. O motivo está no [ADR 010](docs/adr/010-coverage-evidence.md).
+
 ## Decisões de arquitetura
 
 - [ADR 001: Banco de dados e persistência](docs/adr/001-database.md)
@@ -102,6 +115,7 @@ As métricas saem do histórico de status de cada OS. A consulta e o índice est
 - [ADR 007: Versionamento de migrations por timestamp e execução fora de ordem](docs/adr/007-timestamp-migrations.md)
 - [ADR 008: Consultas de métricas sobre tabelas de outros módulos](docs/adr/008-metrics-queries.md)
 - [ADR 009: Reserva de estoque no orçamento](docs/adr/009-stock-reservation.md)
+- [ADR 010: Regra de cobertura e evidência versionada](docs/adr/010-coverage-evidence.md)
 
 ## Contribuindo
 
