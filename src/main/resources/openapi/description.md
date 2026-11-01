@@ -8,6 +8,34 @@ As rotas do cliente (`/customer/...`) não usam token: o cliente informa o `publ
 
 Todas as rotas têm limite de requisições por usuário (ou por IP, sem token), e o login tem um limite mais restrito, por e-mail e IP. Acima do limite, a resposta é 429 com o header `Retry-After`, mesmo com a senha correta.
 
+Cada rota protegida diz, no fim da descrição, quais **papéis** podem chamá-la. Um papel fora da lista recebe 403.
+
+## Fluxo completo
+
+O roteiro abaixo leva uma OS da abertura à entrega usando só esta página. Os exemplos de cada rota já se encaixam (mesmo CPF, mesma placa, ids `1`): em banco limpo, basta clicar em **Try it out** e **Execute**. Em banco com dados, troque o CPF, a placa e o SKU e use os ids devolvidos pelas respostas.
+
+1. **Login.** `POST /auth/login` com o corpo de exemplo (o ADMIN `admin@workshop.local` / `admin123`, que só existe no perfil `development`). Clique em **Authorize** e cole o `accessToken`.
+2. **Cliente.** `POST /admin/customers`. Guarde o `id`.
+3. **Veículo.** `POST /admin/vehicles` com o `customerId` do passo 2. Opcional: a abertura da OS cadastra o veículo se a placa ainda não existir.
+4. **Serviço do catálogo.** `POST /admin/services`. Guarde o `id`.
+5. **Peça e estoque.** `POST /admin/parts` e depois `POST /admin/parts/{partId}/stockMovements` com `type` = `IN`. **A peça nasce com estoque zero: sem essa entrada, incluir a peça na OS responde 422.**
+6. **Abertura da OS.** `POST /admin/serviceOrders` com o CPF do cliente e a placa. Guarde o `id` e o `publicId`: o `id` é usado nas rotas da oficina, e o `publicId` nas rotas do cliente.
+7. **Diagnóstico e orçamento.** Na OS do passo 6:
+   1. `POST /admin/serviceOrders/{id}/startDiagnosis` (o usuário logado vira o mecânico responsável);
+   2. `POST /admin/serviceOrders/{id}/services` e `POST /admin/serviceOrders/{id}/parts`. Guarde o `itemId` do serviço;
+   3. `POST /admin/serviceOrders/{id}/sendQuote` com o exemplo **Orçamento inicial** (corpo `{}`): `canProceedWithoutChanges` só vale no orçamento complementar e, no inicial, responde 422. As peças ficam reservadas por 7 dias.
+8. **Aprovação pelo cliente, sem token.** `GET /customer/serviceOrders/{publicId}` com o header `X-Customer-Document` = CPF do cliente, e depois `POST /customer/serviceOrders/{publicId}/approve`. O estoque das peças é baixado aqui.
+9. **Execução.** `POST /admin/serviceOrders/{id}/startExecution`, e para cada serviço `POST /admin/serviceOrders/{id}/services/{itemId}/start` e `POST /admin/serviceOrders/{id}/services/{itemId}/complete`. Ao concluir o último serviço, a OS vai sozinha para `COMPLETED`.
+10. **Entrega.** `POST /admin/serviceOrders/{id}/deliver`. `GET /admin/serviceOrders/{id}` mostra o histórico de status completo.
+11. **Métricas.** `GET /admin/metrics/averageExecutionTime` com `from` e `to` cobrindo a data de hoje.
+
+Caminhos alternativos:
+
+- **Rejeição:** no passo 8, `POST /customer/serviceOrders/{publicId}/reject`. A oficina reabre com `POST /admin/serviceOrders/{id}/reopenQuote`, ajusta os itens e reenvia.
+- **Orçamento complementar:** durante a execução, inclua um item e chame `sendQuote` com `canProceedWithoutChanges`. O cliente aprova tudo (`approve`) ou só o original (`approveOriginalOnly`).
+- **Cancelamento:** `POST /admin/serviceOrders/{id}/cancel`, enquanto o orçamento não foi aprovado (a descrição da rota lista os status aceitos).
+- **Aprovação no balcão:** `POST /admin/serviceOrders/{id}/approve` faz o mesmo que o passo 8, pela oficina.
+
 ## Erros
 
 Toda resposta de erro tem o mesmo formato, o `ApiError`, sempre em `application/json`:

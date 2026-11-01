@@ -66,6 +66,7 @@ inventory:
     release-interval: PT15M
 
 springdoc:
+  default-produces-media-type: application/json
   api-docs:
     path: /docs/openapi.json
     # Resolves ${...} in @Schema too (DTO fields), not only in @Operation, @Parameter and @Tag
