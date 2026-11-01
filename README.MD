@@ -91,6 +91,10 @@ As métricas saem do histórico de status de cada OS. A consulta e o índice est
 - **Por serviço do catálogo:** o tempo de cada serviço vai do início à conclusão dele na OS (`POST /admin/serviceOrders/{id}/services/{itemId}/start` e `/complete`), contando só os períodos em Em execução. A média é por unidade, dividida pela soma das quantidades, e fica comparável com o tempo estimado. Junto vêm a quantidade de OS que incluíram o serviço e a de execuções. Nome e tempo estimado são os atuais do catálogo.
 - **Rota:** `GET /admin/metrics/averageExecutionTime?from=2026-10-01&to=2026-10-31`, só para ADMIN, com no máximo 366 dias. Cada duração sai em minutos inteiros e em `HH:mm`, com as horas sem limite (`27:05`).
 
+## Análise de vulnerabilidades
+
+O código passa por análise estática no SonarQube, rodando localmente. O resultado da última análise, a justificativa de cada achado e o passo a passo para rodar a análise estão em [docs/security/vulnerability-report.md](docs/security/vulnerability-report.md).
+
 ## Cobertura de testes
 
 O `./gradlew build` falha se a cobertura de linhas das camadas `domain` e `application` ficar abaixo de 90%. A conta junta essas camadas de todos os módulos num número só, e o mínimo fica em `coverageLineMinimum` no `gradle.properties`.

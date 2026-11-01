@@ -8,6 +8,7 @@ errorprone-plugin = "5.1.1"
 springdoc = "3.1.1"
 bouncycastle = "1.86"
 bucket4j = "8.21.0"
+sonarqube = "7.5.0.8588"
 
 [libraries]
 spring-boot-starter-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
@@ -38,3 +39,4 @@ caffeine = { module = "com.github.ben-manes.caffeine:caffeine" }
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
 errorprone = { id = "net.ltgt.errorprone", version.ref = "errorprone-plugin" }
+sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
