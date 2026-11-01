@@ -8,6 +8,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 
+import java.time.Duration;
 import java.time.Instant;
 
 import lombok.AccessLevel;
@@ -72,5 +73,32 @@ public class EmailNotification extends BaseEntity {
             Long customerId, String type, String subject, String body, String reason) {
         return new EmailNotification(
                 customerId, type, null, subject, body, EmailNotificationStatus.FAILED, null, reason);
+    }
+
+    public void markSent(Instant now) {
+        requirePending();
+        attempts++;
+        status = EmailNotificationStatus.SENT;
+        sentAt = now;
+        nextAttemptAt = null;
+        lastError = null;
+    }
+
+    public void registerFailure(String error, Instant now, int maxAttempts, Duration retryDelay) {
+        requirePending();
+        attempts++;
+        lastError = error;
+        if (attempts >= maxAttempts) {
+            status = EmailNotificationStatus.FAILED;
+            nextAttemptAt = null;
+        } else {
+            nextAttemptAt = now.plus(retryDelay.multipliedBy(attempts));
+        }
+    }
+
+    private void requirePending() {
+        if (status != EmailNotificationStatus.PENDING) {
+            throw new IllegalStateException("Email notification " + getId() + " is not pending, it is " + status);
+        }
     }
 }
