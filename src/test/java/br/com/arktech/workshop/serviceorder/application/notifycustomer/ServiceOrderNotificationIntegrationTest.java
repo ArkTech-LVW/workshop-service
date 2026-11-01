@@ -37,6 +37,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.test.util.AopTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -95,7 +96,7 @@ class ServiceOrderNotificationIntegrationTest {
                             TransactionSynchronizationManager.isActualTransactionActive()));
                     return invocation.callRealMethod();
                 })
-                .when(notifier)
+                .when(AopTestUtils.<Notifier>getUltimateTargetObject(notifier))
                 .send(any());
     }
 
@@ -110,17 +111,21 @@ class ServiceOrderNotificationIntegrationTest {
                     assertThat(delivery.notification().customerId()).isEqualTo(customerId);
                     assertThat(delivery.notification().parameters()).containsExactly(publicId.toString(), "R$ 64,00");
                 });
+        assertThat(emailStatusesOf(NotificationType.SERVICE_ORDER_QUOTE_SENT)).containsExactly("PENDING");
     }
 
     @Test
     void shouldRollBackTheActionWhenTheNotificationCannotBeRecorded() throws Exception {
-        doThrow(new IllegalStateException("Notifier unavailable")).when(notifier).send(any());
+        doThrow(new IllegalStateException("Notifier unavailable"))
+                .when(AopTestUtils.<Notifier>getUltimateTargetObject(notifier))
+                .send(any());
         Long partId = createPart(10);
         startDiagnosisWith(partId, 2);
 
         as(Role.ATTENDANT, sendQuote()).andExpect(status().isInternalServerError());
 
         assertThat(statusOf(publicId)).isEqualTo("IN_DIAGNOSIS");
+        assertThat(emailStatusesOf(NotificationType.SERVICE_ORDER_QUOTE_SENT)).isEmpty();
     }
 
     @Test
@@ -135,6 +140,7 @@ class ServiceOrderNotificationIntegrationTest {
                 .andExpect(jsonPath("$.code").value("part.insufficientStock"));
 
         assertThat(deliveriesOf(NotificationType.SERVICE_ORDER_QUOTE_APPROVED)).isEmpty();
+        assertThat(emailStatusesOf(NotificationType.SERVICE_ORDER_QUOTE_APPROVED)).isEmpty();
         assertThat(statusOf(publicId)).isEqualTo("AWAITING_APPROVAL");
     }
 
@@ -147,6 +153,14 @@ class ServiceOrderNotificationIntegrationTest {
 
         assertThat(deliveries).isEmpty();
         assertThat(statusOf(publicId)).isEqualTo("IN_DIAGNOSIS");
+    }
+
+    private List<String> emailStatusesOf(NotificationType type) {
+        return jdbcTemplate.queryForList(
+                "SELECT status FROM email_notification WHERE customer_id = ? AND type = ?",
+                String.class,
+                customerId,
+                type.name());
     }
 
     private List<Delivery> deliveriesOf(NotificationType type) {
