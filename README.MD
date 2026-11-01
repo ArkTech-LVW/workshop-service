@@ -91,6 +91,10 @@ As métricas saem do histórico de status de cada OS. A consulta e o índice est
 - **Por serviço do catálogo:** tempo médio de execução das OS do período que incluíram o serviço, sem peso pela quantidade. Uma OS com vários serviços conta em cada um, com o tempo de execução da OS inteira, porque o item não registra quando começou. Nome e tempo estimado são os atuais do catálogo.
 - **Rota:** `GET /admin/metrics/averageExecutionTime?from=2026-10-01&to=2026-10-31`, só para ADMIN, com no máximo 366 dias. Cada duração sai em minutos inteiros e em `HH:mm`, com as horas sem limite (`27:05`).
 
+## Análise de vulnerabilidades
+
+O código passa por análise estática no SonarQube, rodando localmente. O resultado da última análise, a justificativa de cada achado e o passo a passo para rodar a análise estão em [docs/security/vulnerability-report.md](docs/security/vulnerability-report.md).
+
 ## Decisões de arquitetura
 
 - [ADR 001: Banco de dados e persistência](docs/adr/001-database.md)
