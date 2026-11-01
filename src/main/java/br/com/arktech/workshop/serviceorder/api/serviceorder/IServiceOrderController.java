@@ -52,6 +52,7 @@ interface IServiceOrderController {
     @Operation(summary = "${openapi.serviceOrder.list}", description = "${openapi.serviceOrder.listDescription}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "400", ref = "BadRequest")
+    @AllowedRoles({Role.ADMIN, Role.ATTENDANT, Role.MECHANIC})
     @GetMapping
     PageResponse<ServiceOrderSummaryResponse> list(
             @Parameter(description = "${openapi.serviceOrder.statusFilter}", example = "RECEIVED")
@@ -74,6 +75,7 @@ interface IServiceOrderController {
             description = "${openapi.serviceOrder.findByIdDescription}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "404", ref = "NotFound")
+    @AllowedRoles({Role.ADMIN, Role.ATTENDANT, Role.MECHANIC})
     @GetMapping("/{id}")
     ServiceOrderResponse findById(
             @Parameter(description = "${openapi.serviceOrder.id}", example = "1") @PathVariable Long id);

@@ -136,6 +136,21 @@ class ServiceOrderQueryIntegrationTest {
     }
 
     @Test
+    void shouldLetMechanicsListAndDetailServiceOrders() throws Exception {
+        Long id = openServiceOrderWithItems(1, 1);
+        String token = tokenIssuer.issue(userId, Set.of(Role.MECHANIC)).value();
+
+        mockMvc.perform(get("/admin/serviceOrders")
+                        .param("customerDocument", document.value())
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(id));
+        mockMvc.perform(get("/admin/serviceOrders/{id}", id).header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id));
+    }
+
+    @Test
     void shouldListOpenServiceOrdersFirstAndTheOldestFirst() throws Exception {
         Long received = openServiceOrder(golId, daysAgo(3), ServiceOrderStatus.RECEIVED);
         Long delivered = openServiceOrder(golId, daysAgo(5), ServiceOrderStatus.DELIVERED);
