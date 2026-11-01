@@ -10,13 +10,17 @@ spring:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/workshop}
     username: ${DB_USERNAME:workshop}
     password: ${DB_PASSWORD:workshop}
-  # bootRun starts only the database; the app service in docker-compose.yml would clash on port 8080
+  # bootRun starts only the database and the SMTP server; the app service in docker-compose.yml would clash on port 8080
   docker:
     compose:
       start:
-        arguments: postgres
+        arguments:
+          - postgres
+          - mailpit
       stop:
-        arguments: postgres
+        arguments:
+          - postgres
+          - mailpit
   jpa:
     open-in-view: false
     hibernate:
