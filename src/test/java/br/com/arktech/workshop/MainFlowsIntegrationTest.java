@@ -129,6 +129,59 @@ class MainFlowsIntegrationTest {
     }
 
     @Test
+    void shouldLetEachRoleRunItsPartOfTheFlowWithItsOwnToken() {
+        String suffix = UUID.randomUUID().toString();
+        String serviceName = "Alinhamento " + suffix;
+        String partName = "Pastilha " + suffix;
+        Long service = createService(serviceName, "150.00");
+        Long part = createPart(partName, "45.90", 10);
+
+        customerDocument = uniqueCPF().value();
+        staff(attendantToken, HttpMethod.POST, "/admin/customers", """
+                        {"name": "Ana", "document": "%s", "email": "ana@email.com"}
+                        """.formatted(customerDocument))
+                .expect(201);
+        openServiceOrder();
+
+        staff(mechanicToken, HttpMethod.GET, "/admin/serviceOrders?customerDocument={document}", null, customerDocument)
+                .expect(200);
+        Number vehicleId = staff(mechanicToken, HttpMethod.GET, "/admin/serviceOrders/{id}", null)
+                .expect(200)
+                .read("$.vehicleId");
+        staff(mechanicToken, HttpMethod.GET, "/admin/vehicles/{vehicleId}", null, vehicleId)
+                .expect(200);
+        staff(mechanicToken, HttpMethod.POST, "/admin/serviceOrders/{id}/startDiagnosis", null).expect(200);
+        Number foundService = staff(mechanicToken, HttpMethod.GET, "/admin/services?name={name}", null, serviceName)
+                .expect(200)
+                .read("$.content[0].id");
+        Number foundPart = staff(mechanicToken, HttpMethod.GET, "/admin/parts?name={name}", null, partName)
+                .expect(200)
+                .read("$.content[0].id");
+        assertThat(foundService.longValue()).isEqualTo(service);
+        assertThat(foundPart.longValue()).isEqualTo(part);
+        Long serviceItem = addItem("services", "serviceOfferingId", foundService.longValue(), 1);
+        addItem("parts", "partId", foundPart.longValue(), 1);
+
+        staff(attendantToken, HttpMethod.GET, "/admin/serviceOrders/{id}", null).expect(200);
+        staff(attendantToken, HttpMethod.POST, "/admin/serviceOrders/{id}/sendQuote", null)
+                .expect(200)
+                .expectStatus("AWAITING_APPROVAL");
+        staff(attendantToken, HttpMethod.POST, "/admin/serviceOrders/{id}/approve", null)
+                .expect(200)
+                .expectStatus("QUOTE_APPROVED");
+
+        staff(mechanicToken, HttpMethod.POST, "/admin/serviceOrders/{id}/startExecution", null).expect(200);
+        staff(mechanicToken, HttpMethod.POST, "/admin/serviceOrders/{id}/services/{itemId}/start", null, serviceItem)
+                .expect(200);
+        staff(mechanicToken, HttpMethod.POST, "/admin/serviceOrders/{id}/services/{itemId}/complete", null, serviceItem)
+                .expect(200)
+                .expectStatus("COMPLETED");
+        staff(attendantToken, HttpMethod.POST, "/admin/serviceOrders/{id}/deliver", null)
+                .expect(200)
+                .expectStatus("DELIVERED");
+    }
+
+    @Test
     void shouldLetTheWorkshopReopenARejectedQuoteForTheCustomerToApproveTheNewOne() {
         Long pad = createPart("Pastilha de freio", "45.90", 10);
         openServiceOrder();
