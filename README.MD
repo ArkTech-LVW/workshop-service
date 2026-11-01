@@ -400,12 +400,6 @@ A documentação DDD fica em [`docs/ddd/workshop-ddd.drawio`](docs/ddd/workshop-
 - **Mapa de contextos:** os contextos delimitados, as relações entre eles e os subdomínios.
 - **Legenda:** a notação usada nos diagramas.
 
-> A definir: Event Storming, modelo tático, diagramas C4, linguagem ubíqua e relação com o código.
-
-### Vídeo de apresentação
-
-> A definir: link do vídeo de demonstração.
-
 ## Contribuindo
 
 Leia o [CONTRIBUTING.md](CONTRIBUTING.md) antes de abrir o primeiro PR.
