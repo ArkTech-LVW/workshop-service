@@ -46,6 +46,7 @@ class PartManagementIntegrationTest {
         return Stream.of(
                 Arguments.of(post("/admin/parts").contentType(MediaType.APPLICATION_JSON).content("{}")),
                 Arguments.of(get("/admin/parts")),
+                Arguments.of(get("/admin/parts/lowStock")),
                 Arguments.of(get("/admin/parts/1")),
                 Arguments.of(put("/admin/parts/1").contentType(MediaType.APPLICATION_JSON).content("{}")),
                 Arguments.of(delete("/admin/parts/1")));

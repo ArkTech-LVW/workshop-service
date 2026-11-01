@@ -65,8 +65,7 @@ class StockMovementIntegrationTest {
     static Stream<Arguments> stockEndpoints() {
         return Stream.of(
                 Arguments.of(post("/admin/parts/1/stockMovements").contentType(MediaType.APPLICATION_JSON).content("{}")),
-                Arguments.of(get("/admin/parts/1/stockMovements")),
-                Arguments.of(get("/admin/parts/lowStock")));
+                Arguments.of(get("/admin/parts/1/stockMovements")));
     }
 
     @BeforeEach
