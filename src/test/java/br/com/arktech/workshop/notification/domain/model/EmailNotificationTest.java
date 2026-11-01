@@ -58,12 +58,14 @@ class EmailNotificationTest {
 
     @Test
     void shouldNotSendAnEmailThatIsNoLongerPending() {
-        EmailNotification email = EmailNotification.withoutRecipient(10L, "TYPE", "Assunto", "Corpo", "No email");
+        EmailNotification email =
+                EmailNotification.withoutRecipient(10L, "TYPE", "Assunto", "Corpo", null, "No email");
 
         assertThatThrownBy(() -> email.markSent(NOW)).isInstanceOf(IllegalStateException.class);
     }
 
     private static EmailNotification pending() {
-        return EmailNotification.pending(10L, "TYPE", new Email("ana@email.com"), "Assunto", "Corpo", NOW);
+        return EmailNotification.pending(
+                10L, "TYPE", new Email("ana@email.com"), "Assunto", "Corpo", "<p>Corpo</p>", NOW);
     }
 }

@@ -55,6 +55,7 @@ class SendPendingEmailsIntegrationTest {
                         ANA,
                         "Ordem de serviço finalizada",
                         "Pronto para retirada",
+                        "<p>Pronto para retirada</p>",
                         Instant.EPOCH))
                 .getId();
 

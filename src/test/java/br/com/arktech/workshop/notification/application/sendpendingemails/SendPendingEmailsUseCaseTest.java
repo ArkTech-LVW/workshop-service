@@ -22,12 +22,13 @@ class SendPendingEmailsUseCaseTest {
 
     private final InMemoryEmailNotificationRepository repository = new InMemoryEmailNotificationRepository();
     private final List<Email> sentTo = new ArrayList<>();
-    private final SendPendingEmailsUseCase useCase = new SendPendingEmailsUseCase(repository, (to, subject, body) -> {
-        if (to.equals(BRUNO)) {
-            throw new IllegalStateException("Mailbox unavailable");
-        }
-        sentTo.add(to);
-    });
+    private final SendPendingEmailsUseCase useCase =
+            new SendPendingEmailsUseCase(repository, (to, subject, body) -> {
+                if (to.equals(BRUNO)) {
+                    throw new IllegalStateException("Mailbox unavailable");
+                }
+                sentTo.add(to);
+            });
 
     @Test
     void shouldSendTheDueEmailsAndScheduleAnotherAttemptForTheFailedOnes() {
@@ -56,6 +57,7 @@ class SendPendingEmailsUseCaseTest {
     }
 
     private static EmailNotification pending(Email recipient, Instant nextAttemptAt) {
-        return EmailNotification.pending(10L, "TYPE", recipient, "Assunto", "Corpo", nextAttemptAt);
+        return EmailNotification.pending(
+                10L, "TYPE", recipient, "Assunto", "Corpo", "<p>Corpo</p>", nextAttemptAt);
     }
 }

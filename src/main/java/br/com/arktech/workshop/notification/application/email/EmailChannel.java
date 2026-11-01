@@ -34,12 +34,23 @@ class EmailChannel implements NotificationChannel {
         EmailNotification emailNotification = customerContacts
                 .findEmailById(notification.customerId())
                 .map(recipient -> EmailNotification.pending(
-                        notification.customerId(), type, recipient, email.subject(), email.body(), clock.instant()))
+                        notification.customerId(),
+                        type,
+                        recipient,
+                        email.subject(),
+                        email.body(),
+                        null,
+                        clock.instant()))
                 .orElseGet(() -> {
                     log.warn("Email notification without recipient [customerId={}, type={}]",
                             notification.customerId(), type);
                     return EmailNotification.withoutRecipient(
-                            notification.customerId(), type, email.subject(), email.body(), RECIPIENT_NOT_FOUND);
+                            notification.customerId(),
+                            type,
+                            email.subject(),
+                            email.body(),
+                            null,
+                            RECIPIENT_NOT_FOUND);
                 });
         emailNotificationRepository.save(emailNotification);
     }

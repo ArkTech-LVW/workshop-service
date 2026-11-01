@@ -33,6 +33,8 @@ public class EmailNotification extends BaseEntity {
 
     private String body;
 
+    private @Nullable String htmlBody;
+
     @Enumerated(EnumType.STRING)
     private EmailNotificationStatus status;
 
@@ -50,6 +52,7 @@ public class EmailNotification extends BaseEntity {
             @Nullable Email recipient,
             String subject,
             String body,
+            @Nullable String htmlBody,
             EmailNotificationStatus status,
             @Nullable Instant nextAttemptAt,
             @Nullable String lastError) {
@@ -58,21 +61,28 @@ public class EmailNotification extends BaseEntity {
         this.recipient = recipient;
         this.subject = subject;
         this.body = body;
+        this.htmlBody = htmlBody;
         this.status = status;
         this.nextAttemptAt = nextAttemptAt;
         this.lastError = lastError;
     }
 
     public static EmailNotification pending(
-            Long customerId, String type, Email recipient, String subject, String body, Instant now) {
+            Long customerId,
+            String type,
+            Email recipient,
+            String subject,
+            String body,
+            @Nullable String htmlBody,
+            Instant now) {
         return new EmailNotification(
-                customerId, type, recipient, subject, body, EmailNotificationStatus.PENDING, now, null);
+                customerId, type, recipient, subject, body, htmlBody, EmailNotificationStatus.PENDING, now, null);
     }
 
     public static EmailNotification withoutRecipient(
-            Long customerId, String type, String subject, String body, String reason) {
+            Long customerId, String type, String subject, String body, @Nullable String htmlBody, String reason) {
         return new EmailNotification(
-                customerId, type, null, subject, body, EmailNotificationStatus.FAILED, null, reason);
+                customerId, type, null, subject, body, htmlBody, EmailNotificationStatus.FAILED, null, reason);
     }
 
     public void markSent(Instant now) {
