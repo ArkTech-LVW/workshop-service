@@ -8,7 +8,7 @@
 
 - O JaCoCo já gerava o relatório em todo `./gradlew build`, mas nada falhava quando a cobertura caía.
 - A tarefa pede um mínimo nas camadas `domain` e `application` e uma evidência da cobertura versionada no repositório para a entrega.
-- O ticket cita os módulos `customer` e `identity`, que não existem no código. Os nomes reais são `registry` e `auth`, e o grupo decidiu aplicar a regra a todos os módulos.
+- A regra vale para todos os módulos.
 - Na medição inicial, o escopo da regra estava em 99,9% das linhas, e o projeto inteiro em 99,4%.
 - A `main` só aceita merge por PR, com aprovação e com os checks `build` e `Aguardando outro PR`.
 
