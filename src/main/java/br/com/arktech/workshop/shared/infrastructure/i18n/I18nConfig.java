@@ -13,6 +13,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 class I18nConfig {
 
     I18nConfig(@Value("${spring.web.locale}") Locale locale) {
+        Locale.setDefault(locale);
         LocaleContextHolder.setDefaultLocale(locale);
     }
 
