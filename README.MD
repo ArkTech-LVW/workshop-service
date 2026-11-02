@@ -401,6 +401,7 @@ A documentação DDD fica em [`docs/ddd/workshop-ddd.drawio`](docs/ddd/workshop-
 - **Legenda:** a notação usada nos diagramas.
 - **ES - Criação da OS:** Event Storming do cliente chegando na oficina até o orçamento enviado para aprovação.
 - **ES - Acompanhamento da OS:** Event Storming do orçamento enviado até a entrega do veículo, com a rejeição, o orçamento complementar e o cancelamento, a tabela de status e a máquina de estados da OS.
+- **ES - Peças e insumos:** Event Storming do estoque, do cadastro da peça ou insumo à reposição, com a reserva, a baixa, a liberação e a devolução disparadas pela OS e o pedido de ajuste aprovado pelo ADMIN.
 
 #### Status da OS
 
