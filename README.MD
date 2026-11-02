@@ -400,6 +400,24 @@ A documentação DDD fica em [`docs/ddd/workshop-ddd.drawio`](docs/ddd/workshop-
 - **Mapa de contextos:** os contextos delimitados, as relações entre eles e os subdomínios.
 - **Legenda:** a notação usada nos diagramas.
 - **ES - Criação da OS:** Event Storming do cliente chegando na oficina até o orçamento enviado para aprovação.
+- **ES - Acompanhamento da OS:** Event Storming do orçamento enviado até a entrega do veículo, com a rejeição, o orçamento complementar e o cancelamento, a tabela de status e a máquina de estados da OS.
+
+#### Status da OS
+
+| Status no código | Termo | Significado |
+|---|---|---|
+| `RECEIVED` | Recebida | OS aberta na recepção, esperando o diagnóstico. Os itens podem mudar. |
+| `IN_DIAGNOSIS` | Em diagnóstico | O mecânico avalia o veículo e monta o orçamento com serviços, peças e insumos. |
+| `AWAITING_APPROVAL` | Aguardando aprovação | Orçamento enviado ao cliente, com as peças reservadas por 7 dias. Os itens ficam travados. |
+| `QUOTE_APPROVED` | Orçamento aprovado | O cliente ou o atendente aprovou e as peças saíram do estoque. Espera o início da execução. |
+| `QUOTE_REJECTED` | Orçamento rejeitado | O cliente ou o atendente rejeitou, com motivo, e a reserva foi liberada. Volta para o diagnóstico ou é cancelada. |
+| `IN_PROGRESS` | Em execução | O mecânico executa os serviços aprovados. A oficina pode mudar os itens e enviar um orçamento complementar. |
+| `AWAITING_SUPPLEMENTARY_APPROVAL` | Aguardando aprovação complementar | Orçamento complementar enviado ao cliente, dizendo se dá para seguir sem as mudanças. |
+| `SUPPLEMENTARY_APPROVED` | Complementar aprovado | O cliente aprovou tudo ou só o original e o estoque foi conferido pela diferença. Espera a retomada. |
+| `SUPPLEMENTARY_REJECTED` | Complementar rejeitado | O cliente rejeitou o complementar. A oficina muda os itens e reenvia, ou cancela a OS. |
+| `COMPLETED` | Finalizada | Todos os serviços concluídos, sem mudança pendente, e o cliente avisado. Espera a retirada. |
+| `DELIVERED` | Entregue | Veículo devolvido ao cliente. Status final. |
+| `CANCELED` | Cancelada | OS encerrada com motivo, antes da execução ou com o complementar pendente. O que saiu do estoque volta. Status final. |
 
 ## Contribuindo
 
