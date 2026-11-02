@@ -4777,15 +4777,510 @@
     </mxGraphModel>
   </diagram>
   <diagram id="tactical" name="Modelo tático">
-    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2700" pageHeight="3900" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="tactical-1" value="Modelo tático" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=26;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="60" y="30" width="1200" height="40" as="geometry" />
+          <mxGeometry x="40" y="20" width="1600" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="tactical-2" value="Reservada para T6.5 (KAN-89)." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=16;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="60" y="80" width="1200" height="30" as="geometry" />
+        <mxCell id="tactical-2" value="Os agregados, entidades e objetos de valor de cada contexto delimitado, exatamente como estão no código, e como os contextos se dividem nas camadas do DDD. A notação está no quadro do fim da seção 1." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="40" y="62" width="2500" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-3" value="1. Agregados por contexto delimitado" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="110" width="1200" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-4" value="&lt;b style=&quot;font-size:18px&quot;&gt;Ordem de Serviço&lt;/b&gt;&amp;nbsp;&amp;nbsp;&lt;i style=&quot;font-size:12px&quot;&gt;Subdomínio principal · pacote &lt;code&gt;serviceorder&lt;/code&gt;&lt;/i&gt;" style="rounded=1;absoluteArcSize=1;arcSize=24;whiteSpace=wrap;html=1;dashed=1;strokeWidth=2;fillColor=none;strokeColor=#333333;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="160" width="1580" height="860" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-5" value="Agregado &lt;b&gt;ServiceOrder&lt;/b&gt;" style="rounded=1;absoluteArcSize=1;arcSize=16;whiteSpace=wrap;html=1;fillColor=#fffde7;strokeColor=#b8a93a;strokeWidth=1.5;verticalAlign=top;align=left;spacingLeft=10;spacingTop=2;fontSize=13;fontColor=#6b5f00;" vertex="1" parent="1">
+          <mxGeometry x="290" y="210" width="790" height="790" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-6" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«raiz do agregado»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:14px&quot;&gt;ServiceOrder&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;id, publicId: UUID&lt;br&gt;number: &lt;font color=&quot;#2e7d32&quot;&gt;&lt;b&gt;ServiceOrderNumber&lt;/b&gt;&lt;/font&gt;&lt;br&gt;customerId, vehicleId, mechanicId&lt;br&gt;problemDescription&lt;br&gt;status: ServiceOrderStatus&lt;br&gt;totalPrice: &lt;font color=&quot;#2e7d32&quot;&gt;&lt;b&gt;Money&lt;/b&gt;&lt;/font&gt;&lt;br&gt;canProceedWithoutChanges&lt;br&gt;approvedItemRemoved&lt;hr&gt;&lt;span style=&quot;font-size:11px&quot;&gt;• Só muda de status pelas transições da máquina de estados; fora delas lança InvalidStatusTransitionException.&lt;br&gt;• Itens só entram e saem nos status que permitem mudança; serviço concluído não sai.&lt;br&gt;• Orçamento só é enviado com itens; o total tem limite.&lt;br&gt;• Só finaliza com todos os serviços concluídos.&lt;br&gt;• Registra os eventos de domínio, publicados no save.&lt;/span&gt;&lt;hr&gt;&lt;i style=&quot;font-size:11px&quot;&gt;ServiceOrderRepository&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#fff9b1;strokeColor=#b8a93a;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="320" y="250" width="340" height="381" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-7" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«objeto de valor»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:13px&quot;&gt;ServiceOrderNumber&lt;/b&gt;&lt;/div&gt;&lt;span style=&quot;font-size:11px&quot;&gt;Número legível da OS: SO-2026-000123, criado por ServiceOrderNumber.of(ano, sequência).&lt;/span&gt;" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="320" y="661" width="340" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-8" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«entidade abstrata»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:14px&quot;&gt;&lt;i&gt;ServiceOrderItem&lt;/i&gt;&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;quantity&lt;br&gt;unitPrice: &lt;font color=&quot;#2e7d32&quot;&gt;&lt;b&gt;Money&lt;/b&gt;&lt;/font&gt;&lt;br&gt;approvedAt&lt;br&gt;subtotal = quantity × unitPrice&lt;hr&gt;&lt;span style=&quot;font-size:11px&quot;&gt;• Quantidade sempre positiva.&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#ffffff;strokeColor=#666666;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="740" y="250" width="300" height="155" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-9" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«entidade»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:14px&quot;&gt;ServiceItem&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;serviceOfferingId&lt;br&gt;startedAt, startedByUserId&lt;br&gt;completedAt, completedByUserId" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#ffffff;strokeColor=#666666;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="740" y="475" width="300" height="112" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-10" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«entidade»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:14px&quot;&gt;PartItem&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;partId" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#ffffff;strokeColor=#666666;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="740" y="637" width="300" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-11" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«entidade»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:14px&quot;&gt;StatusChange&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;fromStatus, toStatus: ServiceOrderStatus&lt;br&gt;changedByUserId&lt;br&gt;description, createdAt&lt;hr&gt;&lt;span style=&quot;font-size:11px&quot;&gt;• Uma por mudança de status: é o histórico usado nas métricas.&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#ffffff;strokeColor=#666666;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="740" y="767" width="300" height="154" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;startArrow=diamondThin;startFill=1;startSize=16;endArrow=none;strokeWidth=1.5;strokeColor=#333333;exitX=1.0;exitY=0.62;exitDx=0;exitDy=0;entryX=0.0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="tactical-6" target="tactical-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;startArrow=diamondThin;startFill=1;startSize=16;endArrow=none;strokeWidth=1.5;strokeColor=#333333;exitX=1.0;exitY=0.76;exitDx=0;exitDy=0;entryX=0.0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="tactical-6" target="tactical-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;startArrow=diamondThin;startFill=1;startSize=16;endArrow=none;strokeWidth=1.5;strokeColor=#333333;exitX=1.0;exitY=0.9;exitDx=0;exitDy=0;entryX=0.0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="tactical-6" target="tactical-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-15" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;endArrow=block;endFill=0;endSize=12;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=0.0;exitDx=0;exitDy=0;entryX=0.5;entryY=1.0;entryDx=0;entryDy=0;" edge="1" parent="1" source="tactical-9" target="tactical-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-16" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;endArrow=block;endFill=0;endSize=12;strokeWidth=1.5;strokeColor=#333333;exitX=1.0;exitY=0.5;exitDx=0;exitDy=0;entryX=1.0;entryY=0.6;entryDx=0;entryDy=0;" edge="1" parent="1" source="tactical-10" target="tactical-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-17" value="&lt;b&gt;Customer&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:10px&quot;&gt;Cadastro&lt;/span&gt;" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;dashed=1;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#555555;fontSize=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="70" y="300" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-18" value="&lt;b&gt;Vehicle&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:10px&quot;&gt;Cadastro&lt;/span&gt;" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;dashed=1;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#555555;fontSize=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="70" y="400" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-19" value="&lt;b&gt;User (mecânico)&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:10px&quot;&gt;Identidade e Acesso&lt;/span&gt;" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;dashed=1;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#555555;fontSize=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="70" y="500" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-20" value="customerId" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;endArrow=open;endFill=0;endSize=10;dashed=1;strokeWidth=1.5;strokeColor=#777777;fontColor=#555555;exitX=0.0;exitY=0.17;exitDx=0;exitDy=0;entryX=1.0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="tactical-6" target="tactical-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-21" value="vehicleId" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;endArrow=open;endFill=0;endSize=10;dashed=1;strokeWidth=1.5;strokeColor=#777777;fontColor=#555555;exitX=0.0;exitY=0.27;exitDx=0;exitDy=0;entryX=1.0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="tactical-6" target="tactical-18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-22" value="mechanicId" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;endArrow=open;endFill=0;endSize=10;dashed=1;strokeWidth=1.5;strokeColor=#777777;fontColor=#555555;exitX=0.0;exitY=0.37;exitDx=0;exitDy=0;entryX=1.0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="tactical-6" target="tactical-19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-23" value="&lt;b&gt;ServiceOffering&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:10px&quot;&gt;Catálogo de Serviços&lt;/span&gt;" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;dashed=1;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#555555;fontSize=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="495" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-24" value="&lt;b&gt;Part&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:10px&quot;&gt;Estoque&lt;/span&gt;" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;dashed=1;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#555555;fontSize=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="647" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-25" value="serviceOfferingId" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;endArrow=open;endFill=0;endSize=10;dashed=1;strokeWidth=1.5;strokeColor=#777777;fontColor=#555555;exitX=1.0;exitY=0.25;exitDx=0;exitDy=0;entryX=0.0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="tactical-9" target="tactical-23">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-26" value="partId" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;endArrow=open;endFill=0;endSize=10;dashed=1;strokeWidth=1.5;strokeColor=#777777;fontColor=#555555;exitX=1.0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="tactical-10" target="tactical-24">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-27" value="Eventos de domínio registrados pela raiz" style="rounded=1;absoluteArcSize=1;arcSize=16;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#b97a00;strokeWidth=1.5;verticalAlign=top;align=left;spacingLeft=10;spacingTop=2;fontSize=13;fontColor=#8a5a00;" vertex="1" parent="1">
+          <mxGeometry x="1310" y="210" width="290" height="790" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-28" value="&lt;i style=&quot;font-size:10px&quot;&gt;«evento de domínio»&lt;/i&gt;&lt;br&gt;&lt;b&gt;QuoteSentEvent&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:11px&quot;&gt;Orçamento enviado (também no complementar). Estoque reserva as peças; cliente avisado.&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="250" width="250" height="93" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-29" value="&lt;i style=&quot;font-size:10px&quot;&gt;«evento de domínio»&lt;/i&gt;&lt;br&gt;&lt;b&gt;QuoteApprovedEvent&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:11px&quot;&gt;Orçamento aprovado. Estoque baixa as peças; cliente avisado.&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="361" width="250" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-30" value="&lt;i style=&quot;font-size:10px&quot;&gt;«evento de domínio»&lt;/i&gt;&lt;br&gt;&lt;b&gt;QuoteRejectedEvent&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:11px&quot;&gt;Orçamento rejeitado. Estoque libera a reserva; cliente avisado.&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="457" width="250" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-31" value="&lt;i style=&quot;font-size:10px&quot;&gt;«evento de domínio»&lt;/i&gt;&lt;br&gt;&lt;b&gt;QuoteWithdrawnEvent&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:11px&quot;&gt;Orçamento retirado antes da resposta do cliente. Estoque libera a reserva.&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="553" width="250" height="93" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-32" value="&lt;i style=&quot;font-size:10px&quot;&gt;«evento de domínio»&lt;/i&gt;&lt;br&gt;&lt;b&gt;ServiceOrderCanceledEvent&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:11px&quot;&gt;OS cancelada. Estoque devolve o que saiu.&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="664" width="250" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-33" value="&lt;i style=&quot;font-size:10px&quot;&gt;«evento de domínio»&lt;/i&gt;&lt;br&gt;&lt;b&gt;ServiceOrderCompletedEvent&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:11px&quot;&gt;OS finalizada. Cliente avisado.&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="760" width="250" height="63" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-34" value="registra" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#b97a00;fontColor=#8a5a00;exitX=0.5;exitY=0.0;exitDx=0;exitDy=0;entryX=0.0;entryY=0.025;entryDx=0;entryDy=0;" edge="1" parent="1" source="tactical-6" target="tactical-27">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-35" value="&lt;b style=&quot;font-size:18px&quot;&gt;Cadastro&lt;/b&gt;&amp;nbsp;&amp;nbsp;&lt;i style=&quot;font-size:12px&quot;&gt;Subdomínio de suporte · pacote &lt;code&gt;registry&lt;/code&gt;&lt;/i&gt;" style="rounded=1;absoluteArcSize=1;arcSize=24;whiteSpace=wrap;html=1;dashed=1;strokeWidth=2;fillColor=none;strokeColor=#333333;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="1680" y="160" width="920" height="470" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-36" value="Agregado &lt;b&gt;Customer&lt;/b&gt;" style="rounded=1;absoluteArcSize=1;arcSize=16;whiteSpace=wrap;html=1;fillColor=#fffde7;strokeColor=#b8a93a;strokeWidth=1.5;verticalAlign=top;align=left;spacingLeft=10;spacingTop=2;fontSize=13;fontColor=#6b5f00;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="210" width="420" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-37" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«raiz do agregado»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:14px&quot;&gt;Customer&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;name&lt;br&gt;document: &lt;font color=&quot;#2e7d32&quot;&gt;&lt;b&gt;CPFCNPJ&lt;/b&gt;&lt;/font&gt;&lt;br&gt;personType: PersonType&lt;br&gt;email: &lt;font color=&quot;#2e7d32&quot;&gt;&lt;b&gt;Email&lt;/b&gt;&lt;/font&gt;&lt;br&gt;phone: &lt;font color=&quot;#2e7d32&quot;&gt;&lt;b&gt;Phone&lt;/b&gt;&lt;/font&gt;&lt;hr&gt;&lt;span style=&quot;font-size:11px&quot;&gt;• O documento é um CPF ou um CNPJ válido, e o tipo de pessoa sai dele.&lt;/span&gt;&lt;hr&gt;&lt;i style=&quot;font-size:11px&quot;&gt;CustomerRepository&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#fff9b1;strokeColor=#b8a93a;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1720" y="250" width="380" height="213" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-38" value="Agregado &lt;b&gt;Vehicle&lt;/b&gt;" style="rounded=1;absoluteArcSize=1;arcSize=16;whiteSpace=wrap;html=1;fillColor=#fffde7;strokeColor=#b8a93a;strokeWidth=1.5;verticalAlign=top;align=left;spacingLeft=10;spacingTop=2;fontSize=13;fontColor=#6b5f00;" vertex="1" parent="1">
+          <mxGeometry x="2160" y="210" width="420" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-39" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«raiz do agregado»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:14px&quot;&gt;Vehicle&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;customerId&lt;br&gt;licensePlate: &lt;font color=&quot;#2e7d32&quot;&gt;&lt;b&gt;LicensePlate&lt;/b&gt;&lt;/font&gt;&lt;br&gt;chassis: &lt;font color=&quot;#2e7d32&quot;&gt;&lt;b&gt;Chassis&lt;/b&gt;&lt;/font&gt;&lt;br&gt;brand, model, color&lt;br&gt;year&lt;hr&gt;&lt;span style=&quot;font-size:11px&quot;&gt;• Placa antiga ou Mercosul; ano entre os aceitos por VehicleYears.&lt;/span&gt;&lt;hr&gt;&lt;i style=&quot;font-size:11px&quot;&gt;VehicleRepository&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#fff9b1;strokeColor=#b8a93a;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="2180" y="250" width="380" height="213" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-40" value="customerId" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;endArrow=open;endFill=0;endSize=10;dashed=1;strokeWidth=1.5;strokeColor=#777777;fontColor=#555555;exitX=0.0;exitY=0.3;exitDx=0;exitDy=0;entryX=1.0;entryY=0.3;entryDx=0;entryDy=0;" edge="1" parent="1" source="tactical-39" target="tactical-37">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-41" value="&lt;b style=&quot;font-size:18px&quot;&gt;Catálogo de Serviços&lt;/b&gt;&amp;nbsp;&amp;nbsp;&lt;i style=&quot;font-size:12px&quot;&gt;Subdomínio de suporte · pacote &lt;code&gt;catalog&lt;/code&gt;&lt;/i&gt;" style="rounded=1;absoluteArcSize=1;arcSize=24;whiteSpace=wrap;html=1;dashed=1;strokeWidth=2;fillColor=none;strokeColor=#333333;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="1680" y="660" width="450" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-42" value="Agregado &lt;b&gt;ServiceOffering&lt;/b&gt;" style="rounded=1;absoluteArcSize=1;arcSize=16;whiteSpace=wrap;html=1;fillColor=#fffde7;strokeColor=#b8a93a;strokeWidth=1.5;verticalAlign=top;align=left;spacingLeft=10;spacingTop=2;fontSize=13;fontColor=#6b5f00;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="710" width="410" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-43" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«raiz do agregado»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:14px&quot;&gt;ServiceOffering&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;name, description&lt;br&gt;laborPrice: &lt;font color=&quot;#2e7d32&quot;&gt;&lt;b&gt;Money&lt;/b&gt;&lt;/font&gt;&lt;br&gt;estimatedMinutes&lt;br&gt;active&lt;hr&gt;&lt;span style=&quot;font-size:11px&quot;&gt;• Preço da mão de obra e tempo estimado sempre positivos.&lt;/span&gt;&lt;hr&gt;&lt;i style=&quot;font-size:11px&quot;&gt;ServiceOfferingRepository&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#fff9b1;strokeColor=#b8a93a;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1720" y="750" width="370" height="197" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-44" value="&lt;b style=&quot;font-size:18px&quot;&gt;Indicadores Operacionais&lt;/b&gt;&amp;nbsp;&amp;nbsp;&lt;i style=&quot;font-size:12px&quot;&gt;Subdomínio de suporte · pacote &lt;code&gt;metrics&lt;/code&gt;&lt;/i&gt;" style="rounded=1;absoluteArcSize=1;arcSize=24;whiteSpace=wrap;html=1;dashed=1;strokeWidth=2;fillColor=none;strokeColor=#333333;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="2160" y="660" width="440" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-45" value="&lt;b&gt;Sem agregados nem camada de domínio.&lt;/b&gt;&lt;br&gt;&lt;br&gt;É um contexto só de leitura: calcula o tempo médio de execução e de cada status lendo direto no banco o histórico de status, as execuções dos serviços e o catálogo, pela porta &lt;i&gt;ServiceOrderHistoryReader&lt;/i&gt;." style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#333333;fontSize=13;align=left;verticalAlign=top;spacingLeft=10;spacingRight=8;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="2180" y="720" width="400" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-46" value="&lt;b style=&quot;font-size:18px&quot;&gt;Estoque&lt;/b&gt;&amp;nbsp;&amp;nbsp;&lt;i style=&quot;font-size:12px&quot;&gt;Subdomínio de suporte · pacote &lt;code&gt;inventory&lt;/code&gt;&lt;/i&gt;" style="rounded=1;absoluteArcSize=1;arcSize=24;whiteSpace=wrap;html=1;dashed=1;strokeWidth=2;fillColor=none;strokeColor=#333333;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1080" width="1580" height="760" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-47" value="Agregado &lt;b&gt;Part&lt;/b&gt;" style="rounded=1;absoluteArcSize=1;arcSize=16;whiteSpace=wrap;html=1;fillColor=#fffde7;strokeColor=#b8a93a;strokeWidth=1.5;verticalAlign=top;align=left;spacingLeft=10;spacingTop=2;fontSize=13;fontColor=#6b5f00;" vertex="1" parent="1">
+          <mxGeometry x="700" y="1130" width="560" height="470" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-48" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«raiz do agregado»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:14px&quot;&gt;Part&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;sku: &lt;font color=&quot;#2e7d32&quot;&gt;&lt;b&gt;Sku&lt;/b&gt;&lt;/font&gt;&lt;br&gt;name&lt;br&gt;type: PartType&lt;br&gt;unit: MeasurementUnit&lt;br&gt;salePrice: &lt;font color=&quot;#2e7d32&quot;&gt;&lt;b&gt;Money&lt;/b&gt;&lt;/font&gt;&lt;br&gt;stockQuantity, reservedQuantity&lt;br&gt;minimumStock&lt;br&gt;availableQuantity = estoque − reservado&lt;hr&gt;&lt;span style=&quot;font-size:11px&quot;&gt;• Estoque e reserva nunca ficam negativos.&lt;br&gt;• Só reserva ou baixa o que está disponível.&lt;br&gt;• Estoque mínimo não negativo; abaixo dele, isLowStock.&lt;/span&gt;&lt;hr&gt;&lt;i style=&quot;font-size:11px&quot;&gt;PartRepository&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#fff9b1;strokeColor=#b8a93a;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="720" y="1170" width="340" height="291" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-49" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«objeto de valor»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:13px&quot;&gt;Sku&lt;/b&gt;&lt;/div&gt;&lt;span style=&quot;font-size:11px&quot;&gt;Código da peça ou insumo, validado na criação.&lt;/span&gt;" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="1170" width="160" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-50" value="Agregado &lt;b&gt;StockReservation&lt;/b&gt;" style="rounded=1;absoluteArcSize=1;arcSize=16;whiteSpace=wrap;html=1;fillColor=#fffde7;strokeColor=#b8a93a;strokeWidth=1.5;verticalAlign=top;align=left;spacingLeft=10;spacingTop=2;fontSize=13;fontColor=#6b5f00;" vertex="1" parent="1">
+          <mxGeometry x="300" y="1130" width="360" height="330" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-51" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«raiz do agregado»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:14px&quot;&gt;StockReservation&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;part&lt;br&gt;serviceOrderId&lt;br&gt;quantity&lt;br&gt;expiresAt&lt;hr&gt;&lt;span style=&quot;font-size:11px&quot;&gt;• Criada pela fábrica reserve(); vale 7 dias; release() libera.&lt;/span&gt;&lt;hr&gt;&lt;i style=&quot;font-size:11px&quot;&gt;StockReservationRepository&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#fff9b1;strokeColor=#b8a93a;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="320" y="1170" width="320" height="197" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-52" value="Agregado &lt;b&gt;StockMovement&lt;/b&gt;" style="rounded=1;absoluteArcSize=1;arcSize=16;whiteSpace=wrap;html=1;fillColor=#fffde7;strokeColor=#b8a93a;strokeWidth=1.5;verticalAlign=top;align=left;spacingLeft=10;spacingTop=2;fontSize=13;fontColor=#6b5f00;" vertex="1" parent="1">
+          <mxGeometry x="300" y="1490" width="360" height="330" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-53" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«raiz do agregado»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:14px&quot;&gt;StockMovement&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;part&lt;br&gt;serviceOrderId&lt;br&gt;type: StockMovementType&lt;br&gt;quantity, reason&lt;br&gt;createdByUserId&lt;br&gt;stockAdjustmentRequest&lt;hr&gt;&lt;span style=&quot;font-size:11px&quot;&gt;• Imutável; nasce das fábricas entry, adjustment, withdrawal e serviceOrderReturn.&lt;/span&gt;&lt;hr&gt;&lt;i style=&quot;font-size:11px&quot;&gt;StockMovementRepository&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#fff9b1;strokeColor=#b8a93a;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="320" y="1530" width="320" height="229" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-54" value="Agregado &lt;b&gt;StockAdjustmentRequest&lt;/b&gt;" style="rounded=1;absoluteArcSize=1;arcSize=16;whiteSpace=wrap;html=1;fillColor=#fffde7;strokeColor=#b8a93a;strokeWidth=1.5;verticalAlign=top;align=left;spacingLeft=10;spacingTop=2;fontSize=13;fontColor=#6b5f00;" vertex="1" parent="1">
+          <mxGeometry x="1290" y="1490" width="310" height="330" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-55" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«raiz do agregado»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:14px&quot;&gt;StockAdjustmentRequest&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;part, quantity, reason&lt;br&gt;status&lt;br&gt;requestedByUserId&lt;br&gt;reviewedByUserId&lt;br&gt;reviewNote, reviewedAt&lt;hr&gt;&lt;span style=&quot;font-size:11px&quot;&gt;• Só pendente é revisado; quem pede não revisa; approve() gera o StockMovement.&lt;/span&gt;&lt;hr&gt;&lt;i style=&quot;font-size:11px&quot;&gt;StockAdjustmentRequestRepository&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#fff9b1;strokeColor=#b8a93a;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1305" y="1530" width="280" height="213" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-56" value="part" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;endArrow=open;endFill=0;endSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1.0;exitY=0.3;exitDx=0;exitDy=0;entryX=0.0;entryY=0.3;entryDx=0;entryDy=0;" edge="1" parent="1" source="tactical-51" target="tactical-48">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-57" value="part" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;endArrow=open;endFill=0;endSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1.0;exitY=0.25;exitDx=0;exitDy=0;entryX=0.25;entryY=1.0;entryDx=0;entryDy=0;" edge="1" parent="1" source="tactical-53" target="tactical-48">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-58" value="part" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;endArrow=open;endFill=0;endSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0.0;exitY=0.2;exitDx=0;exitDy=0;entryX=0.8;entryY=1.0;entryDx=0;entryDy=0;" edge="1" parent="1" source="tactical-55" target="tactical-48">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-59" value="stockAdjustmentRequest" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;endArrow=open;endFill=0;endSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1.0;exitY=0.75;exitDx=0;exitDy=0;entryX=0.0;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="tactical-53" target="tactical-55">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-60" value="&lt;b&gt;ServiceOrder&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:10px&quot;&gt;Ordem de Serviço&lt;/span&gt;" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;dashed=1;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#555555;fontSize=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="70" y="1300" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-61" value="serviceOrderId" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;endArrow=open;endFill=0;endSize=10;dashed=1;strokeWidth=1.5;strokeColor=#777777;fontColor=#555555;exitX=0.0;exitY=0.4;exitDx=0;exitDy=0;entryX=0.5;entryY=0.0;entryDx=0;entryDy=0;" edge="1" parent="1" source="tactical-51" target="tactical-60">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-62" value="serviceOrderId" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;endArrow=open;endFill=0;endSize=10;dashed=1;strokeWidth=1.5;strokeColor=#777777;fontColor=#555555;exitX=0.0;exitY=0.3;exitDx=0;exitDy=0;entryX=0.5;entryY=1.0;entryDx=0;entryDy=0;" edge="1" parent="1" source="tactical-53" target="tactical-60">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-63" value="&lt;b&gt;User&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:10px&quot;&gt;Identidade e Acesso&lt;/span&gt;" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;dashed=1;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#555555;fontSize=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="70" y="1720" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-64" value="createdByUserId" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;endArrow=open;endFill=0;endSize=10;dashed=1;strokeWidth=1.5;strokeColor=#777777;fontColor=#555555;exitX=0.0;exitY=0.75;exitDx=0;exitDy=0;entryX=1.0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="tactical-53" target="tactical-63">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-65" value="&lt;b&gt;User&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:10px&quot;&gt;Identidade e Acesso&lt;/span&gt;" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;dashed=1;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#555555;fontSize=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1400" y="1380" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-66" value="requestedByUserId" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;endArrow=open;endFill=0;endSize=10;dashed=1;strokeWidth=1.5;strokeColor=#777777;fontColor=#555555;exitX=0.85;exitY=0.0;exitDx=0;exitDy=0;entryX=0.5;entryY=1.0;entryDx=0;entryDy=0;" edge="1" parent="1" source="tactical-55" target="tactical-65">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-67" value="&lt;b style=&quot;font-size:18px&quot;&gt;Identidade e Acesso&lt;/b&gt;&amp;nbsp;&amp;nbsp;&lt;i style=&quot;font-size:12px&quot;&gt;Subdomínio genérico · pacote &lt;code&gt;auth&lt;/code&gt;&lt;/i&gt;" style="rounded=1;absoluteArcSize=1;arcSize=24;whiteSpace=wrap;html=1;dashed=1;strokeWidth=2;fillColor=none;strokeColor=#333333;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="1680" y="1080" width="920" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-68" value="Agregado &lt;b&gt;User&lt;/b&gt;" style="rounded=1;absoluteArcSize=1;arcSize=16;whiteSpace=wrap;html=1;fillColor=#fffde7;strokeColor=#b8a93a;strokeWidth=1.5;verticalAlign=top;align=left;spacingLeft=10;spacingTop=2;fontSize=13;fontColor=#6b5f00;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="1130" width="880" height="330" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-69" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«raiz do agregado»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:14px&quot;&gt;User&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;name&lt;br&gt;email: &lt;font color=&quot;#2e7d32&quot;&gt;&lt;b&gt;Email&lt;/b&gt;&lt;/font&gt;&lt;br&gt;passwordHash&lt;br&gt;active&lt;hr&gt;&lt;span style=&quot;font-size:11px&quot;&gt;• Tem pelo menos um papel.&lt;br&gt;• Nunca remove nem desativa o último ADMIN ativo.&lt;br&gt;• Senha só com hash, pela porta PasswordHasher.&lt;/span&gt;&lt;hr&gt;&lt;i style=&quot;font-size:11px&quot;&gt;UserRepository&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#fff9b1;strokeColor=#b8a93a;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1720" y="1170" width="380" height="212" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-70" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«entidade»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:14px&quot;&gt;UserRole&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;role: Role (ADMIN, ATTENDANT, MECHANIC)&lt;hr&gt;&lt;span style=&quot;font-size:11px&quot;&gt;• Só existe dentro do User: sem repositório e visível só no pacote.&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#ffffff;strokeColor=#666666;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="2200" y="1170" width="360" height="122" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-71" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;startArrow=diamondThin;startFill=1;startSize=16;endArrow=none;strokeWidth=1.5;strokeColor=#333333;exitX=1.0;exitY=0.25;exitDx=0;exitDy=0;entryX=0.0;entryY=0.3;entryDx=0;entryDy=0;" edge="1" parent="1" source="tactical-69" target="tactical-70">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-72" value="&lt;b style=&quot;font-size:18px&quot;&gt;Notificações&lt;/b&gt;&amp;nbsp;&amp;nbsp;&lt;i style=&quot;font-size:12px&quot;&gt;Subdomínio genérico · pacote &lt;code&gt;notification&lt;/code&gt;&lt;/i&gt;" style="rounded=1;absoluteArcSize=1;arcSize=24;whiteSpace=wrap;html=1;dashed=1;strokeWidth=2;fillColor=none;strokeColor=#333333;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="1680" y="1510" width="920" height="470" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-73" value="Agregado &lt;b&gt;EmailNotification&lt;/b&gt;" style="rounded=1;absoluteArcSize=1;arcSize=16;whiteSpace=wrap;html=1;fillColor=#fffde7;strokeColor=#b8a93a;strokeWidth=1.5;verticalAlign=top;align=left;spacingLeft=10;spacingTop=2;fontSize=13;fontColor=#6b5f00;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="1560" width="640" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-74" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«raiz do agregado»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:14px&quot;&gt;EmailNotification&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;customerId, type&lt;br&gt;recipient: &lt;font color=&quot;#2e7d32&quot;&gt;&lt;b&gt;Email&lt;/b&gt;&lt;/font&gt;&lt;br&gt;subject, body, htmlBody&lt;br&gt;status: EmailNotificationStatus&lt;br&gt;attempts, nextAttemptAt&lt;br&gt;sentAt, lastError&lt;hr&gt;&lt;span style=&quot;font-size:11px&quot;&gt;• Fábricas pending e withoutRecipient; sem e-mail, já nasce FAILED.&lt;br&gt;• Só pendente é enviado; a falha agenda nova tentativa, até o máximo.&lt;/span&gt;&lt;hr&gt;&lt;i style=&quot;font-size:11px&quot;&gt;EmailNotificationRepository&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#fff9b1;strokeColor=#b8a93a;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1720" y="1600" width="400" height="259" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-75" value="&lt;b&gt;Customer&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:10px&quot;&gt;Cadastro&lt;/span&gt;" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;dashed=1;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#555555;fontSize=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="2390" y="1640" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-76" value="customerId" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;endArrow=open;endFill=0;endSize=10;dashed=1;strokeWidth=1.5;strokeColor=#777777;fontColor=#555555;exitX=1.0;exitY=0.12;exitDx=0;exitDy=0;entryX=0.0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="tactical-74" target="tactical-75">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-77" value="&lt;b style=&quot;font-size:18px&quot;&gt;Núcleo compartilhado&lt;/b&gt;&amp;nbsp;&amp;nbsp;&lt;i style=&quot;font-size:12px&quot;&gt;Usado por todos os contextos · pacote &lt;code&gt;shared/domain&lt;/code&gt;&lt;/i&gt;" style="rounded=1;absoluteArcSize=1;arcSize=24;whiteSpace=wrap;html=1;dashed=1;strokeWidth=2;fillColor=none;strokeColor=#333333;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2010" width="1580" height="330" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-78" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«objeto de valor»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:13px&quot;&gt;CPF&lt;/b&gt;&lt;/div&gt;&lt;span style=&quot;font-size:11px&quot;&gt;11 dígitos com dígitos verificadores.&lt;/span&gt;" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="70" y="2060" width="175" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-79" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«objeto de valor»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:13px&quot;&gt;CNPJ&lt;/b&gt;&lt;/div&gt;&lt;span style=&quot;font-size:11px&quot;&gt;14 dígitos com dígitos verificadores.&lt;/span&gt;" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="260" y="2060" width="175" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-80" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«objeto de valor»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:13px&quot;&gt;CPFCNPJ&lt;/b&gt;&lt;/div&gt;&lt;span style=&quot;font-size:11px&quot;&gt;Tipo selado: é um CPF ou um CNPJ.&lt;/span&gt;" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="450" y="2060" width="175" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-81" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«objeto de valor»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:13px&quot;&gt;Money&lt;/b&gt;&lt;/div&gt;&lt;span style=&quot;font-size:11px&quot;&gt;Valor em reais, nunca negativo.&lt;/span&gt;" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="640" y="2060" width="175" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-82" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«objeto de valor»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:13px&quot;&gt;Email&lt;/b&gt;&lt;/div&gt;&lt;span style=&quot;font-size:11px&quot;&gt;Endereço validado e normalizado.&lt;/span&gt;" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="830" y="2060" width="175" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-83" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«objeto de valor»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:13px&quot;&gt;Phone&lt;/b&gt;&lt;/div&gt;&lt;span style=&quot;font-size:11px&quot;&gt;Telefone brasileiro validado.&lt;/span&gt;" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="2060" width="175" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-84" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«objeto de valor»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:13px&quot;&gt;LicensePlate&lt;/b&gt;&lt;/div&gt;&lt;span style=&quot;font-size:11px&quot;&gt;Placa antiga ou Mercosul.&lt;/span&gt;" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="1210" y="2060" width="175" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-85" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«objeto de valor»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:13px&quot;&gt;Chassis&lt;/b&gt;&lt;/div&gt;&lt;span style=&quot;font-size:11px&quot;&gt;Chassi (VIN) de 17 caracteres, com dígito verificador.&lt;/span&gt;" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="1400" y="2060" width="175" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-86" value="&lt;div style=&quot;text-align:center&quot;&gt;&lt;i style=&quot;font-size:10px&quot;&gt;«entidade base»&lt;/i&gt;&lt;br&gt;&lt;b style=&quot;font-size:14px&quot;&gt;BaseEntity&lt;/b&gt;&lt;/div&gt;&lt;hr&gt;id&lt;br&gt;dateCreated, lastUpdated&lt;br&gt;version (bloqueio otimista)&lt;hr&gt;&lt;span style=&quot;font-size:11px&quot;&gt;• Toda entidade estende: dá a identidade e o controle de concorrência.&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#ffffff;strokeColor=#666666;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="70" y="2200" width="300" height="154" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-87" value="Todo agregado guarda os tipos acima em vez de String ou BigDecimal soltos: um CPF inválido nem chega a existir. As exceções de domínio (DomainException, BusinessRuleException, NotFoundException, ConflictException) também ficam aqui." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=13;fontStyle=2;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="400" y="2210" width="1180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-88" value="&lt;b style=&quot;font-size:16px&quot;&gt;Notação desta aba&lt;/b&gt;" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#999999;fontColor=#333333;fontSize=13;align=left;verticalAlign=top;spacingLeft=10;spacingRight=8;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="1680" y="2010" width="920" height="330" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-89" value="&lt;b&gt;Raiz&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#fff9b1;strokeColor=#b8a93a;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="2060" width="110" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-90" value="Raiz do agregado: a única porta de entrada, com o repositório no rodapé." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=13;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="1820" y="2060" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-91" value="&lt;b&gt;Entidade&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#ffffff;strokeColor=#666666;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="2120" width="110" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-92" value="Entidade interna: só muda pela raiz." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=13;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="1820" y="2120" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-93" value="&lt;b&gt;Valor&lt;/b&gt;" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="2180" width="110" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-94" value="Objeto de valor; o tipo aparece &lt;font color=&quot;#2e7d32&quot;&gt;&lt;b&gt;em verde&lt;/b&gt;&lt;/font&gt; nos atributos." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=13;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="1820" y="2180" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-95" value="&lt;b&gt;Evento&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=12;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="2240" width="110" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-96" value="Evento de domínio registrado pela raiz." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=13;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="1820" y="2240" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-97" value="&lt;b&gt;Outro agregado&lt;/b&gt;" style="rounded=1;absoluteArcSize=1;arcSize=14;whiteSpace=wrap;html=1;dashed=1;fillColor=#f5f5f5;strokeColor=#999999;fontColor=#555555;fontSize=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="2300" width="110" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-98" value="Agregado de outro lugar, citado só por id." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=13;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="1820" y="2300" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-99" value="" style="text;html=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="2150" y="2070" width="2" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-100" value="" style="text;html=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="2260" y="2070" width="2" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-101" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;startArrow=diamondThin;startFill=1;startSize=16;endArrow=none;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="tactical-99" target="tactical-100">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-102" value="Composição: a raiz contém a entidade." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=13;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="2275" y="2064" width="300" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-103" value="" style="text;html=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="2150" y="2126" width="2" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-104" value="" style="text;html=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="2260" y="2126" width="2" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-105" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;endArrow=block;endFill=0;endSize=12;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="tactical-103" target="tactical-104">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-106" value="Herança: a entidade estende a abstrata." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=13;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="2275" y="2120" width="300" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-107" value="" style="text;html=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="2150" y="2182" width="2" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-108" value="" style="text;html=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="2260" y="2182" width="2" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-109" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;endArrow=open;endFill=0;endSize=10;dashed=1;strokeWidth=1.5;strokeColor=#777777;fontColor=#555555;" edge="1" parent="1" source="tactical-107" target="tactical-108">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-110" value="Referência só por id (outro agregado)." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=13;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="2275" y="2176" width="300" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-111" value="" style="text;html=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="2150" y="2238" width="2" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-112" value="" style="text;html=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="2260" y="2238" width="2" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-113" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;endArrow=open;endFill=0;endSize=10;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="tactical-111" target="tactical-112">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-114" value="Referência por objeto, no mesmo contexto." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=13;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="2275" y="2232" width="300" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-115" value="" style="text;html=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="2150" y="2294" width="2" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-116" value="" style="text;html=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="2260" y="2294" width="2" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-117" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#b97a00;fontColor=#8a5a00;" edge="1" parent="1" source="tactical-115" target="tactical-116">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-118" value="A raiz registra os eventos." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=13;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="2275" y="2288" width="300" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-119" value="2. Contextos e camadas" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2420" width="1200" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-120" value="Cada contexto delimitado é um pacote com as mesmas quatro camadas do DDD (aula 5). A regra de dependência é api → application → domain ← infrastructure, verificada no build pelo teste ArchUnit LayerDependencyTest. Todos usam o mesmo PostgreSQL." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=13;fontStyle=2;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2460" width="2540" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-121" value="Identidade e Acesso&lt;br&gt;&lt;code&gt;auth&lt;/code&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=13;fontStyle=1;align=center;verticalAlign=middle;strokeWidth=1.5;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="240" y="2520" width="290" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-122" value="Cadastro&lt;br&gt;&lt;code&gt;registry&lt;/code&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=13;fontStyle=1;align=center;verticalAlign=middle;strokeWidth=1.5;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="530" y="2520" width="290" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-123" value="Catálogo de Serviços&lt;br&gt;&lt;code&gt;catalog&lt;/code&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=13;fontStyle=1;align=center;verticalAlign=middle;strokeWidth=1.5;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="820" y="2520" width="290" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-124" value="Estoque&lt;br&gt;&lt;code&gt;inventory&lt;/code&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=13;fontStyle=1;align=center;verticalAlign=middle;strokeWidth=1.5;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="2520" width="290" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-125" value="Ordem de Serviço&lt;br&gt;&lt;code&gt;serviceorder&lt;/code&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=13;fontStyle=1;align=center;verticalAlign=middle;strokeWidth=1.5;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="1400" y="2520" width="290" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-126" value="Notificações&lt;br&gt;&lt;code&gt;notification&lt;/code&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=13;fontStyle=1;align=center;verticalAlign=middle;strokeWidth=1.5;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="1690" y="2520" width="290" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-127" value="Indicadores Operacionais&lt;br&gt;&lt;code&gt;metrics&lt;/code&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=13;fontStyle=1;align=center;verticalAlign=middle;strokeWidth=1.5;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="1980" y="2520" width="290" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-128" value="Núcleo compartilhado&lt;br&gt;&lt;code&gt;shared&lt;/code&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=13;fontStyle=1;align=center;verticalAlign=middle;strokeWidth=1.5;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="2270" y="2520" width="290" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-129" value="&lt;b&gt;Interface&lt;/b&gt;&lt;br&gt;&lt;code&gt;api&lt;/code&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=13;align=center;verticalAlign=middle;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2580" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-130" value="AuthController&lt;br&gt;UserController" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="240" y="2580" width="290" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-131" value="CustomerController&lt;br&gt;VehicleController&lt;br&gt;CustomerVehicleController" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="530" y="2580" width="290" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-132" value="ServiceOfferingController" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="820" y="2580" width="290" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-133" value="PartController&lt;br&gt;StockMovementController&lt;br&gt;StockAdjustmentRequestController" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="2580" width="290" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-134" value="ServiceOrderController&lt;br&gt;ServiceOrderItemController&lt;br&gt;CustomerServiceOrderController (cliente, sem login)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="1400" y="2580" width="290" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-135" value="Sem rotas" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="1690" y="2580" width="290" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-136" value="MetricsController" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="1980" y="2580" width="290" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-137" value="Erros da API (ApiError)&lt;br&gt;OpenAPI" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="2270" y="2580" width="290" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-138" value="&lt;b&gt;Aplicação&lt;/b&gt;&lt;br&gt;&lt;code&gt;application&lt;/code&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=13;align=center;verticalAlign=middle;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2690" width="200" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-139" value="8 casos de uso&lt;br&gt;porta TokenIssuer" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="240" y="2690" width="290" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-140" value="10 casos de uso&lt;br&gt;implementa CustomerDirectory e VehicleDirectory" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="530" y="2690" width="290" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-141" value="6 casos de uso&lt;br&gt;implementa ServiceOfferingDirectory" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="820" y="2690" width="290" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-142" value="16 casos de uso&lt;br&gt;5 listeners dos eventos da OS&lt;br&gt;ExpiredStockReservationsJob&lt;br&gt;implementa PartDirectory" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="2690" width="290" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-143" value="23 casos de uso&lt;br&gt;ServiceOrderNotificationListener" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="1400" y="2690" width="290" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-144" value="1 caso de uso&lt;br&gt;PendingEmailsJob&lt;br&gt;implementa Notifier" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="1690" y="2690" width="290" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-145" value="1 caso de uso&lt;br&gt;porta ServiceOrderHistoryReader" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="1980" y="2690" width="290" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-146" value="UseCase e VoidUseCase&lt;br&gt;contratos entre contextos e CurrentUser&lt;br&gt;eventos em &lt;code&gt;shared/event&lt;/code&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="2270" y="2690" width="290" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-147" value="&lt;b&gt;Domínio&lt;/b&gt;&lt;br&gt;&lt;code&gt;domain&lt;/code&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=13;align=center;verticalAlign=middle;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2830" width="200" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-148" value="User, UserRole&lt;br&gt;porta PasswordHasher" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#fffde7;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="240" y="2830" width="290" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-149" value="Customer, Vehicle" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#fffde7;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="530" y="2830" width="290" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-150" value="ServiceOffering" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#fffde7;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="820" y="2830" width="290" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-151" value="Part, StockReservation, StockMovement, StockAdjustmentRequest, Sku" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#fffde7;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="2830" width="290" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-152" value="ServiceOrder, ServiceItem, PartItem, StatusChange, ServiceOrderNumber" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#fffde7;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="1400" y="2830" width="290" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-153" value="EmailNotification&lt;br&gt;porta EmailSender" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#fffde7;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="1690" y="2830" width="290" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-154" value="&lt;i&gt;Sem domínio&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="1980" y="2830" width="290" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-155" value="Objetos de valor, BaseEntity e exceções de domínio" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="2270" y="2830" width="290" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-156" value="&lt;b&gt;Infraestrutura&lt;/b&gt;&lt;br&gt;&lt;code&gt;infrastructure&lt;/code&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=13;align=center;verticalAlign=middle;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2970" width="200" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-157" value="UserJpaRepository&lt;br&gt;JWT (JwtTokenIssuer, JwtCurrentUser)&lt;br&gt;Argon2PasswordHasher&lt;br&gt;rate limit" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="240" y="2970" width="290" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-158" value="CustomerJpaRepository&lt;br&gt;VehicleJpaRepository" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="530" y="2970" width="290" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-159" value="ServiceOfferingJpaRepository" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="820" y="2970" width="290" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-160" value="4 repositórios JPA" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="2970" width="290" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-161" value="ServiceOrderJpaRepository" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="1400" y="2970" width="290" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-162" value="SmtpEmailSender&lt;br&gt;EmailNotificationJpaRepository" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="1690" y="2970" width="290" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-163" value="JdbcServiceOrderHistoryReader" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="1980" y="2970" width="290" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-164" value="Segurança das rotas, i18n, validação, relógio e agendamento" style="rounded=0;whiteSpace=wrap;html=1;fontSize=11;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#999999;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="2270" y="2970" width="290" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-165" value="&lt;b&gt;Dados&lt;/b&gt;&lt;br&gt;PostgreSQL" style="rounded=0;whiteSpace=wrap;html=1;fontSize=13;align=center;verticalAlign=middle;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="40" y="3090" width="200" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-166" value="&lt;b&gt;PostgreSQL 18&lt;/b&gt;, um banco para o monólito inteiro. Cada contexto grava só nas próprias tabelas; o Indicadores Operacionais é o único que lê tabelas de outro contexto, as da OS e do catálogo." style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;align=center;verticalAlign=middle;fillColor=#dae8fc;strokeColor=#6c8ebf;spacingLeft=8;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="240" y="3090" width="2320" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="tactical-167" value="&lt;b&gt;Como ler&lt;/b&gt;&lt;br&gt;• &lt;b&gt;Seção 1:&lt;/b&gt; cada caixa tracejada é um contexto delimitado, com o subdomínio e o pacote. Dentro dela, cada caixa amarela clara é a fronteira de um agregado: tudo que está dentro muda numa transação só, sempre pela raiz.&lt;br&gt;• &lt;b&gt;Fronteiras:&lt;/b&gt; um agregado nunca guarda outro agregado de outro contexto, só o id dele (setas tracejadas cinza). A OS guarda customerId, vehicleId e mechanicId; o item guarda serviceOfferingId ou partId; o estoque guarda serviceOrderId. Os ids de usuário do histórico e da execução seguem a mesma regra. Dentro do Estoque, reserva, movimento e pedido de ajuste apontam para a peça pelo objeto, porque estão no mesmo contexto e no mesmo banco.&lt;br&gt;• &lt;b&gt;Entre contextos:&lt;/b&gt; a OS não chama o estoque nem as notificações: registra eventos de domínio, e os listeners de cada contexto reagem a eles. As consultas a cliente, veículo, serviço e peça passam pelos contratos do núcleo compartilhado, que devolvem DTOs, nunca a entidade.&lt;br&gt;• &lt;b&gt;Serviços de domínio:&lt;/b&gt; não há. Toda regra coube num agregado; o que coordena mais de um agregado é caso de uso, na camada de aplicação.&lt;br&gt;• &lt;b&gt;Seção 2:&lt;/b&gt; as mesmas fronteiras vistas pelas camadas do DDD. O fundo amarelo marca a camada de domínio, onde mora o modelo da seção 1.&lt;br&gt;• Os comandos e eventos de cada fluxo estão nas abas de Event Storming; os termos, na aba Linguagem ubíqua e glossário." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="3200" width="2540" height="260" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
