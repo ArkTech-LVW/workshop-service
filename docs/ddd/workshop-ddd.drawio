@@ -3788,7 +3788,7 @@
         <mxCell id="es-parts-1" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=26;fontStyle=1;" value="ES - Peças e insumos" vertex="1">
           <mxGeometry height="40" width="1600" x="40" y="20" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-2" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=15;" value="Do cadastro da peça ou insumo à entrada no estoque e ao ajuste, direto ou pedido e aprovado. A reserva e a baixa pela OS estão em ES - Estoque da OS. A notação está na aba Legenda." vertex="1">
+        <mxCell id="es-parts-2" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=15;" value="Do cadastro da peça ou insumo à entrada no estoque, onde o caminho feliz segue para ES - Estoque da OS. O ajuste é o desvio: baixa extraordinária por perda ou avaria, direta ou pedida e aprovada. A notação está na aba Legenda." vertex="1">
           <mxGeometry height="30" width="2600" x="40" y="60" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-3" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontStyle=1;" value="1. Linha do tempo" vertex="1">
@@ -3821,13 +3821,13 @@
         <mxCell id="es-parts-14" parent="es-parts-13" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AT" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-16" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="&lt;b&gt;Peça ou insumo cadastrado&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;estoque zero; tipo e unidade&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-parts-16" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="&lt;b&gt;Peça ou insumo cadastrado&lt;/b&gt;" vertex="1">
           <mxGeometry height="100" width="160" x="350" y="680" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-17" parent="es-parts-16" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-18" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Cadastro recusado: SKU já existe&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;o SKU é único&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-parts-18" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Cadastro recusado: SKU já existe" vertex="1">
           <mxGeometry height="100" width="160" x="350" y="880" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-19" parent="es-parts-18" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -3851,7 +3851,7 @@
         <mxCell id="es-parts-27" parent="es-parts-26" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AT" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-29" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Peça ou insumo alterado&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;o SKU continua único; o preço novo só vale para as próximas inclusões&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-parts-29" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Peça ou insumo alterado" vertex="1">
           <mxGeometry height="100" width="160" x="870" y="360" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-30" parent="es-parts-29" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -3881,7 +3881,7 @@
         <mxCell id="es-parts-39" parent="es-parts-38" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-40" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Exclusão recusada: peça em uso&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;tem movimento, reserva ou OS&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-parts-40" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Exclusão recusada: peça em uso" vertex="1">
           <mxGeometry height="100" width="160" x="870" y="1200" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-41" parent="es-parts-40" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -3911,7 +3911,7 @@
         <mxCell id="es-parts-55" parent="es-parts-54" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AT" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-59" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="&lt;b&gt;Entrada de estoque registrada&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;soma ao disponível; a saída manual só acontece pela OS&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-parts-59" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="&lt;b&gt;Entrada de estoque registrada&lt;/b&gt;" vertex="1">
           <mxGeometry height="100" width="160" x="1390" y="680" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-60" parent="es-parts-59" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -3923,8 +3923,8 @@
         <mxCell id="es-parts-63" parent="es-parts-62" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=0;spacingTop=1;connectable=0;" value="PA" vertex="1">
           <mxGeometry height="18" width="40" x="55" y="10" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-65" parent="1" style="rhombus;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;spacingLeft=14;spacingRight=14;spacingTop=16;fillColor=#f08080;strokeColor=#b85450;" value="Quem avisa que a peça chegou ao estoque mínimo?" vertex="1">
-          <mxGeometry height="150" width="150" x="1395" y="880" as="geometry" />
+        <mxCell id="es-parts-65" parent="1" style="rhombus;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;spacingLeft=14;spacingRight=14;spacingTop=16;fillColor=#f08080;strokeColor=#b85450;" value="O estoque baixo deveria gerar aviso? Para quem e com que frequência?" vertex="1">
+          <mxGeometry height="150" width="150" x="3047" y="950" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-66" parent="es-parts-65" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=0;spacingTop=1;connectable=0;" value="PA" vertex="1">
           <mxGeometry height="18" width="40" x="55" y="10" as="geometry" />
@@ -3947,23 +3947,17 @@
         <mxCell id="es-parts-73" parent="es-parts-72" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AT" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-75" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Ajuste de estoque registrado&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;motivo obrigatório; só tira do disponível&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-parts-75" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Ajuste de estoque registrado" vertex="1">
           <mxGeometry height="100" width="160" x="2030" y="680" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-76" parent="es-parts-75" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-77" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Ajuste recusado: estoque insuficiente&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;o estoque não fica negativo&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-parts-77" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Ajuste não registrado: estoque insuficiente" vertex="1">
           <mxGeometry height="100" width="160" x="2030" y="880" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-78" parent="es-parts-77" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
-        </mxCell>
-        <mxCell id="es-parts-82" parent="1" style="rhombus;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;spacingLeft=14;spacingRight=14;spacingTop=16;fillColor=#f08080;strokeColor=#b85450;" value="O ajuste direto do administrador também deveria ser aprovado?" vertex="1">
-          <mxGeometry height="150" width="150" x="2035" y="490" as="geometry" />
-        </mxCell>
-        <mxCell id="es-parts-83" parent="es-parts-82" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=0;spacingTop=1;connectable=0;" value="PA" vertex="1">
-          <mxGeometry height="18" width="40" x="55" y="10" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-85" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" value="Pede ajuste de estoque" vertex="1">
           <mxGeometry height="100" width="160" x="1820" y="1120" as="geometry" />
@@ -3983,13 +3977,13 @@
         <mxCell id="es-parts-90" parent="es-parts-89" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AT" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-92" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Ajuste de estoque pedido&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;motivo obrigatório; aguarda um administrador&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-parts-92" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Pedido de ajuste aberto" vertex="1">
           <mxGeometry height="100" width="160" x="2030" y="1120" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-93" parent="es-parts-92" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-96" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" value="Aprova ajuste de estoque" vertex="1">
+        <mxCell id="es-parts-96" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" value="Aprova pedido de ajuste" vertex="1">
           <mxGeometry height="100" width="160" x="2340" y="1120" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-97" parent="es-parts-96" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="CMD" vertex="1">
@@ -4007,7 +4001,7 @@
         <mxCell id="es-parts-101" parent="es-parts-100" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AT" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-103" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Ajuste de estoque aprovado&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;outro administrador revisa&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-parts-103" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Pedido de ajuste aprovado" vertex="1">
           <mxGeometry height="100" width="160" x="2550" y="1120" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-104" parent="es-parts-103" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -4019,7 +4013,7 @@
         <mxCell id="es-parts-106" parent="es-parts-105" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-110" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" value="Recusa ajuste de estoque" vertex="1">
+        <mxCell id="es-parts-110" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" value="Recusa pedido de ajuste" vertex="1">
           <mxGeometry height="100" width="160" x="2340" y="1560" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-111" parent="es-parts-110" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="CMD" vertex="1">
@@ -4037,14 +4031,14 @@
         <mxCell id="es-parts-115" parent="es-parts-114" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AT" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-117" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Ajuste de estoque recusado&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;observação obrigatória&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-parts-117" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Pedido de ajuste recusado" vertex="1">
           <mxGeometry height="100" width="160" x="2550" y="1560" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-118" parent="es-parts-117" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-121" parent="1" style="rhombus;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;spacingLeft=14;spacingRight=14;spacingTop=16;fillColor=#f08080;strokeColor=#b85450;" value="O ajuste só tira do estoque: como corrigir uma contagem a mais?" vertex="1">
-          <mxGeometry height="150" width="150" x="2555" y="930" as="geometry" />
+          <mxGeometry height="150" width="150" x="2035" y="490" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-122" parent="es-parts-121" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=0;spacingTop=1;connectable=0;" value="PA" vertex="1">
           <mxGeometry height="18" width="40" x="55" y="10" as="geometry" />
@@ -4055,32 +4049,26 @@
         <mxCell id="es-parts-127" parent="es-parts-126" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="CMD" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-130" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Ajuste de estoque registrado&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;motivo do pedido; só tira do disponível&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-parts-130" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Ajuste de estoque registrado" vertex="1">
           <mxGeometry height="100" width="160" x="3042" y="1120" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-131" parent="es-parts-130" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-132" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Ajuste recusado: estoque insuficiente&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;o estoque não fica negativo&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-parts-132" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Pedido não aprovado: estoque insuficiente" vertex="1">
           <mxGeometry height="100" width="160" x="3042" y="1320" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-133" parent="es-parts-132" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-136" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=13;fontStyle=2;fontColor=#555555;verticalAlign=top;" value="Ajuste é a correção depois da contagem física do estoque. O administrador ajusta direto; o atendente pede, e outro administrador aprova ou recusa." vertex="1">
-          <mxGeometry height="50" width="1000" x="1820" y="1700" as="geometry" />
+        <mxCell id="es-parts-136" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=13;fontStyle=2;fontColor=#555555;verticalAlign=top;" value="Ajuste é a baixa extraordinária por perda ou avaria: só retira do estoque. Fora dele, a saída só acontece pela OS. O administrador ajusta direto; o atendente pede, e um administrador que não fez o pedido aprova ou recusa. O estoque reage à aprovação na mesma hora: se ele recusa, a aprovação é desfeita." vertex="1">
+          <mxGeometry height="60" width="1000" x="1820" y="1815" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-137" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontStyle=1;" value="2. Agregados e contextos delimitados" vertex="1">
           <mxGeometry height="34" width="900" x="40" y="1880" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-138" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=15;" value="Os mesmos comandos e eventos, agrupados pelo agregado que os trata, com as setas do fluxo. A caixa tracejada é o contexto delimitado." vertex="1">
+        <mxCell id="es-parts-138" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=15;" value="Os mesmos comandos e eventos, agrupados pelo agregado que os trata, com as setas do fluxo. A caixa tracejada é o contexto delimitado. A movimentação não é agregado: é o registro imutável de cada mudança no saldo da peça." vertex="1">
           <mxGeometry height="30" width="2400" x="40" y="1918" as="geometry" />
-        </mxCell>
-        <mxCell id="es-parts-140" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Peça ou insumo" vertex="1">
-          <mxGeometry height="500" width="120" x="537" y="2020" as="geometry" />
-        </mxCell>
-        <mxCell id="es-parts-141" parent="es-parts-140" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AG" vertex="1">
-          <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-142" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" value="Cadastra peça ou insumo" vertex="1">
           <mxGeometry height="100" width="160" x="337" y="2020" as="geometry" />
@@ -4154,12 +4142,6 @@
         <mxCell id="es-parts-172" parent="es-parts-171" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-175" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Peça, reserva e movimento" vertex="1">
-          <mxGeometry height="300" width="120" x="537" y="2620" as="geometry" />
-        </mxCell>
-        <mxCell id="es-parts-176" parent="es-parts-175" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AG" vertex="1">
-          <mxGeometry height="18" width="44" as="geometry" />
-        </mxCell>
         <mxCell id="es-parts-177" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" value="Registra entrada de estoque" vertex="1">
           <mxGeometry height="100" width="160" x="337" y="2620" as="geometry" />
         </mxCell>
@@ -4208,12 +4190,6 @@
         <mxCell id="es-parts-196" parent="es-parts-195" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-199" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Pedido de ajuste de estoque" vertex="1">
-          <mxGeometry height="500" width="120" x="537" y="3020" as="geometry" />
-        </mxCell>
-        <mxCell id="es-parts-200" parent="es-parts-199" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AG" vertex="1">
-          <mxGeometry height="18" width="44" as="geometry" />
-        </mxCell>
         <mxCell id="es-parts-201" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" value="Pede ajuste de estoque" vertex="1">
           <mxGeometry height="100" width="160" x="337" y="3020" as="geometry" />
         </mxCell>
@@ -4232,13 +4208,13 @@
         <mxCell id="es-parts-206" parent="es-parts-205" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AT" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-208" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Ajuste de estoque pedido" vertex="1">
+        <mxCell id="es-parts-208" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Pedido de ajuste aberto" vertex="1">
           <mxGeometry height="100" width="160" x="697" y="3020" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-209" parent="es-parts-208" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-212" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" value="Aprova ajuste de estoque" vertex="1">
+        <mxCell id="es-parts-212" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" value="Aprova pedido de ajuste" vertex="1">
           <mxGeometry height="100" width="160" x="337" y="3220" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-213" parent="es-parts-212" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="CMD" vertex="1">
@@ -4256,13 +4232,13 @@
         <mxCell id="es-parts-217" parent="es-parts-216" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AT" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-219" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Ajuste de estoque aprovado" vertex="1">
+        <mxCell id="es-parts-219" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Pedido de ajuste aprovado" vertex="1">
           <mxGeometry height="100" width="160" x="697" y="3220" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-220" parent="es-parts-219" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-223" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" value="Recusa ajuste de estoque" vertex="1">
+        <mxCell id="es-parts-223" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" value="Recusa pedido de ajuste" vertex="1">
           <mxGeometry height="100" width="160" x="337" y="3420" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-224" parent="es-parts-223" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="CMD" vertex="1">
@@ -4280,22 +4256,22 @@
         <mxCell id="es-parts-228" parent="es-parts-227" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AT" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-230" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Ajuste de estoque recusado" vertex="1">
+        <mxCell id="es-parts-230" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Pedido de ajuste recusado" vertex="1">
           <mxGeometry height="100" width="160" x="697" y="3420" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-231" parent="es-parts-230" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-245" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;verticalAlign=top;" value="&lt;b&gt;Como ler&lt;/b&gt;&lt;br&gt;• Linha do tempo: o caminho feliz (linha cheia) é a peça cadastrada, a entrada no estoque e o ajuste direto. As tracejadas são os desvios: alteração e exclusão do cadastro, recusas e o ajuste pedido pelo atendente.&lt;br&gt;• Embaixo do evento fica a regra de negócio que o explica.&lt;br&gt;• Cada política fica sobreposta entre o evento que a dispara e o comando que ela executa. Por isso Registra ajuste de estoque aparece também depois da aprovação do pedido.&lt;br&gt;• Eventos pivotais (barras pretas): Peça ou insumo cadastrado, quando a peça passa a existir no catálogo, e Entrada de estoque registrada, quando passa a ter disponível para as OS.&lt;br&gt;• Ajuste: o administrador ajusta direto; o atendente pede, e outro administrador aprova ou recusa. A aprovação registra o ajuste pela política.&lt;br&gt;• Agregados: cada bloco junta os comandos e os eventos de um agregado, dentro do seu contexto delimitado, com as setas do fluxo.&lt;br&gt;• A reserva, a baixa, a liberação e a devolução pela OS estão em ES - Estoque da OS." vertex="1">
-          <mxGeometry height="200" width="2400" x="40" y="3660" as="geometry" />
+        <mxCell id="es-parts-245" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;verticalAlign=top;" value="&lt;b&gt;Como ler&lt;/b&gt;&lt;br&gt;• Linha do tempo: o caminho feliz (linha cheia) é a peça cadastrada e a entrada no estoque, e segue em ES - Estoque da OS. As tracejadas são os desvios: alteração e exclusão do cadastro, recusas e o ajuste, direto ou pedido.&lt;br&gt;• Cada política fica sobreposta entre o evento que a dispara e o comando que ela executa. Registra ajuste de estoque aparece também depois da aprovação porque o pedido e a peça são agregados diferentes, e só a peça muda o próprio saldo. A política é imediata: sem disponível, a aprovação é desfeita.&lt;br&gt;• Eventos pivotais (barras pretas): Peça ou insumo cadastrado, quando a peça passa a existir no catálogo, e Entrada de estoque registrada, quando passa a ter disponível para as OS.&lt;br&gt;• Ajuste: baixa extraordinária por perda ou avaria, que só retira do estoque. Contagem a mais não é ajuste.&lt;br&gt;• Agregados: Peça ou insumo guarda o cadastro e o saldo; Pedido de ajuste tem ciclo próprio e só muda o saldo ao ser aprovado. A reserva é outro agregado, em ES - Estoque da OS." vertex="1">
+          <mxGeometry height="240" width="2400" x="40" y="3660" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-124" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=12;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;" value="Quando o ajuste é aprovado, registra o ajuste" vertex="1">
+        <mxCell id="es-parts-124" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=12;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;" value="Quando o pedido é aprovado, registra o ajuste na hora" vertex="1">
           <mxGeometry height="110" width="150" x="2690" y="1192" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-125" parent="es-parts-124" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="POL" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-241" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=12;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;" value="Quando o ajuste é aprovado, registra o ajuste" vertex="1">
+        <mxCell id="es-parts-241" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=12;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;" value="Quando o pedido é aprovado, registra o ajuste na hora" vertex="1">
           <mxGeometry height="100" width="150" x="897" y="3220" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-242" parent="es-parts-241" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="POL" vertex="1">
@@ -4340,37 +4316,25 @@
         <mxCell id="es-parts-57" edge="1" parent="1" source="es-parts-16" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-parts-50" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-58" edge="1" parent="1" source="es-parts-18" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" target="es-parts-50" value="">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="430" y="1560" />
-              <mxPoint x="1130" y="1560" />
-              <mxPoint x="1130" y="705" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
         <mxCell id="es-parts-61" edge="1" parent="1" source="es-parts-50" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-parts-59" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-64" edge="1" parent="1" source="es-parts-62" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="es-parts-59" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-67" edge="1" parent="1" source="es-parts-65" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="es-parts-59" value="">
+        <mxCell id="es-parts-67" edge="1" parent="1" source="es-parts-65" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="es-parts-130" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-74" edge="1" parent="1" source="es-parts-70" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="es-parts-68" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-79" edge="1" parent="1" source="es-parts-59" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-parts-68" value="">
+        <mxCell id="es-parts-79" edge="1" parent="1" source="es-parts-59" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" target="es-parts-68" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-80" edge="1" parent="1" source="es-parts-68" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-parts-75" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-81" edge="1" parent="1" source="es-parts-68" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-parts-77" value="">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="es-parts-84" edge="1" parent="1" source="es-parts-82" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="es-parts-75" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-91" edge="1" parent="1" source="es-parts-87" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="es-parts-85" value="">
@@ -4403,7 +4367,7 @@
         <mxCell id="es-parts-120" edge="1" parent="1" source="es-parts-110" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-parts-117" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-123" edge="1" parent="1" source="es-parts-121" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="es-parts-103" value="">
+        <mxCell id="es-parts-123" edge="1" parent="1" source="es-parts-121" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="es-parts-75" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-128" edge="1" parent="1" source="es-parts-103" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="es-parts-124" value="">
@@ -4421,46 +4385,46 @@
         <mxCell id="es-parts-148" edge="1" parent="1" source="es-parts-144" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" target="es-parts-142" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-151" edge="1" parent="1" source="es-parts-142" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.1;entryDx=0;entryDy=0;" target="es-parts-140" value="">
+        <mxCell id="es-parts-151" edge="1" parent="1" source="es-parts-142" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.0556;entryDx=0;entryDy=0;" target="es-parts-140" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-152" edge="1" parent="1" source="es-parts-140" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-parts-149" value="">
+        <mxCell id="es-parts-152" edge="1" parent="1" source="es-parts-140" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.0556;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-parts-149" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-159" edge="1" parent="1" source="es-parts-155" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" target="es-parts-153" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-162" edge="1" parent="1" source="es-parts-153" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-parts-140" value="">
+        <mxCell id="es-parts-162" edge="1" parent="1" source="es-parts-153" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.2778;entryDx=0;entryDy=0;" target="es-parts-140" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-163" edge="1" parent="1" source="es-parts-140" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-parts-160" value="">
+        <mxCell id="es-parts-163" edge="1" parent="1" source="es-parts-140" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.2778;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-parts-160" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-170" edge="1" parent="1" source="es-parts-166" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" target="es-parts-164" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-173" edge="1" parent="1" source="es-parts-164" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.9;entryDx=0;entryDy=0;" target="es-parts-140" value="">
+        <mxCell id="es-parts-173" edge="1" parent="1" source="es-parts-164" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-parts-140" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-174" edge="1" parent="1" source="es-parts-140" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.9;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-parts-171" value="">
+        <mxCell id="es-parts-174" edge="1" parent="1" source="es-parts-140" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-parts-171" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-183" edge="1" parent="1" source="es-parts-179" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" target="es-parts-177" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-186" edge="1" parent="1" source="es-parts-177" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.1667;entryDx=0;entryDy=0;" target="es-parts-175" value="">
+        <mxCell id="es-parts-186" edge="1" parent="1" source="es-parts-177" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.7222;entryDx=0;entryDy=0;" target="es-parts-140" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-187" edge="1" parent="1" source="es-parts-175" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.1667;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-parts-184" value="">
+        <mxCell id="es-parts-187" edge="1" parent="1" source="es-parts-140" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.7222;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-parts-184" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-194" edge="1" parent="1" source="es-parts-190" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" target="es-parts-188" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-197" edge="1" parent="1" source="es-parts-188" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.8333;entryDx=0;entryDy=0;" target="es-parts-175" value="">
+        <mxCell id="es-parts-197" edge="1" parent="1" source="es-parts-188" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.9444;entryDx=0;entryDy=0;" target="es-parts-140" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-parts-198" edge="1" parent="1" source="es-parts-175" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.8333;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-parts-195" value="">
+        <mxCell id="es-parts-198" edge="1" parent="1" source="es-parts-140" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.9444;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-parts-195" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="es-parts-207" edge="1" parent="1" source="es-parts-203" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" target="es-parts-201" value="">
@@ -4565,11 +4529,80 @@
             </Array>
           </mxGeometry>
         </mxCell>
+        <mxCell id="es-parts-301" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Alteração recusada: SKU já existe" vertex="1">
+          <mxGeometry height="100" width="160" x="870" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="es-parts-301-l" parent="es-parts-301" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
+          <mxGeometry height="18" width="44" as="geometry" />
+        </mxCell>
+        <mxCell id="es-parts-302" edge="1" parent="1" source="es-parts-22" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-parts-301" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-parts-303" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Revisão recusada: pedido próprio, já revisado ou sem observação" vertex="1">
+          <mxGeometry height="100" width="160" x="2550" y="1690" as="geometry" />
+        </mxCell>
+        <mxCell id="es-parts-303-l" parent="es-parts-303" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
+          <mxGeometry height="18" width="44" as="geometry" />
+        </mxCell>
+        <mxCell id="es-parts-304" edge="1" parent="1" source="es-parts-110" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-parts-303" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-parts-305" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=13;fontStyle=2;fontColor=#555555;verticalAlign=top;" value="O caminho feliz continua em ES - Estoque da OS: com disponível, a peça pode ser reservada e baixada pelas OS." vertex="1">
+          <mxGeometry height="60" width="400" x="1150" y="1100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-parts-306" parent="1" style="rhombus;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;spacingLeft=14;spacingRight=14;spacingTop=16;fillColor=#f08080;strokeColor=#b85450;" value="Falta na contagem, sem causa conhecida: é perda ou reconciliação?" vertex="1">
+          <mxGeometry height="150" width="150" x="2230" y="655" as="geometry" />
+        </mxCell>
+        <mxCell id="es-parts-306-l" parent="es-parts-306" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=0;spacingTop=1;connectable=0;" value="PA" vertex="1">
+          <mxGeometry height="18" width="40" x="55" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="es-parts-306-e" edge="1" parent="1" source="es-parts-306" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="es-parts-75" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-parts-307" parent="1" style="rhombus;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;spacingLeft=14;spacingRight=14;spacingTop=16;fillColor=#f08080;strokeColor=#b85450;" value="Peça perdida com todo o saldo reservado: como registrar?" vertex="1">
+          <mxGeometry height="150" width="150" x="2230" y="870" as="geometry" />
+        </mxCell>
+        <mxCell id="es-parts-307-l" parent="es-parts-307" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=0;spacingTop=1;connectable=0;" value="PA" vertex="1">
+          <mxGeometry height="18" width="40" x="55" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="es-parts-307-e" edge="1" parent="1" source="es-parts-307" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="es-parts-77" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-parts-308" parent="1" style="rhombus;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;spacingLeft=14;spacingRight=14;spacingTop=16;fillColor=#f08080;strokeColor=#b85450;" value="Trocar a unidade de uma peça com saldo: o que vale para a quantidade?" vertex="1">
+          <mxGeometry height="150" width="150" x="875" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="es-parts-308-l" parent="es-parts-308" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=0;spacingTop=1;connectable=0;" value="PA" vertex="1">
+          <mxGeometry height="18" width="40" x="55" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="es-parts-308-e" edge="1" parent="1" source="es-parts-308" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="es-parts-29" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-parts-309" parent="1" style="rhombus;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;spacingLeft=14;spacingRight=14;spacingTop=16;fillColor=#f08080;strokeColor=#b85450;" value="Litro ou quilo com quantidade inteira: como registrar meio litro?" vertex="1">
+          <mxGeometry height="150" width="150" x="1395" y="880" as="geometry" />
+        </mxCell>
+        <mxCell id="es-parts-309-l" parent="es-parts-309" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=0;spacingTop=1;connectable=0;" value="PA" vertex="1">
+          <mxGeometry height="18" width="40" x="55" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="es-parts-309-e" edge="1" parent="1" source="es-parts-309" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="es-parts-59" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-parts-140" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Peça ou insumo&lt;br&gt;&lt;span style=&quot;font-size:11px;font-weight:normal&quot;&gt;&lt;i&gt;cadastro, saldo e movimentações&lt;/i&gt;&lt;/span&gt;" vertex="1">
+          <mxGeometry height="900" width="120" x="537" y="2020" as="geometry" />
+        </mxCell>
+        <mxCell id="es-parts-141" parent="es-parts-140" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AG" vertex="1">
+          <mxGeometry height="18" width="44" as="geometry" />
+        </mxCell>
+        <mxCell id="es-parts-199" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Pedido de ajuste" vertex="1">
+          <mxGeometry height="500" width="120" x="537" y="3020" as="geometry" />
+        </mxCell>
+        <mxCell id="es-parts-200" parent="es-parts-199" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AG" vertex="1">
+          <mxGeometry height="18" width="44" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
   <diagram id="es-stock" name="ES - Estoque da OS">
-    <mxGraphModel grid="1" page="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" pageScale="1" pageWidth="2600" pageHeight="3780" math="0" shadow="0">
+    <mxGraphModel dx="3141" dy="3782" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2600" pageHeight="3780" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -4597,7 +4630,7 @@
         <mxCell id="es-stock-5" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontStyle=1;" value="Baixa" vertex="1">
           <mxGeometry height="34" width="600" x="870" y="140" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Orçamento enviado para aprovação&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;vem da Criação da OS&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-stock-7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Orçamento enviado para aprovação" vertex="1">
           <mxGeometry height="100" width="160" x="140" y="680" as="geometry" />
         </mxCell>
         <mxCell id="es-stock-8" parent="es-stock-7" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -4609,13 +4642,13 @@
         <mxCell id="es-stock-12" parent="es-stock-11" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="CMD" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-15" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="&lt;b&gt;Peças reservadas para a OS&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;só o que falta sair; válida por 7 dias&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-stock-15" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="&lt;b&gt;Peças reservadas para a OS&lt;/b&gt;" vertex="1">
           <mxGeometry height="100" width="160" x="632" y="680" as="geometry" />
         </mxCell>
         <mxCell id="es-stock-16" parent="es-stock-15" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-17" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Orçamento não enviado: estoque insuficiente&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;o envio é desfeito&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-stock-17" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Orçamento não enviado: estoque insuficiente" vertex="1">
           <mxGeometry height="100" width="160" x="632" y="880" as="geometry" />
         </mxCell>
         <mxCell id="es-stock-18" parent="es-stock-17" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -4627,7 +4660,7 @@
         <mxCell id="es-stock-24" parent="es-stock-23" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="CMD" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-27" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Reservas vencidas liberadas&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;a OS continua aguardando o cliente&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-stock-27" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Reservas vencidas liberadas" vertex="1">
           <mxGeometry height="100" width="160" x="1124" y="520" as="geometry" />
         </mxCell>
         <mxCell id="es-stock-28" parent="es-stock-27" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -4639,7 +4672,7 @@
         <mxCell id="es-stock-31" parent="es-stock-30" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=0;spacingTop=1;connectable=0;" value="PA" vertex="1">
           <mxGeometry height="18" width="40" x="55" y="10" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-33" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Orçamento aprovado&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;vem do Acompanhamento da OS&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-stock-33" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Orçamento aprovado" vertex="1">
           <mxGeometry height="100" width="160" x="942" y="680" as="geometry" />
         </mxCell>
         <mxCell id="es-stock-34" parent="es-stock-33" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -4651,25 +4684,25 @@
         <mxCell id="es-stock-39" parent="es-stock-38" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="CMD" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-42" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Peças baixadas do estoque&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;libera a reserva e baixa só a diferença&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-stock-42" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Peças baixadas do estoque" vertex="1">
           <mxGeometry height="100" width="160" x="1434" y="680" as="geometry" />
         </mxCell>
         <mxCell id="es-stock-43" parent="es-stock-42" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-44" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Aprovação recusada: peça sem saldo&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;a reserva venceu e a peça acabou no estoque&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-stock-44" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Aprovação recusada: peça sem saldo" vertex="1">
           <mxGeometry height="100" width="160" x="1434" y="880" as="geometry" />
         </mxCell>
         <mxCell id="es-stock-45" parent="es-stock-44" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-48" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Só o original aprovado&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;vem do Acompanhamento da OS&lt;/i&gt;&lt;/span&gt;" vertex="1">
-          <mxGeometry height="100" width="160" x="942" y="880" as="geometry" />
+        <mxCell id="es-stock-48" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Só o original aprovado" vertex="1">
+          <mxGeometry height="100" width="160" x="969" y="830" as="geometry" />
         </mxCell>
         <mxCell id="es-stock-49" parent="es-stock-48" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-52" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Orçamento rejeitado&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;vem do Acompanhamento da OS&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-stock-52" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Orçamento rejeitado" vertex="1">
           <mxGeometry height="100" width="160" x="942" y="1100" as="geometry" />
         </mxCell>
         <mxCell id="es-stock-53" parent="es-stock-52" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -4681,13 +4714,13 @@
         <mxCell id="es-stock-58" parent="es-stock-57" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="CMD" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-61" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Reserva da OS liberada&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;sem movimento de estoque&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-stock-61" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Reserva da OS liberada" vertex="1">
           <mxGeometry height="100" width="160" x="1434" y="1100" as="geometry" />
         </mxCell>
         <mxCell id="es-stock-62" parent="es-stock-61" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-64" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Orçamento reaberto&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;vem do Acompanhamento da OS&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-stock-64" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Orçamento reaberto" vertex="1">
           <mxGeometry height="100" width="160" x="942" y="1420" as="geometry" />
         </mxCell>
         <mxCell id="es-stock-65" parent="es-stock-64" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -4699,13 +4732,13 @@
         <mxCell id="es-stock-70" parent="es-stock-69" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="CMD" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-73" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Reserva da OS liberada&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;sem movimento de estoque&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-stock-73" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Reserva da OS liberada" vertex="1">
           <mxGeometry height="100" width="160" x="1434" y="1420" as="geometry" />
         </mxCell>
         <mxCell id="es-stock-74" parent="es-stock-73" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-76" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="OS cancelada&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;vem do Acompanhamento da OS&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-stock-76" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="OS cancelada" vertex="1">
           <mxGeometry height="100" width="160" x="942" y="1740" as="geometry" />
         </mxCell>
         <mxCell id="es-stock-77" parent="es-stock-76" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -4717,7 +4750,7 @@
         <mxCell id="es-stock-82" parent="es-stock-81" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="CMD" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-85" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Peças devolvidas ao estoque&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;libera a reserva e devolve o que saiu&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-stock-85" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Peças devolvidas ao estoque" vertex="1">
           <mxGeometry height="100" width="160" x="1434" y="1740" as="geometry" />
         </mxCell>
         <mxCell id="es-stock-86" parent="es-stock-85" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -4737,12 +4770,6 @@
         </mxCell>
         <mxCell id="es-stock-93" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=15;" value="Os mesmos comandos e eventos, agrupados pelo agregado que os trata, com as setas do fluxo. A caixa tracejada é o contexto delimitado. A caixa Ordem de Serviço mostra de onde vêm os eventos que o estoque escuta." vertex="1">
           <mxGeometry height="30" width="2400" x="40" y="2178" as="geometry" />
-        </mxCell>
-        <mxCell id="es-stock-95" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Ordem de Serviço" vertex="1">
-          <mxGeometry height="1100" width="120" x="537" y="2280" as="geometry" />
-        </mxCell>
-        <mxCell id="es-stock-96" parent="es-stock-95" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AG" vertex="1">
-          <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
         <mxCell id="es-stock-97" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=12;spacingTop=14;fillColor=#8bc34a;strokeColor=#558b2f;" value="Itens e total da OS" vertex="1">
           <mxGeometry height="100" width="150" x="140" y="2280" as="geometry" />
@@ -4888,12 +4915,6 @@
         <mxCell id="es-stock-171" parent="es-stock-170" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-185" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Peça, reserva e movimento" vertex="1">
-          <mxGeometry height="1100" width="120" x="1544" y="2280" as="geometry" />
-        </mxCell>
-        <mxCell id="es-stock-186" parent="es-stock-185" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AG" vertex="1">
-          <mxGeometry height="18" width="44" as="geometry" />
-        </mxCell>
         <mxCell id="es-stock-187" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" value="Reserva peças da OS" vertex="1">
           <mxGeometry height="100" width="160" x="1344" y="2280" as="geometry" />
         </mxCell>
@@ -4966,7 +4987,7 @@
         <mxCell id="es-stock-220" parent="es-stock-219" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-232" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;verticalAlign=top;" value="&lt;b&gt;Como ler&lt;/b&gt;&lt;br&gt;• Linha do tempo: o caminho feliz (linha cheia) é a reserva no envio do orçamento e a baixa na aprovação. As tracejadas são os desvios: reservas vencidas, recusas, só o original aprovado, rejeição, reabertura e cancelamento.&lt;br&gt;• Embaixo do evento fica a regra de negócio que o explica e de onde ele vem: ES - Criação da OS (o envio) ou ES - Acompanhamento da OS (a decisão e o cancelamento).&lt;br&gt;• Cada política fica sobreposta entre o evento que a dispara e o comando que ela executa. Por isso Libera reserva da OS aparece uma vez por política.&lt;br&gt;• Evento pivotal (barra preta, sobre o caminho feliz): Peças reservadas para a OS, quando o estoque separa as peças e a decisão passa para o cliente.&lt;br&gt;• Agregados: cada bloco junta os comandos e os eventos de um agregado, dentro do seu contexto delimitado, com as setas do fluxo. A caixa Ordem de Serviço mostra de onde vêm os eventos que o estoque escuta.&lt;br&gt;• O cadastro da peça, a entrada e o ajuste estão em ES - Peças e insumos." vertex="1">
+        <mxCell id="es-stock-232" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;verticalAlign=top;" value="&lt;b&gt;Como ler&lt;/b&gt;&lt;br&gt;• Linha do tempo: o caminho feliz (linha cheia) é a reserva no envio do orçamento e a baixa na aprovação. As tracejadas são os desvios: reservas vencidas, recusas, só o original aprovado, rejeição, reabertura e cancelamento.&lt;br&gt;• Os eventos da OS vêm de ES - Criação da OS (o envio) ou de ES - Acompanhamento da OS (a decisão e o cancelamento).&lt;br&gt;• Cada política fica sobreposta entre o evento que a dispara e o comando que ela executa. Por isso Libera reserva da OS aparece uma vez por política.&lt;br&gt;• Evento pivotal (barra preta, sobre o caminho feliz): Peças reservadas para a OS, quando o estoque separa as peças e a decisão passa para o cliente.&lt;br&gt;• Agregados: cada bloco junta os comandos e os eventos de um agregado, dentro do seu contexto delimitado, com as setas do fluxo. A caixa Ordem de Serviço mostra de onde vêm os eventos que o estoque escuta. A reserva tem ciclo próprio: nasce no envio, muda a cada envio e sai na liberação ou no vencimento, sempre ajustando o total reservado da peça. A baixa e a devolução mudam o saldo da peça e liberam a reserva da OS na mesma hora.&lt;br&gt;• O cadastro da peça, a entrada e o ajuste estão em ES - Peças e insumos." vertex="1">
           <mxGeometry height="200" width="2400" x="40" y="3520" as="geometry" />
         </mxCell>
         <mxCell id="es-stock-9" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=12;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;" value="Quando o orçamento é enviado, reserva as peças" vertex="1">
@@ -5084,7 +5105,7 @@
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="867" y="765" />
-              <mxPoint x="867" y="930" />
+              <mxPoint x="867" y="880" />
             </Array>
           </mxGeometry>
         </mxCell>
@@ -5269,40 +5290,40 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="es-stock-191" edge="1" parent="1" source="es-stock-187" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.0455;entryDx=0;entryDy=0;" target="es-stock-185" value="">
+        <mxCell id="es-stock-191" edge="1" parent="1" source="es-stock-187" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-stock-185" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-192" edge="1" parent="1" source="es-stock-185" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.0455;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-stock-189" value="">
+        <mxCell id="es-stock-192" edge="1" parent="1" source="es-stock-185" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-stock-189" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-197" edge="1" parent="1" source="es-stock-193" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.2273;entryDx=0;entryDy=0;" target="es-stock-185" value="">
+        <mxCell id="es-stock-197" edge="1" parent="1" source="es-stock-193" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-stock-401" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-198" edge="1" parent="1" source="es-stock-185" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.2273;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-stock-195" value="">
+        <mxCell id="es-stock-198" edge="1" parent="1" source="es-stock-401" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-stock-195" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-203" edge="1" parent="1" source="es-stock-199" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.4091;entryDx=0;entryDy=0;" target="es-stock-185" value="">
+        <mxCell id="es-stock-203" edge="1" parent="1" source="es-stock-199" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.1;entryDx=0;entryDy=0;" target="es-stock-402" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-204" edge="1" parent="1" source="es-stock-185" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.4091;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-stock-201" value="">
+        <mxCell id="es-stock-204" edge="1" parent="1" source="es-stock-402" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-stock-201" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-209" edge="1" parent="1" source="es-stock-205" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5909;entryDx=0;entryDy=0;" target="es-stock-185" value="">
+        <mxCell id="es-stock-209" edge="1" parent="1" source="es-stock-205" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-stock-402" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-210" edge="1" parent="1" source="es-stock-185" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5909;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-stock-207" value="">
+        <mxCell id="es-stock-210" edge="1" parent="1" source="es-stock-402" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-stock-207" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-215" edge="1" parent="1" source="es-stock-211" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.7727;entryDx=0;entryDy=0;" target="es-stock-185" value="">
+        <mxCell id="es-stock-215" edge="1" parent="1" source="es-stock-211" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.9;entryDx=0;entryDy=0;" target="es-stock-402" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-216" edge="1" parent="1" source="es-stock-185" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.7727;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-stock-213" value="">
+        <mxCell id="es-stock-216" edge="1" parent="1" source="es-stock-402" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.9;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-stock-213" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-221" edge="1" parent="1" source="es-stock-217" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.9545;entryDx=0;entryDy=0;" target="es-stock-185" value="">
+        <mxCell id="es-stock-221" edge="1" parent="1" source="es-stock-217" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-stock-403" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-222" edge="1" parent="1" source="es-stock-185" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.9545;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-stock-219" value="">
+        <mxCell id="es-stock-222" edge="1" parent="1" source="es-stock-403" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-stock-219" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="es-stock-223" edge="1" parent="1" source="es-stock-108" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-stock-187" value="">
@@ -5330,6 +5351,36 @@
               <mxPoint x="1440" y="2660" />
             </Array>
           </mxGeometry>
+        </mxCell>
+        <mxCell id="es-stock-95" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Ordem de Serviço" vertex="1">
+          <mxGeometry height="1100" width="120" x="537" y="2280" as="geometry" />
+        </mxCell>
+        <mxCell id="es-stock-96" parent="es-stock-95" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AG" vertex="1">
+          <mxGeometry height="18" width="44" as="geometry" />
+        </mxCell>
+        <mxCell id="es-stock-185" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Reserva" vertex="1">
+          <mxGeometry height="100" width="120" x="1544" y="2280" as="geometry" />
+        </mxCell>
+        <mxCell id="es-stock-186" parent="es-stock-185" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AG" vertex="1">
+          <mxGeometry height="18" width="44" as="geometry" />
+        </mxCell>
+        <mxCell id="es-stock-401" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Peça ou insumo" vertex="1">
+          <mxGeometry height="100" width="120" x="1544" y="2480" as="geometry" />
+        </mxCell>
+        <mxCell id="es-stock-401-l" parent="es-stock-401" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AG" vertex="1">
+          <mxGeometry height="18" width="44" as="geometry" />
+        </mxCell>
+        <mxCell id="es-stock-402" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Reserva" vertex="1">
+          <mxGeometry height="500" width="120" x="1544" y="2680" as="geometry" />
+        </mxCell>
+        <mxCell id="es-stock-402-l" parent="es-stock-402" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AG" vertex="1">
+          <mxGeometry height="18" width="44" as="geometry" />
+        </mxCell>
+        <mxCell id="es-stock-403" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Peça ou insumo" vertex="1">
+          <mxGeometry height="100" width="120" x="1544" y="3280" as="geometry" />
+        </mxCell>
+        <mxCell id="es-stock-403-l" parent="es-stock-403" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AG" vertex="1">
+          <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
