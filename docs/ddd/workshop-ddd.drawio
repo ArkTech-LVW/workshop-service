@@ -5138,7 +5138,7 @@
         <mxCell id="tactical-119" value="2. Contextos e camadas" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="2420" width="1200" height="34" as="geometry" />
         </mxCell>
-        <mxCell id="tactical-120" value="Cada contexto delimitado é um pacote com as mesmas quatro camadas do DDD (aula 5). A regra de dependência é api → application → domain ← infrastructure, verificada no build pelo teste ArchUnit LayerDependencyTest. Todos usam o mesmo PostgreSQL." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=13;fontStyle=2;fontColor=#555555;" vertex="1" parent="1">
+        <mxCell id="tactical-120" value="Cada contexto delimitado é um pacote com as mesmas quatro camadas do DDD. A regra de dependência é api → application → domain ← infrastructure, verificada no build pelo teste ArchUnit LayerDependencyTest. Todos usam o mesmo PostgreSQL." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=13;fontStyle=2;fontColor=#555555;" vertex="1" parent="1">
           <mxGeometry x="40" y="2460" width="2540" height="40" as="geometry" />
         </mxCell>
         <mxCell id="tactical-121" value="Identidade e Acesso&lt;br&gt;&lt;code&gt;auth&lt;/code&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=13;fontStyle=1;align=center;verticalAlign=middle;strokeWidth=1.5;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
