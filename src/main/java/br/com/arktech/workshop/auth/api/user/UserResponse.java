@@ -11,7 +11,7 @@ record UserResponse(
         @Schema(description = "${openapi.user.id}", example = "1") Long id,
         @Schema(description = "${openapi.user.name}", example = "Ana Souza") String name,
         @Schema(description = "${openapi.user.email}", example = "ana@workshop.com") String email,
-        @Schema(description = "${openapi.user.active}") boolean active,
+        @Schema(description = "${openapi.user.active}", example = "true") boolean active,
         @Schema(description = "${openapi.user.roles}") Set<Role> roles) {
 
     static UserResponse from(UserResult result) {

@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -47,6 +48,14 @@ class ServiceOfferingManagementIntegrationTest {
                 Arguments.of(post("/admin/services/1/deactivate")));
     }
 
+    static Stream<Arguments> serviceOfferingWriteEndpoints() {
+        return Stream.of(
+                Arguments.of(post("/admin/services").contentType(MediaType.APPLICATION_JSON).content("{}")),
+                Arguments.of(put("/admin/services/1").contentType(MediaType.APPLICATION_JSON).content("{}")),
+                Arguments.of(post("/admin/services/1/activate")),
+                Arguments.of(post("/admin/services/1/deactivate")));
+    }
+
     @ParameterizedTest
     @MethodSource("serviceOfferingEndpoints")
     void shouldRequireToken(MockHttpServletRequestBuilder request) throws Exception {
@@ -54,13 +63,26 @@ class ServiceOfferingManagementIntegrationTest {
     }
 
     @ParameterizedTest
-    @MethodSource("serviceOfferingEndpoints")
-    void shouldDenyUsersWithoutAdminRole(MockHttpServletRequestBuilder request) throws Exception {
+    @MethodSource("serviceOfferingWriteEndpoints")
+    void shouldDenyWritesToUsersWithoutAdminRole(MockHttpServletRequestBuilder request) throws Exception {
         String token = tokenFor(Role.ATTENDANT, Role.MECHANIC);
 
         mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("auth.accessDenied"));
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = Role.class, names = {"ATTENDANT", "MECHANIC"})
+    void shouldLetAttendantsAndMechanicsConsultTheCatalog(Role role) throws Exception {
+        Integer id = createServiceOffering(uniqueName("Alinhamento"));
+        String token = tokenFor(role);
+
+        mockMvc.perform(get("/admin/services").header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/admin/services/{id}", id).header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id));
     }
 
     @Test

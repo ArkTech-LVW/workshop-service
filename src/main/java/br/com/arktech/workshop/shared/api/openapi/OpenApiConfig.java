@@ -4,9 +4,11 @@ import br.com.arktech.workshop.shared.api.error.ApiError;
 import br.com.arktech.workshop.shared.api.error.ApiFieldError;
 import br.com.arktech.workshop.shared.api.security.EndpointAccess;
 import br.com.arktech.workshop.shared.application.i18n.MessageResolver;
+import br.com.arktech.workshop.shared.domain.security.Role;
 import io.swagger.v3.core.converter.ModelConverters;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Content;
@@ -17,15 +19,23 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.tags.Tag;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.customizers.OperationCustomizer;
+import org.springdoc.core.properties.SwaggerUiConfigProperties;
+import org.springdoc.core.properties.SwaggerUiOAuthProperties;
+import org.springdoc.core.providers.ObjectMapperProvider;
+import org.springdoc.webmvc.ui.SwaggerIndexTransformer;
+import org.springdoc.webmvc.ui.SwaggerWelcomeCommon;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
@@ -42,13 +52,26 @@ class OpenApiConfig {
 
     private static final String TITLE = "Workshop Service API";
     private static final String DEFAULT_VERSION = "dev";
-    private static final String BEARER_AUTH = "bearerAuth";
+    static final String BEARER_AUTH = "bearerAuth";
+    private static final String LOGIN_PATH = "/auth/login";
     private static final String JSON = org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
     private static final String API_ERROR_REF = "#/components/schemas/ApiError";
     private static final String INTERNAL_ERROR_REF = "#/components/responses/InternalError";
     private static final String UNAUTHENTICATED_REF = "#/components/responses/Unauthenticated";
     private static final String ACCESS_DENIED_REF = "#/components/responses/AccessDenied";
     private static final String TOO_MANY_REQUESTS_REF = "#/components/responses/TooManyRequests";
+    private static final List<String> TAG_ORDER = List.of(
+            "auth",
+            "user",
+            "customer",
+            "vehicle",
+            "serviceOffering",
+            "part",
+            "stockMovement",
+            "stockAdjustmentRequest",
+            "serviceOrder",
+            "customerServiceOrder",
+            "metrics");
 
     @Bean
     OpenAPI openApi(
@@ -77,6 +100,16 @@ class OpenApiConfig {
     }
 
     @Bean
+    SwaggerIndexTransformer loginAuthorizingIndexPageTransformer(
+            SwaggerUiConfigProperties swaggerUiConfig,
+            SwaggerUiOAuthProperties swaggerUiOAuthProperties,
+            SwaggerWelcomeCommon swaggerWelcomeCommon,
+            ObjectMapperProvider objectMapperProvider) {
+        return new LoginAuthorizingIndexPageTransformer(
+                swaggerUiConfig, swaggerUiOAuthProperties, swaggerWelcomeCommon, objectMapperProvider, LOGIN_PATH);
+    }
+
+    @Bean
     OpenApiCustomizer globalErrorResponsesCustomizer() {
         return openApi -> {
             if (openApi.getPaths() == null) {
@@ -92,7 +125,43 @@ class OpenApiConfig {
     }
 
     @Bean
-    OperationCustomizer endpointAccessCustomizer() {
+    OpenApiCustomizer requestExampleSummaryCustomizer(Environment environment) {
+        return openApi -> {
+            if (openApi.getPaths() == null) {
+                return;
+            }
+            openApi.getPaths().values().stream()
+                    .flatMap(path -> path.readOperations().stream())
+                    .filter(operation ->
+                            operation.getRequestBody() != null && operation.getRequestBody().getContent() != null)
+                    .flatMap(operation -> operation.getRequestBody().getContent().values().stream())
+                    .filter(mediaType -> mediaType.getExamples() != null)
+                    .flatMap(mediaType -> mediaType.getExamples().values().stream())
+                    .filter(example -> example.getSummary() != null)
+                    .forEach(example ->
+                            example.setSummary(environment.resolveRequiredPlaceholders(example.getSummary())));
+        };
+    }
+
+    @Bean
+    OpenApiCustomizer tagOrderCustomizer(Environment environment) {
+        return openApi -> {
+            List<Tag> tags = new ArrayList<>();
+            TAG_ORDER.forEach(context -> tags.add(new Tag()
+                    .name(environment.getRequiredProperty("openapi." + context + ".tag"))
+                    .description(environment.getRequiredProperty("openapi." + context + ".tagDescription"))));
+            Set<String> declared = tags.stream().map(Tag::getName).collect(Collectors.toSet());
+            if (openApi.getTags() != null) {
+                openApi.getTags().stream()
+                        .filter(tag -> !declared.contains(tag.getName()))
+                        .forEach(tags::add);
+            }
+            openApi.setTags(tags);
+        };
+    }
+
+    @Bean
+    OperationCustomizer endpointAccessCustomizer(Environment environment) {
         return (operation, handlerMethod) -> {
             EndpointAccess access = EndpointAccess.of(handlerMethod);
             if (access instanceof EndpointAccess.Public) {
@@ -106,8 +175,22 @@ class OpenApiConfig {
             if (!(access instanceof EndpointAccess.AnyUser)) {
                 operation.getResponses().putIfAbsent("403", new ApiResponse().$ref(ACCESS_DENIED_REF));
             }
+            if (access instanceof EndpointAccess.AnyUser) {
+                appendAccess(operation, environment, environment.getRequiredProperty("openapi.access.anyUser"));
+            } else if (access instanceof EndpointAccess.Roles(Set<Role> roles)) {
+                appendAccess(
+                        operation,
+                        environment,
+                        roles.stream().sorted().map(Role::name).collect(Collectors.joining(", ")));
+            }
             return operation;
         };
+    }
+
+    private static void appendAccess(Operation operation, Environment environment, String allowed) {
+        String line = "**" + environment.getRequiredProperty("openapi.access.label") + ":** " + allowed;
+        String description = operation.getDescription();
+        operation.setDescription(description == null || description.isBlank() ? line : description + "\n\n" + line);
     }
 
     private static void addErrorResponses(
