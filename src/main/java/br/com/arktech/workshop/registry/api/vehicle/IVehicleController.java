@@ -44,6 +44,7 @@ interface IVehicleController {
     @Operation(summary = "${openapi.vehicle.list}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "400", ref = "BadRequest")
+    @AllowedRoles({Role.ADMIN, Role.ATTENDANT, Role.MECHANIC})
     @GetMapping
     PageResponse<VehicleResponse> list(
             @Parameter(description = "${openapi.vehicle.licensePlateFilter}", example = "ABC-1D23")
@@ -56,6 +57,7 @@ interface IVehicleController {
     @Operation(summary = "${openapi.vehicle.findById}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "404", ref = "NotFound")
+    @AllowedRoles({Role.ADMIN, Role.ATTENDANT, Role.MECHANIC})
     @GetMapping("/{id}")
     VehicleResponse findById(
             @Parameter(description = "${openapi.vehicle.id}", example = "1") @PathVariable Long id);

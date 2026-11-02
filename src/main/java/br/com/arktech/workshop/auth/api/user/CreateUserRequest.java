@@ -17,7 +17,8 @@ record CreateUserRequest(
                 @NotBlank @Size(max = 150, message = "{validation.maxLength}") String name,
         @Schema(description = "${openapi.user.email}", example = "ana@workshop.com")
                 @NotBlank @Email @Size(max = 254, message = "{validation.maxLength}") String email,
-        @Schema(description = "${openapi.user.initialPassword}") @NotBlank @Size(min = 8, max = 128) String password,
+        @Schema(description = "${openapi.user.initialPassword}", example = "senha1234")
+                @NotBlank @Size(min = 8, max = 128) String password,
         @Schema(description = "${openapi.user.roles}") @NotEmpty Set<@NotNull Role> roles) {
 
     @Override
