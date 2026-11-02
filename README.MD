@@ -405,6 +405,7 @@ A documentação DDD fica em [`docs/ddd/workshop-ddd.drawio`](docs/ddd/workshop-
 
 - **Mapa de contextos:** os contextos delimitados, as relações entre eles e os subdomínios.
 - **Legenda:** a notação usada nos diagramas.
+- **ES - Criação da OS:** Event Storming do cliente chegando na oficina até o orçamento enviado para aprovação.
 
 ## Contribuindo
 

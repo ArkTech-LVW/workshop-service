@@ -269,56 +269,65 @@
         <mxCell id="legend-1" value="Legenda da documentação DDD" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=26;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="60" y="30" width="1200" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="legend-2" value="Event Storming" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+        <mxCell id="legend-es-1" value="Event Storming" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="60" y="90" width="600" height="36" as="geometry" />
         </mxCell>
-        <mxCell id="legend-3" value="EV&lt;br&gt;Evento" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;verticalAlign=middle;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
-          <mxGeometry x="60" y="140" width="120" height="80" as="geometry" />
+        <mxCell id="legend-es-2" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="60" y="140" width="8" height="420" as="geometry" />
         </mxCell>
-        <mxCell id="legend-4" value="Fato que já aconteceu; escrito no passado." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="200" y="140" width="520" height="80" as="geometry" />
+        <mxCell id="legend-es-3" value="Eventos pivotais" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="76" y="134" width="200" height="24" as="geometry" />
         </mxCell>
-        <mxCell id="legend-5" value="CMD&lt;br&gt;Comando" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;verticalAlign=middle;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
-          <mxGeometry x="60" y="235" width="120" height="80" as="geometry" />
+        <mxCell id="legend-es-4" value="Eventos" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="100" y="175" width="110" height="110" as="geometry" />
         </mxCell>
-        <mxCell id="legend-6" value="Ação que gera o evento; escrita no presente." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="200" y="235" width="520" height="80" as="geometry" />
+        <mxCell id="legend-es-5" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="legend-es-4">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="legend-7" value="POL&lt;br&gt;Política" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;verticalAlign=middle;fillColor=#c77dd9;strokeColor=#8e44ad;" vertex="1" parent="1">
-          <mxGeometry x="60" y="330" width="120" height="80" as="geometry" />
+        <mxCell id="legend-es-6" value="Comandos" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+          <mxGeometry x="230" y="175" width="110" height="110" as="geometry" />
         </mxCell>
-        <mxCell id="legend-8" value="Regra que dispara um comando sem espera; fica entre o evento e o comando." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="200" y="330" width="520" height="80" as="geometry" />
+        <mxCell id="legend-es-7" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="legend-es-6">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="legend-9" value="ML&lt;br&gt;Modelo de leitura" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;verticalAlign=middle;fillColor=#8bc34a;strokeColor=#558b2f;" vertex="1" parent="1">
-          <mxGeometry x="60" y="425" width="120" height="80" as="geometry" />
+        <mxCell id="legend-es-8" value="Políticas" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;" vertex="1" parent="1">
+          <mxGeometry x="100" y="305" width="110" height="110" as="geometry" />
         </mxCell>
-        <mxCell id="legend-10" value="O que o ator consulta antes do comando; aqui, os contratos das rotas." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="200" y="425" width="520" height="80" as="geometry" />
+        <mxCell id="legend-es-9" value="POL" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="legend-es-8">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="legend-11" value="SE&lt;br&gt;Sistema externo" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;verticalAlign=middle;fillColor=#e91e63;strokeColor=#ad1457;" vertex="1" parent="1">
-          <mxGeometry x="60" y="520" width="120" height="80" as="geometry" />
+        <mxCell id="legend-es-10" value="Modelos de leitura" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#8bc34a;strokeColor=#558b2f;" vertex="1" parent="1">
+          <mxGeometry x="230" y="305" width="110" height="110" as="geometry" />
         </mxCell>
-        <mxCell id="legend-12" value="Sistema fora da solução." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="200" y="520" width="520" height="80" as="geometry" />
+        <mxCell id="legend-es-11" value="ML" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="legend-es-10">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="legend-13" value="PA&lt;br&gt;Ponto de atenção" style="rhombus;whiteSpace=wrap;html=1;fontSize=12;fillColor=#f08080;strokeColor=#b85450;" vertex="1" parent="1">
-          <mxGeometry x="60" y="615" width="120" height="110" as="geometry" />
+        <mxCell id="legend-es-12" value="Ator" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;horizontal=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="360" y="305" width="50" height="110" as="geometry" />
         </mxCell>
-        <mxCell id="legend-14" value="Dúvida ou decisão em aberto; prioriza-se ao final do fluxo." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="200" y="630" width="520" height="80" as="geometry" />
+        <mxCell id="legend-es-13" value="AT" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="legend-es-12">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="legend-15" value="AT&lt;br&gt;Ator" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;verticalAlign=middle;fillColor=#fff9b1;strokeColor=#b8a93a;" vertex="1" parent="1">
-          <mxGeometry x="60" y="740" width="80" height="90" as="geometry" />
+        <mxCell id="legend-es-14" value="Sistemas externos" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#e91e63;strokeColor=#ad1457;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="435" width="110" height="110" as="geometry" />
         </mxCell>
-        <mxCell id="legend-16" value="Pessoa que executa um comando." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="200" y="745" width="520" height="80" as="geometry" />
+        <mxCell id="legend-es-15" value="SE" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="legend-es-14">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="legend-17" value="AG&lt;br&gt;Agregado" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;verticalAlign=middle;fillColor=#fff9b1;strokeColor=#b8a93a;" vertex="1" parent="1">
-          <mxGeometry x="60" y="845" width="120" height="170" as="geometry" />
+        <mxCell id="legend-es-16" value="Ponto de atenção" style="rhombus;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;spacingLeft=14;spacingRight=14;spacingTop=16;fillColor=#f08080;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="230" y="435" width="110" height="110" as="geometry" />
         </mxCell>
-        <mxCell id="legend-18" value="Agrupa comandos e eventos; é o maior elemento do board." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="200" y="890" width="520" height="80" as="geometry" />
+        <mxCell id="legend-es-17" value="PA" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=0;spacingTop=1;connectable=0;" vertex="1" parent="legend-es-16">
+          <mxGeometry x="35.0" y="10" width="40" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-es-18" value="Agregados" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" vertex="1" parent="1">
+          <mxGeometry x="450" y="175" width="130" height="370" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-es-19" value="AG" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="legend-es-18">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-es-20" value="&lt;b&gt;EV · Evento:&lt;/b&gt; fato que já aconteceu, escrito no passado. Quando virou classe no código, o nome da classe vem embaixo.&lt;br&gt;&lt;b&gt;CMD · Comando:&lt;/b&gt; ação que gera o evento, escrita no presente. Sempre feito por um ator ou por uma política; embaixo, o caso de uso que o implementa.&lt;br&gt;&lt;b&gt;POL · Política:&lt;/b&gt; lógica de negócio que dispara um comando na hora, sem ninguém agir. Fica sobreposta entre o evento e o comando e pode responder a um ponto de atenção.&lt;br&gt;&lt;b&gt;ML · Modelo de leitura:&lt;/b&gt; o que o ator vê antes de agir. Vem sempre antes do comando e se liga a ele.&lt;br&gt;&lt;b&gt;AT · Ator:&lt;/b&gt; quem executa o comando. Retângulo estreito, colado ao comando.&lt;br&gt;&lt;b&gt;AG · Agregado:&lt;/b&gt; junta os comandos e os eventos de um mesmo dado. Retângulo maior que o do ator.&lt;br&gt;&lt;b&gt;SE · Sistema externo:&lt;/b&gt; sistema fora da solução.&lt;br&gt;&lt;b&gt;PA · Ponto de atenção:&lt;/b&gt; dúvida sobre um evento, um novo brainstorm. A seta aponta para o evento." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="60" y="580" width="680" height="440" as="geometry" />
         </mxCell>
         <mxCell id="legend-19" value="Fluxo do Event Storming" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="820" y="90" width="600" height="36" as="geometry" />
@@ -399,15 +408,1184 @@
     </mxGraphModel>
   </diagram>
   <diagram id="es-create" name="ES - Criação da OS">
-    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="4600" pageHeight="3040" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="es-create-1" value="ES - Criação da OS" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=26;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="60" y="30" width="1200" height="40" as="geometry" />
+          <mxGeometry x="40" y="20" width="1600" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-2" value="Reservada para T6.2 (KAN-86)." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=16;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="60" y="80" width="1200" height="30" as="geometry" />
+        <mxCell id="es-create-2" value="Do cliente chegando na oficina até o orçamento enviado para aprovação. A notação está na aba Legenda." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="40" y="60" width="2000" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-3" value="1. Linha do tempo" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="96" width="600" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-4" value="Recepção" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="140" y="140" width="600" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-5" value="Diagnóstico e orçamento" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1730" y="140" width="800" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-6" value="Reserva e aviso ao cliente" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="3580" y="140" width="800" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-7" value="Cadastra cliente&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;CreateCustomerUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+          <mxGeometry x="140" y="680" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-8" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-7">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-9" value="Clientes por CPF/CNPJ&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;GET /admin/customers?document=&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#8bc34a;strokeColor=#558b2f;" vertex="1" parent="1">
+          <mxGeometry x="140" y="560" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-10" value="ML" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-9">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-11" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-9" target="es-create-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-12" value="Atendente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;" vertex="1" parent="1">
+          <mxGeometry x="114" y="742" width="40" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-13" value="AT" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-12">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-14" value="Cliente cadastrado" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="350" y="680" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-15" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-14">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-16" value="Cliente já cadastrado&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;CPF/CNPJ existente, 409&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="350" y="880" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-17" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-16">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-18" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-7" target="es-create-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-19" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#8a2be2;dashed=1;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-7" target="es-create-16">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="325" y="765" />
+              <mxPoint x="325" y="930.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-20" value="Cadastra veículo&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;CreateVehicleUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+          <mxGeometry x="660" y="680" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-21" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-20">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-22" value="Veículos por placa&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;GET /admin/vehicles?licensePlate=&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#8bc34a;strokeColor=#558b2f;" vertex="1" parent="1">
+          <mxGeometry x="660" y="560" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-23" value="ML" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-22">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-24" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-22" target="es-create-20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-25" value="Atendente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;" vertex="1" parent="1">
+          <mxGeometry x="634" y="742" width="40" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-26" value="AT" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-25">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-27" value="Veículo cadastrado" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="870" y="680" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-28" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-27">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-29" value="Placa já cadastrada para o cliente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="870" y="880" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-30" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-29">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-31" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-14" target="es-create-20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-32" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#8a2be2;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.6875;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-16" target="es-create-20">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="770" y="930.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-33" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-20" target="es-create-27">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-34" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#8a2be2;dashed=1;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-20" target="es-create-29">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="845" y="765" />
+              <mxPoint x="845" y="930.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-35" value="A abertura deve atualizar os dados do veículo quando a placa já existe?" style="rhombus;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;spacingLeft=14;spacingRight=14;spacingTop=16;fillColor=#f08080;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="875" y="1030" width="150" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-36" value="PA" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=0;spacingTop=1;connectable=0;" vertex="1" parent="es-create-35">
+          <mxGeometry x="55.0" y="10" width="40" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-37" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-35" target="es-create-29">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-38" value="Abre OS&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;OpenServiceOrderUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+          <mxGeometry x="1180" y="680" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-39" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-38">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-40" value="OS do cliente ou da placa&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;GET /admin/serviceOrders&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#8bc34a;strokeColor=#558b2f;" vertex="1" parent="1">
+          <mxGeometry x="1180" y="560" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-41" value="ML" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-40">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-42" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-40" target="es-create-38">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-43" value="Atendente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;" vertex="1" parent="1">
+          <mxGeometry x="1154" y="742" width="40" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-44" value="AT" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-43">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-45" value="&lt;b&gt;OS aberta&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;status Recebida&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="1390" y="680" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-46" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-45">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-47" value="Abertura recusada: placa de outro cliente&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;409&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="1390" y="880" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-48" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-47">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-49" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-27" target="es-create-38">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-50" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#8a2be2;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.6875;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-29" target="es-create-38">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1290" y="930.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-51" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-38" target="es-create-45">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-52" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#8a2be2;dashed=1;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-38" target="es-create-47">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1365" y="765" />
+              <mxPoint x="1365" y="930.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-53" value="Como transferir um veículo que trocou de dono?" style="rhombus;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;spacingLeft=14;spacingRight=14;spacingTop=16;fillColor=#f08080;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="1395" y="1030" width="150" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-54" value="PA" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=0;spacingTop=1;connectable=0;" vertex="1" parent="es-create-53">
+          <mxGeometry x="55.0" y="10" width="40" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-55" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-53" target="es-create-47">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-56" value="Pode abrir outra OS para um veículo com OS em andamento?" style="rhombus;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;spacingLeft=14;spacingRight=14;spacingTop=16;fillColor=#f08080;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="1395" y="490" width="150" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-57" value="PA" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=0;spacingTop=1;connectable=0;" vertex="1" parent="es-create-56">
+          <mxGeometry x="55.0" y="10" width="40" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-58" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-56" target="es-create-45">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-59" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="140" width="8" height="1400" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-60" value="Inicia diagnóstico&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;StartDiagnosisUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="680" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-61" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-60">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-62" value="OS recebidas&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;GET /admin/serviceOrders?status=RECEIVED&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#8bc34a;strokeColor=#558b2f;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="560" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-63" value="ML" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-62">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-64" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-62" target="es-create-60">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-65" value="Mecânico" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;" vertex="1" parent="1">
+          <mxGeometry x="1784" y="742" width="40" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-66" value="AT" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-65">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-67" value="Diagnóstico iniciado&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;status Em diagnóstico&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="2020" y="680" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-68" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-67">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-69" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-45" target="es-create-60">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-70" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-60" target="es-create-67">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-71" value="Onde fica registrado o que foi encontrado no diagnóstico?" style="rhombus;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;spacingLeft=14;spacingRight=14;spacingTop=16;fillColor=#f08080;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="2025" y="880" width="150" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-72" value="PA" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=0;spacingTop=1;connectable=0;" vertex="1" parent="es-create-71">
+          <mxGeometry x="55.0" y="10" width="40" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-73" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-71" target="es-create-67">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-74" value="Orçamento recalculado" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="2820" y="680" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-75" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-74">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-76" value="Inclui serviço&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;AddServiceItemUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+          <mxGeometry x="2330" y="360" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-77" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-76">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-78" value="Serviços ativos do catálogo&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;GET /admin/services?active=true&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#8bc34a;strokeColor=#558b2f;" vertex="1" parent="1">
+          <mxGeometry x="2330" y="240" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-79" value="ML" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-78">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-80" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-78" target="es-create-76">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-81" value="Mecânico ou atendente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;" vertex="1" parent="1">
+          <mxGeometry x="2304" y="422" width="40" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-82" value="AT" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-81">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-83" value="Serviço incluído" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="2540" y="360" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-84" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-83">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-85" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-67" target="es-create-76">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2270" y="730.0" />
+              <mxPoint x="2270" y="410.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-86" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-76" target="es-create-83">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-87" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-83" target="es-create-74">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2760" y="410.0" />
+              <mxPoint x="2760" y="730.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-88" value="Inclui peça ou insumo&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;AddPartItemUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+          <mxGeometry x="2330" y="680" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-89" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-88">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-90" value="Peças e insumos com disponível&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;GET /admin/parts&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#8bc34a;strokeColor=#558b2f;" vertex="1" parent="1">
+          <mxGeometry x="2330" y="560" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-91" value="ML" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-90">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-92" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-90" target="es-create-88">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-93" value="Mecânico ou atendente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;" vertex="1" parent="1">
+          <mxGeometry x="2304" y="742" width="40" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-94" value="AT" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-93">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-95" value="Peça ou insumo incluído" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="2540" y="680" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-96" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-95">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-97" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-67" target="es-create-88">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2270" y="730.0" />
+              <mxPoint x="2270" y="730.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-98" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-88" target="es-create-95">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-99" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-95" target="es-create-74">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2760" y="730.0" />
+              <mxPoint x="2760" y="730.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-100" value="Remove serviço&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;RemoveServiceItemUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+          <mxGeometry x="2330" y="1000" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-101" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-100">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-102" value="Itens e total da OS&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;GET /admin/serviceOrders/{id}&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#8bc34a;strokeColor=#558b2f;" vertex="1" parent="1">
+          <mxGeometry x="2330" y="880" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-103" value="ML" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-102">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-104" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-102" target="es-create-100">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-105" value="Mecânico ou atendente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;" vertex="1" parent="1">
+          <mxGeometry x="2304" y="1062" width="40" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-106" value="AT" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-105">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-107" value="Serviço removido" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="2540" y="1000" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-108" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-107">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-109" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-67" target="es-create-100">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2270" y="730.0" />
+              <mxPoint x="2270" y="1050.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-110" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-100" target="es-create-107">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-111" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-107" target="es-create-74">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2760" y="1050.0" />
+              <mxPoint x="2760" y="730.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-112" value="Remove peça ou insumo&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;RemovePartItemUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+          <mxGeometry x="2330" y="1320" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-113" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-112">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-114" value="Itens e total da OS&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;GET /admin/serviceOrders/{id}&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#8bc34a;strokeColor=#558b2f;" vertex="1" parent="1">
+          <mxGeometry x="2330" y="1200" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-115" value="ML" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-114">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-116" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-114" target="es-create-112">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-117" value="Mecânico ou atendente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;" vertex="1" parent="1">
+          <mxGeometry x="2304" y="1382" width="40" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-118" value="AT" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-117">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-119" value="Peça ou insumo removido" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="2540" y="1320" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-120" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-119">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-121" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-67" target="es-create-112">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2270" y="730.0" />
+              <mxPoint x="2270" y="1370.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-122" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-112" target="es-create-119">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-123" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-119" target="es-create-74">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2760" y="1370.0" />
+              <mxPoint x="2760" y="730.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-124" value="Inclusões e remoções se repetem, em qualquer ordem, até o orçamento ficar completo." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=13;fontStyle=2;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="2300" y="1500" width="420" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-125" value="Envia orçamento&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;SendQuoteUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+          <mxGeometry x="3130" y="680" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-126" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-125">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-127" value="Itens e total da OS&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;GET /admin/serviceOrders/{id}&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#8bc34a;strokeColor=#558b2f;" vertex="1" parent="1">
+          <mxGeometry x="3130" y="560" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-128" value="ML" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-127">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-129" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-127" target="es-create-125">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-130" value="Mecânico ou atendente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;" vertex="1" parent="1">
+          <mxGeometry x="3104" y="742" width="40" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-131" value="AT" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-130">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-132" value="&lt;b&gt;Orçamento enviado para aprovação&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;status Aguardando aprovação&lt;/i&gt;&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;classe QuoteSentEvent&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="3340" y="650.0" width="160" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-133" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-132">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-134" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-74" target="es-create-125">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-135" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-125" target="es-create-132">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-136" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="3551.0" y="140" width="8" height="1400" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-137" value="Reserva peças da OS&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;ReserveServiceOrderStockUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="3610" y="480.0" width="172" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-138" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-137">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-139" value="Quando o orçamento é enviado, reserva as peças" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="3480" y="560.0" width="150" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-140" value="POL" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-139">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-141" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=0.75;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-132" target="es-create-139">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="3460" y="615.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-142" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=0.733;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-139" target="es-create-137">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="3590" y="530.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-143" value="Peças reservadas para a OS&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;válida por 7 dias&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="3832" y="480.0" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-144" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-143">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-145" value="Orçamento não enviado: estoque insuficiente&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;422; nada é reservado e o cliente não é avisado&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="3832" y="280.0" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-146" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-145">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-147" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-137" target="es-create-143">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-148" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#8a2be2;dashed=1;exitX=1;exitY=0.15;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-137" target="es-create-145">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="3807" y="495.0" />
+              <mxPoint x="3807" y="330.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-149" value="Registra aviso ao cliente&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;contrato Notifier&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="3610" y="710.0" width="172" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-150" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-149">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-151" value="Quando o orçamento é enviado, avisa o cliente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="3480" y="790.0" width="150" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-152" value="POL" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-151">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-153" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-132" target="es-create-151">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="3460" y="845.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-154" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=0.733;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-151" target="es-create-149">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="3590" y="760.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-155" value="Aviso do orçamento registrado" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="3832" y="710.0" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-156" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-155">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-157" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-149" target="es-create-155">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-158" value="O aviso deve ter um caso de uso próprio, como os outros comandos?" style="rhombus;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;spacingLeft=14;spacingRight=14;spacingTop=16;fillColor=#f08080;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="3837" y="910.0" width="150" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-159" value="PA" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=0;spacingTop=1;connectable=0;" vertex="1" parent="es-create-158">
+          <mxGeometry x="55.0" y="10" width="40" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-160" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-158" target="es-create-155">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-161" value="E-mail do orçamento enviado" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="4324" y="710.0" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-162" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-161">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-163" value="Envio do e-mail falhou&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;nova tentativa em 1 minuto, até 5 vezes&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="4324" y="910.0" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-164" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-163">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-165" value="Envia e-mails pendentes&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;SendPendingEmailsUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="4102" y="710.0" width="172" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-166" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-165">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-167" value="A cada 30 segundos, envia os e-mails pendentes" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="3972" y="770.0" width="150" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-168" value="POL" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-167">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-169" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=0.693;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-167" target="es-create-165">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="4076" y="740.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-170" value="Servidor de e-mail&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;SMTP&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#e91e63;strokeColor=#ad1457;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="4108" y="530.0" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-171" value="SE" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-170">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-172" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0.3;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-155" target="es-create-167">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="4017" y="740.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-173" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-165" target="es-create-161">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-174" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-165" target="es-create-170">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-175" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#8a2be2;dashed=1;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-165" target="es-create-163">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="4299" y="795.0" />
+              <mxPoint x="4299" y="960.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-176" value="2. Agregados e contextos delimitados" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1620" width="900" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-177" value="Os mesmos comandos e eventos, agrupados pelo agregado que os trata. A caixa tracejada é o contexto delimitado." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1658" width="2000" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-178" value="Cadastro" style="rounded=1;absoluteArcSize=1;arcSize=24;whiteSpace=wrap;html=1;dashed=1;strokeWidth=2;fillColor=none;strokeColor=#333333;verticalAlign=top;align=left;spacingLeft=12;spacingTop=4;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1700" width="717" height="335" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-179" value="Cadastra cliente&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;CreateCustomerUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="257" y="1760" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-180" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-179">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-181" value="Clientes por CPF/CNPJ" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#8bc34a;strokeColor=#558b2f;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1760" width="150" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-182" value="ML" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-181">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-183" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-181" target="es-create-179">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-184" value="Atendente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="225" y="1788" width="40" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-185" value="AT" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-184">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-186" value="Cliente cadastrado" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="577" y="1760" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-187" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-186">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-188" value="Cliente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" vertex="1" parent="1">
+          <mxGeometry x="427" y="1760" width="120" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-189" value="AG" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-188">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-190" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-188" target="es-create-186">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-191" value="Cadastra veículo&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;CreateVehicleUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="257" y="1890" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-192" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-191">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-193" value="Veículos por placa" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#8bc34a;strokeColor=#558b2f;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1890" width="150" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-194" value="ML" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-193">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-195" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-193" target="es-create-191">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-196" value="Atendente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="225" y="1918" width="40" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-197" value="AT" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-196">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-198" value="Veículo cadastrado" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="577" y="1890" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-199" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-198">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-200" value="Veículo" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" vertex="1" parent="1">
+          <mxGeometry x="427" y="1890" width="120" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-201" value="AG" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-200">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-202" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-200" target="es-create-198">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-203" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-186" target="es-create-191">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="752" y="1810.0" />
+              <mxPoint x="752" y="1875" />
+              <mxPoint x="337.0" y="1875" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-204" value="Ordem de Serviço" style="rounded=1;absoluteArcSize=1;arcSize=24;whiteSpace=wrap;html=1;dashed=1;strokeWidth=2;fillColor=none;strokeColor=#333333;verticalAlign=top;align=left;spacingLeft=12;spacingTop=4;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="790" y="1700" width="937" height="1090" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-205" value="Abre OS&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;OpenServiceOrderUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="1007" y="1760" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-206" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-205">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-207" value="OS do cliente ou da placa" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#8bc34a;strokeColor=#558b2f;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="810" y="1760" width="150" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-208" value="ML" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-207">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-209" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-207" target="es-create-205">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-210" value="Atendente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="975" y="1788" width="40" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-211" value="AT" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-210">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-212" value="OS aberta" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="1327" y="1760" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-213" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-212">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-214" value="Inicia diagnóstico&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;StartDiagnosisUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="1007" y="1890" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-215" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-214">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-216" value="OS recebidas" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#8bc34a;strokeColor=#558b2f;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="810" y="1890" width="150" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-217" value="ML" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-216">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-218" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-216" target="es-create-214">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-219" value="Mecânico" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="975" y="1918" width="40" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-220" value="AT" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-219">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-221" value="Diagnóstico iniciado" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="1327" y="1890" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-222" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-221">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-223" value="Inclui serviço&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;AddServiceItemUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="1007" y="2020" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-224" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-223">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-225" value="Serviços ativos do catálogo" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#8bc34a;strokeColor=#558b2f;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="810" y="2020" width="150" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-226" value="ML" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-225">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-227" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-225" target="es-create-223">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-228" value="Mecânico ou atendente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="975" y="2048" width="40" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-229" value="AT" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-228">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-230" value="Serviço incluído" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="1327" y="2020" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-231" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-230">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-232" value="Inclui peça ou insumo&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;AddPartItemUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="1007" y="2150" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-233" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-232">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-234" value="Peças e insumos com disponível" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#8bc34a;strokeColor=#558b2f;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="810" y="2150" width="150" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-235" value="ML" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-234">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-236" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-234" target="es-create-232">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-237" value="Mecânico ou atendente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="975" y="2178" width="40" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-238" value="AT" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-237">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-239" value="Peça ou insumo incluído" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="1327" y="2150" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-240" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-239">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-241" value="Remove serviço&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;RemoveServiceItemUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="1007" y="2280" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-242" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-241">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-243" value="Itens e total da OS" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#8bc34a;strokeColor=#558b2f;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="810" y="2280" width="150" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-244" value="ML" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-243">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-245" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-243" target="es-create-241">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-246" value="Mecânico ou atendente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="975" y="2308" width="40" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-247" value="AT" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-246">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-248" value="Serviço removido" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="1327" y="2280" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-249" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-248">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-250" value="Remove peça ou insumo&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;RemovePartItemUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="1007" y="2410" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-251" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-250">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-252" value="Itens e total da OS" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#8bc34a;strokeColor=#558b2f;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="810" y="2410" width="150" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-253" value="ML" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-252">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-254" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-252" target="es-create-250">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-255" value="Mecânico ou atendente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="975" y="2438" width="40" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-256" value="AT" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-255">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-257" value="Peça ou insumo removido" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="1327" y="2410" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-258" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-257">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-259" value="Envia orçamento&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;SendQuoteUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="1007" y="2540" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-260" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-259">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-261" value="Itens e total da OS" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#8bc34a;strokeColor=#558b2f;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="810" y="2540" width="150" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-262" value="ML" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-261">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-263" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-261" target="es-create-259">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-264" value="Mecânico ou atendente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="975" y="2568" width="40" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-265" value="AT" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-264">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-266" value="Orçamento enviado para aprovação&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;classe QuoteSentEvent&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="1327" y="2540" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-267" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-266">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-268" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-198" target="es-create-205">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="773.5" y="1940.0" />
+              <mxPoint x="773.5" y="1745" />
+              <mxPoint x="1087.0" y="1745" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-269" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-212" target="es-create-214">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1502" y="1810.0" />
+              <mxPoint x="1502" y="1875" />
+              <mxPoint x="1087.0" y="1875" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-270" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-221" target="es-create-223">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1502" y="1940.0" />
+              <mxPoint x="1502" y="2005" />
+              <mxPoint x="1237" y="2005" />
+              <mxPoint x="1237" y="2005" />
+              <mxPoint x="1087.0" y="2005" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-271" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-221" target="es-create-232">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1502" y="1940.0" />
+              <mxPoint x="1502" y="2005" />
+              <mxPoint x="1237" y="2005" />
+              <mxPoint x="1237" y="2135" />
+              <mxPoint x="1087.0" y="2135" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-272" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-221" target="es-create-241">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1502" y="1940.0" />
+              <mxPoint x="1502" y="2005" />
+              <mxPoint x="1237" y="2005" />
+              <mxPoint x="1237" y="2265" />
+              <mxPoint x="1087.0" y="2265" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-273" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-221" target="es-create-250">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1502" y="1940.0" />
+              <mxPoint x="1502" y="2005" />
+              <mxPoint x="1237" y="2005" />
+              <mxPoint x="1237" y="2395" />
+              <mxPoint x="1087.0" y="2395" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-274" value="Orçamento recalculado" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="1547" y="2215.0" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-275" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-274">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-276" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-274" target="es-create-259">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1627.0" y="2525" />
+              <mxPoint x="1087.0" y="2525" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-277" value="Ordem de Serviço" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" vertex="1" parent="1">
+          <mxGeometry x="1177" y="1760" width="120" height="880" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-278" value="AG" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-277">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-279" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.0568;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-277" target="es-create-212">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-280" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.2045;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-277" target="es-create-221">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-281" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.3523;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-277" target="es-create-230">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-282" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-277" target="es-create-239">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-283" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.6477;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-277" target="es-create-248">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-284" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.7955;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-277" target="es-create-257">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-285" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.9432;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-277" target="es-create-266">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-286" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-230" target="es-create-274">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1517" y="2070.0" />
+              <mxPoint x="1517" y="2265.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-287" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-239" target="es-create-274">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1517" y="2200.0" />
+              <mxPoint x="1517" y="2265.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-288" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-248" target="es-create-274">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1517" y="2330.0" />
+              <mxPoint x="1517" y="2265.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-289" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-257" target="es-create-274">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1517" y="2460.0" />
+              <mxPoint x="1517" y="2265.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-290" value="Quando o orçamento é enviado, reserva as peças" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1517" y="2540" width="150" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-291" value="POL" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-290">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-292" value="Quando o orçamento é enviado, avisa o cliente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1517" y="2670" width="150" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-293" value="POL" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-292">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-294" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-266" target="es-create-290">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-295" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-266" target="es-create-292">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1407.0" y="2720.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-296" value="Estoque" style="rounded=1;absoluteArcSize=1;arcSize=24;whiteSpace=wrap;html=1;dashed=1;strokeWidth=2;fillColor=none;strokeColor=#333333;verticalAlign=top;align=left;spacingLeft=12;spacingTop=4;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1795" y="1700" width="530" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-297" value="Reserva peças da OS&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;ReserveServiceOrderStockUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+          <mxGeometry x="1815" y="1760" width="170" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-298" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-297">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-299" value="Peça e reserva" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" vertex="1" parent="1">
+          <mxGeometry x="1995" y="1760" width="120" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-300" value="AG" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-299">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-301" value="Peças reservadas para a OS" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="2145" y="1760" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-302" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-301">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-303" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-299" target="es-create-301">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-304" value="Notificações" style="rounded=1;absoluteArcSize=1;arcSize=24;whiteSpace=wrap;html=1;dashed=1;strokeWidth=2;fillColor=none;strokeColor=#333333;verticalAlign=top;align=left;spacingLeft=12;spacingTop=4;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1795" y="1920" width="710" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-305" value="Registra aviso ao cliente&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;contrato Notifier&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+          <mxGeometry x="1815" y="1960" width="170" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-306" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-305">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-307" value="Envia e-mails pendentes&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;SendPendingEmailsUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+          <mxGeometry x="1815" y="2090" width="170" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-308" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-307">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-309" value="Notificação por e-mail" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" vertex="1" parent="1">
+          <mxGeometry x="1995" y="1960" width="120" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-310" value="AG" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-309">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-311" value="Aviso do orçamento registrado" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="2145" y="1960" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-312" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-311">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-313" value="E-mail do orçamento enviado" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="2145" y="2090" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-314" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-313">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-315" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.2174;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-309" target="es-create-311">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-316" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.7826;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-309" target="es-create-313">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-317" value="A cada 30 segundos, envia os e-mails pendentes" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="2335" y="1960" width="150" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-318" value="POL" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-317">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-319" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-311" target="es-create-317">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-320" value="Servidor de e-mail&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;SMTP&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#e91e63;strokeColor=#ad1457;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="2555" y="2090" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-321" value="SE" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-320">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-322" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-290" target="es-create-297">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1750" y="2590.0" />
+              <mxPoint x="1750" y="1810.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-323" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-292" target="es-create-305">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1772" y="2720.0" />
+              <mxPoint x="1772" y="2010.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-324" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-317" target="es-create-307">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2410" y="2200" />
+              <mxPoint x="1803" y="2200" />
+              <mxPoint x="1803" y="2140.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-325" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;jumpStyle=arc;jumpSize=10;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-307" target="es-create-320">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1900" y="2235" />
+              <mxPoint x="2635" y="2235" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-create-326" value="&lt;b&gt;Como ler&lt;/b&gt;&lt;br&gt;• Linha do tempo: o caminho feliz é a primeira visita, com cliente e veículo novos. As linhas tracejadas são os caminhos alternativos.&lt;br&gt;• No comando, embaixo, o caso de uso que o implementa. No evento, embaixo, o status da OS e, quando o evento virou classe, o nome da classe: neste fluxo, só o QuoteSentEvent tem ouvinte fora da OS (ADR 004).&lt;br&gt;• Eventos pivotais (barras pretas): OS aberta, quando o atendimento vira OS, e Orçamento enviado para aprovação, quando a decisão passa para o cliente.&lt;br&gt;• Agregados: cada bloco junta os comandos e os eventos de um agregado, dentro do seu contexto delimitado.&lt;br&gt;• Continua em ES - Acompanhamento da OS, com a aprovação ou a recusa do orçamento." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2850" width="2200" height="150" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
