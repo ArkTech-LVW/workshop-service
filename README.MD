@@ -401,6 +401,7 @@ A documentação DDD fica em [`docs/ddd/workshop-ddd.drawio`](docs/ddd/workshop-
 - **Legenda:** a notação usada nos diagramas.
 - **C4 - Contexto:** o sistema, as pessoas que o usam e o sistema externo.
 - **C4 - Contêineres:** as partes executáveis e o banco, com a tecnologia e o protocolo de cada relação.
+- **C4 - Componentes:** os módulos internos da API e as dependências entre eles.
 
 ## Contribuindo
 
