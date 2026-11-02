@@ -407,7 +407,8 @@ A documentação DDD fica em [`docs/ddd/workshop-ddd.drawio`](docs/ddd/workshop-
 - **Legenda:** a notação usada nos diagramas.
 - **ES - Criação da OS:** Event Storming do cliente chegando na oficina até o orçamento enviado para aprovação.
 - **ES - Acompanhamento da OS:** Event Storming do orçamento enviado até a entrega do veículo, com a rejeição, a reabertura, o cancelamento e o orçamento complementar, e a máquina de estados da OS.
-- **ES - Peças e insumos:** Event Storming do estoque, do cadastro da peça ou insumo à reposição, com a reserva, a baixa, a liberação e a devolução disparadas pela OS e o pedido de ajuste aprovado pelo ADMIN.
+- **ES - Peças e insumos:** Event Storming da peça ou insumo: o cadastro, a entrada no estoque e o ajuste, direto ou pedido e aprovado.
+- **ES - Estoque da OS:** Event Storming do estoque reagindo à OS: a reserva no envio do orçamento, a baixa na aprovação e a liberação e a devolução na rejeição, na reabertura e no cancelamento.
 - **C4 - Contexto:** o sistema, as pessoas que o usam e o sistema externo.
 - **C4 - Contêineres:** as partes executáveis e o banco, com a tecnologia e o protocolo de cada relação.
 - **C4 - Componentes:** os módulos internos da API e as dependências entre eles.
