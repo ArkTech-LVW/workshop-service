@@ -41,6 +41,7 @@ interface IServiceOfferingController {
     @Operation(summary = "${openapi.serviceOffering.list}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "400", ref = "BadRequest")
+    @AllowedRoles({Role.ADMIN, Role.ATTENDANT, Role.MECHANIC})
     @GetMapping
     PageResponse<ServiceOfferingResponse> list(
             @Parameter(description = "${openapi.serviceOffering.nameFilter}", example = "óleo")
@@ -56,6 +57,7 @@ interface IServiceOfferingController {
     @Operation(summary = "${openapi.serviceOffering.findById}")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "404", ref = "NotFound")
+    @AllowedRoles({Role.ADMIN, Role.ATTENDANT, Role.MECHANIC})
     @GetMapping("/{id}")
     ServiceOfferingResponse findById(
             @Parameter(description = "${openapi.serviceOffering.id}", example = "1") @PathVariable Long id);

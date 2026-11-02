@@ -255,16 +255,22 @@ Um usuário pode ter mais de um papel. O que cada papel pode fazer:
 
 | Ação | ADMIN | ATTENDANT | MECHANIC |
 |---|:-:|:-:|:-:|
-| Usuários, clientes, catálogo de serviços, peças e movimentações de estoque | ✓ | | |
+| Usuários e movimentações de estoque | ✓ | | |
+| Cadastrar, alterar, ativar, desativar ou excluir itens do catálogo de serviços e peças | ✓ | | |
+| Consultar o catálogo de serviços e as peças | ✓ | ✓ | ✓ |
 | Aprovar ou rejeitar pedidos de ajuste de estoque | ✓ | | |
 | Pedir ajuste de estoque | ✓ | ✓ | |
-| Veículos (cadastrar, consultar, alterar) | ✓ | ✓ | |
+| Clientes (cadastrar, consultar, alterar) | ✓ | ✓ | |
+| Excluir cliente | ✓ | | |
+| Veículos (cadastrar, alterar, listar por cliente) | ✓ | ✓ | |
+| Listar e detalhar veículos | ✓ | ✓ | ✓ |
 | Excluir veículo | ✓ | | |
-| Abrir, listar e consultar OS | ✓ | ✓ | |
+| Abrir OS | ✓ | ✓ | |
+| Listar e detalhar OS | ✓ | ✓ | ✓ |
 | Aprovar ou rejeitar orçamento no balcão, entregar e cancelar OS | ✓ | ✓ | |
+| Reabrir orçamento rejeitado ou retirar orçamento enviado | ✓ | ✓ | |
 | Incluir e remover itens da OS e enviar o orçamento | ✓ | ✓ | ✓ |
 | Iniciar diagnóstico e execução, iniciar e concluir serviços, finalizar OS | ✓ | | ✓ |
-| Reabrir orçamento rejeitado ou retirar orçamento enviado | ✓ | | |
 | Métricas | ✓ | | |
 
 Um papel fora da lista recebe 403. No Swagger, cada rota protegida diz no fim da descrição quais papéis podem chamá-la. O cliente da oficina não tem usuário: ele acessa a própria OS pelas rotas `/customer/...`, como explica a [autenticação](#autenticação).
@@ -400,26 +406,13 @@ A documentação DDD fica em [`docs/ddd/workshop-ddd.drawio`](docs/ddd/workshop-
 - **Mapa de contextos:** os contextos delimitados, as relações entre eles e os subdomínios.
 - **Legenda:** a notação usada nos diagramas.
 - **ES - Criação da OS:** Event Storming do cliente chegando na oficina até o orçamento enviado para aprovação.
-- **ES - Acompanhamento da OS:** Event Storming do orçamento enviado até a entrega do veículo, com a rejeição, o orçamento complementar e o cancelamento, a tabela de status e a máquina de estados da OS.
-- **ES - Peças e insumos:** Event Storming do estoque, do cadastro da peça ou insumo à reposição, com a reserva, a baixa, a liberação e a devolução disparadas pela OS e o pedido de ajuste aprovado pelo ADMIN.
+- **ES - Acompanhamento da OS:** Event Storming do orçamento enviado até a entrega do veículo, com a rejeição, a reabertura, o cancelamento e o orçamento complementar, e a máquina de estados da OS.
+- **ES - Peças e insumos:** Event Storming da peça ou insumo: o cadastro, a entrada no estoque e o ajuste, direto ou pedido e aprovado.
+- **ES - Estoque da OS:** Event Storming do estoque reagindo à OS: a reserva no envio do orçamento, a baixa na aprovação e a liberação e a devolução na rejeição, na reabertura e no cancelamento.
 - **Modelo tático:** os agregados de cada contexto, com a raiz, as entidades internas, os objetos de valor, as referências por id entre agregados e os eventos de domínio da OS, e a divisão de cada contexto nas camadas api, application, domain e infrastructure.
-
-#### Status da OS
-
-| Status no código | Termo | Significado |
-|---|---|---|
-| `RECEIVED` | Recebida | OS aberta na recepção, esperando o diagnóstico. Os itens podem mudar. |
-| `IN_DIAGNOSIS` | Em diagnóstico | O mecânico avalia o veículo e monta o orçamento com serviços, peças e insumos. |
-| `AWAITING_APPROVAL` | Aguardando aprovação | Orçamento enviado ao cliente, com as peças reservadas por 7 dias. Os itens ficam travados. |
-| `QUOTE_APPROVED` | Orçamento aprovado | O cliente ou o atendente aprovou e as peças saíram do estoque. Espera o início da execução. |
-| `QUOTE_REJECTED` | Orçamento rejeitado | O cliente ou o atendente rejeitou, com motivo, e a reserva foi liberada. Volta para o diagnóstico ou é cancelada. |
-| `IN_PROGRESS` | Em execução | O mecânico executa os serviços aprovados. A oficina pode mudar os itens e enviar um orçamento complementar. |
-| `AWAITING_SUPPLEMENTARY_APPROVAL` | Aguardando aprovação complementar | Orçamento complementar enviado ao cliente, dizendo se dá para seguir sem as mudanças. |
-| `SUPPLEMENTARY_APPROVED` | Complementar aprovado | O cliente aprovou tudo ou só o original e o estoque foi conferido pela diferença. Espera a retomada. |
-| `SUPPLEMENTARY_REJECTED` | Complementar rejeitado | O cliente rejeitou o complementar. A oficina muda os itens e reenvia, ou cancela a OS. |
-| `COMPLETED` | Finalizada | Todos os serviços concluídos, sem mudança pendente, e o cliente avisado. Espera a retirada. |
-| `DELIVERED` | Entregue | Veículo devolvido ao cliente. Status final. |
-| `CANCELED` | Cancelada | OS encerrada com motivo, antes da execução ou com o complementar pendente. O que saiu do estoque volta. Status final. |
+- **C4 - Contexto:** o sistema, as pessoas que o usam e o sistema externo.
+- **C4 - Contêineres:** as partes executáveis e o banco, com a tecnologia e o protocolo de cada relação.
+- **C4 - Componentes:** os módulos internos da API e as dependências entre eles.
 
 ## Contribuindo
 

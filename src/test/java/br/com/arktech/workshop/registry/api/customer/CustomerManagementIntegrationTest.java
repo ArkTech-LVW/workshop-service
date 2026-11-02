@@ -61,10 +61,37 @@ class CustomerManagementIntegrationTest {
 
     @ParameterizedTest
     @MethodSource("customerEndpoints")
-    void shouldDenyUsersWithoutAdminRole(MockHttpServletRequestBuilder request) throws Exception {
-        String token = tokenFor(Role.ATTENDANT, Role.MECHANIC);
+    void shouldDenyMechanics(MockHttpServletRequestBuilder request) throws Exception {
+        String token = tokenFor(Role.MECHANIC);
 
         mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("auth.accessDenied"));
+    }
+
+    @Test
+    void shouldLetAttendantsRegisterFindAndUpdateCustomersButNotDeleteThem() throws Exception {
+        CPFCNPJ cpf = uniqueCPF();
+
+        String created = asAttendant(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
+                        {"name": "Ana Souza", "document": "%s", "email": "ana@email.com"}
+                        """.formatted(cpf.value())))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        Integer id = JsonPath.read(created, "$.id");
+
+        asAttendant(get("/admin/customers").param("document", cpf.value()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(id));
+        asAttendant(get("/admin/customers/{id}", id)).andExpect(status().isOk());
+        asAttendant(put("/admin/customers/{id}", id).contentType(MediaType.APPLICATION_JSON).content("""
+                        {"name": "Ana Lima", "document": "%s", "email": "ana@email.com"}
+                        """.formatted(cpf.value())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Ana Lima"));
+        asAttendant(delete("/admin/customers/{id}", id))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("auth.accessDenied"));
     }
@@ -198,6 +225,10 @@ class CustomerManagementIntegrationTest {
 
     private ResultActions asAdmin(MockHttpServletRequestBuilder request) throws Exception {
         return mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenFor(Role.ADMIN)));
+    }
+
+    private ResultActions asAttendant(MockHttpServletRequestBuilder request) throws Exception {
+        return mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenFor(Role.ATTENDANT)));
     }
 
     private String tokenFor(Role... roles) {
