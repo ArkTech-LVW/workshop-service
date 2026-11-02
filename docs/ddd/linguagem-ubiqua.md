@@ -234,7 +234,7 @@ Cada objeto de valor se valida na criação: CPF, CNPJ e chassi pelos dígitos v
 
 ## Eventos de domínio
 
-Só os eventos da OS viraram classe ([ADR 004](../adr/004-domain-events.md)). Os demais fatos do Event Storming ficam registrados no próprio agregado, sem classe de evento.
+Só os eventos da OS viraram classe ([ADR 004](../adr/004-domain-events.md)). Os demais fatos do Event Storming não têm classe de evento: ficam registrados no próprio agregado, e a tabela aponta o método ou construtor que registra cada um.
 
 | Termo | Nome no código | O que acontece depois |
 |---|---|---|
@@ -244,20 +244,20 @@ Só os eventos da OS viraram classe ([ADR 004](../adr/004-domain-events.md)). Os
 | Orçamento retirado | `QuoteWithdrawnEvent` | O estoque libera a reserva. |
 | OS finalizada | `ServiceOrderCompletedEvent` | O cliente é avisado. |
 | OS cancelada | `ServiceOrderCanceledEvent` | O estoque devolve as peças que saíram e libera a reserva. |
-| OS aberta | `serviceOrderOpened` | Nada; fica no histórico de status. |
-| Diagnóstico iniciado | `diagnosisStarted` | Nada; fica no histórico de status. |
-| Item incluído / removido | `itemAdded` / `itemRemoved` | O valor total é recalculado. |
-| Execução iniciada | `executionStarted` | Nada; fica no histórico e entra nas métricas. |
-| Serviço iniciado / concluído | `serviceItemStarted` / `completed` | Entra nas métricas; o último concluído finaliza a OS. |
-| Veículo entregue | `delivered` | Nada; fica no histórico de status. |
-| Cliente cadastrado | `customerCreated` | Nada. |
-| Veículo cadastrado | `vehicleCreated` | Nada. |
-| Serviço cadastrado / desativado | `serviceOfferingCreated` / `deactivated` | Nada. |
-| Peça cadastrada | `partCreated` | Nada. |
-| Estoque movimentado | `stockMovementRegistered` | A quantidade da peça muda. |
-| Ajuste solicitado / revisado | `stockAdjustmentRequested` / `reviewed` | Se aprovado, vira movimentação de ajuste. |
-| Estoque reservado / liberado | `stockReserved` / `released` | O disponível da peça muda. |
-| E-mail enviado / falhou | `emailSent` / `failed` | Se falhou, agenda nova tentativa. |
+| OS aberta | Sem classe: `new ServiceOrder` | Nada; fica no histórico de status. |
+| Diagnóstico iniciado | Sem classe: `ServiceOrder.startDiagnosis` | Nada; fica no histórico de status. |
+| Item incluído / removido | Sem classe: `ServiceOrder.addServiceItem` e `addPartItem` / `removeServiceItem` e `removePartItem` | O valor total é recalculado. |
+| Execução iniciada | Sem classe: `ServiceOrder.startExecution` | Nada; fica no histórico e entra nas métricas. |
+| Serviço iniciado / concluído | Sem classe: `ServiceOrder.startServiceItem` / `completeServiceItem` | Entra nas métricas; o último concluído finaliza a OS. |
+| Veículo entregue | Sem classe: `ServiceOrder.deliver` | Nada; fica no histórico de status. |
+| Cliente cadastrado | Sem classe: `new Customer` | Nada. |
+| Veículo cadastrado | Sem classe: `new Vehicle` | Nada. |
+| Serviço cadastrado / desativado | Sem classe: `new ServiceOffering` / `ServiceOffering.deactivate` | Nada. |
+| Peça cadastrada | Sem classe: `new Part` | Nada. |
+| Estoque movimentado | Sem classe: `StockMovement.entry`, `adjustment`, `withdrawal` e `serviceOrderReturn` | A quantidade da peça muda. |
+| Ajuste solicitado / revisado | Sem classe: `new StockAdjustmentRequest` / `StockAdjustmentRequest.approve` e `reject` | Se aprovado, vira movimentação de ajuste. |
+| Estoque reservado / liberado | Sem classe: `StockReservation.reserve` / `release` | O disponível da peça muda. |
+| E-mail enviado / falhou | Sem classe: `EmailNotification.markSent` / `registerFailure` | Se falhou, agenda nova tentativa. |
 
 ## Termos que mudam de significado entre contextos
 
