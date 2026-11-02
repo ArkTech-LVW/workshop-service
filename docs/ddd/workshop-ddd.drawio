@@ -326,7 +326,7 @@
         <mxCell id="legend-es-19" value="AG" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="legend-es-18">
           <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="legend-es-20" value="&lt;b&gt;EV · Evento:&lt;/b&gt; fato que já aconteceu, escrito no passado. Quando virou classe no código, o nome da classe vem embaixo.&lt;br&gt;&lt;b&gt;CMD · Comando:&lt;/b&gt; ação que gera o evento, escrita no presente. Sempre feito por um ator ou por uma política; embaixo, o caso de uso que o implementa.&lt;br&gt;&lt;b&gt;POL · Política:&lt;/b&gt; lógica de negócio que dispara um comando na hora, sem ninguém agir. Fica sobreposta entre o evento e o comando e pode responder a um ponto de atenção.&lt;br&gt;&lt;b&gt;ML · Modelo de leitura:&lt;/b&gt; o que o ator vê antes de agir. Vem sempre antes do comando e se liga a ele.&lt;br&gt;&lt;b&gt;AT · Ator:&lt;/b&gt; quem executa o comando. Retângulo estreito, colado ao comando.&lt;br&gt;&lt;b&gt;AG · Agregado:&lt;/b&gt; junta os comandos e os eventos de um mesmo dado. Retângulo maior que o do ator.&lt;br&gt;&lt;b&gt;SE · Sistema externo:&lt;/b&gt; sistema fora da solução.&lt;br&gt;&lt;b&gt;PA · Ponto de atenção:&lt;/b&gt; dúvida sobre um evento, um novo brainstorm. A seta aponta para o evento." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;verticalAlign=top;" vertex="1" parent="1">
+        <mxCell id="legend-es-20" value="&lt;b&gt;EV · Evento:&lt;/b&gt; fato que já aconteceu, escrito no passado. Quando virou classe no código, vem marcado embaixo.&lt;br&gt;&lt;b&gt;CMD · Comando:&lt;/b&gt; ação que gera o evento, escrita no presente. Sempre feito por um ator ou por uma política.&lt;br&gt;&lt;b&gt;POL · Política:&lt;/b&gt; lógica de negócio que dispara um comando na hora, sem ninguém agir. Fica sobreposta entre o evento e o comando e pode responder a um ponto de atenção.&lt;br&gt;&lt;b&gt;ML · Modelo de leitura:&lt;/b&gt; o que o ator vê antes de agir. Vem sempre antes do comando e se liga a ele.&lt;br&gt;&lt;b&gt;AT · Ator:&lt;/b&gt; quem executa o comando. Retângulo estreito, colado ao comando.&lt;br&gt;&lt;b&gt;AG · Agregado:&lt;/b&gt; junta os comandos e os eventos de um mesmo dado. Retângulo maior que o do ator.&lt;br&gt;&lt;b&gt;SE · Sistema externo:&lt;/b&gt; sistema fora da solução.&lt;br&gt;&lt;b&gt;PA · Ponto de atenção:&lt;/b&gt; dúvida sobre um evento, um novo brainstorm. A seta aponta para o evento." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;verticalAlign=top;" vertex="1" parent="1">
           <mxGeometry x="60" y="580" width="680" height="440" as="geometry" />
         </mxCell>
         <mxCell id="legend-19" value="Fluxo do Event Storming" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontStyle=1;" vertex="1" parent="1">
@@ -408,7 +408,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="es-create" name="ES - Criação da OS">
-    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="4600" pageHeight="3040" math="0" shadow="0">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="4760" pageHeight="3040" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -430,7 +430,7 @@
         <mxCell id="es-create-6" value="Reserva e aviso ao cliente" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="3580" y="140" width="800" height="34" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-7" value="Cadastra cliente&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;CreateCustomerUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+        <mxCell id="es-create-7" value="Cadastra cliente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
           <mxGeometry x="140" y="680" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-8" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-7">
@@ -474,7 +474,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="es-create-20" value="Cadastra veículo&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;CreateVehicleUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+        <mxCell id="es-create-20" value="Cadastra veículo" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
           <mxGeometry x="660" y="680" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-21" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-20">
@@ -537,7 +537,7 @@
         <mxCell id="es-create-37" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-35" target="es-create-29">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-38" value="Abre OS&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;OpenServiceOrderUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+        <mxCell id="es-create-38" value="Abre OS" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
           <mxGeometry x="1180" y="680" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-39" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-38">
@@ -612,7 +612,7 @@
         <mxCell id="es-create-59" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
           <mxGeometry x="1700" y="140" width="8" height="1400" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-60" value="Inicia diagnóstico&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;StartDiagnosisUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+        <mxCell id="es-create-60" value="Inicia diagnóstico" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
           <mxGeometry x="1810" y="680" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-61" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-60">
@@ -660,7 +660,7 @@
         <mxCell id="es-create-75" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-74">
           <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-76" value="Inclui serviço&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;AddServiceItemUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+        <mxCell id="es-create-76" value="Inclui serviço" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
           <mxGeometry x="2330" y="360" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-77" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-76">
@@ -706,7 +706,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="es-create-88" value="Inclui peça ou insumo&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;AddPartItemUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+        <mxCell id="es-create-88" value="Inclui peça ou insumo" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
           <mxGeometry x="2330" y="680" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-89" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-88">
@@ -752,7 +752,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="es-create-100" value="Remove serviço&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;RemoveServiceItemUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+        <mxCell id="es-create-100" value="Remove serviço" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
           <mxGeometry x="2330" y="1000" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-101" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-100">
@@ -798,7 +798,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="es-create-112" value="Remove peça ou insumo&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;RemovePartItemUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+        <mxCell id="es-create-112" value="Remove peça ou insumo" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
           <mxGeometry x="2330" y="1320" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-113" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-112">
@@ -847,7 +847,7 @@
         <mxCell id="es-create-124" value="Inclusões e remoções se repetem, em qualquer ordem, até o orçamento ficar completo." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=13;fontStyle=2;fontColor=#555555;" vertex="1" parent="1">
           <mxGeometry x="2300" y="1500" width="420" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-125" value="Envia orçamento&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;SendQuoteUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+        <mxCell id="es-create-125" value="Envia orçamento" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
           <mxGeometry x="3130" y="680" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-126" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-125">
@@ -868,7 +868,7 @@
         <mxCell id="es-create-131" value="AT" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-130">
           <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-132" value="&lt;b&gt;Orçamento enviado para aprovação&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;status Aguardando aprovação&lt;/i&gt;&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;classe QuoteSentEvent&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+        <mxCell id="es-create-132" value="&lt;b&gt;Orçamento enviado para aprovação&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;status Aguardando aprovação&lt;/i&gt;&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;virou classe no código&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
           <mxGeometry x="3340" y="650.0" width="160" height="160" as="geometry" />
         </mxCell>
         <mxCell id="es-create-133" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-132">
@@ -883,7 +883,7 @@
         <mxCell id="es-create-136" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
           <mxGeometry x="3551.0" y="140" width="8" height="1400" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-137" value="Reserva peças da OS&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;ReserveServiceOrderStockUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=14;" vertex="1" parent="1">
+        <mxCell id="es-create-137" value="Reserva peças da OS" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=14;" vertex="1" parent="1">
           <mxGeometry x="3610" y="480.0" width="172" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-138" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-137">
@@ -932,7 +932,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="es-create-149" value="Registra aviso ao cliente&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;contrato Notifier&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=14;" vertex="1" parent="1">
+        <mxCell id="es-create-149" value="Registra aviso ao cliente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=14;" vertex="1" parent="1">
           <mxGeometry x="3610" y="710.0" width="172" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-150" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-149">
@@ -988,7 +988,7 @@
         <mxCell id="es-create-164" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-163">
           <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-165" value="Envia e-mails pendentes&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;SendPendingEmailsUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=14;" vertex="1" parent="1">
+        <mxCell id="es-create-165" value="Envia e-mails pendentes" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=14;" vertex="1" parent="1">
           <mxGeometry x="4102" y="710.0" width="172" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-166" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-165">
@@ -1008,7 +1008,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="es-create-170" value="Servidor de e-mail&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;SMTP&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#e91e63;strokeColor=#ad1457;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="4108" y="530.0" width="160" height="100" as="geometry" />
+          <mxGeometry x="4544" y="710.0" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-171" value="SE" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-170">
           <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
@@ -1023,7 +1023,7 @@
         <mxCell id="es-create-173" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-165" target="es-create-161">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-174" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-165" target="es-create-170">
+        <mxCell id="es-create-174" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-161" target="es-create-170">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="es-create-175" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#8a2be2;dashed=1;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-165" target="es-create-163">
@@ -1043,7 +1043,7 @@
         <mxCell id="es-create-178" value="Cadastro" style="rounded=1;absoluteArcSize=1;arcSize=24;whiteSpace=wrap;html=1;dashed=1;strokeWidth=2;fillColor=none;strokeColor=#333333;verticalAlign=top;align=left;spacingLeft=12;spacingTop=4;fontSize=16;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="1700" width="717" height="335" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-179" value="Cadastra cliente&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;CreateCustomerUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
+        <mxCell id="es-create-179" value="Cadastra cliente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
           <mxGeometry x="257" y="1760" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-180" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-179">
@@ -1079,7 +1079,7 @@
         <mxCell id="es-create-190" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-188" target="es-create-186">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-191" value="Cadastra veículo&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;CreateVehicleUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
+        <mxCell id="es-create-191" value="Cadastra veículo" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
           <mxGeometry x="257" y="1890" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-192" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-191">
@@ -1127,7 +1127,7 @@
         <mxCell id="es-create-204" value="Ordem de Serviço" style="rounded=1;absoluteArcSize=1;arcSize=24;whiteSpace=wrap;html=1;dashed=1;strokeWidth=2;fillColor=none;strokeColor=#333333;verticalAlign=top;align=left;spacingLeft=12;spacingTop=4;fontSize=16;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="790" y="1700" width="937" height="1090" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-205" value="Abre OS&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;OpenServiceOrderUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
+        <mxCell id="es-create-205" value="Abre OS" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
           <mxGeometry x="1007" y="1760" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-206" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-205">
@@ -1154,7 +1154,7 @@
         <mxCell id="es-create-213" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-212">
           <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-214" value="Inicia diagnóstico&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;StartDiagnosisUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
+        <mxCell id="es-create-214" value="Inicia diagnóstico" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
           <mxGeometry x="1007" y="1890" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-215" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-214">
@@ -1181,7 +1181,7 @@
         <mxCell id="es-create-222" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-221">
           <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-223" value="Inclui serviço&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;AddServiceItemUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
+        <mxCell id="es-create-223" value="Inclui serviço" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
           <mxGeometry x="1007" y="2020" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-224" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-223">
@@ -1208,7 +1208,7 @@
         <mxCell id="es-create-231" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-230">
           <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-232" value="Inclui peça ou insumo&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;AddPartItemUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
+        <mxCell id="es-create-232" value="Inclui peça ou insumo" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
           <mxGeometry x="1007" y="2150" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-233" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-232">
@@ -1235,7 +1235,7 @@
         <mxCell id="es-create-240" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-239">
           <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-241" value="Remove serviço&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;RemoveServiceItemUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
+        <mxCell id="es-create-241" value="Remove serviço" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
           <mxGeometry x="1007" y="2280" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-242" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-241">
@@ -1262,7 +1262,7 @@
         <mxCell id="es-create-249" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-248">
           <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-250" value="Remove peça ou insumo&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;RemovePartItemUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
+        <mxCell id="es-create-250" value="Remove peça ou insumo" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
           <mxGeometry x="1007" y="2410" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-251" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-250">
@@ -1289,7 +1289,7 @@
         <mxCell id="es-create-258" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-257">
           <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-259" value="Envia orçamento&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;SendQuoteUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
+        <mxCell id="es-create-259" value="Envia orçamento" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;spacingLeft=12;" vertex="1" parent="1">
           <mxGeometry x="1007" y="2540" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-260" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-259">
@@ -1310,7 +1310,7 @@
         <mxCell id="es-create-265" value="AT" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-264">
           <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-266" value="Orçamento enviado para aprovação&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;classe QuoteSentEvent&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+        <mxCell id="es-create-266" value="Orçamento enviado para aprovação&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;virou classe no código&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
           <mxGeometry x="1327" y="2540" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-267" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-266">
@@ -1476,7 +1476,7 @@
         <mxCell id="es-create-296" value="Estoque" style="rounded=1;absoluteArcSize=1;arcSize=24;whiteSpace=wrap;html=1;dashed=1;strokeWidth=2;fillColor=none;strokeColor=#333333;verticalAlign=top;align=left;spacingLeft=12;spacingTop=4;fontSize=16;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="1795" y="1700" width="530" height="180" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-297" value="Reserva peças da OS&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;ReserveServiceOrderStockUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+        <mxCell id="es-create-297" value="Reserva peças da OS" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
           <mxGeometry x="1815" y="1760" width="170" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-298" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-297">
@@ -1500,58 +1500,69 @@
         <mxCell id="es-create-304" value="Notificações" style="rounded=1;absoluteArcSize=1;arcSize=24;whiteSpace=wrap;html=1;dashed=1;strokeWidth=2;fillColor=none;strokeColor=#333333;verticalAlign=top;align=left;spacingLeft=12;spacingTop=4;fontSize=16;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="1795" y="1920" width="710" height="290" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-305" value="Registra aviso ao cliente&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;contrato Notifier&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+        <mxCell id="es-create-305" value="Registra aviso ao cliente" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
           <mxGeometry x="1815" y="1960" width="170" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-306" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-305">
           <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-307" value="Envia e-mails pendentes&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;SendPendingEmailsUseCase&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
+        <mxCell id="es-create-307" value="Envia e-mails pendentes" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" vertex="1" parent="1">
           <mxGeometry x="1815" y="2090" width="170" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-308" value="CMD" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-307">
           <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-309" value="Notificação por e-mail" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" vertex="1" parent="1">
-          <mxGeometry x="1995" y="1960" width="120" height="230" as="geometry" />
+        <mxCell id="es-create-309" value="Aviso do orçamento registrado" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="2145" y="1960" width="160" height="100" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-310" value="AG" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-309">
+        <mxCell id="es-create-310" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-309">
           <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-311" value="Aviso do orçamento registrado" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
-          <mxGeometry x="2145" y="1960" width="160" height="100" as="geometry" />
+        <mxCell id="es-create-311" value="E-mail do orçamento enviado" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
+          <mxGeometry x="2145" y="2090" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="es-create-312" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-311">
           <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-313" value="E-mail do orçamento enviado" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" vertex="1" parent="1">
-          <mxGeometry x="2145" y="2090" width="160" height="100" as="geometry" />
-        </mxCell>
-        <mxCell id="es-create-314" value="EV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-313">
-          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
-        </mxCell>
-        <mxCell id="es-create-315" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.2174;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-309" target="es-create-311">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="es-create-316" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.7826;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-309" target="es-create-313">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="es-create-317" value="A cada 30 segundos, envia os e-mails pendentes" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="es-create-313" value="A cada 30 segundos, envia os e-mails pendentes" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="2335" y="1960" width="150" height="100" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-318" value="POL" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-317">
+        <mxCell id="es-create-314" value="POL" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-313">
           <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-319" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-311" target="es-create-317">
+        <mxCell id="es-create-315" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-309" target="es-create-313">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-320" value="Servidor de e-mail&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;SMTP&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#e91e63;strokeColor=#ad1457;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="2555" y="2090" width="160" height="100" as="geometry" />
+        <mxCell id="es-create-316" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-313" target="es-create-307">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2410" y="2075" />
+              <mxPoint x="1900" y="2075" />
+            </Array>
+          </mxGeometry>
         </mxCell>
-        <mxCell id="es-create-321" value="SE" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-320">
+        <mxCell id="es-create-317" value="Notificação por e-mail" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" vertex="1" parent="1">
+          <mxGeometry x="1995" y="1960" width="120" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-318" value="AG" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-317">
           <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="es-create-322" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-290" target="es-create-297">
+        <mxCell id="es-create-319" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.2174;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-317" target="es-create-309">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-320" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.7826;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-317" target="es-create-311">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-321" value="Servidor de e-mail&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;SMTP&lt;/i&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#e91e63;strokeColor=#ad1457;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="2555" y="2090" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-322" value="SE" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" vertex="1" parent="es-create-321">
+          <mxGeometry x="0" y="0" width="44" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-323" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-311" target="es-create-321">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-create-324" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-290" target="es-create-297">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="1750" y="2590.0" />
@@ -1559,7 +1570,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="es-create-323" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-292" target="es-create-305">
+        <mxCell id="es-create-325" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-292" target="es-create-305">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="1772" y="2720.0" />
@@ -1567,24 +1578,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="es-create-324" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=2;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-317" target="es-create-307">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="2410" y="2200" />
-              <mxPoint x="1803" y="2200" />
-              <mxPoint x="1803" y="2140.0" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="es-create-325" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;jumpStyle=arc;jumpSize=10;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="es-create-307" target="es-create-320">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="1900" y="2235" />
-              <mxPoint x="2635" y="2235" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="es-create-326" value="&lt;b&gt;Como ler&lt;/b&gt;&lt;br&gt;• Linha do tempo: o caminho feliz é a primeira visita, com cliente e veículo novos. As linhas tracejadas são os caminhos alternativos.&lt;br&gt;• No comando, embaixo, o caso de uso que o implementa. No evento, embaixo, o status da OS e, quando o evento virou classe, o nome da classe: neste fluxo, só o QuoteSentEvent tem ouvinte fora da OS (ADR 004).&lt;br&gt;• Eventos pivotais (barras pretas): OS aberta, quando o atendimento vira OS, e Orçamento enviado para aprovação, quando a decisão passa para o cliente.&lt;br&gt;• Agregados: cada bloco junta os comandos e os eventos de um agregado, dentro do seu contexto delimitado.&lt;br&gt;• Continua em ES - Acompanhamento da OS, com a aprovação ou a recusa do orçamento." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;verticalAlign=top;" vertex="1" parent="1">
+        <mxCell id="es-create-326" value="&lt;b&gt;Como ler&lt;/b&gt;&lt;br&gt;• Linha do tempo: o caminho feliz é a primeira visita, com cliente e veículo novos. As linhas tracejadas são os caminhos alternativos.&lt;br&gt;• No evento, embaixo, o status da OS. Neste fluxo, só o Orçamento enviado para aprovação virou classe no código, porque tem ouvintes fora da OS (ADR 004). O nome da classe está na aba Linguagem ubíqua e glossário.&lt;br&gt;• Eventos pivotais (barras pretas): OS aberta, quando o atendimento vira OS, e Orçamento enviado para aprovação, quando a decisão passa para o cliente.&lt;br&gt;• Agregados: cada bloco junta os comandos e os eventos de um agregado, dentro do seu contexto delimitado.&lt;br&gt;• Continua em ES - Acompanhamento da OS, com a aprovação ou a recusa do orçamento." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;verticalAlign=top;" vertex="1" parent="1">
           <mxGeometry x="40" y="2850" width="2200" height="150" as="geometry" />
         </mxCell>
       </root>
