@@ -449,6 +449,8 @@ A documentação DDD fica em [`docs/ddd/workshop-ddd.drawio`](docs/ddd/workshop-
 - **C4 - Contêineres:** as partes executáveis e o banco, com a tecnologia e o protocolo de cada relação.
 - **C4 - Componentes:** os módulos internos da API e as dependências entre eles.
 
+As abas também estão exportadas em PDF: [`event-storming.pdf`](docs/ddd/event-storming.pdf), com a legenda e os quatro fluxos, e [`diagramas.pdf`](docs/ddd/diagramas.pdf), com o mapa de contextos, os três níveis do C4 e o glossário resumido.
+
 A relação entre a documentação e o código está em [`docs/ddd/do-modelo-ao-codigo`](docs/ddd/do-modelo-ao-codigo/README.md), com um arquivo por fluxo de Event Storming: cada comando, evento, política, ator e agregado ligado à rota, ao caso de uso, à classe ou ao listener que o implementa, e o que não tem correspondente direto marcado como tal.
 
 ## Contribuindo
