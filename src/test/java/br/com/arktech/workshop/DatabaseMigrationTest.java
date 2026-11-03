@@ -35,6 +35,14 @@ class DatabaseMigrationTest {
     }
 
     @Test
+    void shouldNotApplyTheDemoSeed() {
+        Boolean seedHistoryExists = jdbcTemplate.queryForObject(
+                "SELECT to_regclass('flyway_seed_history') IS NOT NULL", Boolean.class);
+
+        assertThat(seedHistoryExists).isFalse();
+    }
+
+    @Test
     void shouldApplyAMigrationWithLowerVersionThanTheLatestApplied() {
         jdbcTemplate.execute("DROP SCHEMA IF EXISTS " + OUT_OF_ORDER_SCHEMA + " CASCADE");
         outOfOrderFlyway("classpath:db/out-of-order/first").migrate();
