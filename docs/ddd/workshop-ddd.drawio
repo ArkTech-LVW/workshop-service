@@ -1,4 +1,4 @@
-<mxfile host="Electron" pages="12">
+<mxfile host="Electron" pages="10">
   <diagram id="context-map" name="Mapa de contextos">
     <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2600" pageHeight="1300" math="0" shadow="0">
       <root>
@@ -5595,20 +5595,6 @@
       </root>
     </mxGraphModel>
   </diagram>
-  <diagram id="tactical" name="Modelo tático">
-    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
-      <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
-        <mxCell id="tactical-1" value="Modelo tático" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=26;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="60" y="30" width="1200" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="tactical-2" value="Reservada para T6.5 (KAN-89)." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=16;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="60" y="80" width="1200" height="30" as="geometry" />
-        </mxCell>
-      </root>
-    </mxGraphModel>
-  </diagram>
   <diagram id="c4-context" name="C4 - Contexto">
     <mxGraphModel dx="1992" dy="1977" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
       <root>
@@ -6092,20 +6078,6 @@
         </mxCell>
         <mxCell id="ubiquitous-13" value="&lt;b style=&quot;font-size:18px&quot;&gt;Eventos de domínio com classe&lt;/b&gt;&lt;br&gt;&lt;i style=&quot;font-size:12px&quot;&gt;Só os da OS viraram classe; os demais fatos ficam no agregado&lt;/i&gt;&lt;table style=&quot;width:100%;border-collapse:collapse;font-size:12px;margin-top:8px&quot;&gt;&lt;tr&gt;&lt;th style=&quot;text-align:left;border-bottom:2px solid #000000;padding:3px 4px;width:25%&quot;&gt;Termo&lt;/th&gt;&lt;th style=&quot;text-align:left;border-bottom:2px solid #000000;padding:3px 4px;width:28%&quot;&gt;Nome no código&lt;/th&gt;&lt;th style=&quot;text-align:left;border-bottom:2px solid #000000;padding:3px 4px;width:47%&quot;&gt;O que acontece depois&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;border-bottom:1px solid #cccccc;padding:3px 4px;vertical-align:top&quot;&gt;Orçamento enviado&lt;/td&gt;&lt;td style=&quot;border-bottom:1px solid #cccccc;padding:3px 4px;vertical-align:top&quot;&gt;&lt;font face=&quot;Courier New&quot;&gt;QuoteSentEvent&lt;/font&gt;&lt;/td&gt;&lt;td style=&quot;border-bottom:1px solid #cccccc;padding:3px 4px;vertical-align:top&quot;&gt;O estoque reserva as peças e o cliente é avisado&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;border-bottom:1px solid #cccccc;padding:3px 4px;vertical-align:top&quot;&gt;Orçamento aprovado&lt;/td&gt;&lt;td style=&quot;border-bottom:1px solid #cccccc;padding:3px 4px;vertical-align:top&quot;&gt;&lt;font face=&quot;Courier New&quot;&gt;QuoteApprovedEvent&lt;/font&gt;&lt;/td&gt;&lt;td style=&quot;border-bottom:1px solid #cccccc;padding:3px 4px;vertical-align:top&quot;&gt;O estoque baixa as peças pela diferença e o cliente é avisado&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;border-bottom:1px solid #cccccc;padding:3px 4px;vertical-align:top&quot;&gt;Orçamento rejeitado&lt;/td&gt;&lt;td style=&quot;border-bottom:1px solid #cccccc;padding:3px 4px;vertical-align:top&quot;&gt;&lt;font face=&quot;Courier New&quot;&gt;QuoteRejectedEvent&lt;/font&gt;&lt;/td&gt;&lt;td style=&quot;border-bottom:1px solid #cccccc;padding:3px 4px;vertical-align:top&quot;&gt;O estoque libera a reserva e o cliente é avisado&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;border-bottom:1px solid #cccccc;padding:3px 4px;vertical-align:top&quot;&gt;Orçamento retirado&lt;/td&gt;&lt;td style=&quot;border-bottom:1px solid #cccccc;padding:3px 4px;vertical-align:top&quot;&gt;&lt;font face=&quot;Courier New&quot;&gt;QuoteWithdrawnEvent&lt;/font&gt;&lt;/td&gt;&lt;td style=&quot;border-bottom:1px solid #cccccc;padding:3px 4px;vertical-align:top&quot;&gt;O estoque libera a reserva&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;border-bottom:1px solid #cccccc;padding:3px 4px;vertical-align:top&quot;&gt;OS finalizada&lt;/td&gt;&lt;td style=&quot;border-bottom:1px solid #cccccc;padding:3px 4px;vertical-align:top&quot;&gt;&lt;font face=&quot;Courier New&quot;&gt;ServiceOrderCompletedEvent&lt;/font&gt;&lt;/td&gt;&lt;td style=&quot;border-bottom:1px solid #cccccc;padding:3px 4px;vertical-align:top&quot;&gt;O cliente é avisado&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;border-bottom:1px solid #cccccc;padding:3px 4px;vertical-align:top&quot;&gt;OS cancelada&lt;/td&gt;&lt;td style=&quot;border-bottom:1px solid #cccccc;padding:3px 4px;vertical-align:top&quot;&gt;&lt;font face=&quot;Courier New&quot;&gt;ServiceOrderCanceledEvent&lt;/font&gt;&lt;/td&gt;&lt;td style=&quot;border-bottom:1px solid #cccccc;padding:3px 4px;vertical-align:top&quot;&gt;O estoque devolve as peças que saíram e libera a reserva&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=10;spacingRight=10;spacingTop=6;" vertex="1" parent="1">
           <mxGeometry x="1020" y="1162" width="920" height="248" as="geometry" />
-        </mxCell>
-      </root>
-    </mxGraphModel>
-  </diagram>
-  <diagram id="traceability" name="Relação com o código">
-    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
-      <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
-        <mxCell id="traceability-1" value="Relação com o código" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=26;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="60" y="30" width="1200" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="traceability-2" value="Reservada para T6.7 (KAN-91)." style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=16;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="60" y="80" width="1200" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
