@@ -12,6 +12,7 @@ API de gestão de oficina mecânica: clientes, veículos, catálogo de serviços
 - [Tecnologias](#tecnologias)
 - [Pré-requisitos](#pré-requisitos)
 - [Como executar](#como-executar)
+- [Dados de demonstração](#dados-de-demonstração)
 - [Usuários de demonstração e papéis](#usuários-de-demonstração-e-papéis)
 - [Autenticação](#autenticação)
 - [Documentação da API](#documentação-da-api)
@@ -198,6 +199,8 @@ Pronto para usar:
 | Caixa de entrada do Mailpit | <http://localhost:8025> |
 | Login | `admin@workshop.local` / `admin123` ([detalhes](#usuários-de-demonstração-e-papéis)) |
 
+O `docker compose up` já vem com clientes, veículos, serviços, peças com estoque, OS em todas as etapas e um usuário de cada papel ([dados de demonstração](#dados-de-demonstração)), então dá para testar tudo sem cadastrar nada antes.
+
 Usuário e senha do banco vêm das variáveis `DB_USERNAME` e `DB_PASSWORD`, lidas de um arquivo `.env` na raiz (fora do git). Sem `.env`, os dois valem `workshop`. Para parar, `docker compose down`; para apagar também os dados, `docker compose down -v`.
 
 ### Para desenvolvimento
@@ -216,9 +219,11 @@ Para usar um PostgreSQL próprio, desligue o compose com `SPRING_DOCKER_COMPOSE_
 | Como roda | Perfil | O que precisa |
 |---|---|---|
 | IntelliJ, `./gradlew bootRun` ou o jar na sua máquina | `development` (padrão do `application.yml`) | nada |
-| `docker compose up` | `development` (definido no `docker-compose.yml`) | nada |
+| `docker compose up` | `development` e `demo` (definidos no `docker-compose.yml`) | nada |
 | Imagem Docker num servidor | `production` (definido no `Dockerfile`) | `JWT_SECRET` e as variáveis do banco |
 | Jar direto num servidor | `production` | `SPRING_PROFILES_ACTIVE=production`, `JWT_SECRET` e as variáveis do banco |
+
+O perfil `demo` só carrega os [dados de demonstração](#dados-de-demonstração) e pode ser somado a qualquer outro. Para tê-los também no `bootRun`, use `SPRING_PROFILES_ACTIVE=development,demo`.
 
 O perfil `development` assina os tokens JWT com uma chave de desenvolvimento, que é pública no repositório. Fora dele, a variável `JWT_SECRET` é obrigatória, com pelo menos 32 bytes (para gerar uma: `openssl rand -base64 48`); sem ela, a aplicação não sobe. Nunca rode num servidor sem `SPRING_PROFILES_ACTIVE=production`: em `development`, qualquer um consegue gerar um token válido.
 
@@ -237,6 +242,29 @@ O perfil `development` assina os tokens JWT com uma chave de desenvolvimento, qu
 | `SPRING_DOCKER_COMPOSE_ENABLED` | `true` | `false` para o `bootRun` não subir o compose |
 | `SERVER_TOMCAT_REMOTEIP_INTERNAL_PROXIES` | endereços privados | Proxies aceitos no `X-Forwarded-For` ([rate limit](#autenticação)) |
 
+## Dados de demonstração
+
+No perfil `demo`, a aplicação carrega na subida os dados de `src/main/resources/db/seed`:
+
+| O quê | Quantos |
+|---|---|
+| Clientes | 3 (dois com CPF, um com CNPJ), com documentos válidos gerados para teste |
+| Veículos | 4, ligados aos clientes |
+| Serviços do catálogo | 6 |
+| Peças e insumos | 10, com estoque inicial registrado como entrada, já com as baixas e reservas das OS (um deles abaixo do estoque mínimo) |
+| Ordens de serviço | 8, uma em cada etapa: duas entregues, uma finalizada, uma em execução, uma aguardando aprovação, uma em diagnóstico, uma recebida e uma cancelada após orçamento rejeitado |
+| Pedido de ajuste de estoque | 1 pendente, para o ADMIN aprovar ou rejeitar |
+| Usuários | 1 de cada papel ([abaixo](#usuários-de-demonstração-e-papéis)) |
+
+As OS têm histórico de status, itens com início e conclusão e datas espalhadas pelos últimos 20 dias, então as [métricas](#métricas-de-tempo-da-os) já trazem resultado. A OS aguardando aprovação serve para testar as rotas do cliente sem abrir uma OS antes:
+
+```bash
+curl http://localhost:8080/customer/serviceOrders/7d3f1a52-0c4e-4b8a-9f21-5e6a7b8c9d05 \
+  -H 'X-Customer-Document: 529.982.247-25'
+```
+
+O seed roda uma vez por banco, com o histórico na tabela `flyway_seed_history`, separado do histórico das migrations do esquema. Por isso o mesmo banco pode subir com ou sem o perfil `demo`. Registros que já existem (mesmo e-mail, CPF/CNPJ, placa, chassi ou SKU) são mantidos. Para recarregar do zero, `docker compose down -v`. Os testes automatizados não ligam o perfil `demo`.
+
 ## Usuários de demonstração e papéis
 
 No perfil `development`, a aplicação cria na subida, se ainda não existir, um usuário ADMIN só para ambiente local:
@@ -245,7 +273,15 @@ No perfil `development`, a aplicação cria na subida, se ainda não existir, um
 |---|---|---|
 | `admin@workshop.local` | `admin123` | ADMIN |
 
-No perfil `production`, nenhum usuário é criado. Para demonstrar os outros papéis, faça o login como ADMIN e crie os usuários em `POST /admin/users`:
+No perfil `demo`, o seed traz também um usuário de cada papel:
+
+| E-mail | Senha | Papel |
+|---|---|---|
+| `gerente@workshop.local` | `demo1234` | ADMIN |
+| `atendente@workshop.local` | `demo1234` | ATTENDANT |
+| `mecanico@workshop.local` | `demo1234` | MECHANIC |
+
+No perfil `production` sem o `demo`, nenhum usuário é criado. Para demonstrar os outros papéis, faça o login como ADMIN e crie os usuários em `POST /admin/users`:
 
 ```json
 { "name": "Ana Souza", "email": "ana@workshop.com", "password": "senha1234", "roles": ["ATTENDANT"] }
