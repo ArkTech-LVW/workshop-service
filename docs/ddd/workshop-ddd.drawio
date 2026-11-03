@@ -1585,7 +1585,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="es-track" name="ES - Acompanhamento da OS">
-    <mxGraphModel dx="2049" dy="1219" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="9000" pageHeight="6470" math="0" shadow="0">
+    <mxGraphModel dx="2946" dy="1752" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="9000" pageHeight="6470" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -1622,7 +1622,7 @@
         <mxCell id="es-track-6" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontStyle=1;" value="Entrega" vertex="1">
           <mxGeometry height="34" width="700" x="7018" y="140" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-9" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="&lt;b&gt;Orçamento enviado para aprovação&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;vem de ES - Criação da OS&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-track-9" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="&lt;b&gt;Orçamento enviado para aprovação&lt;/b&gt;" vertex="1">
           <mxGeometry height="100" width="160" x="140" y="680" as="geometry" />
         </mxCell>
         <mxCell id="es-track-10" parent="es-track-9" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -1664,8 +1664,8 @@
         <mxCell id="es-track-26" parent="es-track-25" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=0;spacingTop=1;connectable=0;" value="PA" vertex="1">
           <mxGeometry height="18" width="40" x="55" y="10" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-28" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Aprovação recusada: peça sem saldo&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;a reserva venceu e a peça acabou no estoque&lt;/i&gt;&lt;/span&gt;" vertex="1">
-          <mxGeometry height="100" width="160" x="660" y="880" as="geometry" />
+        <mxCell id="es-track-28" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Aprovação recusada: peça sem saldo" vertex="1">
+          <mxGeometry height="100" width="160" x="1152" y="870" as="geometry" />
         </mxCell>
         <mxCell id="es-track-29" parent="es-track-28" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
@@ -1700,7 +1700,7 @@
         <mxCell id="es-track-49" parent="es-track-48" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="SE" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-50" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Envio do e-mail falhou&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;nova tentativa em 1 minuto, até 5 vezes&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-track-50" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Envio do e-mail falhou" vertex="1">
           <mxGeometry height="100" width="160" x="1644" y="320" as="geometry" />
         </mxCell>
         <mxCell id="es-track-51" parent="es-track-50" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -1712,7 +1712,7 @@
         <mxCell id="es-track-59" parent="es-track-58" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="CMD" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-62" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Peças baixadas do estoque&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;libera a reserva e baixa só a diferença&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-track-62" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Peças baixadas do estoque" vertex="1">
           <mxGeometry height="100" width="160" x="1152" y="720" as="geometry" />
         </mxCell>
         <mxCell id="es-track-63" parent="es-track-62" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -1736,7 +1736,7 @@
         <mxCell id="es-track-70" parent="es-track-69" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AT" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-73" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Orçamento rejeitado&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;motivo obrigatório&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-track-73" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Orçamento rejeitado" vertex="1">
           <mxGeometry height="100" width="160" x="660" y="1160" as="geometry" />
         </mxCell>
         <mxCell id="es-track-74" parent="es-track-73" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -1784,13 +1784,13 @@
         <mxCell id="es-track-101" parent="es-track-100" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="ML" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-102" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=10;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Administrador&lt;br&gt;ou atendente" vertex="1">
+        <mxCell id="es-track-102" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=10;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Atendente" vertex="1">
           <mxGeometry height="110" width="40" x="1436" y="1262" as="geometry" />
         </mxCell>
         <mxCell id="es-track-103" parent="es-track-102" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AT" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-107" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Orçamento reaberto&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;volta para o diagnóstico&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-track-107" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Orçamento retirado" vertex="1">
           <mxGeometry height="100" width="160" x="1672" y="1200" as="geometry" />
         </mxCell>
         <mxCell id="es-track-108" parent="es-track-107" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -1844,10 +1844,10 @@
         <mxCell id="es-track-133" parent="es-track-132" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AT" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-136" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=13;fontStyle=2;fontColor=#555555;verticalAlign=top;" value="Também reabre o orçamento que ainda aguarda o cliente e o complementar. Também cancela em Recebida, Em diagnóstico e no complementar aguardando aprovação ou rejeitado." vertex="1">
+        <mxCell id="es-track-136" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=13;fontStyle=2;fontColor=#555555;verticalAlign=top;" value="Também retira o orçamento que ainda aguarda o cliente e o complementar. Também cancela em Recebida, Em diagnóstico, Aguardando aprovação e no complementar aguardando aprovação ou rejeitado." vertex="1">
           <mxGeometry height="150" width="300" x="1150" y="1680" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-137" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="OS cancelada&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;motivo obrigatório&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-track-137" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="OS cancelada" vertex="1">
           <mxGeometry height="100" width="160" x="1672" y="1520" as="geometry" />
         </mxCell>
         <mxCell id="es-track-138" parent="es-track-137" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -1865,7 +1865,7 @@
         <mxCell id="es-track-146" parent="es-track-145" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="CMD" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-149" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Peças devolvidas ao estoque&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;libera a reserva e devolve o que saiu&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-track-149" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Peças devolvidas ao estoque" vertex="1">
           <mxGeometry height="100" width="160" x="2164" y="1520" as="geometry" />
         </mxCell>
         <mxCell id="es-track-150" parent="es-track-149" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -1925,7 +1925,7 @@
         <mxCell id="es-track-174" parent="es-track-173" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AT" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-177" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Serviço iniciado&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;só item aprovado&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-track-177" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Serviço iniciado" vertex="1">
           <mxGeometry height="100" width="160" x="3680" y="680" as="geometry" />
         </mxCell>
         <mxCell id="es-track-178" parent="es-track-177" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -1937,8 +1937,8 @@
         <mxCell id="es-track-180" parent="es-track-179" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-183" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=13;fontStyle=2;fontColor=#555555;verticalAlign=top;" value="Orçamento complementar: durante a execução, a oficina muda os itens e pede uma nova aprovação ao cliente." vertex="1">
-          <mxGeometry height="60" width="440" x="3990" y="1010" as="geometry" />
+        <mxCell id="es-track-183" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=13;fontStyle=2;fontColor=#555555;verticalAlign=top;" value="Orçamento complementar: durante toda a execução, a oficina muda os itens e pede uma nova aprovação ao cliente. No envio, informa se dá para continuar sem as mudanças; se um item aprovado foi removido, não dá." vertex="1">
+          <mxGeometry height="60" width="440" x="3990" y="950" as="geometry" />
         </mxCell>
         <mxCell id="es-track-184" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" value="Inclui serviço ou peça" vertex="1">
           <mxGeometry height="100" width="160" x="3990" y="1240" as="geometry" />
@@ -1958,7 +1958,7 @@
         <mxCell id="es-track-189" parent="es-track-188" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AT" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-191" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Serviço ou peça incluído&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;pendente de aprovação do cliente&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-track-191" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Serviço ou peça incluído" vertex="1">
           <mxGeometry height="100" width="160" x="4200" y="1240" as="geometry" />
         </mxCell>
         <mxCell id="es-track-192" parent="es-track-191" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -1982,7 +1982,7 @@
         <mxCell id="es-track-198" parent="es-track-197" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AT" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-200" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Serviço ou peça removido&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;serviço concluído não sai&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-track-200" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Serviço ou peça removido" vertex="1">
           <mxGeometry height="100" width="160" x="4200" y="1560" as="geometry" />
         </mxCell>
         <mxCell id="es-track-201" parent="es-track-200" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -2084,7 +2084,7 @@
         <mxCell id="es-track-250" parent="es-track-249" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-251" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Só o original aprovado&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;itens novos removidos&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-track-251" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Só o original aprovado" vertex="1">
           <mxGeometry height="100" width="160" x="5240" y="1560" as="geometry" />
         </mxCell>
         <mxCell id="es-track-252" parent="es-track-251" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -2114,14 +2114,14 @@
         <mxCell id="es-track-264" parent="es-track-263" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AT" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-268" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Execução retomada&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;volta à execução dos serviços&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-track-268" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Execução retomada" vertex="1">
           <mxGeometry height="100" width="160" x="5760" y="1240" as="geometry" />
         </mxCell>
         <mxCell id="es-track-269" parent="es-track-268" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-271" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=13;fontStyle=2;fontColor=#555555;verticalAlign=top;" value="O complementar enviado, aprovado ou rejeitado dispara as mesmas políticas do orçamento inicial. A oficina também pode reabrir o complementar: a OS volta para a execução e a reserva é liberada. Do complementar rejeitado, a OS também pode ser cancelada." vertex="1">
-          <mxGeometry height="60" width="1900" x="3990" y="2060" as="geometry" />
+        <mxCell id="es-track-271" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=13;fontStyle=2;fontColor=#555555;verticalAlign=top;" value="O complementar enviado, aprovado ou rejeitado dispara as mesmas políticas do orçamento inicial; na aprovação, a baixa também devolve as peças que sobraram. Só o original aprovado também avisa o cliente e libera a reserva dos itens novos. A oficina também pode retirar o complementar: a OS volta para a execução e a reserva é liberada. Do complementar rejeitado, a OS também pode ser cancelada." vertex="1">
+          <mxGeometry height="60" width="1900" x="3990" y="2080" as="geometry" />
         </mxCell>
         <mxCell id="es-track-272" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" value="Conclui serviço" vertex="1">
           <mxGeometry height="100" width="160" x="6070" y="680" as="geometry" />
@@ -2141,7 +2141,7 @@
         <mxCell id="es-track-277" parent="es-track-276" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AT" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-281" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Serviço concluído&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;o último, sem mudança pendente, finaliza a OS&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-track-281" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Serviço concluído" vertex="1">
           <mxGeometry height="100" width="160" x="6280" y="680" as="geometry" />
         </mxCell>
         <mxCell id="es-track-282" parent="es-track-281" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -2154,19 +2154,19 @@
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
         <mxCell id="es-track-288" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" value="Finaliza OS" vertex="1">
-          <mxGeometry height="100" width="160" x="6590" y="680" as="geometry" />
+          <mxGeometry height="100" width="160" x="6590" y="1120" as="geometry" />
         </mxCell>
         <mxCell id="es-track-289" parent="es-track-288" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="CMD" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
         <mxCell id="es-track-290" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=12;spacingTop=14;fillColor=#8bc34a;strokeColor=#558b2f;" value="OS em execução" vertex="1">
-          <mxGeometry height="70" width="160" x="6590" y="560" as="geometry" />
+          <mxGeometry height="70" width="160" x="6590" y="1000" as="geometry" />
         </mxCell>
         <mxCell id="es-track-291" parent="es-track-290" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="ML" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
         <mxCell id="es-track-292" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Mecânico" vertex="1">
-          <mxGeometry height="110" width="40" x="6564" y="742" as="geometry" />
+          <mxGeometry height="110" width="40" x="6564" y="1182" as="geometry" />
         </mxCell>
         <mxCell id="es-track-293" parent="es-track-292" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AT" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
@@ -2178,16 +2178,10 @@
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
         <mxCell id="es-track-298" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Finalização recusada: serviço pendente ou mudança aguardando o cliente" vertex="1">
-          <mxGeometry height="100" width="160" x="6800" y="880" as="geometry" />
+          <mxGeometry height="100" width="160" x="6800" y="1260" as="geometry" />
         </mxCell>
         <mxCell id="es-track-299" parent="es-track-298" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
-        </mxCell>
-        <mxCell id="es-track-303" parent="1" style="rhombus;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;spacingLeft=14;spacingRight=14;spacingTop=16;fillColor=#f08080;strokeColor=#b85450;" value="Precisa de Finaliza OS, se o último serviço concluído já finaliza a OS?" vertex="1">
-          <mxGeometry height="150" width="150" x="6760" y="410" as="geometry" />
-        </mxCell>
-        <mxCell id="es-track-304" parent="es-track-303" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=0;spacingTop=1;connectable=0;" value="PA" vertex="1">
-          <mxGeometry height="18" width="40" x="55" y="10" as="geometry" />
         </mxCell>
         <mxCell id="es-track-308" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" value="Registra aviso ao cliente" vertex="1">
           <mxGeometry height="100" width="172" x="7070" y="520" as="geometry" />
@@ -2219,7 +2213,7 @@
         <mxCell id="es-track-324" parent="es-track-323" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="SE" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-325" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Envio do e-mail falhou&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;nova tentativa em 1 minuto, até 5 vezes&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-track-325" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Envio do e-mail falhou" vertex="1">
           <mxGeometry height="100" width="160" x="7784" y="320" as="geometry" />
         </mxCell>
         <mxCell id="es-track-326" parent="es-track-325" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -2243,7 +2237,7 @@
         <mxCell id="es-track-336" parent="es-track-335" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AT" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-339" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Veículo entregue&lt;br&gt;&lt;span style=&quot;font-size:9px&quot;&gt;&lt;i&gt;fim da OS&lt;/i&gt;&lt;/span&gt;" vertex="1">
+        <mxCell id="es-track-339" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Veículo entregue" vertex="1">
           <mxGeometry height="100" width="160" x="8520" y="680" as="geometry" />
         </mxCell>
         <mxCell id="es-track-340" parent="es-track-339" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -2258,14 +2252,8 @@
         <mxCell id="es-track-345" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontStyle=1;" value="2. Agregados e contextos delimitados" vertex="1">
           <mxGeometry height="34" width="900" x="40" y="2220" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-346" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=15;" value="Os mesmos comandos e eventos, agrupados pelo agregado que os trata, com as setas do fluxo. A caixa tracejada é o contexto delimitado." vertex="1">
+        <mxCell id="es-track-346" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=15;" value="Os mesmos comandos e eventos, agrupados pelo agregado que os trata, com as setas do fluxo. A caixa tracejada é o contexto delimitado. Aprovar e rejeitar o complementar usam as linhas de Aprova orçamento e Rejeita orçamento. Recusas e falhas ficam só na linha do tempo." vertex="1">
           <mxGeometry height="30" width="2400" x="40" y="2258" as="geometry" />
-        </mxCell>
-        <mxCell id="es-track-348" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Ordem de Serviço" vertex="1">
-          <mxGeometry height="2900" width="120" x="537" y="2360" as="geometry" />
-        </mxCell>
-        <mxCell id="es-track-349" parent="es-track-348" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AG" vertex="1">
-          <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
         <mxCell id="es-track-350" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=12;spacingTop=14;fillColor=#8bc34a;strokeColor=#558b2f;" value="Itens e total da OS" vertex="1">
           <mxGeometry height="100" width="150" x="140" y="2360" as="geometry" />
@@ -2375,13 +2363,13 @@
         <mxCell id="es-track-397" parent="es-track-396" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="CMD" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-398" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=10;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Administrador&lt;br&gt;ou atendente" vertex="1">
+        <mxCell id="es-track-398" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=10;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Atendente" vertex="1">
           <mxGeometry height="100" width="40" x="305" y="3188" as="geometry" />
         </mxCell>
         <mxCell id="es-track-399" parent="es-track-398" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AT" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-400" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Orçamento reaberto" vertex="1">
+        <mxCell id="es-track-400" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Orçamento retirado" vertex="1">
           <mxGeometry height="100" width="160" x="697" y="3160" as="geometry" />
         </mxCell>
         <mxCell id="es-track-401" parent="es-track-400" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -2627,12 +2615,6 @@
         <mxCell id="es-track-511" parent="es-track-510" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-533" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Peça, reserva e movimento" vertex="1">
-          <mxGeometry height="900" width="120" x="1377" y="2560" as="geometry" />
-        </mxCell>
-        <mxCell id="es-track-534" parent="es-track-533" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AG" vertex="1">
-          <mxGeometry height="18" width="44" as="geometry" />
-        </mxCell>
         <mxCell id="es-track-537" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" value="Baixa peças da OS" vertex="1">
           <mxGeometry height="100" width="170" x="1167" y="2560" as="geometry" />
         </mxCell>
@@ -2681,12 +2663,6 @@
         <mxCell id="es-track-570" parent="es-track-569" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-580" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Notificação por e-mail" vertex="1">
-          <mxGeometry height="300" width="120" x="1377" y="4960" as="geometry" />
-        </mxCell>
-        <mxCell id="es-track-581" parent="es-track-580" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AG" vertex="1">
-          <mxGeometry height="18" width="44" as="geometry" />
-        </mxCell>
         <mxCell id="es-track-584" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" value="Registra aviso ao cliente" vertex="1">
           <mxGeometry height="100" width="170" x="1167" y="4960" as="geometry" />
         </mxCell>
@@ -2717,7 +2693,7 @@
         <mxCell id="es-track-605" parent="es-track-604" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="SE" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-654" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;verticalAlign=top;" value="&lt;b&gt;Como ler&lt;/b&gt;&lt;br&gt;• Linha do tempo: o caminho feliz (linha cheia) é o cliente aprovando, as peças saindo do estoque, a execução, a finalização e a entrega. As tracejadas são os desvios: aprovação recusada por falta de peça, rejeição, reabertura, cancelamento, recusas na execução e o orçamento complementar. Todos voltam para o fluxo ou terminam num evento final.&lt;br&gt;• Embaixo do evento ficam a regra de negócio que o explica e para onde o fluxo segue.&lt;br&gt;• Cada política fica sobreposta entre o evento que a dispara e o comando que ela executa. Por isso Registra aviso ao cliente aparece uma vez por evento; o aviso da rejeição usa o mesmo envio de e-mails do aviso da aprovação.&lt;br&gt;• Cliente ou atendente: o cliente decide sozinho, sem login, com o CPF/CNPJ dele; o atendente decide por ele no balcão ou por telefone. A decisão do cliente fica no histórico sem usuário.&lt;br&gt;• O aviso ao cliente só registra o e-mail. O envio pelo servidor de e-mail (sistema externo) roda a cada 30 segundos, com novas tentativas quando falha, como em ES - Criação da OS.&lt;br&gt;• Eventos pivotais (barras pretas, cruzando a linha do tempo): Orçamento aprovado, quando a decisão volta para a oficina e as peças saem do estoque, e OS finalizada, quando o trabalho acaba e o cliente é chamado para retirar o veículo. A barra da execução fica logo antes de Inicia execução, depois das reações à aprovação; a da entrega fica logo depois de OS finalizada, atrás da política que sai dele.&lt;br&gt;• Agregados: cada bloco junta os comandos e os eventos de um agregado, dentro do seu contexto delimitado, com as setas do fluxo. Lá, o mesmo comando atende o orçamento inicial e o complementar. Libera reserva da OS aparece duas vezes, uma por política; os avisos da aprovação e da rejeição chegam ao mesmo Registra aviso ao cliente.&lt;br&gt;• Máquina de estados: as transições da OS entre os status.&lt;br&gt;• Vem de ES - Criação da OS, que termina no orçamento enviado para aprovação; a reabertura volta para lá até o novo envio." vertex="1">
+        <mxCell id="es-track-654" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;verticalAlign=top;" value="&lt;b&gt;Como ler&lt;/b&gt;&lt;br&gt;• Linha do tempo: o caminho feliz (linha cheia) é o cliente aprovando, as peças saindo do estoque, a execução, a finalização pelo último serviço concluído e a entrega. As tracejadas são os desvios: aprovação recusada por falta de peça, rejeição, reabertura, cancelamento, recusas na execução e o orçamento complementar. Todos voltam para o fluxo ou terminam num evento final.&lt;br&gt;• Cada política fica sobreposta entre o evento que a dispara e o comando que ela executa. Por isso Registra aviso ao cliente aparece uma vez por evento; o aviso da rejeição usa o mesmo envio de e-mails do aviso da aprovação.&lt;br&gt;• Cliente ou atendente: o cliente decide sozinho, sem login, com o CPF/CNPJ dele; o atendente decide por ele no balcão ou por telefone. A decisão do cliente fica no histórico sem usuário.&lt;br&gt;• O aviso ao cliente só registra o e-mail. O envio pelo servidor de e-mail (sistema externo) roda a cada 30 segundos, com novas tentativas quando falha, como em ES - Criação da OS.&lt;br&gt;• Eventos pivotais (barras pretas, cruzando a linha do tempo): Orçamento aprovado, quando a decisão volta para a oficina e as peças saem do estoque, e OS finalizada, quando o trabalho acaba e o cliente é chamado para retirar o veículo. A barra da execução fica logo antes de Inicia execução, depois das reações à aprovação; a da entrega fica logo depois de OS finalizada, atrás da política que sai dele.&lt;br&gt;• Agregados: cada bloco junta os comandos e os eventos de um agregado, dentro do seu contexto delimitado, com as setas do fluxo. Lá, o mesmo comando atende o orçamento inicial e o complementar. Libera reserva da OS aparece duas vezes, uma por política; os avisos da aprovação e da rejeição chegam ao mesmo Registra aviso ao cliente.&lt;br&gt;• Máquina de estados: as transições da OS entre os status.&lt;br&gt;• Vem de ES - Criação da OS, que termina no orçamento enviado para aprovação; a reabertura volta para lá até o novo envio." vertex="1">
           <mxGeometry height="300" width="2400" x="40" y="6110" as="geometry" />
         </mxCell>
         <mxCell id="es-track-31" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=12;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;" value="Quando o orçamento é aprovado, avisa o cliente" vertex="1">
@@ -2750,7 +2726,7 @@
         <mxCell id="es-track-90" parent="es-track-89" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="POL" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-110" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=12;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;" value="Quando o orçamento é reaberto, libera a reserva" vertex="1">
+        <mxCell id="es-track-110" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=12;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;" value="Quando o orçamento é retirado, libera a reserva" vertex="1">
           <mxGeometry height="110" width="150" x="1812" y="1260" as="geometry" />
         </mxCell>
         <mxCell id="es-track-111" parent="es-track-110" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="POL" vertex="1">
@@ -2786,7 +2762,7 @@
         <mxCell id="es-track-546" parent="es-track-545" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="POL" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-555" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=12;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;" value="Quando o orçamento é reaberto, libera a reserva" vertex="1">
+        <mxCell id="es-track-555" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=12;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;" value="Quando o orçamento é retirado, libera a reserva" vertex="1">
           <mxGeometry height="100" width="150" x="897" y="3160" as="geometry" />
         </mxCell>
         <mxCell id="es-track-556" parent="es-track-555" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="POL" vertex="1">
@@ -2842,7 +2818,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="es-track-30" edge="1" parent="1" source="es-track-11" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-28" value="">
+        <mxCell id="es-track-30" edge="1" parent="1" source="es-track-58" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-28" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="es-track-35" edge="1" parent="1" source="es-track-18" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.4;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="es-track-31" value="">
@@ -2932,7 +2908,7 @@
         <mxCell id="es-track-106" edge="1" parent="1" source="es-track-28" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" target="es-track-98" value="">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="1400" y="930" />
+              <mxPoint x="1400" y="920" />
               <mxPoint x="1400" y="1225" />
             </Array>
           </mxGeometry>
@@ -3044,16 +3020,8 @@
         <mxCell id="es-track-216" edge="1" parent="1" source="es-track-191" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-209" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-217" edge="1" parent="1" source="es-track-200" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.8;entryDx=0;entryDy=0;" target="es-track-209" value="">
+        <mxCell id="es-track-217" edge="1" parent="1" source="es-track-200" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" target="es-track-209" value="">
           <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="es-track-218" edge="1" parent="1" source="es-track-179" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" target="es-track-209" value="">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="4450" y="930" />
-              <mxPoint x="4450" y="1260" />
-            </Array>
-          </mxGeometry>
         </mxCell>
         <mxCell id="es-track-221" edge="1" parent="1" source="es-track-209" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-219" value="">
           <mxGeometry relative="1" as="geometry" />
@@ -3102,7 +3070,7 @@
         <mxCell id="es-track-266" edge="1" parent="1" source="es-track-249" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-259" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-267" edge="1" parent="1" source="es-track-251" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.8;entryDx=0;entryDy=0;" target="es-track-259" value="">
+        <mxCell id="es-track-267" edge="1" parent="1" source="es-track-251" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" target="es-track-259" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="es-track-270" edge="1" parent="1" source="es-track-259" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-268" value="">
@@ -3123,35 +3091,16 @@
         <mxCell id="es-track-286" edge="1" parent="1" source="es-track-272" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-283" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-287" edge="1" parent="1" source="es-track-283" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" target="es-track-169" value="">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="6360" y="1050" />
-              <mxPoint x="3590" y="1050" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
         <mxCell id="es-track-294" edge="1" parent="1" source="es-track-290" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="es-track-288" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-295" edge="1" parent="1" source="es-track-281" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-288" value="">
+        <mxCell id="es-track-295" edge="1" parent="1" source="es-track-281" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" target="es-track-288" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-300" edge="1" parent="1" source="es-track-288" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-296" value="">
+        <mxCell id="es-track-300" edge="1" parent="1" source="es-track-704" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-296" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="es-track-301" edge="1" parent="1" source="es-track-288" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-298" value="">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="es-track-302" edge="1" parent="1" source="es-track-298" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" target="es-track-272" value="">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="6880" y="1100" />
-              <mxPoint x="6190" y="1100" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="es-track-305" edge="1" parent="1" source="es-track-303" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.3;entryY=0;entryDx=0;entryDy=0;" target="es-track-296" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="es-track-310" edge="1" parent="1" source="es-track-296" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#333333;exitX=1;exitY=0.4;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="es-track-306" value="">
@@ -3373,10 +3322,10 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="es-track-520" edge="1" parent="1" source="es-track-488" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="es-track-495" value="">
+        <mxCell id="es-track-520" edge="1" parent="1" source="es-track-720" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="es-track-495" value="">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="777" y="4920" />
+              <mxPoint x="972" y="4920" />
               <mxPoint x="417" y="4920" />
             </Array>
           </mxGeometry>
@@ -3495,10 +3444,10 @@
         <mxCell id="es-track-542" edge="1" parent="1" source="es-track-535" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.8;entryDx=0;entryDy=0;" target="es-track-537" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-543" edge="1" parent="1" source="es-track-537" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.0556;entryDx=0;entryDy=0;" target="es-track-533" value="">
+        <mxCell id="es-track-543" edge="1" parent="1" source="es-track-537" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-533" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-544" edge="1" parent="1" source="es-track-533" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.0556;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-539" value="">
+        <mxCell id="es-track-544" edge="1" parent="1" source="es-track-533" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-539" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="es-track-551" edge="1" parent="1" source="es-track-389" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-545" value="">
@@ -3507,10 +3456,10 @@
         <mxCell id="es-track-552" edge="1" parent="1" source="es-track-545" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.8;entryDx=0;entryDy=0;" target="es-track-547" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-553" edge="1" parent="1" source="es-track-547" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-533" value="">
+        <mxCell id="es-track-553" edge="1" parent="1" source="es-track-547" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.1667;entryDx=0;entryDy=0;" target="es-track-agr-res" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-554" edge="1" parent="1" source="es-track-533" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-549" value="">
+        <mxCell id="es-track-554" edge="1" parent="1" source="es-track-agr-res" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.1667;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-549" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="es-track-561" edge="1" parent="1" source="es-track-400" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-555" value="">
@@ -3519,10 +3468,10 @@
         <mxCell id="es-track-562" edge="1" parent="1" source="es-track-555" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-557" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-563" edge="1" parent="1" source="es-track-557" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.7222;entryDx=0;entryDy=0;" target="es-track-533" value="">
+        <mxCell id="es-track-563" edge="1" parent="1" source="es-track-557" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.8333;entryDx=0;entryDy=0;" target="es-track-agr-res" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-564" edge="1" parent="1" source="es-track-533" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.7222;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-559" value="">
+        <mxCell id="es-track-564" edge="1" parent="1" source="es-track-agr-res" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.8333;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-559" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="es-track-571" edge="1" parent="1" source="es-track-411" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-565" value="">
@@ -3531,10 +3480,10 @@
         <mxCell id="es-track-572" edge="1" parent="1" source="es-track-565" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-567" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-573" edge="1" parent="1" source="es-track-567" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.9444;entryDx=0;entryDy=0;" target="es-track-533" value="">
+        <mxCell id="es-track-573" edge="1" parent="1" source="es-track-567" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-agr-pec" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="es-track-574" edge="1" parent="1" source="es-track-533" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.9444;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-569" value="">
+        <mxCell id="es-track-574" edge="1" parent="1" source="es-track-agr-pec" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-569" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="es-track-575" edge="1" parent="1" source="es-track-539" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.6;entryY=0;entryDx=0;entryDy=0;" target="es-track-418" value="">
@@ -3767,6 +3716,267 @@
         </mxCell>
         <mxCell id="es-track-653" edge="1" parent="1" source="es-track-628" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#ffffff;fontSize=11;" target="es-track-629" value="">
           <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-702" edge="1" parent="1" source="es-track-281" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#333333;exitX=0.75;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-701" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-703" edge="1" parent="1" source="es-track-701" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" target="es-track-704" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-704" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#26c6da;strokeColor=#0097a7;" value="Finaliza OS" vertex="1">
+          <mxGeometry height="100" width="160" x="6590" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-704-l" parent="es-track-704" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="CMD" vertex="1">
+          <mxGeometry height="18" width="44" x="10" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-701" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=12;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;" value="Quando o último serviço é concluído, sem mudança pendente, finaliza a OS" vertex="1">
+          <mxGeometry height="115" width="170" x="6430" y="590" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-701-l" parent="es-track-701" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="POL" vertex="1">
+          <mxGeometry height="18" width="44" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-705" edge="1" parent="1" source="es-track-288" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" target="es-track-296" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-706" edge="1" parent="1" source="es-track-268" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;dashed=1;" target="es-track-288" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-707" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=13;fontStyle=2;fontColor=#555555;verticalAlign=top;" value="Finaliza OS pelo mecânico: OS só com peças, ou quando não sobra serviço para concluir depois que a mudança é resolvida." vertex="1">
+          <mxGeometry height="60" width="370" x="6590" y="1440" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-708" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Orçamento reaberto" vertex="1">
+          <mxGeometry height="100" width="160" x="1672" y="1040" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-708-l" parent="es-track-708" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
+          <mxGeometry height="18" width="44" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-709" edge="1" parent="1" source="es-track-98" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.15;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-708" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-710" edge="1" parent="1" source="es-track-708" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" target="es-track-119" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2420" y="1090" />
+              <mxPoint x="2420" y="1225" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-track-711" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Inclusão recusada: peça sem disponível ou serviço inativo" vertex="1">
+          <mxGeometry height="100" width="160" x="4200" y="1400" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-711-l" parent="es-track-711" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
+          <mxGeometry height="18" width="44" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-711e" edge="1" parent="1" source="es-track-184" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-711" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-712" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Complementar não enviado: sem mudanças, ou só o original não é possível" vertex="1">
+          <mxGeometry height="100" width="160" x="4720" y="1450" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-712-l" parent="es-track-712" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
+          <mxGeometry height="18" width="44" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-712e" edge="1" parent="1" source="es-track-209" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-712" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-713" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Aprovação recusada: peça sem saldo" vertex="1">
+          <mxGeometry height="100" width="160" x="5240" y="1430" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-713-l" parent="es-track-713" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
+          <mxGeometry height="18" width="44" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-713e" edge="1" parent="1" source="es-track-225" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-713" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-714" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Só o original recusado: a oficina não permitiu" vertex="1">
+          <mxGeometry height="100" width="160" x="5240" y="1720" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-714-l" parent="es-track-714" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
+          <mxGeometry height="18" width="44" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-714e" edge="1" parent="1" source="es-track-232" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-714" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-715" parent="1" style="rhombus;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;spacingLeft=14;spacingRight=14;spacingTop=16;fillColor=#f08080;strokeColor=#b85450;" value="A entrega depende de o cliente ter sido avisado de que o veículo está pronto?" vertex="1">
+          <mxGeometry height="150" width="150" x="8525" y="850" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-715-l" parent="es-track-715" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=0;spacingTop=1;connectable=0;" value="PA" vertex="1">
+          <mxGeometry height="18" width="40" x="55" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-715e" edge="1" parent="1" source="es-track-715" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="es-track-339" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-716" parent="1" style="rhombus;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;spacingLeft=14;spacingRight=14;spacingTop=16;fillColor=#f08080;strokeColor=#b85450;" value="Se o aviso de veículo pronto falhar em todas as tentativas, quem avisa o cliente?" vertex="1">
+          <mxGeometry height="150" width="150" x="7990" y="295" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-716-l" parent="es-track-716" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=0;spacingTop=1;connectable=0;" value="PA" vertex="1">
+          <mxGeometry height="18" width="40" x="55" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-716e" edge="1" parent="1" source="es-track-716" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-325" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-717" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Orçamento reaberto" vertex="1">
+          <mxGeometry height="60" width="160" x="697" y="3268" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-717-l" parent="es-track-717" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
+          <mxGeometry height="18" width="44" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-718" edge="1" parent="1" source="es-track-348" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.3234;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-717" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-719" edge="1" parent="1" source="es-track-717" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.6;entryY=0;entryDx=0;entryDy=0;" target="es-track-352" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1770" y="3298" />
+              <mxPoint x="1770" y="2340" />
+              <mxPoint x="433" y="2340" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-track-720" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=12;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;" value="Quando o último serviço é concluído, sem mudança pendente, finaliza a OS" vertex="1">
+          <mxGeometry height="100" width="150" x="897" y="4760" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-720-l" parent="es-track-720" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="POL" vertex="1">
+          <mxGeometry height="18" width="44" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-721" edge="1" parent="1" source="es-track-488" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-720" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-730" edge="1" parent="1" source="es-track-179" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.2;entryDx=0;entryDy=0;" target="es-track-209" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="4450" y="930" />
+              <mxPoint x="4450" y="1260" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-track-731" edge="1" parent="1" source="es-track-283" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" target="es-track-169" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="6360" y="1050" />
+              <mxPoint x="3590" y="1050" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-track-732" edge="1" parent="1" source="es-track-298" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" target="es-track-272" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="6880" y="1420" />
+              <mxPoint x="6190" y="1420" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-track-733" edge="1" parent="1" source="es-track-298" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" target="es-track-209" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="6880" y="1420" />
+              <mxPoint x="4630" y="1420" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-track-734" edge="1" parent="1" source="es-track-253" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" target="es-track-184" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="5320" y="2060" />
+              <mxPoint x="3950" y="2060" />
+              <mxPoint x="3950" y="1265" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-track-735" edge="1" parent="1" source="es-track-253" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=2;strokeColor=#8B2A2A;dashed=1;exitX=0.62;exitY=0.972;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;exitPerimeter=0;" target="es-track-193" value="">
+          <mxGeometry relative="1" x="-0.0056" as="geometry">
+            <Array as="points">
+              <mxPoint x="5341.6" y="1977.2" />
+              <mxPoint x="5341.6" y="1980" />
+              <mxPoint x="5340" y="1980" />
+              <mxPoint x="5340" y="2070" />
+              <mxPoint x="3930" y="2070" />
+              <mxPoint x="3930" y="1585" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-track-736" parent="1" style="rhombus;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=11;spacingLeft=14;spacingRight=14;spacingTop=16;fillColor=#f08080;strokeColor=#b85450;" value="Se o cliente rejeita o complementar, o serviço original pode continuar sem nova aprovação?" vertex="1">
+          <mxGeometry height="150" width="150" x="5440" y="1855" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-736-l" parent="es-track-736" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=0;spacingTop=1;connectable=0;" value="PA" vertex="1">
+          <mxGeometry height="18" width="40" x="55" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-737" edge="1" parent="1" source="es-track-736" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-253" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-740" edge="1" parent="1" source="es-track-389" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0.2;exitY=1;exitDx=0;exitDy=0;entryX=0.6;entryY=0;entryDx=0;entryDy=0;" target="es-track-440" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="729" y="3100" />
+              <mxPoint x="100" y="3100" />
+              <mxPoint x="100" y="3940" />
+              <mxPoint x="433" y="3940" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-track-741" edge="1" parent="1" source="es-track-389" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0.2;exitY=1;exitDx=0;exitDy=0;entryX=0.6;entryY=0;entryDx=0;entryDy=0;" target="es-track-451" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="729" y="3100" />
+              <mxPoint x="100" y="3100" />
+              <mxPoint x="100" y="4140" />
+              <mxPoint x="433" y="4140" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-track-742" edge="1" parent="1" source="es-track-488" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="es-track-495" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="777" y="4920" />
+              <mxPoint x="417" y="4920" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-track-743" edge="1" parent="1" source="es-track-477" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=0.2;exitY=1;exitDx=0;exitDy=0;entryX=0.6;entryY=0;entryDx=0;entryDy=0;" target="es-track-495" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="729" y="4700" />
+              <mxPoint x="130" y="4700" />
+              <mxPoint x="130" y="4940" />
+              <mxPoint x="433" y="4940" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="es-track-744" edge="1" parent="1" source="es-track-378" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-535" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-745" edge="1" parent="1" source="es-track-378" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;endFill=1;jumpStyle=arc;jumpSize=10;strokeWidth=1.5;strokeColor=#333333;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="es-track-588" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-348" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Ordem de Serviço" vertex="1">
+          <mxGeometry height="2900" width="120" x="537" y="2360" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-349" parent="es-track-348" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AG" vertex="1">
+          <mxGeometry height="18" width="44" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-533" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Peça ou insumo" vertex="1">
+          <mxGeometry height="100" width="120" x="1377" y="2560" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-534" parent="es-track-533" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AG" vertex="1">
+          <mxGeometry height="18" width="44" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-580" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Notificação por e-mail" vertex="1">
+          <mxGeometry height="300" width="120" x="1377" y="4960" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-581" parent="es-track-580" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AG" vertex="1">
+          <mxGeometry height="18" width="44" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-agr-res" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Reserva" vertex="1">
+          <mxGeometry height="300" width="120" x="1377" y="2960" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-agr-res-l" parent="es-track-agr-res" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AG" vertex="1">
+          <mxGeometry height="18" width="44" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-agr-pec" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=16;fontStyle=1;spacingTop=14;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Peça ou insumo" vertex="1">
+          <mxGeometry height="100" width="120" x="1377" y="3360" as="geometry" />
+        </mxCell>
+        <mxCell id="es-track-agr-pec-l" parent="es-track-agr-pec" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AG" vertex="1">
+          <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
