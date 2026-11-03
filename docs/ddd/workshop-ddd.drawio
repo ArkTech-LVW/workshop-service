@@ -4930,7 +4930,7 @@
         <mxCell id="es-stock-62" parent="es-stock-61" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-64" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Orçamento reaberto" vertex="1">
+        <mxCell id="es-stock-64" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Orçamento retirado" vertex="1">
           <mxGeometry height="100" width="160" x="942" y="1420" as="geometry" />
         </mxCell>
         <mxCell id="es-stock-65" parent="es-stock-64" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -5089,13 +5089,13 @@
         <mxCell id="es-stock-153" parent="es-stock-152" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="CMD" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-154" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=10;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Administrador&lt;br&gt;ou atendente" vertex="1">
+        <mxCell id="es-stock-154" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=10;horizontal=0;spacingRight=0;spacingLeft=0;spacingBottom=0;spacingTop=0;fillColor=#fff9b1;strokeColor=#b8a93a;" value="Atendente" vertex="1">
           <mxGeometry height="100" width="40" x="305" y="3108" as="geometry" />
         </mxCell>
         <mxCell id="es-stock-155" parent="es-stock-154" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="AT" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-156" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Orçamento reaberto" vertex="1">
+        <mxCell id="es-stock-156" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=13;spacingTop=14;fillColor=#f5a623;strokeColor=#b97a00;" value="Orçamento retirado" vertex="1">
           <mxGeometry height="100" width="160" x="697" y="3080" as="geometry" />
         </mxCell>
         <mxCell id="es-stock-157" parent="es-stock-156" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="EV" vertex="1">
@@ -5224,7 +5224,7 @@
         <mxCell id="es-stock-56" parent="es-stock-55" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="POL" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-67" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=12;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;" value="Quando o orçamento é reaberto, libera a reserva" vertex="1">
+        <mxCell id="es-stock-67" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=12;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;" value="Quando o orçamento é retirado, libera a reserva" vertex="1">
           <mxGeometry height="110" width="150" x="1082" y="1492" as="geometry" />
         </mxCell>
         <mxCell id="es-stock-68" parent="es-stock-67" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="POL" vertex="1">
@@ -5254,7 +5254,7 @@
         <mxCell id="es-stock-148" parent="es-stock-147" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="POL" vertex="1">
           <mxGeometry height="18" width="44" as="geometry" />
         </mxCell>
-        <mxCell id="es-stock-161" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=12;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;" value="Quando o orçamento é reaberto, libera a reserva" vertex="1">
+        <mxCell id="es-stock-161" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fontSize=12;spacingTop=14;fillColor=#c77dd9;strokeColor=#8e44ad;" value="Quando o orçamento é retirado, libera a reserva" vertex="1">
           <mxGeometry height="100" width="150" x="897" y="3080" as="geometry" />
         </mxCell>
         <mxCell id="es-stock-162" parent="es-stock-161" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontStyle=1;spacingLeft=4;spacingTop=1;connectable=0;" value="POL" vertex="1">
