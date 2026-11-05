@@ -1,5 +1,6 @@
 package br.com.arktech.workshop.serviceorder.api.serviceorder;
 
+import static br.com.arktech.workshop.TestUsers.bearer;
 import static br.com.arktech.workshop.UniqueTestData.uniqueCPF;
 import static br.com.arktech.workshop.UniqueTestData.uniquePlate;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -10,12 +11,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import br.com.arktech.workshop.IntegrationTest;
-import br.com.arktech.workshop.auth.application.port.TokenIssuer;
-import br.com.arktech.workshop.auth.domain.model.User;
-import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
-import br.com.arktech.workshop.auth.domain.repository.UserRepository;
+import br.com.arktech.workshop.TestUsers;
 import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
-import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
 import com.jayway.jsonpath.JsonPath;
@@ -23,20 +20,17 @@ import com.jayway.jsonpath.JsonPath;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
@@ -50,16 +44,10 @@ class QuoteWithdrawalIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private TokenIssuer tokenIssuer;
+    private TestUsers testUsers;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordHasher passwordHasher;
 
     private Long userId;
 
@@ -69,17 +57,11 @@ class QuoteWithdrawalIntegrationTest {
 
     @BeforeEach
     void openAServiceOrder() throws Exception {
-        long suffix = ThreadLocalRandom.current().nextLong(1_000_000_000L);
-        userId = userRepository
-                .save(new User(
-                        "Administrador",
-                        new Email("admin-%d@workshop.com".formatted(suffix)),
-                        "secret",
-                        Set.of(Role.ADMIN),
-                        passwordHasher))
-                .getId();
+        userId = testUsers.save(Role.ADMIN).getId();
         serviceOrderId = openServiceOrder();
-        as(post("/admin/serviceOrders/{id}/startDiagnosis", serviceOrderId)).andExpect(status().isOk());
+        mockMvc.perform(post("/admin/serviceOrders/{id}/startDiagnosis", serviceOrderId)
+                        .with(bearer(userId, Role.ADMIN)))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -89,11 +71,12 @@ class QuoteWithdrawalIntegrationTest {
         Long missingItemId = addPart(missing, 3);
         sendQuote().andExpect(status().isOk());
 
-        as(post("/admin/serviceOrders/{id}/reopenQuote", serviceOrderId)
+        mockMvc.perform(post("/admin/serviceOrders/{id}/reopenQuote", serviceOrderId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"description": "Peça em falta, trocar pela similar"}
-                                """))
+                                """)
+                        .with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("IN_DIAGNOSIS"));
 
@@ -103,7 +86,8 @@ class QuoteWithdrawalIntegrationTest {
                 .containsEntry("to_status", "IN_DIAGNOSIS")
                 .containsEntry("description", "Peça em falta, trocar pela similar");
 
-        as(delete("/admin/serviceOrders/{id}/parts/{itemId}", serviceOrderId, missingItemId))
+        mockMvc.perform(delete("/admin/serviceOrders/{id}/parts/{itemId}", serviceOrderId, missingItemId)
+                        .with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isNoContent());
         addPart(similar, 3);
         sendQuote().andExpect(status().isOk());
@@ -120,30 +104,36 @@ class QuoteWithdrawalIntegrationTest {
         Long serviceItemId = addService();
         addPart(pad, 2);
         sendQuote().andExpect(status().isOk());
-        as(post("/admin/serviceOrders/{id}/approve", serviceOrderId)).andExpect(status().isOk());
-        as(post("/admin/serviceOrders/{id}/startExecution", serviceOrderId)).andExpect(status().isOk());
+        mockMvc.perform(post("/admin/serviceOrders/{id}/approve", serviceOrderId).with(bearer(userId, Role.ADMIN)))
+                .andExpect(status().isOk());
+        mockMvc.perform(post("/admin/serviceOrders/{id}/startExecution", serviceOrderId)
+                        .with(bearer(userId, Role.ADMIN)))
+                .andExpect(status().isOk());
         addPart(filter, 1);
-        as(post("/admin/serviceOrders/{id}/sendQuote", serviceOrderId)
+        mockMvc.perform(post("/admin/serviceOrders/{id}/sendQuote", serviceOrderId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"canProceedWithoutChanges": true}
-                                """))
+                                """)
+                        .with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isOk());
 
-        as(post("/admin/serviceOrders/{id}/reopenQuote", serviceOrderId))
+        mockMvc.perform(post("/admin/serviceOrders/{id}/reopenQuote", serviceOrderId).with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("IN_PROGRESS"))
                 .andExpect(jsonPath("$.canProceedWithoutChanges").doesNotExist());
 
         assertThat(reservedOf(filter)).isZero();
         assertThat(stockOf(pad)).isEqualTo(8);
-        as(post("/admin/serviceOrders/{id}/services/{itemId}/start", serviceOrderId, serviceItemId))
+        mockMvc.perform(post("/admin/serviceOrders/{id}/services/{itemId}/start", serviceOrderId, serviceItemId)
+                        .with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("IN_PROGRESS"));
-        as(post("/admin/serviceOrders/{id}/services/{itemId}/complete", serviceOrderId, serviceItemId))
+        mockMvc.perform(post("/admin/serviceOrders/{id}/services/{itemId}/complete", serviceOrderId, serviceItemId)
+                        .with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("IN_PROGRESS"));
-        as(post("/admin/serviceOrders/{id}/complete", serviceOrderId))
+        mockMvc.perform(post("/admin/serviceOrders/{id}/complete", serviceOrderId).with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("serviceOrder.quoteChangesPendingApproval"));
     }
@@ -162,8 +152,8 @@ class QuoteWithdrawalIntegrationTest {
             List<Future<Integer>> results = List.of(
                     executor.submit(statusOf(start, post("/customer/serviceOrders/{publicId}/approve", publicId)
                             .header("X-Customer-Document", customerDocument.value()))),
-                    executor.submit(statusOf(start, authenticated(
-                            post("/admin/serviceOrders/{id}/reopenQuote", serviceOrderId)))));
+                    executor.submit(statusOf(start, post("/admin/serviceOrders/{id}/reopenQuote", serviceOrderId)
+                            .with(bearer(userId, Role.ADMIN)))));
             start.countDown();
             for (Future<Integer> result : results) {
                 statuses.add(result.get(30, TimeUnit.SECONDS));
@@ -186,68 +176,72 @@ class QuoteWithdrawalIntegrationTest {
     }
 
     private ResultActions sendQuote() throws Exception {
-        return as(post("/admin/serviceOrders/{id}/sendQuote", serviceOrderId));
+        return mockMvc.perform(post("/admin/serviceOrders/{id}/sendQuote", serviceOrderId)
+                        .with(bearer(userId, Role.ADMIN)));
     }
 
     private Long addPart(Long partId, int quantity) throws Exception {
-        return idOf(as(post("/admin/serviceOrders/{id}/parts", serviceOrderId)
+        return idOf(mockMvc.perform(post("/admin/serviceOrders/{id}/parts", serviceOrderId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"partId": %d, "quantity": %d}
-                                """.formatted(partId, quantity)))
+                                """.formatted(partId, quantity))
+                        .with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isCreated()));
     }
 
     private Long addService() throws Exception {
-        String body = as(post("/admin/services").contentType(MediaType.APPLICATION_JSON).content("""
+        String body = mockMvc.perform(post("/admin/services").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Troca de pastilhas", "laborPrice": 150, "estimatedMinutes": 60}
-                        """))
+                        """).with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
         Long serviceOfferingId = ((Number) JsonPath.read(body, "$.id")).longValue();
-        return idOf(as(post("/admin/serviceOrders/{id}/services", serviceOrderId)
+        return idOf(mockMvc.perform(post("/admin/serviceOrders/{id}/services", serviceOrderId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"serviceOfferingId": %d, "quantity": 1}
-                                """.formatted(serviceOfferingId)))
+                                """.formatted(serviceOfferingId))
+                        .with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isCreated()));
     }
 
     private Long createPart(int stockQuantity) throws Exception {
         String sku = "WD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-        Long partId = idOf(as(post("/admin/parts").contentType(MediaType.APPLICATION_JSON).content("""
+        Long partId = idOf(mockMvc.perform(post("/admin/parts").contentType(MediaType.APPLICATION_JSON).content("""
                         {"sku": "%s", "name": "Filtro de óleo", "type": "PART", "unit": "UNIT", "salePrice": 32,
                          "minimumStock": 1}
-                        """.formatted(sku)))
+                        """.formatted(sku)).with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isCreated()));
-        as(post("/admin/parts/{id}/stockMovements", partId)
+        mockMvc.perform(post("/admin/parts/{id}/stockMovements", partId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"type": "IN", "quantity": %d}
-                                """.formatted(stockQuantity)))
+                                """.formatted(stockQuantity))
+                        .with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isCreated());
         return partId;
     }
 
     private Long openServiceOrder() throws Exception {
         customerDocument = uniqueCPF();
-        as(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
+        mockMvc.perform(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Ana", "document": "%s", "email": "ana@email.com"}
-                        """.formatted(customerDocument.value())))
+                        """.formatted(customerDocument.value())).with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isCreated());
-        return idOf(as(post("/admin/serviceOrders").contentType(MediaType.APPLICATION_JSON).content("""
+        return idOf(mockMvc.perform(post("/admin/serviceOrders").contentType(MediaType.APPLICATION_JSON).content("""
                         {"customerDocument": "%s",
                          "vehicle": {"licensePlate": "%s", "brand": "Volkswagen", "model": "Gol", "year": 2020,
                                      "color": "Prata"},
                          "problemDescription": "Barulho ao frear"}
-                        """.formatted(customerDocument.value(), uniquePlate())))
+                        """.formatted(customerDocument.value(), uniquePlate())).with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isCreated()));
     }
 
     private int reservedOf(Long partId) throws Exception {
-        String body = as(get("/admin/parts/{id}", partId))
+        String body = mockMvc.perform(get("/admin/parts/{id}", partId).with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -276,14 +270,5 @@ class QuoteWithdrawalIntegrationTest {
     private static Long idOf(ResultActions result) throws Exception {
         String body = result.andReturn().getResponse().getContentAsString();
         return ((Number) JsonPath.read(body, "$.id")).longValue();
-    }
-
-    private ResultActions as(MockHttpServletRequestBuilder request) throws Exception {
-        return mockMvc.perform(authenticated(request));
-    }
-
-    private MockHttpServletRequestBuilder authenticated(MockHttpServletRequestBuilder request) {
-        String token = tokenIssuer.issue(userId, Set.of(Role.ADMIN)).value();
-        return request.header(HttpHeaders.AUTHORIZATION, "Bearer " + token);
     }
 }

@@ -1,5 +1,6 @@
 package br.com.arktech.workshop.serviceorder.api.serviceorder;
 
+import static br.com.arktech.workshop.TestUsers.bearer;
 import static br.com.arktech.workshop.UniqueTestData.uniqueCPF;
 import static br.com.arktech.workshop.UniqueTestData.uniquePlate;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -8,30 +9,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import br.com.arktech.workshop.IntegrationTest;
-import br.com.arktech.workshop.auth.application.port.TokenIssuer;
-import br.com.arktech.workshop.auth.domain.model.User;
-import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
-import br.com.arktech.workshop.auth.domain.repository.UserRepository;
+import br.com.arktech.workshop.TestUsers;
 import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrderStatus;
-import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
 import com.jayway.jsonpath.JsonPath;
 
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 @IntegrationTest
@@ -43,26 +36,16 @@ class CancelServiceOrderIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private TokenIssuer tokenIssuer;
+    private TestUsers testUsers;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordHasher passwordHasher;
 
     private Long userId;
 
     @BeforeEach
     void saveTheUserBehindTheTokens() {
-        long suffix = ThreadLocalRandom.current().nextLong(1_000_000_000L);
-        Email email = new Email("atendente-%d@workshop.com".formatted(suffix));
-        userId = userRepository
-                .save(new User("Atendente", email, "secret", Set.of(Role.ATTENDANT), passwordHasher))
-                .getId();
+        userId = testUsers.save(Role.ATTENDANT).getId();
     }
 
     @Test
@@ -75,7 +58,7 @@ class CancelServiceOrderIntegrationTest {
         Long serviceOrderId = openServiceOrder();
 
         mockMvc.perform(cancelRequest(serviceOrderId, REASON)
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenFor(Role.MECHANIC)))
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("auth.accessDenied"));
 
@@ -89,7 +72,7 @@ class CancelServiceOrderIntegrationTest {
     void shouldCancelRecordingTheReasonAndWhoCanceled(ServiceOrderStatus current) throws Exception {
         Long serviceOrderId = openServiceOrderIn(current);
 
-        asAttendant(cancelRequest(serviceOrderId, REASON))
+        mockMvc.perform(cancelRequest(serviceOrderId, REASON).with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(serviceOrderId))
                 .andExpect(jsonPath("$.status").value("CANCELED"));
@@ -109,7 +92,7 @@ class CancelServiceOrderIntegrationTest {
     void shouldRefuseToCancelAfterTheQuoteIsApprovedOrTwice(ServiceOrderStatus current) throws Exception {
         Long serviceOrderId = openServiceOrderIn(current);
 
-        asAttendant(cancelRequest(serviceOrderId, REASON))
+        mockMvc.perform(cancelRequest(serviceOrderId, REASON).with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("serviceOrder.invalidStatusTransition"));
 
@@ -121,7 +104,7 @@ class CancelServiceOrderIntegrationTest {
     void shouldRequireAReasonWithoutChangingTheServiceOrder() throws Exception {
         Long serviceOrderId = openServiceOrder();
 
-        asAttendant(cancelRequest(serviceOrderId, " "))
+        mockMvc.perform(cancelRequest(serviceOrderId, " ").with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.details[0].field").value("reason"));
 
@@ -131,7 +114,7 @@ class CancelServiceOrderIntegrationTest {
 
     @Test
     void shouldAnswer404ForAnUnknownServiceOrder() throws Exception {
-        asAttendant(cancelRequest(Long.MAX_VALUE, REASON))
+        mockMvc.perform(cancelRequest(Long.MAX_VALUE, REASON).with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("serviceOrder.notFound"));
     }
@@ -144,16 +127,16 @@ class CancelServiceOrderIntegrationTest {
 
     private Long openServiceOrder() throws Exception {
         String document = uniqueCPF().value();
-        asAdmin(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
+        mockMvc.perform(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Ana", "document": "%s", "email": "ana@email.com"}
-                        """.formatted(document)))
+                        """.formatted(document)).with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isCreated());
-        String body = asAdmin(post("/admin/serviceOrders").contentType(MediaType.APPLICATION_JSON).content("""
+        String body = mockMvc.perform(post("/admin/serviceOrders").contentType(MediaType.APPLICATION_JSON).content("""
                         {"customerDocument": "%s",
                          "vehicle": {"licensePlate": "%s", "brand": "Volkswagen", "model": "Gol", "year": 2020,
                                      "color": "Prata"},
                          "problemDescription": "Barulho ao frear"}
-                        """.formatted(document, uniquePlate())))
+                        """.formatted(document, uniquePlate())).with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
@@ -186,17 +169,5 @@ class CancelServiceOrderIntegrationTest {
                 .content("""
                         {"reason": "%s"}
                         """.formatted(reason));
-    }
-
-    private ResultActions asAdmin(MockHttpServletRequestBuilder request) throws Exception {
-        return mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenFor(Role.ADMIN)));
-    }
-
-    private ResultActions asAttendant(MockHttpServletRequestBuilder request) throws Exception {
-        return mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenFor(Role.ATTENDANT)));
-    }
-
-    private String tokenFor(Role... roles) {
-        return tokenIssuer.issue(userId, Set.of(roles)).value();
     }
 }

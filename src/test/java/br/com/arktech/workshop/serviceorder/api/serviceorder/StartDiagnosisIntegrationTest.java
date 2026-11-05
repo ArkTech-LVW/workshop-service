@@ -1,5 +1,6 @@
 package br.com.arktech.workshop.serviceorder.api.serviceorder;
 
+import static br.com.arktech.workshop.TestUsers.bearer;
 import static br.com.arktech.workshop.UniqueTestData.uniqueCPF;
 import static br.com.arktech.workshop.UniqueTestData.uniquePlate;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -8,28 +9,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import br.com.arktech.workshop.IntegrationTest;
-import br.com.arktech.workshop.auth.application.port.TokenIssuer;
-import br.com.arktech.workshop.auth.domain.model.User;
-import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
-import br.com.arktech.workshop.auth.domain.repository.UserRepository;
+import br.com.arktech.workshop.TestUsers;
 import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
-import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
 import com.jayway.jsonpath.JsonPath;
 
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 @IntegrationTest
@@ -39,16 +32,10 @@ class StartDiagnosisIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private TokenIssuer tokenIssuer;
+    private TestUsers testUsers;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordHasher passwordHasher;
 
     private Long userId;
 
@@ -56,15 +43,7 @@ class StartDiagnosisIntegrationTest {
 
     @BeforeEach
     void openAServiceOrder() throws Exception {
-        long suffix = ThreadLocalRandom.current().nextLong(1_000_000_000L);
-        userId = userRepository
-                .save(new User(
-                        "Mecânico",
-                        new Email("mecanico-%d@workshop.com".formatted(suffix)),
-                        "secret",
-                        Set.of(Role.MECHANIC),
-                        passwordHasher))
-                .getId();
+        userId = testUsers.save(Role.MECHANIC).getId();
         serviceOrderId = openServiceOrder();
     }
 
@@ -75,14 +54,14 @@ class StartDiagnosisIntegrationTest {
 
     @Test
     void shouldDenyAttendants() throws Exception {
-        as(Role.ATTENDANT, startDiagnosis()).andExpect(status().isForbidden());
+        mockMvc.perform(startDiagnosis().with(bearer(userId, Role.ATTENDANT))).andExpect(status().isForbidden());
 
         assertThat(serviceOrder().get("status")).isEqualTo("RECEIVED");
     }
 
     @Test
     void shouldLetMechanicsStartTheDiagnosisAsTheResponsibleMechanic() throws Exception {
-        as(Role.MECHANIC, startDiagnosis())
+        mockMvc.perform(startDiagnosis().with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("IN_DIAGNOSIS"))
                 .andExpect(jsonPath("$.mechanicId").value(userId))
@@ -106,39 +85,40 @@ class StartDiagnosisIntegrationTest {
 
     @Test
     void shouldLetAdminsStartTheDiagnosis() throws Exception {
-        as(Role.ADMIN, startDiagnosis()).andExpect(status().isOk());
+        mockMvc.perform(startDiagnosis().with(bearer(userId, Role.ADMIN))).andExpect(status().isOk());
 
         assertThat(serviceOrder().get("status")).isEqualTo("IN_DIAGNOSIS");
     }
 
     @Test
     void shouldRefuseToStartTheDiagnosisTwice() throws Exception {
-        as(Role.MECHANIC, startDiagnosis()).andExpect(status().isOk());
+        mockMvc.perform(startDiagnosis().with(bearer(userId, Role.MECHANIC))).andExpect(status().isOk());
 
-        as(Role.MECHANIC, startDiagnosis())
+        mockMvc.perform(startDiagnosis().with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("serviceOrder.invalidStatusTransition"));
     }
 
     @Test
     void shouldReportAnUnknownServiceOrder() throws Exception {
-        as(Role.MECHANIC, post("/admin/serviceOrders/{id}/startDiagnosis", Long.MAX_VALUE))
+        mockMvc.perform(post("/admin/serviceOrders/{id}/startDiagnosis", Long.MAX_VALUE)
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("serviceOrder.notFound"));
     }
 
     private Long openServiceOrder() throws Exception {
         CPFCNPJ document = uniqueCPF();
-        as(Role.ADMIN, post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
+        mockMvc.perform(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Ana", "document": "%s", "email": "ana@email.com"}
-                        """.formatted(document.value())))
+                        """.formatted(document.value())).with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isCreated());
-        String body = as(Role.ATTENDANT, post("/admin/serviceOrders").contentType(MediaType.APPLICATION_JSON).content("""
+        String body = mockMvc.perform(post("/admin/serviceOrders").contentType(MediaType.APPLICATION_JSON).content("""
                         {"customerDocument": "%s",
                          "vehicle": {"licensePlate": "%s", "brand": "Volkswagen", "model": "Gol", "year": 2020,
                                      "color": "Prata"},
                          "problemDescription": "Barulho ao frear"}
-                        """.formatted(document.value(), uniquePlate())))
+                        """.formatted(document.value(), uniquePlate())).with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
@@ -152,10 +132,5 @@ class StartDiagnosisIntegrationTest {
 
     private MockHttpServletRequestBuilder startDiagnosis() {
         return post("/admin/serviceOrders/{id}/startDiagnosis", serviceOrderId);
-    }
-
-    private ResultActions as(Role role, MockHttpServletRequestBuilder request) throws Exception {
-        String token = tokenIssuer.issue(userId, Set.of(role)).value();
-        return mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + token));
     }
 }

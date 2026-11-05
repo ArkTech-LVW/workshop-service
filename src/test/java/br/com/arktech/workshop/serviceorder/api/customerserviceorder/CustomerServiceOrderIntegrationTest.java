@@ -1,5 +1,6 @@
 package br.com.arktech.workshop.serviceorder.api.customerserviceorder;
 
+import static br.com.arktech.workshop.TestUsers.bearer;
 import static br.com.arktech.workshop.UniqueTestData.uniqueCPF;
 import static br.com.arktech.workshop.UniqueTestData.uniquePlate;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -12,12 +13,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import br.com.arktech.workshop.IntegrationTest;
-import br.com.arktech.workshop.auth.application.port.TokenIssuer;
-import br.com.arktech.workshop.auth.domain.model.User;
-import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
-import br.com.arktech.workshop.auth.domain.repository.UserRepository;
+import br.com.arktech.workshop.TestUsers;
 import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
-import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
 import com.jayway.jsonpath.JsonPath;
@@ -25,24 +22,20 @@ import com.jayway.jsonpath.JsonPath;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 @IntegrationTest
@@ -54,16 +47,10 @@ class CustomerServiceOrderIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private TokenIssuer tokenIssuer;
+    private TestUsers testUsers;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordHasher passwordHasher;
 
     private Long userId;
 
@@ -77,23 +64,15 @@ class CustomerServiceOrderIntegrationTest {
 
     @BeforeEach
     void openAServiceOrder() throws Exception {
-        long suffix = ThreadLocalRandom.current().nextLong(1_000_000_000L);
-        userId = userRepository
-                .save(new User(
-                        "Atendente",
-                        new Email("atendente-%d@workshop.com".formatted(suffix)),
-                        "secret",
-                        Set.of(Role.ATTENDANT),
-                        passwordHasher))
-                .getId();
+        userId = testUsers.save(Role.ATTENDANT).getId();
         document = createCustomer();
         plate = uniquePlate();
-        String body = as(Role.ATTENDANT, post("/admin/serviceOrders").contentType(MediaType.APPLICATION_JSON).content("""
+        String body = mockMvc.perform(post("/admin/serviceOrders").contentType(MediaType.APPLICATION_JSON).content("""
                         {"customerDocument": "%s",
                          "vehicle": {"licensePlate": "%s", "brand": "Volkswagen", "model": "Gol", "year": 2020,
                                      "color": "Prata"},
                          "problemDescription": "Barulho ao frear"}
-                        """.formatted(document.value(), plate)))
+                        """.formatted(document.value(), plate)).with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
@@ -141,7 +120,8 @@ class CustomerServiceOrderIntegrationTest {
     void shouldShowTheDetailedQuoteOnlyAfterItIsSent() throws Exception {
         Long brakes = createService("Troca de pastilhas", "150.00");
         Long pad = createPart("Pastilha de freio", "45.90", 10);
-        as(Role.MECHANIC, post("/admin/serviceOrders/{id}/startDiagnosis", serviceOrderId))
+        mockMvc.perform(post("/admin/serviceOrders/{id}/startDiagnosis", serviceOrderId)
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isOk());
         addItem("services", "serviceOfferingId", brakes, 1);
         addItem("parts", "partId", pad, 2);
@@ -151,7 +131,8 @@ class CustomerServiceOrderIntegrationTest {
                 .andExpect(jsonPath("$.status").value("IN_DIAGNOSIS"))
                 .andExpect(jsonPath("$.quote").isEmpty());
 
-        as(Role.ATTENDANT, post("/admin/serviceOrders/{id}/sendQuote", serviceOrderId))
+        mockMvc.perform(post("/admin/serviceOrders/{id}/sendQuote", serviceOrderId)
+                        .with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isOk());
 
         mockMvc.perform(track(document.value()))
@@ -176,7 +157,7 @@ class CustomerServiceOrderIntegrationTest {
         sendQuoteWithPart(pad, 3);
 
         mockMvc.perform(approve(document.value())
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenFor(Role.ATTENDANT)))
+                        .with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isNoContent());
 
         assertThat(statusOf()).isEqualTo("QUOTE_APPROVED");
@@ -259,35 +240,38 @@ class CustomerServiceOrderIntegrationTest {
     }
 
     private void sendQuoteWithPart(Long partId, int quantity) throws Exception {
-        as(Role.MECHANIC, post("/admin/serviceOrders/{id}/startDiagnosis", serviceOrderId))
+        mockMvc.perform(post("/admin/serviceOrders/{id}/startDiagnosis", serviceOrderId)
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isOk());
         addItem("parts", "partId", partId, quantity);
-        as(Role.ATTENDANT, post("/admin/serviceOrders/{id}/sendQuote", serviceOrderId))
+        mockMvc.perform(post("/admin/serviceOrders/{id}/sendQuote", serviceOrderId)
+                        .with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isOk());
     }
 
     private void addItem(String kind, String idField, Long id, int quantity) throws Exception {
-        as(Role.MECHANIC, post("/admin/serviceOrders/{id}/" + kind, serviceOrderId)
+        mockMvc.perform(post("/admin/serviceOrders/{id}/" + kind, serviceOrderId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"%s": %d, "quantity": %d}
-                                """.formatted(idField, id, quantity)))
+                                """.formatted(idField, id, quantity))
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isCreated());
     }
 
     private CPFCNPJ createCustomer() throws Exception {
         CPFCNPJ customerDocument = uniqueCPF();
-        as(Role.ADMIN, post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
+        mockMvc.perform(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Ana", "document": "%s", "email": "ana@email.com"}
-                        """.formatted(customerDocument.value())))
+                        """.formatted(customerDocument.value())).with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isCreated());
         return customerDocument;
     }
 
     private Long createService(String name, String laborPrice) throws Exception {
-        String body = as(Role.ADMIN, post("/admin/services").contentType(MediaType.APPLICATION_JSON).content("""
+        String body = mockMvc.perform(post("/admin/services").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "%s", "laborPrice": %s, "estimatedMinutes": 60}
-                        """.formatted(name, laborPrice)))
+                        """.formatted(name, laborPrice)).with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
@@ -297,20 +281,21 @@ class CustomerServiceOrderIntegrationTest {
 
     private Long createPart(String name, String salePrice, int stockQuantity) throws Exception {
         String sku = "CS-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-        String body = as(Role.ADMIN, post("/admin/parts").contentType(MediaType.APPLICATION_JSON).content("""
+        String body = mockMvc.perform(post("/admin/parts").contentType(MediaType.APPLICATION_JSON).content("""
                         {"sku": "%s", "name": "%s", "type": "PART", "unit": "UNIT", "salePrice": %s,
                          "minimumStock": 1}
-                        """.formatted(sku, name, salePrice)))
+                        """.formatted(sku, name, salePrice)).with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
         Long partId = ((Number) JsonPath.read(body, "$.id")).longValue();
-        as(Role.ADMIN, post("/admin/parts/{id}/stockMovements", partId)
+        mockMvc.perform(post("/admin/parts/{id}/stockMovements", partId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"type": "IN", "quantity": %d}
-                                """.formatted(stockQuantity)))
+                                """.formatted(stockQuantity))
+                        .with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isCreated());
         return partId;
     }
@@ -335,13 +320,5 @@ class CustomerServiceOrderIntegrationTest {
 
     private MockHttpServletRequestBuilder approve(String customerDocument) {
         return post("/customer/serviceOrders/{publicId}/approve", publicId).header(CUSTOMER_DOCUMENT, customerDocument);
-    }
-
-    private String tokenFor(Role role) {
-        return tokenIssuer.issue(userId, Set.of(role)).value();
-    }
-
-    private ResultActions as(Role role, MockHttpServletRequestBuilder request) throws Exception {
-        return mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenFor(role)));
     }
 }
