@@ -1,5 +1,6 @@
 package br.com.arktech.workshop.inventory.api.stockadjustmentrequest;
 
+import static br.com.arktech.workshop.TestUsers.bearer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -7,13 +8,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import br.com.arktech.workshop.IntegrationTest;
-import br.com.arktech.workshop.auth.application.port.TokenIssuer;
+import br.com.arktech.workshop.TestUsers;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
 import com.jayway.jsonpath.JsonPath;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -23,7 +23,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,7 +36,7 @@ class StockAdjustmentRequestIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private TokenIssuer tokenIssuer;
+    private TestUsers testUsers;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -71,9 +70,9 @@ class StockAdjustmentRequestIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        attendantId = insertUser();
-        adminId = insertUser();
-        otherAdminId = insertUser();
+        attendantId = testUsers.save(Role.ATTENDANT).getId();
+        adminId = testUsers.save(Role.ADMIN).getId();
+        otherAdminId = testUsers.save(Role.ADMIN).getId();
     }
 
     @ParameterizedTest
@@ -85,7 +84,7 @@ class StockAdjustmentRequestIntegrationTest {
     @ParameterizedTest
     @MethodSource("adminOnlyEndpoints")
     void shouldDenyAttendantOnQueueAndReview(MockHttpServletRequestBuilder request) throws Exception {
-        perform(request, attendantId, Role.ATTENDANT)
+        mockMvc.perform(request.with(bearer(attendantId, Role.ATTENDANT)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("auth.accessDenied"));
     }
@@ -93,7 +92,7 @@ class StockAdjustmentRequestIntegrationTest {
     @ParameterizedTest
     @MethodSource("endpoints")
     void shouldDenyMechanic(MockHttpServletRequestBuilder request) throws Exception {
-        perform(request, attendantId, Role.MECHANIC)
+        mockMvc.perform(request.with(bearer(attendantId, Role.MECHANIC)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("auth.accessDenied"));
     }
@@ -106,7 +105,8 @@ class StockAdjustmentRequestIntegrationTest {
         stockOf(partId).andExpect(jsonPath("$.stockQuantity").value(5));
         assertThat(pendingRequestIds()).contains(requestId);
 
-        perform(post("/admin/stockAdjustmentRequests/{id}/approve", requestId), adminId, Role.ADMIN)
+        mockMvc.perform(post("/admin/stockAdjustmentRequests/{id}/approve", requestId)
+                        .with(bearer(adminId, Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("APPROVED"))
                 .andExpect(jsonPath("$.requestedByUserId").value(attendantId))
@@ -115,7 +115,7 @@ class StockAdjustmentRequestIntegrationTest {
 
         stockOf(partId).andExpect(jsonPath("$.stockQuantity").value(3));
         assertThat(pendingRequestIds()).doesNotContain(requestId);
-        perform(get("/admin/parts/{id}/stockMovements", partId), adminId, Role.ADMIN)
+        mockMvc.perform(get("/admin/parts/{id}/stockMovements", partId).with(bearer(adminId, Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].type").value("ADJUSTMENT"))
                 .andExpect(jsonPath("$.content[0].quantity").value(2))
@@ -130,12 +130,14 @@ class StockAdjustmentRequestIntegrationTest {
         Integer partId = createPartWithStock(5);
         Integer requestId = openRequest(partId, 1, "Perda", adminId, Role.ADMIN);
 
-        perform(post("/admin/stockAdjustmentRequests/{id}/approve", requestId), adminId, Role.ADMIN)
+        mockMvc.perform(post("/admin/stockAdjustmentRequests/{id}/approve", requestId)
+                        .with(bearer(adminId, Role.ADMIN)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("stockAdjustmentRequest.selfReview"));
         stockOf(partId).andExpect(jsonPath("$.stockQuantity").value(5));
 
-        perform(post("/admin/stockAdjustmentRequests/{id}/approve", requestId), otherAdminId, Role.ADMIN)
+        mockMvc.perform(post("/admin/stockAdjustmentRequests/{id}/approve", requestId)
+                        .with(bearer(otherAdminId, Role.ADMIN)))
                 .andExpect(status().isOk());
         stockOf(partId).andExpect(jsonPath("$.stockQuantity").value(4));
     }
@@ -145,16 +147,17 @@ class StockAdjustmentRequestIntegrationTest {
         Integer partId = createPartWithStock(5);
         Integer requestId = openRequest(partId, 2, "Avaria", attendantId, Role.ATTENDANT);
 
-        perform(reject(requestId, " "), adminId, Role.ADMIN).andExpect(status().isBadRequest());
-        perform(reject(requestId, "Peça encontrada no almoxarifado"), adminId, Role.ADMIN)
+        mockMvc.perform(reject(requestId, " ").with(bearer(adminId, Role.ADMIN))).andExpect(status().isBadRequest());
+        mockMvc.perform(reject(requestId, "Peça encontrada no almoxarifado").with(bearer(adminId, Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("REJECTED"))
                 .andExpect(jsonPath("$.reviewNote").value("Peça encontrada no almoxarifado"));
 
-        perform(post("/admin/stockAdjustmentRequests/{id}/approve", requestId), otherAdminId, Role.ADMIN)
+        mockMvc.perform(post("/admin/stockAdjustmentRequests/{id}/approve", requestId)
+                        .with(bearer(otherAdminId, Role.ADMIN)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("stockAdjustmentRequest.alreadyReviewed"));
-        perform(reject(requestId, "Outra observação"), otherAdminId, Role.ADMIN)
+        mockMvc.perform(reject(requestId, "Outra observação").with(bearer(otherAdminId, Role.ADMIN)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("stockAdjustmentRequest.alreadyReviewed"));
         stockOf(partId).andExpect(jsonPath("$.stockQuantity").value(5));
@@ -167,7 +170,8 @@ class StockAdjustmentRequestIntegrationTest {
         Integer requestId = openRequest(partId, 3, "Avaria", attendantId, Role.ATTENDANT);
         directAdjustment(partId, 2).andExpect(status().isCreated());
 
-        perform(post("/admin/stockAdjustmentRequests/{id}/approve", requestId), adminId, Role.ADMIN)
+        mockMvc.perform(post("/admin/stockAdjustmentRequests/{id}/approve", requestId)
+                        .with(bearer(adminId, Role.ADMIN)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("part.insufficientStock"));
 
@@ -177,14 +181,15 @@ class StockAdjustmentRequestIntegrationTest {
 
     @Test
     void shouldReportUnknownRequest() throws Exception {
-        perform(post("/admin/stockAdjustmentRequests/{id}/approve", Long.MAX_VALUE), adminId, Role.ADMIN)
+        mockMvc.perform(post("/admin/stockAdjustmentRequests/{id}/approve", Long.MAX_VALUE)
+                        .with(bearer(adminId, Role.ADMIN)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("stockAdjustmentRequest.notFound"));
     }
 
     private Integer openRequest(Integer partId, int quantity, String reason, Long userId, Role role)
             throws Exception {
-        String body = perform(openRequestCall(partId, quantity, reason), userId, role)
+        String body = mockMvc.perform(openRequestCall(partId, quantity, reason).with(bearer(userId, role)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("PENDING"))
                 .andExpect(jsonPath("$.requestedByUserId").value(userId))
@@ -211,10 +216,10 @@ class StockAdjustmentRequestIntegrationTest {
     }
 
     private List<Integer> pendingRequestIds() throws Exception {
-        String body = perform(
-                        get("/admin/stockAdjustmentRequests").param("status", "PENDING").param("size", "100"),
-                        adminId,
-                        Role.ADMIN)
+        String body = mockMvc.perform(get("/admin/stockAdjustmentRequests")
+                        .param("status", "PENDING")
+                        .param("size", "100")
+                        .with(bearer(adminId, Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -223,18 +228,17 @@ class StockAdjustmentRequestIntegrationTest {
     }
 
     private ResultActions directAdjustment(Integer partId, int quantity) throws Exception {
-        return perform(
-                post("/admin/parts/{id}/stockMovements", partId)
+        return mockMvc.perform(post("/admin/parts/{id}/stockMovements", partId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"type": "ADJUSTMENT", "quantity": %d, "reason": "Contagem"}
-                                """.formatted(quantity)),
-                adminId,
-                Role.ADMIN);
+                                """.formatted(quantity))
+                        .with(bearer(adminId, Role.ADMIN)));
     }
 
     private ResultActions stockOf(Integer partId) throws Exception {
-        return perform(get("/admin/parts/{id}", partId), adminId, Role.ADMIN).andExpect(status().isOk());
+        return mockMvc.perform(get("/admin/parts/{id}", partId).with(bearer(adminId, Role.ADMIN)))
+                .andExpect(status().isOk());
     }
 
     private Integer adjustmentCount(Integer partId) {
@@ -246,42 +250,22 @@ class StockAdjustmentRequestIntegrationTest {
 
     private Integer createPartWithStock(int stock) throws Exception {
         String sku = "IT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-        String created = perform(
-                        post("/admin/parts").contentType(MediaType.APPLICATION_JSON).content("""
-                                {"sku": "%s", "name": "Filtro de óleo", "type": "PART", "unit": "UNIT",
-                                 "salePrice": 32, "minimumStock": 0}
-                                """.formatted(sku)),
-                        adminId,
-                        Role.ADMIN)
+        String created = mockMvc.perform(post("/admin/parts").contentType(MediaType.APPLICATION_JSON).content("""
+                        {"sku": "%s", "name": "Filtro de óleo", "type": "PART", "unit": "UNIT",
+                         "salePrice": 32, "minimumStock": 0}
+                        """.formatted(sku)).with(bearer(adminId, Role.ADMIN)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
         Integer partId = JsonPath.read(created, "$.id");
-        perform(
-                        post("/admin/parts/{id}/stockMovements", partId)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content("""
-                                        {"type": "IN", "quantity": %d}
-                                        """.formatted(stock)),
-                        adminId,
-                        Role.ADMIN)
+        mockMvc.perform(post("/admin/parts/{id}/stockMovements", partId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"type": "IN", "quantity": %d}
+                                """.formatted(stock))
+                        .with(bearer(adminId, Role.ADMIN)))
                 .andExpect(status().isCreated());
         return partId;
-    }
-
-    private Long insertUser() {
-        return jdbcTemplate.queryForObject(
-                """
-                INSERT INTO "user" (name, email, password_hash, date_created, last_updated, version)
-                VALUES ('Estoquista', ?, 'hash', now(), now(), 0) RETURNING id
-                """,
-                Long.class,
-                "stock-" + UUID.randomUUID() + "@arktech.com.br");
-    }
-
-    private ResultActions perform(MockHttpServletRequestBuilder request, Long userId, Role role) throws Exception {
-        String token = tokenIssuer.issue(userId, Set.of(role)).value();
-        return mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + token));
     }
 }

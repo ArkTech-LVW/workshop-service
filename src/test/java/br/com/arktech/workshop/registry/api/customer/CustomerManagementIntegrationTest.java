@@ -1,5 +1,6 @@
 package br.com.arktech.workshop.registry.api.customer;
 
+import static br.com.arktech.workshop.TestUsers.bearer;
 import static br.com.arktech.workshop.UniqueTestData.uniqueCNPJ;
 import static br.com.arktech.workshop.UniqueTestData.uniqueCPF;
 import static org.hamcrest.Matchers.nullValue;
@@ -11,13 +12,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import br.com.arktech.workshop.IntegrationTest;
-import br.com.arktech.workshop.auth.application.port.TokenIssuer;
 import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
 import com.jayway.jsonpath.JsonPath;
 
-import java.util.Set;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -25,11 +24,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 @IntegrationTest
@@ -37,9 +34,6 @@ class CustomerManagementIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private TokenIssuer tokenIssuer;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -62,9 +56,7 @@ class CustomerManagementIntegrationTest {
     @ParameterizedTest
     @MethodSource("customerEndpoints")
     void shouldDenyMechanics(MockHttpServletRequestBuilder request) throws Exception {
-        String token = tokenFor(Role.MECHANIC);
-
-        mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+        mockMvc.perform(request.with(bearer(Role.MECHANIC)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("auth.accessDenied"));
     }
@@ -73,25 +65,25 @@ class CustomerManagementIntegrationTest {
     void shouldLetAttendantsRegisterFindAndUpdateCustomersButNotDeleteThem() throws Exception {
         CPFCNPJ cpf = uniqueCPF();
 
-        String created = asAttendant(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
+        String created = mockMvc.perform(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Ana Souza", "document": "%s", "email": "ana@email.com"}
-                        """.formatted(cpf.value())))
+                        """.formatted(cpf.value())).with(bearer(Role.ATTENDANT)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
         Integer id = JsonPath.read(created, "$.id");
 
-        asAttendant(get("/admin/customers").param("document", cpf.value()))
+        mockMvc.perform(get("/admin/customers").param("document", cpf.value()).with(bearer(Role.ATTENDANT)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value(id));
-        asAttendant(get("/admin/customers/{id}", id)).andExpect(status().isOk());
-        asAttendant(put("/admin/customers/{id}", id).contentType(MediaType.APPLICATION_JSON).content("""
+        mockMvc.perform(get("/admin/customers/{id}", id).with(bearer(Role.ATTENDANT))).andExpect(status().isOk());
+        mockMvc.perform(put("/admin/customers/{id}", id).contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Ana Lima", "document": "%s", "email": "ana@email.com"}
-                        """.formatted(cpf.value())))
+                        """.formatted(cpf.value())).with(bearer(Role.ATTENDANT)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Ana Lima"));
-        asAttendant(delete("/admin/customers/{id}", id))
+        mockMvc.perform(delete("/admin/customers/{id}", id).with(bearer(Role.ATTENDANT)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("auth.accessDenied"));
     }
@@ -100,9 +92,9 @@ class CustomerManagementIntegrationTest {
     void shouldCreateFindAndSearchCustomerByDocument() throws Exception {
         CPFCNPJ cpf = uniqueCPF();
 
-        String created = asAdmin(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
+        String created = mockMvc.perform(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Ana Souza", "document": "%s", "email": "Ana@Email.com", "phone": "(11) 98765-4321"}
-                        """.formatted(cpf.formatted())))
+                        """.formatted(cpf.formatted())).with(bearer(Role.ADMIN)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.document").value(cpf.value()))
                 .andExpect(jsonPath("$.personType").value("NATURAL_PERSON"))
@@ -113,14 +105,14 @@ class CustomerManagementIntegrationTest {
                 .getContentAsString();
         Integer id = JsonPath.read(created, "$.id");
 
-        asAdmin(get("/admin/customers/{id}", id))
+        mockMvc.perform(get("/admin/customers/{id}", id).with(bearer(Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Ana Souza"));
-        asAdmin(get("/admin/customers").param("document", cpf.formatted()))
+        mockMvc.perform(get("/admin/customers").param("document", cpf.formatted()).with(bearer(Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(1))
                 .andExpect(jsonPath("$.content[0].id").value(id));
-        asAdmin(get("/admin/customers").param("document", uniqueCPF().value()))
+        mockMvc.perform(get("/admin/customers").param("document", uniqueCPF().value()).with(bearer(Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(0));
     }
@@ -130,18 +122,18 @@ class CustomerManagementIntegrationTest {
         CPFCNPJ cpf = uniqueCPF();
         createCustomer(cpf.value());
 
-        asAdmin(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
+        mockMvc.perform(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Outra Ana", "document": "%s", "email": "outra@email.com"}
-                        """.formatted(cpf.formatted())))
+                        """.formatted(cpf.formatted())).with(bearer(Role.ADMIN)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("customer.documentAlreadyExists"));
     }
 
     @Test
     void shouldRejectInvalidDocument() throws Exception {
-        asAdmin(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
+        mockMvc.perform(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Ana", "document": "529.982.247-24", "email": "ana@email.com"}
-                        """))
+                        """).with(bearer(Role.ADMIN)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.details[0].field").value("document"));
     }
@@ -152,16 +144,16 @@ class CustomerManagementIntegrationTest {
         CPFCNPJ cnpj = uniqueCNPJ();
         Integer id = createCustomer(cpf.value());
 
-        asAdmin(put("/admin/customers/{id}", id).contentType(MediaType.APPLICATION_JSON).content("""
+        mockMvc.perform(put("/admin/customers/{id}", id).contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Ana Souza ME", "document": "%s", "email": "Contato@AnaSouza.com"}
-                        """.formatted(cnpj.formatted())))
+                        """.formatted(cnpj.formatted())).with(bearer(Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Ana Souza ME"))
                 .andExpect(jsonPath("$.document").value(cnpj.value()))
                 .andExpect(jsonPath("$.personType").value("LEGAL_PERSON"))
                 .andExpect(jsonPath("$.email").value("contato@anasouza.com"))
                 .andExpect(jsonPath("$.phone").value(nullValue()));
-        asAdmin(get("/admin/customers").param("document", cpf.value()))
+        mockMvc.perform(get("/admin/customers").param("document", cpf.value()).with(bearer(Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(0));
     }
@@ -172,9 +164,9 @@ class CustomerManagementIntegrationTest {
         createCustomer(taken.value());
         Integer id = createCustomer(uniqueCPF().value());
 
-        asAdmin(put("/admin/customers/{id}", id).contentType(MediaType.APPLICATION_JSON).content("""
+        mockMvc.perform(put("/admin/customers/{id}", id).contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Ana", "document": "%s", "email": "ana@email.com"}
-                        """.formatted(taken.formatted())))
+                        """.formatted(taken.formatted())).with(bearer(Role.ADMIN)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("customer.documentAlreadyExists"));
     }
@@ -183,8 +175,8 @@ class CustomerManagementIntegrationTest {
     void shouldDeleteCustomer() throws Exception {
         Integer id = createCustomer(uniqueCPF().value());
 
-        asAdmin(delete("/admin/customers/{id}", id)).andExpect(status().isNoContent());
-        asAdmin(get("/admin/customers/{id}", id))
+        mockMvc.perform(delete("/admin/customers/{id}", id).with(bearer(Role.ADMIN))).andExpect(status().isNoContent());
+        mockMvc.perform(get("/admin/customers/{id}", id).with(bearer(Role.ADMIN)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("customer.notFound"));
     }
@@ -196,10 +188,10 @@ class CustomerManagementIntegrationTest {
         try {
             jdbcTemplate.update("INSERT INTO customer_reference_test (customer_id) VALUES (?)", id);
 
-            asAdmin(delete("/admin/customers/{id}", id))
+            mockMvc.perform(delete("/admin/customers/{id}", id).with(bearer(Role.ADMIN)))
                     .andExpect(status().isConflict())
                     .andExpect(jsonPath("$.code").value("customer.inUse"));
-            asAdmin(get("/admin/customers/{id}", id)).andExpect(status().isOk());
+            mockMvc.perform(get("/admin/customers/{id}", id).with(bearer(Role.ADMIN))).andExpect(status().isOk());
         } finally {
             jdbcTemplate.execute("DROP TABLE customer_reference_test");
         }
@@ -207,31 +199,19 @@ class CustomerManagementIntegrationTest {
 
     @Test
     void shouldAnswer404ForUnknownCustomer() throws Exception {
-        asAdmin(get("/admin/customers/{id}", Long.MAX_VALUE))
+        mockMvc.perform(get("/admin/customers/{id}", Long.MAX_VALUE).with(bearer(Role.ADMIN)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("customer.notFound"));
     }
 
     private Integer createCustomer(String document) throws Exception {
-        String body = asAdmin(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
+        String body = mockMvc.perform(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Ana", "document": "%s", "email": "ana@email.com"}
-                        """.formatted(document)))
+                        """.formatted(document)).with(bearer(Role.ADMIN)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
         return JsonPath.read(body, "$.id");
-    }
-
-    private ResultActions asAdmin(MockHttpServletRequestBuilder request) throws Exception {
-        return mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenFor(Role.ADMIN)));
-    }
-
-    private ResultActions asAttendant(MockHttpServletRequestBuilder request) throws Exception {
-        return mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenFor(Role.ATTENDANT)));
-    }
-
-    private String tokenFor(Role... roles) {
-        return tokenIssuer.issue(1L, Set.of(roles)).value();
     }
 }

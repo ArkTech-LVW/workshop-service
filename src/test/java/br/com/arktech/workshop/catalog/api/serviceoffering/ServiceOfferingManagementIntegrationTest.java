@@ -1,5 +1,6 @@
 package br.com.arktech.workshop.catalog.api.serviceoffering;
 
+import static br.com.arktech.workshop.TestUsers.bearer;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -8,12 +9,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import br.com.arktech.workshop.IntegrationTest;
-import br.com.arktech.workshop.auth.application.port.TokenIssuer;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
 import com.jayway.jsonpath.JsonPath;
 
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -23,10 +22,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 @IntegrationTest
@@ -34,9 +31,6 @@ class ServiceOfferingManagementIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private TokenIssuer tokenIssuer;
 
     static Stream<Arguments> serviceOfferingEndpoints() {
         return Stream.of(
@@ -65,9 +59,7 @@ class ServiceOfferingManagementIntegrationTest {
     @ParameterizedTest
     @MethodSource("serviceOfferingWriteEndpoints")
     void shouldDenyWritesToUsersWithoutAdminRole(MockHttpServletRequestBuilder request) throws Exception {
-        String token = tokenFor(Role.ATTENDANT, Role.MECHANIC);
-
-        mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+        mockMvc.perform(request.with(bearer(Role.ATTENDANT, Role.MECHANIC)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("auth.accessDenied"));
     }
@@ -76,11 +68,10 @@ class ServiceOfferingManagementIntegrationTest {
     @EnumSource(value = Role.class, names = {"ATTENDANT", "MECHANIC"})
     void shouldLetAttendantsAndMechanicsConsultTheCatalog(Role role) throws Exception {
         Integer id = createServiceOffering(uniqueName("Alinhamento"));
-        String token = tokenFor(role);
 
-        mockMvc.perform(get("/admin/services").header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+        mockMvc.perform(get("/admin/services").with(bearer(role)))
                 .andExpect(status().isOk());
-        mockMvc.perform(get("/admin/services/{id}", id).header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+        mockMvc.perform(get("/admin/services/{id}", id).with(bearer(role)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id));
     }
@@ -89,9 +80,9 @@ class ServiceOfferingManagementIntegrationTest {
     void shouldCreateFindAndSearchServiceOfferingByName() throws Exception {
         String name = uniqueName("Troca de óleo");
 
-        String created = asAdmin(post("/admin/services").contentType(MediaType.APPLICATION_JSON).content("""
+        String created = mockMvc.perform(post("/admin/services").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "%s", "description": "Óleo e filtro", "laborPrice": 150.5, "estimatedMinutes": 60}
-                        """.formatted(name)))
+                        """.formatted(name)).with(bearer(Role.ADMIN)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value(name))
                 .andExpect(jsonPath("$.laborPrice").value(150.50))
@@ -102,14 +93,14 @@ class ServiceOfferingManagementIntegrationTest {
                 .getContentAsString();
         Integer id = JsonPath.read(created, "$.id");
 
-        asAdmin(get("/admin/services/{id}", id))
+        mockMvc.perform(get("/admin/services/{id}", id).with(bearer(Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description").value("Óleo e filtro"));
-        asAdmin(get("/admin/services").param("name", name.toUpperCase()))
+        mockMvc.perform(get("/admin/services").param("name", name.toUpperCase()).with(bearer(Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(1))
                 .andExpect(jsonPath("$.content[0].id").value(id));
-        asAdmin(get("/admin/services").param("name", uniqueName("Inexistente")))
+        mockMvc.perform(get("/admin/services").param("name", uniqueName("Inexistente")).with(bearer(Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(0));
     }
@@ -119,9 +110,9 @@ class ServiceOfferingManagementIntegrationTest {
         Integer id = createServiceOffering(uniqueName("Alinhamento"));
         String renamed = uniqueName("Alinhamento 3D");
 
-        asAdmin(put("/admin/services/{id}", id).contentType(MediaType.APPLICATION_JSON).content("""
+        mockMvc.perform(put("/admin/services/{id}", id).contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "%s", "laborPrice": 99.90, "estimatedMinutes": 45}
-                        """.formatted(renamed)))
+                        """.formatted(renamed)).with(bearer(Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(renamed))
                 .andExpect(jsonPath("$.description").value(nullValue()))
@@ -135,57 +126,49 @@ class ServiceOfferingManagementIntegrationTest {
         String name = uniqueName("Balanceamento");
         Integer id = createServiceOffering(name);
 
-        asAdmin(post("/admin/services/{id}/deactivate", id))
+        mockMvc.perform(post("/admin/services/{id}/deactivate", id).with(bearer(Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.active").value(false));
-        asAdmin(get("/admin/services").param("name", name).param("active", "true"))
+        mockMvc.perform(get("/admin/services").param("name", name).param("active", "true").with(bearer(Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(0));
-        asAdmin(get("/admin/services").param("name", name).param("active", "false"))
+        mockMvc.perform(get("/admin/services").param("name", name).param("active", "false").with(bearer(Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value(id));
 
-        asAdmin(post("/admin/services/{id}/activate", id))
+        mockMvc.perform(post("/admin/services/{id}/activate", id).with(bearer(Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.active").value(true));
     }
 
     @Test
     void shouldRejectInvalidLaborPrice() throws Exception {
-        asAdmin(post("/admin/services").contentType(MediaType.APPLICATION_JSON).content("""
+        mockMvc.perform(post("/admin/services").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Troca de óleo", "laborPrice": -10, "estimatedMinutes": 60}
-                        """))
+                        """).with(bearer(Role.ADMIN)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.details[0].field").value("laborPrice"));
     }
 
     @Test
     void shouldAnswer404ForUnknownServiceOffering() throws Exception {
-        asAdmin(get("/admin/services/{id}", Long.MAX_VALUE))
+        mockMvc.perform(get("/admin/services/{id}", Long.MAX_VALUE).with(bearer(Role.ADMIN)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("serviceOffering.notFound"));
-        asAdmin(post("/admin/services/{id}/deactivate", Long.MAX_VALUE))
+        mockMvc.perform(post("/admin/services/{id}/deactivate", Long.MAX_VALUE).with(bearer(Role.ADMIN)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("serviceOffering.notFound"));
     }
 
     private Integer createServiceOffering(String name) throws Exception {
-        String body = asAdmin(post("/admin/services").contentType(MediaType.APPLICATION_JSON).content("""
+        String body = mockMvc.perform(post("/admin/services").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "%s", "laborPrice": 80, "estimatedMinutes": 30}
-                        """.formatted(name)))
+                        """.formatted(name)).with(bearer(Role.ADMIN)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
         return JsonPath.read(body, "$.id");
-    }
-
-    private ResultActions asAdmin(MockHttpServletRequestBuilder request) throws Exception {
-        return mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenFor(Role.ADMIN)));
-    }
-
-    private String tokenFor(Role... roles) {
-        return tokenIssuer.issue(1L, Set.of(roles)).value();
     }
 
     private static String uniqueName(String name) {

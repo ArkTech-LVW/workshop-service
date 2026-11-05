@@ -1,5 +1,6 @@
 package br.com.arktech.workshop.inventory.api.stockmovement;
 
+import static br.com.arktech.workshop.TestUsers.bearer;
 import static br.com.arktech.workshop.UniqueTestData.uniqueCPF;
 import static br.com.arktech.workshop.UniqueTestData.uniquePlate;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -9,7 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import br.com.arktech.workshop.IntegrationTest;
-import br.com.arktech.workshop.auth.application.port.TokenIssuer;
+import br.com.arktech.workshop.TestUsers;
 import br.com.arktech.workshop.inventory.application.reconcileserviceorderstock.ReconcileServiceOrderStockCommand;
 import br.com.arktech.workshop.inventory.application.reconcileserviceorderstock.ReconcileServiceOrderStockUseCase;
 import br.com.arktech.workshop.inventory.application.serviceorderpart.ServiceOrderPart;
@@ -21,7 +22,6 @@ import com.jayway.jsonpath.JsonPath;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -38,7 +38,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
@@ -52,7 +51,7 @@ class StockMovementIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private TokenIssuer tokenIssuer;
+    private TestUsers testUsers;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -70,13 +69,7 @@ class StockMovementIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        adminId = jdbcTemplate.queryForObject(
-                """
-                INSERT INTO "user" (name, email, password_hash, date_created, last_updated, version)
-                VALUES ('Estoquista', ?, 'hash', now(), now(), 0) RETURNING id
-                """,
-                Long.class,
-                "stock-" + UUID.randomUUID() + "@arktech.com.br");
+        adminId = testUsers.save(Role.ADMIN).getId();
     }
 
     @ParameterizedTest
@@ -88,9 +81,7 @@ class StockMovementIntegrationTest {
     @ParameterizedTest
     @MethodSource("stockEndpoints")
     void shouldDenyUsersWithoutAdminRole(MockHttpServletRequestBuilder request) throws Exception {
-        String token = tokenIssuer.issue(adminId, Set.of(Role.ATTENDANT, Role.MECHANIC)).value();
-
-        mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+        mockMvc.perform(request.with(bearer(adminId, Role.ATTENDANT, Role.MECHANIC)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("auth.accessDenied"));
     }
@@ -106,7 +97,7 @@ class StockMovementIntegrationTest {
                 .andExpect(jsonPath("$.dateCreated").isNotEmpty());
         movement(partId, "ADJUSTMENT", 7, "Avaria no transporte").andExpect(status().isCreated());
 
-        asAdmin(get("/admin/parts/{id}/stockMovements", partId))
+        mockMvc.perform(get("/admin/parts/{id}/stockMovements", partId).with(bearer(adminId, Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(2))
                 .andExpect(jsonPath("$.content[0].type").value("ADJUSTMENT"))
@@ -115,7 +106,8 @@ class StockMovementIntegrationTest {
                 .andExpect(jsonPath("$.content[0].createdByUserId").value(adminId))
                 .andExpect(jsonPath("$.content[1].type").value("IN"))
                 .andExpect(jsonPath("$.content[1].reason").value("Compra do fornecedor, NF 1234"));
-        asAdmin(get("/admin/parts/{id}", partId)).andExpect(jsonPath("$.stockQuantity").value(3));
+        mockMvc.perform(get("/admin/parts/{id}", partId).with(bearer(adminId, Role.ADMIN)))
+                .andExpect(jsonPath("$.stockQuantity").value(3));
     }
 
     @Test
@@ -133,8 +125,10 @@ class StockMovementIntegrationTest {
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("stockMovement.outRequiresServiceOrder"));
 
-        asAdmin(get("/admin/parts/{id}", partId)).andExpect(jsonPath("$.stockQuantity").value(2));
-        asAdmin(get("/admin/parts/{id}/stockMovements", partId)).andExpect(jsonPath("$.totalElements").value(1));
+        mockMvc.perform(get("/admin/parts/{id}", partId).with(bearer(adminId, Role.ADMIN)))
+                .andExpect(jsonPath("$.stockQuantity").value(2));
+        mockMvc.perform(get("/admin/parts/{id}/stockMovements", partId).with(bearer(adminId, Role.ADMIN)))
+                .andExpect(jsonPath("$.totalElements").value(1));
     }
 
     @Test
@@ -144,7 +138,8 @@ class StockMovementIntegrationTest {
         movement(low, "IN", 5, null).andExpect(status().isCreated());
         movement(enough, "IN", 5, null).andExpect(status().isCreated());
 
-        String body = asAdmin(get("/admin/parts/lowStock").param("size", "100"))
+        String body = mockMvc.perform(get("/admin/parts/lowStock").param("size", "100")
+                        .with(bearer(adminId, Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
@@ -184,7 +179,8 @@ class StockMovementIntegrationTest {
                 .singleElement()
                 .isInstanceOf(BusinessRuleException.class)
                 .hasFieldOrPropertyWithValue("message", "part.insufficientStock");
-        asAdmin(get("/admin/parts/{id}", partId)).andExpect(jsonPath("$.stockQuantity").value(2));
+        mockMvc.perform(get("/admin/parts/{id}", partId).with(bearer(adminId, Role.ADMIN)))
+                .andExpect(jsonPath("$.stockQuantity").value(2));
         Integer withdrawals = jdbcTemplate.queryForObject(
                 "SELECT count(*) FROM stock_movement WHERE part_id = ? AND type = 'OUT'", Integer.class, partId);
         assertThat(withdrawals).isOne();
@@ -200,8 +196,9 @@ class StockMovementIntegrationTest {
         reconcile(serviceOrderId, partId, 1, null);
         reconcile(serviceOrderId, partId, 1, null);
 
-        asAdmin(get("/admin/parts/{id}", partId)).andExpect(jsonPath("$.stockQuantity").value(4));
-        asAdmin(get("/admin/parts/{id}/stockMovements", partId))
+        mockMvc.perform(get("/admin/parts/{id}", partId).with(bearer(adminId, Role.ADMIN)))
+                .andExpect(jsonPath("$.stockQuantity").value(4));
+        mockMvc.perform(get("/admin/parts/{id}/stockMovements", partId).with(bearer(adminId, Role.ADMIN)))
                 .andExpect(jsonPath("$.totalElements").value(3))
                 .andExpect(jsonPath("$.content[0].type").value("IN"))
                 .andExpect(jsonPath("$.content[0].quantity").value(2))
@@ -226,16 +223,16 @@ class StockMovementIntegrationTest {
 
     private Long openServiceOrder() throws Exception {
         CPFCNPJ document = uniqueCPF();
-        asAdmin(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
+        mockMvc.perform(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Ana", "document": "%s", "email": "ana@email.com"}
-                        """.formatted(document.value())))
+                        """.formatted(document.value())).with(bearer(adminId, Role.ADMIN)))
                 .andExpect(status().isCreated());
-        String body = asAdmin(post("/admin/serviceOrders").contentType(MediaType.APPLICATION_JSON).content("""
+        String body = mockMvc.perform(post("/admin/serviceOrders").contentType(MediaType.APPLICATION_JSON).content("""
                         {"customerDocument": "%s",
                          "vehicle": {"licensePlate": "%s", "brand": "Volkswagen", "model": "Gol", "year": 2020,
                                      "color": "Prata"},
                          "problemDescription": "Troca de óleo"}
-                        """.formatted(document.value(), uniquePlate())))
+                        """.formatted(document.value(), uniquePlate())).with(bearer(adminId, Role.ADMIN)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
@@ -251,26 +248,22 @@ class StockMovementIntegrationTest {
                 : """
                 {"type": "%s", "quantity": %d, "reason": "%s"}
                 """.formatted(type, quantity, reason);
-        return asAdmin(post("/admin/parts/{id}/stockMovements", partId)
+        return mockMvc.perform(post("/admin/parts/{id}/stockMovements", partId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(json));
+                .content(json)
+                .with(bearer(adminId, Role.ADMIN)));
     }
 
     private Integer createPart(int minimumStock) throws Exception {
         String sku = "IT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-        String created = asAdmin(post("/admin/parts").contentType(MediaType.APPLICATION_JSON).content("""
+        String created = mockMvc.perform(post("/admin/parts").contentType(MediaType.APPLICATION_JSON).content("""
                         {"sku": "%s", "name": "Filtro de óleo", "type": "PART", "unit": "UNIT", "salePrice": 32,
                          "minimumStock": %d}
-                        """.formatted(sku, minimumStock)))
+                        """.formatted(sku, minimumStock)).with(bearer(adminId, Role.ADMIN)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
         return JsonPath.read(created, "$.id");
-    }
-
-    private ResultActions asAdmin(MockHttpServletRequestBuilder request) throws Exception {
-        String token = tokenIssuer.issue(adminId, Set.of(Role.ADMIN)).value();
-        return mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + token));
     }
 }
