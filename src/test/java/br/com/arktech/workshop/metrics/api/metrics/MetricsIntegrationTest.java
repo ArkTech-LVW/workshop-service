@@ -1,5 +1,6 @@
 package br.com.arktech.workshop.metrics.api.metrics;
 
+import static br.com.arktech.workshop.TestUsers.bearer;
 import static java.time.Duration.ofHours;
 import static java.time.Duration.ofMinutes;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -8,19 +9,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import br.com.arktech.workshop.IntegrationTest;
-import br.com.arktech.workshop.auth.application.port.TokenIssuer;
 import br.com.arktech.workshop.metrics.application.getserviceordertimemetrics.ServiceOrderHistoryFixture;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
@@ -35,9 +33,6 @@ class MetricsIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private TokenIssuer tokenIssuer;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -60,7 +55,7 @@ class MetricsIntegrationTest {
         mockMvc.perform(get(ROUTE)
                         .param("from", "2001-04-01")
                         .param("to", "2001-04-01")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenFor(Role.ATTENDANT, Role.MECHANIC)))
+                        .with(bearer(Role.ATTENDANT, Role.MECHANIC)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("auth.accessDenied"));
     }
@@ -147,11 +142,7 @@ class MetricsIntegrationTest {
         return mockMvc.perform(get(ROUTE)
                 .param("from", from)
                 .param("to", to)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenFor(Role.ADMIN)));
-    }
-
-    private String tokenFor(Role... roles) {
-        return tokenIssuer.issue(1L, Set.of(roles)).value();
+                .with(bearer(Role.ADMIN)));
     }
 
     private static Instant at(LocalDate day, int hour) {

@@ -1,5 +1,6 @@
 package br.com.arktech.workshop.shared.infrastructure.seed;
 
+import static br.com.arktech.workshop.TestUsers.bearer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -15,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
@@ -54,7 +54,7 @@ class DemoSeedIntegrationTest {
 
     @Test
     void shouldListTheSeededCustomers() throws Exception {
-        mockMvc.perform(get("/admin/customers").header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken()))
+        mockMvc.perform(get("/admin/customers").with(bearer(adminToken())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(3)));
     }
@@ -81,7 +81,7 @@ class DemoSeedIntegrationTest {
                         "RECEIVED",
                         "CANCELED");
 
-        mockMvc.perform(get("/admin/serviceOrders").header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken()))
+        mockMvc.perform(get("/admin/serviceOrders").with(bearer(adminToken())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(8)));
     }

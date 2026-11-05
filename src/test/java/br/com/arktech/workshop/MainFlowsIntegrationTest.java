@@ -4,17 +4,12 @@ import static br.com.arktech.workshop.UniqueTestData.uniqueCPF;
 import static br.com.arktech.workshop.UniqueTestData.uniquePlate;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import br.com.arktech.workshop.auth.domain.model.User;
-import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
-import br.com.arktech.workshop.auth.domain.repository.UserRepository;
-import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
 import com.jayway.jsonpath.JsonPath;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -43,10 +38,7 @@ class MainFlowsIntegrationTest {
     private int port;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordHasher passwordHasher;
+    private TestUsers testUsers;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -299,8 +291,7 @@ class MainFlowsIntegrationTest {
     }
 
     private String login(Role role) {
-        String email = "%s-%s@workshop.com".formatted(role.name().toLowerCase(), UUID.randomUUID());
-        userRepository.save(new User("Equipe", new Email(email), PASSWORD, Set.of(role), passwordHasher));
+        String email = testUsers.save(PASSWORD, role).getEmail().value();
         return send(HttpMethod.POST, "/auth/login", """
                         {"email": "%s", "password": "%s"}
                         """.formatted(email, PASSWORD), headers -> {})

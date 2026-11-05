@@ -19,7 +19,7 @@ import org.springframework.core.annotation.AliasFor;
 @SpringBootTest(properties = "security.jwt.secret=test-secret-with-at-least-thirty-two-bytes")
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-@Import(TestcontainersConfiguration.class)
+@Import({TestcontainersConfiguration.class, TestUsers.class})
 @Tag("integration")
 public @interface IntegrationTest {
 

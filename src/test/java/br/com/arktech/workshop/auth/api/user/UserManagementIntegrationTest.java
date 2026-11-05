@@ -1,5 +1,7 @@
 package br.com.arktech.workshop.auth.api.user;
 
+import static br.com.arktech.workshop.TestUsers.bearer;
+import static br.com.arktech.workshop.UniqueTestData.uniqueEmail;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -9,13 +11,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import br.com.arktech.workshop.IntegrationTest;
-import br.com.arktech.workshop.auth.application.port.TokenIssuer;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
 import com.jayway.jsonpath.JsonPath;
 
-import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -36,9 +34,6 @@ class UserManagementIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private TokenIssuer tokenIssuer;
 
     static Stream<Arguments> userEndpoints() {
         return Stream.of(
@@ -59,9 +54,7 @@ class UserManagementIntegrationTest {
     @ParameterizedTest
     @MethodSource("userEndpoints")
     void shouldDenyUsersWithoutAdminRole(MockHttpServletRequestBuilder request) throws Exception {
-        String token = tokenFor(1L, Role.ATTENDANT, Role.MECHANIC);
-
-        mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+        mockMvc.perform(request.with(bearer(Role.ATTENDANT, Role.MECHANIC)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("auth.accessDenied"));
     }
@@ -70,9 +63,9 @@ class UserManagementIntegrationTest {
     void shouldManageUserLifecycle() throws Exception {
         String email = uniqueEmail();
 
-        String created = asAdmin(post("/admin/users").contentType(MediaType.APPLICATION_JSON).content("""
+        String created = mockMvc.perform(post("/admin/users").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Ana", "email": "%s", "password": "%s", "roles": ["MECHANIC", "ATTENDANT"]}
-                        """.formatted(email.toUpperCase(), PASSWORD)))
+                        """.formatted(email.toUpperCase(), PASSWORD)).with(bearer(Role.ADMIN)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.email").value(email))
                 .andExpect(jsonPath("$.active").value(true))
@@ -83,25 +76,27 @@ class UserManagementIntegrationTest {
         assertThat(created).doesNotContain(PASSWORD).doesNotContainIgnoringCase("password");
         Integer id = JsonPath.read(created, "$.id");
 
-        asAdmin(get("/admin/users/{id}", id)).andExpect(status().isOk()).andExpect(jsonPath("$.name").value("Ana"));
-        asAdmin(get("/admin/users").param("size", "100"))
+        mockMvc.perform(get("/admin/users/{id}", id).with(bearer(Role.ADMIN)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Ana"));
+        mockMvc.perform(get("/admin/users").param("size", "100").with(bearer(Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size").value(100))
                 .andExpect(jsonPath("$.content[*].password").doesNotExist());
 
-        asAdmin(put("/admin/users/{id}", id).contentType(MediaType.APPLICATION_JSON).content("""
+        mockMvc.perform(put("/admin/users/{id}", id).contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Ana Souza", "roles": ["MECHANIC"]}
-                        """))
+                        """).with(bearer(Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Ana Souza"))
                 .andExpect(jsonPath("$.roles").value(contains("MECHANIC")));
 
-        asAdmin(post("/admin/users/{id}/deactivate", id))
+        mockMvc.perform(post("/admin/users/{id}/deactivate", id).with(bearer(Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.active").value(false));
         login(email, PASSWORD).andExpect(status().isUnauthorized());
 
-        asAdmin(post("/admin/users/{id}/activate", id))
+        mockMvc.perform(post("/admin/users/{id}/activate", id).with(bearer(Role.ADMIN)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.active").value(true));
         login(email, PASSWORD).andExpect(status().isOk());
@@ -112,16 +107,16 @@ class UserManagementIntegrationTest {
         String email = uniqueEmail();
         createUser(email);
 
-        asAdmin(post("/admin/users").contentType(MediaType.APPLICATION_JSON).content("""
+        mockMvc.perform(post("/admin/users").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Bia", "email": "%s", "password": "%s", "roles": ["MECHANIC"]}
-                        """.formatted(email.toUpperCase(), PASSWORD)))
+                        """.formatted(email.toUpperCase(), PASSWORD)).with(bearer(Role.ADMIN)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("user.emailAlreadyExists"));
     }
 
     @Test
     void shouldAnswer404ForUnknownUser() throws Exception {
-        asAdmin(get("/admin/users/{id}", Long.MAX_VALUE))
+        mockMvc.perform(get("/admin/users/{id}", Long.MAX_VALUE).with(bearer(Role.ADMIN)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("user.notFound"));
     }
@@ -130,10 +125,9 @@ class UserManagementIntegrationTest {
     void shouldLetUserChangeOwnPassword() throws Exception {
         String email = uniqueEmail();
         Integer id = createUser(email);
-        String token = tokenFor(id.longValue(), Role.MECHANIC);
 
         mockMvc.perform(put("/auth/password")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .with(bearer(id.longValue(), Role.MECHANIC))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"currentPassword": "%s", "newPassword": "Another-Secret!"}
@@ -153,9 +147,9 @@ class UserManagementIntegrationTest {
     }
 
     private Integer createUser(String email) throws Exception {
-        String body = asAdmin(post("/admin/users").contentType(MediaType.APPLICATION_JSON).content("""
+        String body = mockMvc.perform(post("/admin/users").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Ana", "email": "%s", "password": "%s", "roles": ["MECHANIC"]}
-                        """.formatted(email, PASSWORD)))
+                        """.formatted(email, PASSWORD)).with(bearer(Role.ADMIN)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
@@ -163,21 +157,9 @@ class UserManagementIntegrationTest {
         return JsonPath.read(body, "$.id");
     }
 
-    private ResultActions asAdmin(MockHttpServletRequestBuilder request) throws Exception {
-        return mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenFor(1L, Role.ADMIN)));
-    }
-
     private ResultActions login(String email, String password) throws Exception {
         return mockMvc.perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON).content("""
                 {"email": "%s", "password": "%s"}
                 """.formatted(email, password)));
-    }
-
-    private String tokenFor(Long userId, Role... roles) {
-        return tokenIssuer.issue(userId, Set.of(roles)).value();
-    }
-
-    private static String uniqueEmail() {
-        return "user-" + UUID.randomUUID() + "@workshop.com";
     }
 }
