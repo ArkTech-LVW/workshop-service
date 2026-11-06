@@ -1,5 +1,6 @@
 package br.com.arktech.workshop.serviceorder.api.serviceorder;
 
+import static br.com.arktech.workshop.TestUsers.bearer;
 import static br.com.arktech.workshop.UniqueTestData.uniqueCPF;
 import static br.com.arktech.workshop.UniqueTestData.uniquePlate;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -9,14 +10,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import br.com.arktech.workshop.IntegrationTest;
-import br.com.arktech.workshop.auth.application.port.TokenIssuer;
-import br.com.arktech.workshop.auth.domain.model.User;
-import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
-import br.com.arktech.workshop.auth.domain.repository.UserRepository;
+import br.com.arktech.workshop.TestUsers;
 import br.com.arktech.workshop.catalog.domain.model.ServiceOffering;
 import br.com.arktech.workshop.catalog.domain.repository.ServiceOfferingRepository;
 import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
-import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.shared.domain.money.Money;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
@@ -24,17 +21,13 @@ import com.jayway.jsonpath.JsonPath;
 
 import java.math.BigDecimal;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 @IntegrationTest
@@ -44,16 +37,10 @@ class SendQuoteIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private TokenIssuer tokenIssuer;
+    private TestUsers testUsers;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordHasher passwordHasher;
 
     @Autowired
     private ServiceOfferingRepository serviceOfferingRepository;
@@ -64,15 +51,7 @@ class SendQuoteIntegrationTest {
 
     @BeforeEach
     void openAServiceOrder() throws Exception {
-        long suffix = ThreadLocalRandom.current().nextLong(1_000_000_000L);
-        userId = userRepository
-                .save(new User(
-                        "Atendente",
-                        new Email("atendente-%d@workshop.com".formatted(suffix)),
-                        "secret",
-                        Set.of(Role.ATTENDANT),
-                        passwordHasher))
-                .getId();
+        userId = testUsers.save(Role.ATTENDANT).getId();
         serviceOrderId = openServiceOrder();
     }
 
@@ -85,7 +64,7 @@ class SendQuoteIntegrationTest {
     void shouldSendTheQuoteRecordingWhoSentIt() throws Exception {
         diagnoseWithAService();
 
-        as(Role.ATTENDANT, sendQuote())
+        mockMvc.perform(sendQuote().with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("AWAITING_APPROVAL"))
                 .andExpect(jsonPath("$.services.length()").value(1))
@@ -102,22 +81,23 @@ class SendQuoteIntegrationTest {
     @Test
     void shouldLetAdminsAndMechanicsSendTheQuote() throws Exception {
         diagnoseWithAService();
-        as(Role.MECHANIC, sendQuote()).andExpect(status().isOk());
+        mockMvc.perform(sendQuote().with(bearer(userId, Role.MECHANIC))).andExpect(status().isOk());
 
         serviceOrderId = openServiceOrder();
         diagnoseWithAService();
-        as(Role.ADMIN, sendQuote()).andExpect(status().isOk());
+        mockMvc.perform(sendQuote().with(bearer(userId, Role.ADMIN))).andExpect(status().isOk());
     }
 
     @Test
     void shouldLockTheItemsAfterSending() throws Exception {
         Long serviceItemId = diagnoseWithAService();
-        as(Role.ATTENDANT, sendQuote()).andExpect(status().isOk());
+        mockMvc.perform(sendQuote().with(bearer(userId, Role.ATTENDANT))).andExpect(status().isOk());
 
-        as(Role.MECHANIC, addService(savedService()))
+        mockMvc.perform(addService(savedService()).with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("serviceOrder.itemsLocked"));
-        as(Role.MECHANIC, delete("/admin/serviceOrders/{id}/services/{itemId}", serviceOrderId, serviceItemId))
+        mockMvc.perform(delete("/admin/serviceOrders/{id}/services/{itemId}", serviceOrderId, serviceItemId)
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("serviceOrder.itemsLocked"));
 
@@ -128,9 +108,9 @@ class SendQuoteIntegrationTest {
 
     @Test
     void shouldRefuseAQuoteWithoutItemsWithoutChangingTheServiceOrder() throws Exception {
-        as(Role.MECHANIC, startDiagnosis()).andExpect(status().isOk());
+        mockMvc.perform(startDiagnosis().with(bearer(userId, Role.MECHANIC))).andExpect(status().isOk());
 
-        as(Role.ATTENDANT, sendQuote())
+        mockMvc.perform(sendQuote().with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("serviceOrder.quoteWithoutItems"));
 
@@ -140,7 +120,7 @@ class SendQuoteIntegrationTest {
 
     @Test
     void shouldRefuseAServiceOrderThatIsNotInDiagnosis() throws Exception {
-        as(Role.ATTENDANT, sendQuote())
+        mockMvc.perform(sendQuote().with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("serviceOrder.invalidStatusTransition"));
 
@@ -150,9 +130,9 @@ class SendQuoteIntegrationTest {
     @Test
     void shouldRefuseToSendTheQuoteTwice() throws Exception {
         diagnoseWithAService();
-        as(Role.ATTENDANT, sendQuote()).andExpect(status().isOk());
+        mockMvc.perform(sendQuote().with(bearer(userId, Role.ATTENDANT))).andExpect(status().isOk());
 
-        as(Role.ATTENDANT, sendQuote())
+        mockMvc.perform(sendQuote().with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("serviceOrder.invalidStatusTransition"));
 
@@ -168,14 +148,15 @@ class SendQuoteIntegrationTest {
 
     @Test
     void shouldReportAnUnknownServiceOrder() throws Exception {
-        as(Role.ATTENDANT, post("/admin/serviceOrders/{id}/sendQuote", Long.MAX_VALUE))
+        mockMvc.perform(post("/admin/serviceOrders/{id}/sendQuote", Long.MAX_VALUE)
+                        .with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("serviceOrder.notFound"));
     }
 
     private Long diagnoseWithAService() throws Exception {
-        as(Role.MECHANIC, startDiagnosis()).andExpect(status().isOk());
-        String body = as(Role.MECHANIC, addService(savedService()))
+        mockMvc.perform(startDiagnosis().with(bearer(userId, Role.MECHANIC))).andExpect(status().isOk());
+        String body = mockMvc.perform(addService(savedService()).with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
@@ -185,16 +166,16 @@ class SendQuoteIntegrationTest {
 
     private Long openServiceOrder() throws Exception {
         CPFCNPJ document = uniqueCPF();
-        as(Role.ADMIN, post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
+        mockMvc.perform(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Ana", "document": "%s", "email": "ana@email.com"}
-                        """.formatted(document.value())))
+                        """.formatted(document.value())).with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isCreated());
-        String body = as(Role.ATTENDANT, post("/admin/serviceOrders").contentType(MediaType.APPLICATION_JSON).content("""
+        String body = mockMvc.perform(post("/admin/serviceOrders").contentType(MediaType.APPLICATION_JSON).content("""
                         {"customerDocument": "%s",
                          "vehicle": {"licensePlate": "%s", "brand": "Volkswagen", "model": "Gol", "year": 2020,
                                      "color": "Prata"},
                          "problemDescription": "Barulho ao frear"}
-                        """.formatted(document.value(), uniquePlate())))
+                        """.formatted(document.value(), uniquePlate())).with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
@@ -236,10 +217,5 @@ class SendQuoteIntegrationTest {
                 .content("""
                         {"serviceOfferingId": %d, "quantity": 2}
                         """.formatted(serviceOfferingId));
-    }
-
-    private ResultActions as(Role role, MockHttpServletRequestBuilder request) throws Exception {
-        String token = tokenIssuer.issue(userId, Set.of(role)).value();
-        return mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + token));
     }
 }

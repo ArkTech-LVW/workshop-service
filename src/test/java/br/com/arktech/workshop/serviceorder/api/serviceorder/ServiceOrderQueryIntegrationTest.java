@@ -1,5 +1,6 @@
 package br.com.arktech.workshop.serviceorder.api.serviceorder;
 
+import static br.com.arktech.workshop.TestUsers.bearer;
 import static br.com.arktech.workshop.UniqueTestData.uniqueCPF;
 import static br.com.arktech.workshop.UniqueTestData.uniquePlate;
 import static br.com.arktech.workshop.UniqueTestData.withHyphen;
@@ -10,10 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import br.com.arktech.workshop.IntegrationTest;
-import br.com.arktech.workshop.auth.application.port.TokenIssuer;
-import br.com.arktech.workshop.auth.domain.model.User;
-import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
-import br.com.arktech.workshop.auth.domain.repository.UserRepository;
+import br.com.arktech.workshop.TestUsers;
 import br.com.arktech.workshop.catalog.domain.model.ServiceOffering;
 import br.com.arktech.workshop.catalog.domain.repository.ServiceOfferingRepository;
 import br.com.arktech.workshop.inventory.domain.model.MeasurementUnit;
@@ -42,7 +40,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
@@ -51,10 +48,8 @@ import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -69,19 +64,13 @@ class ServiceOrderQueryIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private TokenIssuer tokenIssuer;
+    private TestUsers testUsers;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private TransactionTemplate transactionTemplate;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordHasher passwordHasher;
 
     @Autowired
     private CustomerRepository customerRepository;
@@ -115,11 +104,7 @@ class ServiceOrderQueryIntegrationTest {
 
     @BeforeEach
     void saveTheCustomerAndTheirVehicles() {
-        long suffix = ThreadLocalRandom.current().nextLong(1_000_000_000L);
-        Email email = new Email("atendente-%d@workshop.com".formatted(suffix));
-        userId = userRepository
-                .save(new User("Atendente", email, "secret", Set.of(Role.ATTENDANT), passwordHasher))
-                .getId();
+        userId = testUsers.save(Role.ATTENDANT).getId();
         document = uniqueCPF();
         customerId = customerRepository
                 .save(new Customer("Ana", document, new Email("ana@email.com"), null))
@@ -138,14 +123,13 @@ class ServiceOrderQueryIntegrationTest {
     @Test
     void shouldLetMechanicsListAndDetailServiceOrders() throws Exception {
         Long id = openServiceOrderWithItems(1, 1);
-        String token = tokenIssuer.issue(userId, Set.of(Role.MECHANIC)).value();
 
         mockMvc.perform(get("/admin/serviceOrders")
                         .param("customerDocument", document.value())
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value(id));
-        mockMvc.perform(get("/admin/serviceOrders/{id}", id).header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+        mockMvc.perform(get("/admin/serviceOrders/{id}", id).with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id));
     }
@@ -158,7 +142,8 @@ class ServiceOrderQueryIntegrationTest {
         Long canceled = openServiceOrder(unoId, daysAgo(4), ServiceOrderStatus.CANCELED);
         Long awaitingApproval = openServiceOrder(golId, daysAgo(10), ServiceOrderStatus.AWAITING_APPROVAL);
 
-        asAttendant(get("/admin/serviceOrders").param("customerDocument", document.formatted()))
+        mockMvc.perform(get("/admin/serviceOrders").param("customerDocument", document.formatted())
+                        .with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[*].id")
                         .value(contains(asInts(awaitingApproval, received, inProgress, delivered, canceled))))
@@ -171,18 +156,20 @@ class ServiceOrderQueryIntegrationTest {
         Long middle = openServiceOrder(golId, daysAgo(2), ServiceOrderStatus.RECEIVED);
         Long newest = openServiceOrder(golId, daysAgo(1), ServiceOrderStatus.RECEIVED);
 
-        asAttendant(get("/admin/serviceOrders")
+        mockMvc.perform(get("/admin/serviceOrders")
                         .param("customerDocument", document.value())
-                        .param("size", "2"))
+                        .param("size", "2")
+                        .with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(jsonPath("$.content[*].id").value(contains(asInts(oldest, middle))))
                 .andExpect(jsonPath("$.page").value(0))
                 .andExpect(jsonPath("$.size").value(2))
                 .andExpect(jsonPath("$.totalElements").value(3))
                 .andExpect(jsonPath("$.totalPages").value(2));
-        asAttendant(get("/admin/serviceOrders")
+        mockMvc.perform(get("/admin/serviceOrders")
                         .param("customerDocument", document.value())
                         .param("size", "2")
-                        .param("page", "1"))
+                        .param("page", "1")
+                        .with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(jsonPath("$.content[*].id").value(contains(asInts(newest))))
                 .andExpect(jsonPath("$.totalElements").value(3));
     }
@@ -194,19 +181,23 @@ class ServiceOrderQueryIntegrationTest {
         Long golInDiagnosis = openServiceOrder(golId, daysAgo(2), ServiceOrderStatus.IN_DIAGNOSIS);
         openServiceOrder(unoId, daysAgo(1), ServiceOrderStatus.RECEIVED);
 
-        asAttendant(get("/admin/serviceOrders").param("licensePlate", withHyphen(golPlate.toLowerCase())))
+        mockMvc.perform(get("/admin/serviceOrders").param("licensePlate", withHyphen(golPlate.toLowerCase()))
+                        .with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(jsonPath("$.content[*].id")
                         .value(contains(asInts(golLastWeek, golInDiagnosis, golYesterday))));
-        asAttendant(get("/admin/serviceOrders").param("licensePlate", golPlate).param("status", "RECEIVED"))
+        mockMvc.perform(get("/admin/serviceOrders").param("licensePlate", golPlate).param("status", "RECEIVED")
+                        .with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(jsonPath("$.content[*].id").value(contains(asInts(golLastWeek, golYesterday))));
-        asAttendant(get("/admin/serviceOrders")
+        mockMvc.perform(get("/admin/serviceOrders")
                         .param("licensePlate", golPlate)
                         .param("openedFrom", daysAgo(2).toString())
-                        .param("openedTo", daysAgo(1).toString()))
+                        .param("openedTo", daysAgo(1).toString())
+                        .with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(jsonPath("$.content[*].id").value(contains(asInts(golInDiagnosis, golYesterday))));
-        asAttendant(get("/admin/serviceOrders")
+        mockMvc.perform(get("/admin/serviceOrders")
                         .param("customerDocument", document.value())
-                        .param("openedTo", daysAgo(3).toString()))
+                        .param("openedTo", daysAgo(3).toString())
+                        .with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(jsonPath("$.content[*].id").value(contains(asInts(golLastWeek))));
     }
 
@@ -214,13 +205,15 @@ class ServiceOrderQueryIntegrationTest {
     void shouldAnswerAnEmptyPageForAnUnregisteredDocumentOrPlate() throws Exception {
         openServiceOrder(golId, daysAgo(1), ServiceOrderStatus.RECEIVED);
 
-        asAttendant(get("/admin/serviceOrders").param("customerDocument", uniqueCPF().value()))
+        mockMvc.perform(get("/admin/serviceOrders").param("customerDocument", uniqueCPF().value())
+                        .with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isEmpty())
                 .andExpect(jsonPath("$.totalElements").value(0));
-        asAttendant(get("/admin/serviceOrders")
+        mockMvc.perform(get("/admin/serviceOrders")
                         .param("customerDocument", document.value())
-                        .param("licensePlate", uniquePlate()))
+                        .param("licensePlate", uniquePlate())
+                        .with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isEmpty());
     }
@@ -229,7 +222,7 @@ class ServiceOrderQueryIntegrationTest {
     void shouldDetailItemsQuoteStatusHistoryAndTimes() throws Exception {
         Long id = openServiceOrderWithItems(1, 1);
 
-        asAttendant(get("/admin/serviceOrders/{id}", id))
+        mockMvc.perform(get("/admin/serviceOrders/{id}", id).with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id))
                 .andExpect(jsonPath("$.status").value("AWAITING_APPROVAL"))
@@ -248,7 +241,7 @@ class ServiceOrderQueryIntegrationTest {
 
     @Test
     void shouldAnswer404ForAnUnknownServiceOrder() throws Exception {
-        asAttendant(get("/admin/serviceOrders/{id}", Long.MAX_VALUE))
+        mockMvc.perform(get("/admin/serviceOrders/{id}", Long.MAX_VALUE).with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("serviceOrder.notFound"));
     }
@@ -281,7 +274,7 @@ class ServiceOrderQueryIntegrationTest {
     private long statementsToRun(MockHttpServletRequestBuilder request) throws Exception {
         Statistics statistics = entityManagerFactory.unwrap(SessionFactory.class).getStatistics();
         statistics.clear();
-        asAttendant(request).andExpect(status().isOk());
+        mockMvc.perform(request.with(bearer(userId, Role.ATTENDANT))).andExpect(status().isOk());
         return statistics.getPrepareStatementCount();
     }
 
@@ -334,10 +327,5 @@ class ServiceOrderQueryIntegrationTest {
 
     private static Integer[] asInts(Long... ids) {
         return Arrays.stream(ids).map(Long::intValue).toArray(Integer[]::new);
-    }
-
-    private ResultActions asAttendant(MockHttpServletRequestBuilder request) throws Exception {
-        String token = tokenIssuer.issue(userId, Set.of(Role.ATTENDANT)).value();
-        return mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + token));
     }
 }

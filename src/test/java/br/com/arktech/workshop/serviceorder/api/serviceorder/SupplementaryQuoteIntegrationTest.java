@@ -1,5 +1,6 @@
 package br.com.arktech.workshop.serviceorder.api.serviceorder;
 
+import static br.com.arktech.workshop.TestUsers.bearer;
 import static br.com.arktech.workshop.UniqueTestData.uniqueCPF;
 import static br.com.arktech.workshop.UniqueTestData.uniquePlate;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -10,14 +11,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import br.com.arktech.workshop.IntegrationTest;
-import br.com.arktech.workshop.auth.application.port.TokenIssuer;
-import br.com.arktech.workshop.auth.domain.model.User;
-import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
-import br.com.arktech.workshop.auth.domain.repository.UserRepository;
+import br.com.arktech.workshop.TestUsers;
 import br.com.arktech.workshop.catalog.domain.model.ServiceOffering;
 import br.com.arktech.workshop.catalog.domain.repository.ServiceOfferingRepository;
 import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
-import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.shared.domain.money.Money;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
@@ -26,14 +23,11 @@ import com.jayway.jsonpath.JsonPath;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
@@ -47,16 +41,10 @@ class SupplementaryQuoteIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private TokenIssuer tokenIssuer;
+    private TestUsers testUsers;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordHasher passwordHasher;
 
     @Autowired
     private ServiceOfferingRepository serviceOfferingRepository;
@@ -75,37 +63,31 @@ class SupplementaryQuoteIntegrationTest {
 
     @BeforeEach
     void startTheExecutionWithAnApprovedQuote() throws Exception {
-        long suffix = ThreadLocalRandom.current().nextLong(1_000_000_000L);
-        userId = userRepository
-                .save(new User(
-                        "Atendente",
-                        new Email("atendente-%d@workshop.com".formatted(suffix)),
-                        "secret",
-                        Set.of(Role.ATTENDANT),
-                        passwordHasher))
-                .getId();
+        userId = testUsers.save(Role.ATTENDANT).getId();
         serviceOrderId = openServiceOrder();
         padId = createPart(10);
 
-        as(Role.MECHANIC, post("/admin/serviceOrders/{id}/startDiagnosis", serviceOrderId))
+        mockMvc.perform(post("/admin/serviceOrders/{id}/startDiagnosis", serviceOrderId)
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isOk());
         serviceItemId = addService(savedService());
         padItemId = addPart(padId, 2);
-        as(Role.MECHANIC, post("/admin/serviceOrders/{id}/sendQuote", serviceOrderId))
+        mockMvc.perform(post("/admin/serviceOrders/{id}/sendQuote", serviceOrderId).with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isOk());
-        as(Role.ATTENDANT, approve()).andExpect(status().isOk());
-        as(Role.MECHANIC, startExecution()).andExpect(status().isOk());
+        mockMvc.perform(approve().with(bearer(userId, Role.ATTENDANT))).andExpect(status().isOk());
+        mockMvc.perform(startExecution().with(bearer(userId, Role.MECHANIC))).andExpect(status().isOk());
     }
 
     @Test
     void shouldNotCountTheApprovedPartsAgainstTheAvailableStockWhenAddingDuringTheExecution() throws Exception {
         addPart(padId, 8);
 
-        as(Role.MECHANIC, post("/admin/serviceOrders/{id}/parts", serviceOrderId)
+        mockMvc.perform(post("/admin/serviceOrders/{id}/parts", serviceOrderId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"partId": %d, "quantity": 1}
-                                """.formatted(padId)))
+                                """.formatted(padId))
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("part.insufficientStock"));
         assertThat(stockOf(padId)).isEqualTo(8);
@@ -116,11 +98,11 @@ class SupplementaryQuoteIntegrationTest {
         Long filterId = createPart(10);
         addPart(filterId, 1);
 
-        as(Role.MECHANIC, sendQuote(true))
+        mockMvc.perform(sendQuote(true).with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("AWAITING_SUPPLEMENTARY_APPROVAL"))
                 .andExpect(jsonPath("$.canProceedWithoutChanges").value(true));
-        as(Role.ATTENDANT, approve())
+        mockMvc.perform(approve().with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("SUPPLEMENTARY_APPROVED"))
                 .andExpect(jsonPath("$.parts[1].approvedAt").isNotEmpty());
@@ -129,7 +111,7 @@ class SupplementaryQuoteIntegrationTest {
         assertThat(stockOf(filterId)).isEqualTo(9);
         assertThat(statusOf()).isEqualTo("SUPPLEMENTARY_APPROVED");
 
-        as(Role.MECHANIC, startExecution())
+        mockMvc.perform(startExecution().with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("IN_PROGRESS"));
         assertThat(statusHistory())
@@ -145,9 +127,10 @@ class SupplementaryQuoteIntegrationTest {
     void shouldDropTheNewItemsWhenOnlyTheOriginalQuoteIsApproved() throws Exception {
         Long filterId = createPart(10);
         addPart(filterId, 1);
-        as(Role.MECHANIC, sendQuote(true)).andExpect(status().isOk());
+        mockMvc.perform(sendQuote(true).with(bearer(userId, Role.MECHANIC))).andExpect(status().isOk());
 
-        as(Role.ATTENDANT, post("/admin/serviceOrders/{id}/approveOriginalOnly", serviceOrderId))
+        mockMvc.perform(post("/admin/serviceOrders/{id}/approveOriginalOnly", serviceOrderId)
+                        .with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("SUPPLEMENTARY_APPROVED"))
                 .andExpect(jsonPath("$.parts.length()").value(1));
@@ -160,15 +143,16 @@ class SupplementaryQuoteIntegrationTest {
     @Test
     void shouldReturnTheApprovedPartThatWasReplaced() throws Exception {
         Long filterId = createPart(10);
-        as(Role.MECHANIC, delete("/admin/serviceOrders/{id}/parts/{itemId}", serviceOrderId, padItemId))
+        mockMvc.perform(delete("/admin/serviceOrders/{id}/parts/{itemId}", serviceOrderId, padItemId)
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isNoContent());
         addPart(filterId, 1);
 
-        as(Role.MECHANIC, sendQuote(true))
+        mockMvc.perform(sendQuote(true).with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("serviceOrder.originalOnlyNotPossible"));
-        as(Role.MECHANIC, sendQuote(false)).andExpect(status().isOk());
-        as(Role.ATTENDANT, approve()).andExpect(status().isOk());
+        mockMvc.perform(sendQuote(false).with(bearer(userId, Role.MECHANIC))).andExpect(status().isOk());
+        mockMvc.perform(approve().with(bearer(userId, Role.ATTENDANT))).andExpect(status().isOk());
 
         assertThat(stockOf(padId)).isEqualTo(10);
         assertThat(stockOf(filterId)).isEqualTo(9);
@@ -179,17 +163,18 @@ class SupplementaryQuoteIntegrationTest {
     void shouldResendTheSameQuoteAfterARejectionWithoutMovingTheStock() throws Exception {
         Long filterId = createPart(10);
         Long filterItemId = addPart(filterId, 1);
-        as(Role.MECHANIC, sendQuote(true)).andExpect(status().isOk());
-        as(Role.ATTENDANT, reject())
+        mockMvc.perform(sendQuote(true).with(bearer(userId, Role.MECHANIC))).andExpect(status().isOk());
+        mockMvc.perform(reject().with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("SUPPLEMENTARY_REJECTED"));
-        as(Role.MECHANIC, post("/admin/serviceOrders/{id}/complete", serviceOrderId))
+        mockMvc.perform(post("/admin/serviceOrders/{id}/complete", serviceOrderId).with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isUnprocessableContent());
 
-        as(Role.MECHANIC, delete("/admin/serviceOrders/{id}/parts/{itemId}", serviceOrderId, filterItemId))
+        mockMvc.perform(delete("/admin/serviceOrders/{id}/parts/{itemId}", serviceOrderId, filterItemId)
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isNoContent());
-        as(Role.MECHANIC, sendQuote(true)).andExpect(status().isOk());
-        as(Role.ATTENDANT, approve()).andExpect(status().isOk());
+        mockMvc.perform(sendQuote(true).with(bearer(userId, Role.MECHANIC))).andExpect(status().isOk());
+        mockMvc.perform(approve().with(bearer(userId, Role.ATTENDANT))).andExpect(status().isOk());
 
         assertThat(stockOf(padId)).isEqualTo(8);
         assertThat(movementsOf(padId)).containsExactly("IN", "OUT");
@@ -199,14 +184,15 @@ class SupplementaryQuoteIntegrationTest {
     @Test
     void shouldReturnEveryPartWhenTheServiceOrderIsCanceledAfterARejection() throws Exception {
         addPart(createPart(10), 1);
-        as(Role.MECHANIC, sendQuote(true)).andExpect(status().isOk());
-        as(Role.ATTENDANT, reject()).andExpect(status().isOk());
+        mockMvc.perform(sendQuote(true).with(bearer(userId, Role.MECHANIC))).andExpect(status().isOk());
+        mockMvc.perform(reject().with(bearer(userId, Role.ATTENDANT))).andExpect(status().isOk());
 
-        as(Role.ATTENDANT, post("/admin/serviceOrders/{id}/cancel", serviceOrderId)
+        mockMvc.perform(post("/admin/serviceOrders/{id}/cancel", serviceOrderId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"reason": "Cliente desistiu do reparo"}
-                                """))
+                                """)
+                        .with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("CANCELED"));
 
@@ -218,22 +204,26 @@ class SupplementaryQuoteIntegrationTest {
     void shouldNotCompleteAServiceAddedDuringTheExecutionBeforeTheApproval() throws Exception {
         Long newServiceItemId = addService(savedService());
 
-        as(Role.MECHANIC, post(
-                        "/admin/serviceOrders/{id}/services/{itemId}/complete", serviceOrderId, newServiceItemId))
+        mockMvc.perform(post(
+                        "/admin/serviceOrders/{id}/services/{itemId}/complete", serviceOrderId, newServiceItemId)
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("serviceOrder.pendingItemCompletionNotAllowed"));
-        as(Role.MECHANIC, post(
-                        "/admin/serviceOrders/{id}/services/{itemId}/start", serviceOrderId, newServiceItemId))
+        mockMvc.perform(post(
+                        "/admin/serviceOrders/{id}/services/{itemId}/start", serviceOrderId, newServiceItemId)
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("serviceOrder.pendingItemStartNotAllowed"));
-        as(Role.MECHANIC, post(
-                        "/admin/serviceOrders/{id}/services/{itemId}/start", serviceOrderId, serviceItemId))
+        mockMvc.perform(post(
+                        "/admin/serviceOrders/{id}/services/{itemId}/start", serviceOrderId, serviceItemId)
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isOk());
-        as(Role.MECHANIC, post(
-                        "/admin/serviceOrders/{id}/services/{itemId}/complete", serviceOrderId, serviceItemId))
+        mockMvc.perform(post(
+                        "/admin/serviceOrders/{id}/services/{itemId}/complete", serviceOrderId, serviceItemId)
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("IN_PROGRESS"));
-        as(Role.MECHANIC, post("/admin/serviceOrders/{id}/complete", serviceOrderId))
+        mockMvc.perform(post("/admin/serviceOrders/{id}/complete", serviceOrderId).with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("serviceOrder.pendingServiceItems"));
     }
@@ -242,7 +232,7 @@ class SupplementaryQuoteIntegrationTest {
     void shouldLetTheCustomerChooseTheSupplementaryQuoteThroughTheirApi() throws Exception {
         Long filterId = createPart(10);
         addPart(filterId, 1);
-        as(Role.MECHANIC, sendQuote(true)).andExpect(status().isOk());
+        mockMvc.perform(sendQuote(true).with(bearer(userId, Role.MECHANIC))).andExpect(status().isOk());
 
         mockMvc.perform(get("/customer/serviceOrders/{publicId}", publicId())
                         .header("X-Customer-Document", customerDocument.value()))
@@ -264,9 +254,10 @@ class SupplementaryQuoteIntegrationTest {
 
     @Test
     void shouldReturnAReplacedPartWithoutUserWhenTheCustomerApproves() throws Exception {
-        as(Role.MECHANIC, delete("/admin/serviceOrders/{id}/parts/{itemId}", serviceOrderId, padItemId))
+        mockMvc.perform(delete("/admin/serviceOrders/{id}/parts/{itemId}", serviceOrderId, padItemId)
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isNoContent());
-        as(Role.MECHANIC, sendQuote(false)).andExpect(status().isOk());
+        mockMvc.perform(sendQuote(false).with(bearer(userId, Role.MECHANIC))).andExpect(status().isOk());
 
         mockMvc.perform(post("/customer/serviceOrders/{publicId}/approve", publicId())
                         .header("X-Customer-Document", customerDocument.value()))
@@ -309,20 +300,22 @@ class SupplementaryQuoteIntegrationTest {
     }
 
     private Long addService(Long serviceOfferingId) throws Exception {
-        return idOf(as(Role.MECHANIC, post("/admin/serviceOrders/{id}/services", serviceOrderId)
+        return idOf(mockMvc.perform(post("/admin/serviceOrders/{id}/services", serviceOrderId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"serviceOfferingId": %d, "quantity": 1}
-                                """.formatted(serviceOfferingId)))
+                                """.formatted(serviceOfferingId))
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isCreated()));
     }
 
     private Long addPart(Long partId, int quantity) throws Exception {
-        return idOf(as(Role.MECHANIC, post("/admin/serviceOrders/{id}/parts", serviceOrderId)
+        return idOf(mockMvc.perform(post("/admin/serviceOrders/{id}/parts", serviceOrderId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"partId": %d, "quantity": %d}
-                                """.formatted(partId, quantity)))
+                                """.formatted(partId, quantity))
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isCreated()));
     }
 
@@ -334,32 +327,33 @@ class SupplementaryQuoteIntegrationTest {
 
     private Long createPart(int stockQuantity) throws Exception {
         String sku = "SQ-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-        Long partId = idOf(as(Role.ADMIN, post("/admin/parts").contentType(MediaType.APPLICATION_JSON).content("""
+        Long partId = idOf(mockMvc.perform(post("/admin/parts").contentType(MediaType.APPLICATION_JSON).content("""
                         {"sku": "%s", "name": "Filtro de óleo", "type": "PART", "unit": "UNIT", "salePrice": 32,
                          "minimumStock": 1}
-                        """.formatted(sku)))
+                        """.formatted(sku)).with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isCreated()));
-        as(Role.ADMIN, post("/admin/parts/{id}/stockMovements", partId)
+        mockMvc.perform(post("/admin/parts/{id}/stockMovements", partId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"type": "IN", "quantity": %d}
-                                """.formatted(stockQuantity)))
+                                """.formatted(stockQuantity))
+                        .with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isCreated());
         return partId;
     }
 
     private Long openServiceOrder() throws Exception {
         customerDocument = uniqueCPF();
-        as(Role.ADMIN, post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
+        mockMvc.perform(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Ana", "document": "%s", "email": "ana@email.com"}
-                        """.formatted(customerDocument.value())))
+                        """.formatted(customerDocument.value())).with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isCreated());
-        return idOf(as(Role.ATTENDANT, post("/admin/serviceOrders").contentType(MediaType.APPLICATION_JSON).content("""
+        return idOf(mockMvc.perform(post("/admin/serviceOrders").contentType(MediaType.APPLICATION_JSON).content("""
                         {"customerDocument": "%s",
                          "vehicle": {"licensePlate": "%s", "brand": "Volkswagen", "model": "Gol", "year": 2020,
                                      "color": "Prata"},
                          "problemDescription": "Barulho ao frear"}
-                        """.formatted(customerDocument.value(), uniquePlate())))
+                        """.formatted(customerDocument.value(), uniquePlate())).with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isCreated()));
     }
 
@@ -374,7 +368,7 @@ class SupplementaryQuoteIntegrationTest {
     }
 
     private int stockOf(Long partId) throws Exception {
-        String body = as(Role.ADMIN, get("/admin/parts/{id}", partId))
+        String body = mockMvc.perform(get("/admin/parts/{id}", partId).with(bearer(userId, Role.ADMIN)))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -405,10 +399,5 @@ class SupplementaryQuoteIntegrationTest {
                 WHERE service_order_id = ? ORDER BY id DESC LIMIT 1
                 """,
                 serviceOrderId);
-    }
-
-    private ResultActions as(Role role, MockHttpServletRequestBuilder request) throws Exception {
-        String token = tokenIssuer.issue(userId, Set.of(role)).value();
-        return mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + token));
     }
 }

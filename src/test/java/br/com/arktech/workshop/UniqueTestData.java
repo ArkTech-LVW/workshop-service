@@ -3,6 +3,7 @@ package br.com.arktech.workshop;
 import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
 import br.com.arktech.workshop.shared.domain.vehicle.Chassis;
 
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
@@ -19,6 +20,10 @@ public final class UniqueTestData {
 
     public static CPFCNPJ uniqueCNPJ() {
         return withCheckDigits("%08d0001".formatted(ThreadLocalRandom.current().nextLong(100_000_000L)));
+    }
+
+    public static String uniqueEmail() {
+        return "user-" + UUID.randomUUID() + "@workshop.com";
     }
 
     public static String uniquePlate() {

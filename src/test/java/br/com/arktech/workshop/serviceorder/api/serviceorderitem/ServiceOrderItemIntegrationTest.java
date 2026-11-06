@@ -1,5 +1,6 @@
 package br.com.arktech.workshop.serviceorder.api.serviceorderitem;
 
+import static br.com.arktech.workshop.TestUsers.bearer;
 import static br.com.arktech.workshop.UniqueTestData.uniqueCPF;
 import static br.com.arktech.workshop.UniqueTestData.uniquePlate;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -9,10 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import br.com.arktech.workshop.IntegrationTest;
-import br.com.arktech.workshop.auth.application.port.TokenIssuer;
-import br.com.arktech.workshop.auth.domain.model.User;
-import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
-import br.com.arktech.workshop.auth.domain.repository.UserRepository;
+import br.com.arktech.workshop.TestUsers;
 import br.com.arktech.workshop.catalog.domain.model.ServiceOffering;
 import br.com.arktech.workshop.catalog.domain.repository.ServiceOfferingRepository;
 import br.com.arktech.workshop.inventory.domain.model.MeasurementUnit;
@@ -23,7 +21,6 @@ import br.com.arktech.workshop.inventory.domain.repository.PartRepository;
 import br.com.arktech.workshop.serviceorder.domain.model.ServiceOrder;
 import br.com.arktech.workshop.serviceorder.domain.repository.ServiceOrderRepository;
 import br.com.arktech.workshop.shared.domain.document.CPFCNPJ;
-import br.com.arktech.workshop.shared.domain.email.Email;
 import br.com.arktech.workshop.shared.domain.money.Money;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
@@ -31,13 +28,11 @@ import com.jayway.jsonpath.JsonPath;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
@@ -55,19 +50,13 @@ class ServiceOrderItemIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private TokenIssuer tokenIssuer;
+    private TestUsers testUsers;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private TransactionTemplate transactionTemplate;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordHasher passwordHasher;
 
     @Autowired
     private ServiceOfferingRepository serviceOfferingRepository;
@@ -84,15 +73,7 @@ class ServiceOrderItemIntegrationTest {
 
     @BeforeEach
     void openAServiceOrder() throws Exception {
-        long suffix = ThreadLocalRandom.current().nextLong(1_000_000_000L);
-        userId = userRepository
-                .save(new User(
-                        "Mecânico",
-                        new Email("mecanico-%d@workshop.com".formatted(suffix)),
-                        "secret",
-                        Set.of(Role.MECHANIC),
-                        passwordHasher))
-                .getId();
+        userId = testUsers.save(Role.MECHANIC).getId();
         serviceOrderId = openServiceOrder();
     }
 
@@ -103,13 +84,15 @@ class ServiceOrderItemIntegrationTest {
 
     @Test
     void shouldLetMechanicsBuildAndUndoTheQuote() throws Exception {
-        Long serviceItemId = idOf(as(Role.MECHANIC, addService(serviceOrderId, savedService(LABOR_PRICE), 2))
+        Long serviceItemId = idOf(mockMvc.perform(addService(serviceOrderId, savedService(LABOR_PRICE), 2)
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.quantity").value(2))
                 .andExpect(jsonPath("$.unitPrice").value(150.0))
                 .andExpect(jsonPath("$.subtotal").value(300.0))
                 .andExpect(jsonPath("$.serviceOrderTotalPrice").value(300.0)));
-        Long partItemId = idOf(as(Role.MECHANIC, addPart(serviceOrderId, savedPart(5), 3))
+        Long partItemId = idOf(mockMvc.perform(addPart(serviceOrderId, savedPart(5), 3)
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.unitPrice").value(35.9))
                 .andExpect(jsonPath("$.subtotal").value(107.7))
@@ -118,9 +101,11 @@ class ServiceOrderItemIntegrationTest {
                 .andExpect(jsonPath("$.insufficientStock").doesNotExist()));
         assertThat(totalPrice()).isEqualByComparingTo("407.70");
 
-        as(Role.MECHANIC, delete("/admin/serviceOrders/{id}/services/{itemId}", serviceOrderId, serviceItemId))
+        mockMvc.perform(delete("/admin/serviceOrders/{id}/services/{itemId}", serviceOrderId, serviceItemId)
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isNoContent());
-        as(Role.MECHANIC, delete("/admin/serviceOrders/{id}/parts/{itemId}", serviceOrderId, partItemId))
+        mockMvc.perform(delete("/admin/serviceOrders/{id}/parts/{itemId}", serviceOrderId, partItemId)
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isNoContent());
 
         assertThat(itemCount()).isZero();
@@ -130,12 +115,13 @@ class ServiceOrderItemIntegrationTest {
     @Test
     void shouldKeepThePriceOfTheMomentOfInclusion() throws Exception {
         Long serviceOfferingId = savedService(LABOR_PRICE);
-        as(Role.ATTENDANT, addService(serviceOrderId, serviceOfferingId, 1)).andExpect(status().isCreated());
+        mockMvc.perform(addService(serviceOrderId, serviceOfferingId, 1).with(bearer(userId, Role.ATTENDANT)))
+                .andExpect(status().isCreated());
         ServiceOffering serviceOffering = serviceOfferingRepository.findRequiredById(serviceOfferingId);
         serviceOffering.changeLaborPrice(new Money(new BigDecimal("200.00")));
         serviceOfferingRepository.save(serviceOffering);
 
-        as(Role.ATTENDANT, addService(serviceOrderId, serviceOfferingId, 1))
+        mockMvc.perform(addService(serviceOrderId, serviceOfferingId, 1).with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.unitPrice").value(200.0))
                 .andExpect(jsonPath("$.serviceOrderTotalPrice").value(350.0));
@@ -154,22 +140,22 @@ class ServiceOrderItemIntegrationTest {
         inactive.deactivate();
         serviceOfferingRepository.save(inactive);
 
-        as(Role.MECHANIC, addService(serviceOrderId, inactive.getId(), 1))
+        mockMvc.perform(addService(serviceOrderId, inactive.getId(), 1).with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("serviceOffering.inactive"));
-        as(Role.MECHANIC, addService(serviceOrderId, Long.MAX_VALUE, 1))
+        mockMvc.perform(addService(serviceOrderId, Long.MAX_VALUE, 1).with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("serviceOffering.notFound"));
-        as(Role.MECHANIC, addPart(serviceOrderId, Long.MAX_VALUE, 1))
+        mockMvc.perform(addPart(serviceOrderId, Long.MAX_VALUE, 1).with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("part.notFound"));
-        as(Role.MECHANIC, addService(Long.MAX_VALUE, savedService(LABOR_PRICE), 1))
+        mockMvc.perform(addService(Long.MAX_VALUE, savedService(LABOR_PRICE), 1).with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("serviceOrder.notFound"));
-        as(Role.MECHANIC, addPart(serviceOrderId, savedPart(5), 1000))
+        mockMvc.perform(addPart(serviceOrderId, savedPart(5), 1000).with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.details[0].field").value("quantity"));
-        as(Role.MECHANIC, addPart(serviceOrderId, savedPart(2), 3))
+        mockMvc.perform(addPart(serviceOrderId, savedPart(2), 3).with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("part.insufficientStock"));
 
@@ -178,14 +164,16 @@ class ServiceOrderItemIntegrationTest {
 
     @Test
     void shouldLockTheItemsOnceTheQuoteIsSent() throws Exception {
-        Long serviceItemId = idOf(as(Role.MECHANIC, addService(serviceOrderId, savedService(LABOR_PRICE), 1))
+        Long serviceItemId = idOf(mockMvc.perform(addService(serviceOrderId, savedService(LABOR_PRICE), 1)
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isCreated()));
         sendQuote();
 
-        as(Role.MECHANIC, addPart(serviceOrderId, savedPart(5), 1))
+        mockMvc.perform(addPart(serviceOrderId, savedPart(5), 1).with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("serviceOrder.itemsLocked"));
-        as(Role.MECHANIC, delete("/admin/serviceOrders/{id}/services/{itemId}", serviceOrderId, serviceItemId))
+        mockMvc.perform(delete("/admin/serviceOrders/{id}/services/{itemId}", serviceOrderId, serviceItemId)
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("serviceOrder.itemsLocked"));
 
@@ -194,11 +182,13 @@ class ServiceOrderItemIntegrationTest {
 
     @Test
     void shouldRefuseATotalAboveWhatTheColumnHolds() throws Exception {
-        as(Role.MECHANIC, addService(serviceOrderId, savedService(new Money(new BigDecimal("9999999999.99"))), 1))
+        mockMvc.perform(addService(serviceOrderId, savedService(new Money(new BigDecimal("9999999999.99"))), 1)
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.serviceOrderTotalPrice").value(9999999999.99));
 
-        as(Role.MECHANIC, addService(serviceOrderId, savedService(new Money(new BigDecimal("1.00"))), 1))
+        mockMvc.perform(addService(serviceOrderId, savedService(new Money(new BigDecimal("1.00"))), 1)
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("serviceOrder.totalPriceTooHigh"));
 
@@ -208,11 +198,13 @@ class ServiceOrderItemIntegrationTest {
 
     @Test
     void shouldNotRemoveAnItemThroughAnotherServiceOrder() throws Exception {
-        Long serviceItemId = idOf(as(Role.MECHANIC, addService(serviceOrderId, savedService(LABOR_PRICE), 1))
+        Long serviceItemId = idOf(mockMvc.perform(addService(serviceOrderId, savedService(LABOR_PRICE), 1)
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isCreated()));
         Long otherServiceOrderId = openServiceOrder();
 
-        as(Role.MECHANIC, delete("/admin/serviceOrders/{id}/services/{itemId}", otherServiceOrderId, serviceItemId))
+        mockMvc.perform(delete("/admin/serviceOrders/{id}/services/{itemId}", otherServiceOrderId, serviceItemId)
+                        .with(bearer(userId, Role.MECHANIC)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("serviceOrder.itemNotFound"));
 
@@ -221,16 +213,16 @@ class ServiceOrderItemIntegrationTest {
 
     private Long openServiceOrder() throws Exception {
         CPFCNPJ document = uniqueCPF();
-        as(Role.ADMIN, post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
+        mockMvc.perform(post("/admin/customers").contentType(MediaType.APPLICATION_JSON).content("""
                         {"name": "Ana", "document": "%s", "email": "ana@email.com"}
-                        """.formatted(document.value())))
+                        """.formatted(document.value())).with(bearer(userId, Role.ADMIN)))
                 .andExpect(status().isCreated());
-        return idOf(as(Role.ATTENDANT, post("/admin/serviceOrders").contentType(MediaType.APPLICATION_JSON).content("""
+        return idOf(mockMvc.perform(post("/admin/serviceOrders").contentType(MediaType.APPLICATION_JSON).content("""
                         {"customerDocument": "%s",
                          "vehicle": {"licensePlate": "%s", "brand": "Volkswagen", "model": "Gol", "year": 2020,
                                      "color": "Prata"},
                          "problemDescription": "Barulho ao frear"}
-                        """.formatted(document.value(), uniquePlate())))
+                        """.formatted(document.value(), uniquePlate())).with(bearer(userId, Role.ATTENDANT)))
                 .andExpect(status().isCreated()));
     }
 
@@ -286,11 +278,6 @@ class ServiceOrderItemIntegrationTest {
                 .content("""
                         {"partId": %d, "quantity": %d}
                         """.formatted(partId, quantity));
-    }
-
-    private ResultActions as(Role role, MockHttpServletRequestBuilder request) throws Exception {
-        String token = tokenIssuer.issue(userId, Set.of(role)).value();
-        return mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + token));
     }
 
     private static Long idOf(ResultActions result) throws Exception {

@@ -1,5 +1,6 @@
 package br.com.arktech.workshop.auth.infrastructure.ratelimit;
 
+import static br.com.arktech.workshop.TestUsers.bearer;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -7,14 +8,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import br.com.arktech.workshop.IntegrationTest;
-import br.com.arktech.workshop.auth.application.port.TokenIssuer;
-import br.com.arktech.workshop.auth.domain.model.User;
-import br.com.arktech.workshop.auth.domain.port.PasswordHasher;
-import br.com.arktech.workshop.auth.domain.repository.UserRepository;
-import br.com.arktech.workshop.shared.domain.email.Email;
+import br.com.arktech.workshop.TestUsers;
 import br.com.arktech.workshop.shared.domain.security.Role;
 
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -53,13 +49,7 @@ class RateLimitIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordHasher passwordHasher;
-
-    @Autowired
-    private TokenIssuer tokenIssuer;
+    private TestUsers testUsers;
 
     @Test
     void shouldRejectLoginOverTheEmailLimitEvenWithTheRightPassword() throws Exception {
@@ -107,16 +97,16 @@ class RateLimitIntegrationTest {
     @Test
     void shouldLimitOtherRoutesPerLoggedUser() throws Exception {
         String ip = newIp();
-        String token = tokenFor(randomUserId());
+        Long userId = randomUserId();
         for (int i = 0; i < 4; i++) {
-            mockMvc.perform(from(ip, me(token))).andExpect(status().isOk());
+            mockMvc.perform(from(ip, me(userId))).andExpect(status().isOk());
         }
 
-        mockMvc.perform(from(ip, me(token)))
+        mockMvc.perform(from(ip, me(userId)))
                 .andExpect(status().isTooManyRequests())
                 .andExpect(header().exists(HttpHeaders.RETRY_AFTER))
                 .andExpect(content().json(TOO_MANY_REQUESTS, JsonCompareMode.STRICT));
-        mockMvc.perform(from(ip, me(tokenFor(randomUserId())))).andExpect(status().isOk());
+        mockMvc.perform(from(ip, me(randomUserId()))).andExpect(status().isOk());
     }
 
     @Test
@@ -150,9 +140,7 @@ class RateLimitIntegrationTest {
     }
 
     private String saveUser() {
-        String email = "user-" + UUID.randomUUID() + "@workshop.com";
-        userRepository.save(new User("Ana", new Email(email), PASSWORD, Set.of(Role.ATTENDANT), passwordHasher));
-        return email;
+        return testUsers.save(PASSWORD, Role.ATTENDANT).getEmail().value();
     }
 
     private void failLogin(String email, String ip, int times) throws Exception {
@@ -168,12 +156,8 @@ class RateLimitIntegrationTest {
         return mockMvc.perform(from(ip, post("/auth/login").contentType(MediaType.APPLICATION_JSON).content(body)));
     }
 
-    private MockHttpServletRequestBuilder me(String token) {
-        return get("/test/security/me").header(HttpHeaders.AUTHORIZATION, "Bearer " + token);
-    }
-
-    private String tokenFor(Long userId) {
-        return tokenIssuer.issue(userId, Set.of(Role.ATTENDANT)).value();
+    private MockHttpServletRequestBuilder me(Long userId) {
+        return get("/test/security/me").with(bearer(userId, Role.ATTENDANT));
     }
 
     private static MockHttpServletRequestBuilder from(String ip, MockHttpServletRequestBuilder request) {
